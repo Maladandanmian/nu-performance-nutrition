@@ -1,6 +1,13 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, users,
+  InsertClient, clients,
+  InsertNutritionGoal, nutritionGoals,
+  InsertMeal, meals,
+  InsertDrink, drinks,
+  InsertBodyMetric, bodyMetrics
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +96,108 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Client management queries
+export async function createClient(client: InsertClient) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(clients).values(client);
+  return result;
+}
+
+export async function getClientsByTrainerId(trainerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(clients).where(eq(clients.trainerId, trainerId));
+}
+
+export async function getClientById(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(clients).where(eq(clients.id, clientId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getClientByPIN(pin: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(clients).where(eq(clients.pin, pin)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateClient(clientId: number, data: Partial<InsertClient>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(clients).set(data).where(eq(clients.id, clientId));
+}
+
+export async function deleteClient(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(clients).where(eq(clients.id, clientId));
+}
+
+// Nutrition goals queries
+export async function createNutritionGoal(goal: InsertNutritionGoal) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(nutritionGoals).values(goal);
+}
+
+export async function getNutritionGoalByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(nutritionGoals).where(eq(nutritionGoals.clientId, clientId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateNutritionGoal(clientId: number, data: Partial<InsertNutritionGoal>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(nutritionGoals).set(data).where(eq(nutritionGoals.clientId, clientId));
+}
+
+// Meal queries
+export async function createMeal(meal: InsertMeal) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(meals).values(meal);
+}
+
+export async function getMealsByClientId(clientId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(meals).where(eq(meals.clientId, clientId)).orderBy(meals.loggedAt).limit(limit);
+}
+
+export async function getMealById(mealId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(meals).where(eq(meals.id, mealId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Drink queries
+export async function createDrink(drink: InsertDrink) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(drinks).values(drink);
+}
+
+export async function getDrinksByClientId(clientId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drinks).where(eq(drinks.clientId, clientId)).orderBy(drinks.loggedAt).limit(limit);
+}
+
+// Body metrics queries
+export async function createBodyMetric(metric: InsertBodyMetric) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(bodyMetrics).values(metric);
+}
+
+export async function getBodyMetricsByClientId(clientId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(bodyMetrics).where(eq(bodyMetrics.clientId, clientId)).orderBy(bodyMetrics.recordedAt).limit(limit);
+}
