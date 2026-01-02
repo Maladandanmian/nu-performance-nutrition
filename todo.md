@@ -77,3 +77,8 @@
 - [x] Update homepage to display logo in white circle
 - [x] Update favicon with logo
 - [x] Test logo display on all pages
+
+## Multi-Trainer Support
+- [x] Add Luke@nuperformancecoaching.com as additional trainer
+- [x] Update authentication to support multiple admin users
+- [x] Test Luke's login and trainer access
