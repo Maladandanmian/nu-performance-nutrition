@@ -103,6 +103,18 @@ export default function ClientDashboard() {
 
   const utils = trpc.useUtils();
   
+  const recalculateScoreMutation = trpc.meals.recalculateScore.useMutation({
+    onSuccess: (data) => {
+      if (data.success && analysisResult) {
+        setAnalysisResult({
+          ...analysisResult,
+          score: data.score,
+        });
+        toast.success('Meal score updated');
+      }
+    },
+  });
+
   const saveMealMutation = trpc.meals.saveMeal.useMutation({
     onSuccess: () => {
       toast.success('Meal logged successfully!');
@@ -610,10 +622,34 @@ export default function ClientDashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsEditMode(!isEditMode)}
+                    onClick={async () => {
+                      if (isEditMode) {
+                        // Recalculate score when done editing
+                        await recalculateScoreMutation.mutateAsync({
+                          clientId: currentClientId,
+                          calories: calculatedTotals.calories,
+                          protein: calculatedTotals.protein,
+                          fat: calculatedTotals.fat,
+                          carbs: calculatedTotals.carbs,
+                          fibre: calculatedTotals.fibre,
+                        });
+                        // Clear old improvement advice since meal has changed
+                        setShowAdvice(false);
+                        setImprovementAdvice("");
+                      }
+                      setIsEditMode(!isEditMode);
+                    }}
                     className="text-xs"
+                    disabled={recalculateScoreMutation.isPending}
                   >
-                    {isEditMode ? 'Done Editing' : 'Edit Meal'}
+                    {recalculateScoreMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      isEditMode ? 'Done Editing' : 'Edit Meal'
+                    )}
                   </Button>
                 </div>
                 <div className="space-y-2 max-h-64 overflow-y-auto">

@@ -94,3 +94,12 @@
 - [x] Pass image context to AI for accurate portion estimation
 - [x] Display loading state during re-analysis
 - [x] Test with various food substitutions (milk types, protein sources, etc.)
+
+## AI-Powered Add Component
+- [x] Create AI endpoint to estimate nutrition from food name + quantity
+- [x] Update AddComponentForm to use food name and quantity inputs
+- [x] Remove manual nutrition entry fields from add component form
+- [x] Recalculate meal score after adding components
+- [x] Update improvement advice based on complete edited meal
+- [x] Save updated meal to database (replace original)
+- [x] Test with various food items and quantities

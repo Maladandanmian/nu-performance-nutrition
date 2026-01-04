@@ -10,6 +10,7 @@ import { analyzeMealImage, calculateNutritionScore } from "./qwenVision";
 import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvementAdvice";
 import { estimateBeverageNutrition } from "./beverageNutrition";
 import { reEstimateComponentNutrition } from "./componentReEstimation";
+import { estimateFoodNutrition } from "./foodQuantityEstimation";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -619,6 +620,98 @@ export const appRouter = router({
             fibre: goals?.fibreTarget || 0,
           },
         };
+      }),
+
+    estimateFood: authenticatedProcedure
+      .input(z.object({
+        foodName: z.string(),
+        quantity: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const nutrition = await estimateFoodNutrition(
+            input.foodName,
+            input.quantity
+          );
+          return {
+            success: true,
+            nutrition,
+          };
+        } catch (error) {
+          console.error('Error in estimateFood:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to estimate food nutrition',
+          });
+        }
+      }),
+
+    recalculateScore: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        calories: z.number(),
+        protein: z.number(),
+        fat: z.number(),
+        carbs: z.number(),
+        fibre: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // Get client's nutrition goals
+          const goals = await db.getNutritionGoalByClientId(input.clientId);
+          if (!goals) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Nutrition goals not found for this client' 
+            });
+          }
+
+          // Calculate today's totals (before this meal)
+          const allMeals = await db.getMealsByClientId(input.clientId);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const todaysMeals = allMeals.filter(meal => {
+            const mealDate = new Date(meal.loggedAt);
+            mealDate.setHours(0, 0, 0, 0);
+            return mealDate.getTime() === today.getTime();
+          });
+          
+          const todaysTotals = todaysMeals.reduce(
+            (totals, meal) => ({
+              calories: totals.calories + (meal.calories || 0) + (meal.beverageCalories || 0),
+              protein: totals.protein + (meal.protein || 0) + (meal.beverageProtein || 0),
+              fat: totals.fat + (meal.fat || 0) + (meal.beverageFat || 0),
+              carbs: totals.carbs + (meal.carbs || 0) + (meal.beverageCarbs || 0),
+              fibre: totals.fibre + (meal.fibre || 0) + (meal.beverageFibre || 0),
+            }),
+            { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
+          );
+
+          // Calculate nutrition score with quality + progress
+          const score = calculateNutritionScore(
+            {
+              calories: input.calories,
+              protein: input.protein,
+              fat: input.fat,
+              carbs: input.carbs,
+              fibre: input.fibre,
+            },
+            goals,
+            todaysTotals
+          );
+
+          return {
+            success: true,
+            score,
+          };
+        } catch (error) {
+          console.error('Error in recalculateScore:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to recalculate score',
+          });
+        }
       }),
 
     reEstimateComponent: authenticatedProcedure
