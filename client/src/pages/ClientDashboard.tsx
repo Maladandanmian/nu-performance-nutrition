@@ -376,7 +376,7 @@ export default function ClientDashboard() {
                   Log Your Meal
                 </CardTitle>
                 <CardDescription>
-                  Take a photo of your meal or nutrition label for AI analysis
+                  Take a photo or select from gallery for AI analysis
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -399,7 +399,6 @@ export default function ClientDashboard() {
                       id="meal-image"
                       type="file"
                       accept="image/*"
-                      capture="environment"
                       onChange={handleFileChange}
                       className="flex-1"
                     />

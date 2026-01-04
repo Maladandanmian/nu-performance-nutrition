@@ -82,3 +82,8 @@
 - [x] Add Luke@nuperformancecoaching.com as additional trainer
 - [x] Update authentication to support multiple admin users
 - [x] Test Luke's login and trainer access
+
+## Image Upload Enhancement
+- [x] Update meal photo input to support both camera and gallery
+- [x] Test on iOS devices
+- [x] Test on Android devices
