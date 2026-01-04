@@ -90,7 +90,7 @@ export default function TodaysSummary({ clientId }: TodaysSummaryProps) {
         <div className="animate-pulse">
           <div className="h-6 bg-muted rounded w-48 mb-4"></div>
           <div className="flex gap-4 justify-around">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 <div className="w-24 h-24 bg-muted rounded-full"></div>
                 <div className="h-4 bg-muted rounded w-16"></div>
@@ -156,6 +156,14 @@ export default function TodaysSummary({ clientId }: TodaysSummaryProps) {
       unit: "g",
       emoji: "🌾",
       color: "#84cc16",
+    },
+    {
+      label: "Hydration",
+      value: today.hydration || 0,
+      max: goals.hydrationTarget,
+      unit: "ml",
+      emoji: "💧",
+      color: "#06b6d4",
     },
   ];
 

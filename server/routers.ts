@@ -541,6 +541,9 @@ export const appRouter = router({
         const meals = await db.getMealsByClientId(input.clientId);
         const goals = await db.getNutritionGoalByClientId(input.clientId);
         
+        // Get body metrics for hydration data
+        const bodyMetrics = await db.getBodyMetricsByClientId(input.clientId);
+        
         // Group meals by date and sum nutrients
         const dailyMap = new Map<string, {
           date: string;
@@ -549,6 +552,7 @@ export const appRouter = router({
           fat: number;
           carbs: number;
           fibre: number;
+          hydration: number;
         }>();
         
         // Calculate date range in client's timezone
@@ -587,6 +591,7 @@ export const appRouter = router({
             fat: 0,
             carbs: 0,
             fibre: 0,
+            hydration: 0,
           };
           
           // Sum meal nutrients
@@ -606,6 +611,20 @@ export const appRouter = router({
           dailyMap.set(dateKey, existing);
         });
         
+        // Add hydration data from body metrics
+        bodyMetrics.forEach(metric => {
+          if (!metric.hydration) return;
+          
+          const metricDate = new Date(metric.recordedAt);
+          const metricDateUTC = new Date(metricDate.getTime() - (timezoneOffset * 60 * 1000));
+          const dateKey = metricDateUTC.toISOString().split('T')[0];
+          
+          const existing = dailyMap.get(dateKey);
+          if (existing) {
+            existing.hydration += metric.hydration;
+          }
+        });
+        
         // Convert to array and sort by date
         const dailyTotals = Array.from(dailyMap.values())
           .sort((a, b) => a.date.localeCompare(b.date));
@@ -618,6 +637,7 @@ export const appRouter = router({
             fat: goals?.fatTarget || 0,
             carbs: goals?.carbsTarget || 0,
             fibre: goals?.fibreTarget || 0,
+            hydration: goals?.hydrationTarget || 0,
           },
         };
       }),

@@ -103,3 +103,10 @@
 - [x] Update improvement advice based on complete edited meal
 - [x] Save updated meal to database (replace original)
 - [x] Test with various food items and quantities
+
+## Hydration in Today's Summary
+- [x] Add hydration indicator to TodaysSummary component
+- [x] Display current hydration vs target (ml)
+- [x] Show circular progress indicator for hydration
+- [x] Ensure hydration data is fetched from body_metrics table
+- [x] Test hydration display with various intake levels
