@@ -623,6 +623,7 @@ export default function ClientDashboard() {
                       component={component}
                       index={index}
                       isEditMode={isEditMode}
+                      imageUrl={imageUrl}
                       onUpdate={(updated) => {
                         const newComponents = [...editedComponents];
                         newComponents[index] = updated;

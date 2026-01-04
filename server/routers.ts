@@ -9,6 +9,7 @@ import { storagePut } from "./storage";
 import { analyzeMealImage, calculateNutritionScore } from "./qwenVision";
 import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvementAdvice";
 import { estimateBeverageNutrition } from "./beverageNutrition";
+import { reEstimateComponentNutrition } from "./componentReEstimation";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -618,6 +619,30 @@ export const appRouter = router({
             fibre: goals?.fibreTarget || 0,
           },
         };
+      }),
+
+    reEstimateComponent: authenticatedProcedure
+      .input(z.object({
+        componentName: z.string(),
+        imageUrl: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const nutrition = await reEstimateComponentNutrition(
+            input.componentName,
+            input.imageUrl
+          );
+          return {
+            success: true,
+            nutrition,
+          };
+        } catch (error) {
+          console.error('Error in reEstimateComponent:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to re-estimate component nutrition',
+          });
+        }
       }),
 
     get: protectedProcedure

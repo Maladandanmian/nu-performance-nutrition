@@ -87,3 +87,10 @@
 - [x] Update meal photo input to support both camera and gallery
 - [x] Test on iOS devices
 - [x] Test on Android devices
+
+## AI Re-Analysis for Edited Components
+- [x] Create tRPC endpoint for AI-powered component re-estimation
+- [x] Update ComponentEditor to call AI re-analysis when description changes
+- [x] Pass image context to AI for accurate portion estimation
+- [x] Display loading state during re-analysis
+- [x] Test with various food substitutions (milk types, protein sources, etc.)
