@@ -490,6 +490,19 @@ export default function ClientDashboard() {
                       />
                     </div>
                   </div>
+                  
+                  {/* Volume Reference Guide */}
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs font-medium text-gray-700 mb-2">Quick Reference:</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
+                      <div>• Glass = 250ml</div>
+                      <div>• Mug = 350ml</div>
+                      <div>• Water Bottle = 500ml</div>
+                      <div>• Can = 330ml</div>
+                      <div>• Wine Glass = 150ml</div>
+                      <div>• Shot = 30ml</div>
+                    </div>
+                  </div>
 
                 </div>
 

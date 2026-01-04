@@ -117,3 +117,9 @@
 - [x] Clear notes textarea
 - [x] Clear drink type and volume fields
 - [x] Test form reset with various meal logging scenarios
+
+## Drink Volume Reference Guide
+- [x] Add common drink container volumes beneath drink entry section
+- [x] Include 6 typical containers with ml equivalents
+- [x] Style as compact reference list
+- [x] Test visibility and usability
