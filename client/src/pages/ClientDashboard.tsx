@@ -17,7 +17,7 @@ import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
 import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
 import { Camera, Droplets, LogOut, Scale, Upload } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
@@ -45,6 +45,7 @@ export default function ClientDashboard() {
   const [improvementAdvice, setImprovementAdvice] = useState<string>("");
   const [showAdvice, setShowAdvice] = useState(false);
   const [beverageNutrition, setBeverageNutrition] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate totals from edited components + beverage
   const calculatedTotals = useMemo(() => {
@@ -93,8 +94,17 @@ export default function ClientDashboard() {
       setImageKey(data.imageKey);
       setIsEditMode(false);
       setShowAnalysisModal(true);
+      // Reset all form fields
       setSelectedFile(null);
+      setMealType("lunch");
       setMealNotes("");
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
+      // Reset file input element
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     },
     onError: (error) => {
       toast.error(`Failed to analyze meal: ${error.message}`);
@@ -413,6 +423,7 @@ export default function ClientDashboard() {
                       accept="image/*"
                       onChange={handleFileChange}
                       className="flex-1"
+                      ref={fileInputRef}
                     />
                     {selectedFile && (
                       <span className="text-sm text-gray-600">{selectedFile.name}</span>

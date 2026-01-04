@@ -110,3 +110,10 @@
 - [x] Show circular progress indicator for hydration
 - [x] Ensure hydration data is fetched from body_metrics table
 - [x] Test hydration display with various intake levels
+
+## Form Reset After Meal Logging
+- [x] Clear meal photo input after successful submission
+- [x] Reset meal type to default value
+- [x] Clear notes textarea
+- [x] Clear drink type and volume fields
+- [x] Test form reset with various meal logging scenarios
