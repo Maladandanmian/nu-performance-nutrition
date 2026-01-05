@@ -253,3 +253,8 @@
 - [x] Add cleanup function to delete test clients after tests
 - [x] Update test files to use cleanup in afterEach
 - [x] Verify main database remains clean after test runs
+
+## Water Logging Bug (Jan 5, 2026)
+- [x] Fix "beverage could not be logged" error for plain water
+- [x] Add special handling to skip estimation for water
+- [x] Allow logging water directly without Analyse button

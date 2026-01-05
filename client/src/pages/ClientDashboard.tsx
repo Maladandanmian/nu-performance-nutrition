@@ -838,27 +838,54 @@ export default function ClientDashboard() {
                 </div>
               </div>
               {drinkType && volumeMl && !analysisResult?.isDrink && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    estimateBeverageMutation.mutate({
-                      drinkType,
-                      volumeMl: parseInt(volumeMl),
-                    });
-                  }}
-                  disabled={estimateBeverageMutation.isPending}
-                  className="w-full text-xs"
-                >
-                  {estimateBeverageMutation.isPending ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
-                      Estimating...
-                    </>
+                <>
+                  {/* Special handling for plain water - auto-estimate */}
+                  {drinkType.toLowerCase().trim() === 'water' ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Auto-set water nutrition values
+                        setBeverageNutrition({
+                          drinkType: 'Water',
+                          volumeMl: parseInt(volumeMl),
+                          calories: 0,
+                          protein: 0,
+                          fat: 0,
+                          carbs: 0,
+                          fibre: 0,
+                          confidence: 100,
+                          description: 'Plain water has no calories or nutrients'
+                        });
+                      }}
+                      className="w-full text-xs"
+                    >
+                      {beverageNutrition ? '✓ Water Logged' : 'Log Water'}
+                    </Button>
                   ) : (
-                    beverageNutrition ? '✓ Beverage Estimated' : 'Estimate Beverage Nutrition'
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        estimateBeverageMutation.mutate({
+                          drinkType,
+                          volumeMl: parseInt(volumeMl),
+                        });
+                      }}
+                      disabled={estimateBeverageMutation.isPending}
+                      className="w-full text-xs"
+                    >
+                      {estimateBeverageMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
+                          Estimating...
+                        </>
+                      ) : (
+                        beverageNutrition ? '✓ Beverage Estimated' : 'Estimate Beverage Nutrition'
+                      )}
+                    </Button>
                   )}
-                </Button>
+                </>
               )}
               {drinkType && volumeMl && analysisResult?.isDrink && (
                 <div className="text-xs text-green-600 font-medium text-center py-2">✓ Beverage Estimated</div>
