@@ -169,4 +169,9 @@
 ## Logout Redirect Fix (Jan 5, 2026)
 - [x] Update ClientDashboard logout to redirect to home page instead of Manus OAuth
 - [x] Remove auto-redirect from home page for client sessions
-- [ ] Test logout flow from client dashboard
+- [x] Test logout flow from client dashboard
+
+## React Hooks Order Error Fix (Jan 5, 2026)
+- [x] Move deleteMealMutation and other hooks to top of ClientDashboard
+- [x] Ensure all hooks are called before any conditional returns
+- [x] Test that error is resolved

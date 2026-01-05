@@ -114,6 +114,17 @@ export default function ClientDashboard() {
 
   const utils = trpc.useUtils();
   
+  const deleteMealMutation = trpc.meals.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meal deleted successfully!");
+      utils.meals.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+  
   const recalculateScoreMutation = trpc.meals.recalculateScore.useMutation({
     onSuccess: (data) => {
       if (data.success && analysisResult) {
@@ -395,17 +406,6 @@ export default function ClientDashboard() {
     await logout();
     setLocation('/');
   };
-
-  const deleteMealMutation = trpc.meals.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Meal deleted successfully!");
-      utils.meals.list.invalidate();
-      utils.meals.dailyTotals.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete meal: ${error.message}`);
-    },
-  });
 
   const handleDeleteMeal = async (mealId: number) => {
     if (confirm("Are you sure you want to delete this meal? This action cannot be undone.")) {
