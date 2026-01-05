@@ -33,6 +33,8 @@ For example:
 - Cappuccino (250ml) ≈ 120 kcal, 6g protein, 4g fat, 12g carbs
 - Coca-Cola (330ml) ≈ 140 kcal, 0g protein, 0g fat, 35g carbs
 - Orange juice (250ml) ≈ 110 kcal, 2g protein, 0g fat, 26g carbs
+- English breakfast tea with milk (250ml) ≈ 30 kcal, 2g protein, 1g fat, 3g carbs (assuming 30ml whole milk)
+- Black tea (250ml) ≈ 2 kcal, 0g protein, 0g fat, 0g carbs
 - Water (any volume) = 0 kcal
 
 Return your estimate in JSON format with these exact fields:
@@ -88,7 +90,9 @@ Return your estimate in JSON format with these exact fields:
   });
 
   const content = response.choices[0].message.content;
+  console.log('[beverageNutrition] AI response for', drinkType, ':', content);
   const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+  console.log('[beverageNutrition] Parsed nutrition:', parsed);
 
   return {
     drinkType,

@@ -197,3 +197,13 @@
 - [x] Allow changing meal type from dropdown
 - [x] Allow modifying beverage volume and type
 - [x] Test editing meal type and beverage volume
+
+## iOS Webapp Login & Beverage Estimation Fixes (Jan 5, 2026)
+- [x] Add client PIN login section to home page (already exists)
+- [x] Add trainer login button to home page (already exists)
+- [x] Always show login forms even when session exists
+- [x] Add Switch User/Logout button for existing sessions
+- [x] Fix beverage nutrition estimation returning 0 calories for "english breakfast tea with milk" (added example to prompt)
+- [x] Test client PIN login on iOS webapp (login forms now always visible)
+- [x] Test trainer login on iOS webapp (login forms now always visible)
+- [ ] Test beverage estimation with tea and milk (needs user testing)

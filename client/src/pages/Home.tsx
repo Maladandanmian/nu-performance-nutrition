@@ -92,8 +92,50 @@ export default function Home() {
         </div>
 
         {/* Login Sections - Two Column Layout */}
-        {!isAuthenticated && !clientSession && (
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
+        {/* Show logout option if already logged in */}
+        {(isAuthenticated || clientSession) && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <Card className="bg-white/95 backdrop-blur border-none shadow-lg">
+              <CardContent className="p-6 text-center">
+                <p className="text-lg mb-4" style={{color: '#2B2A2C'}}>
+                  {clientSession ? `Logged in as ${clientSession.name}` : `Logged in as ${user?.name || 'Trainer'}`}
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    onClick={() => {
+                      if (clientSession) {
+                        setLocation('/client');
+                      } else if (user?.role === 'admin') {
+                        setLocation('/trainer');
+                      }
+                    }}
+                    style={{backgroundColor: '#578DB3'}}
+                  >
+                    Go to Dashboard
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to log out and clear your session?')) {
+                        // Clear all cookies and reload
+                        document.cookie.split(";").forEach((c) => {
+                          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                        });
+                        window.location.href = '/';
+                        setTimeout(() => window.location.reload(), 100);
+                      }
+                    }}
+                  >
+                    Switch User / Logout
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Always show login forms for easy access */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
             {/* Client PIN Login - LEFT SIDE (Primary) */}
             <Card className="bg-white/95 backdrop-blur border-none shadow-2xl ring-4 ring-white/50">
               <CardHeader className="text-center pb-4">
@@ -170,7 +212,6 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
-        )}
 
         {/* Features Section */}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
