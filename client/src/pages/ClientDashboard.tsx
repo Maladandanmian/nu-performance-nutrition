@@ -325,7 +325,8 @@ export default function ClientDashboard() {
         
         toast.success("Beverage logged successfully!");
         // Show summary modal with drink nutrition
-        const drinkScore = Math.max(1, Math.min(10, Math.round((beverageNutrition.calories < 50 ? 9 : beverageNutrition.calories < 100 ? 7 : 5))));
+        // Score drinks 1-5: low-cal drinks score higher (5 is best)
+        const drinkScore = beverageNutrition.calories < 50 ? 5 : beverageNutrition.calories < 100 ? 4 : beverageNutrition.calories < 150 ? 3 : beverageNutrition.calories < 200 ? 2 : 1;
         setAnalysisResult({
           description: drinkType,
           calories: beverageNutrition.calories,
@@ -478,7 +479,8 @@ export default function ClientDashboard() {
       fibre: drink.fibre,
     });
     // Set analysis result for the modal
-    const drinkScore = Math.max(1, Math.min(10, Math.round((drink.calories < 50 ? 9 : drink.calories < 100 ? 7 : 5))));
+    // Score drinks 1-5: low-cal drinks score higher (5 is best)
+    const drinkScore = drink.calories < 50 ? 5 : drink.calories < 100 ? 4 : drink.calories < 150 ? 3 : drink.calories < 200 ? 2 : 1;
     setAnalysisResult({
       description: drink.drinkType,
       calories: drink.calories,
@@ -820,7 +822,7 @@ export default function ClientDashboard() {
                   />
                 </div>
               </div>
-              {drinkType && volumeMl && (
+              {drinkType && volumeMl && !analysisResult?.isDrink && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -842,6 +844,9 @@ export default function ClientDashboard() {
                     beverageNutrition ? '✓ Beverage Estimated' : 'Estimate Beverage Nutrition'
                   )}
                 </Button>
+              )}
+              {drinkType && volumeMl && analysisResult?.isDrink && (
+                <div className="text-xs text-green-600 font-medium text-center py-2">✓ Beverage Estimated</div>
               )}
             </div>
 
