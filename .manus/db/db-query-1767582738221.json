@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, clientId, mealType, aiDescription, beverageType, beverageVolumeMl, calories, loggedAt \nFROM meals \nWHERE beverageType IS NOT NULL \n  AND beverageVolumeMl IS NOT NULL \n  AND calories = 0 \n  AND protein = 0 \n  AND fat = 0 \n  AND carbs = 0 \n  AND fibre = 0\nORDER BY loggedAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, aiDescription, beverageType, beverageVolumeMl, calories, loggedAt \nFROM meals \nWHERE beverageType IS NOT NULL \n  AND beverageVolumeMl IS NOT NULL \n  AND calories = 0 \n  AND protein = 0 \n  AND fat = 0 \n  AND carbs = 0 \n  AND fibre = 0\nORDER BY loggedAt DESC;",
+  "rows": [
+    {
+      "id": "60008",
+      "clientId": "60006",
+      "mealType": "lunch",
+      "aiDescription": "Water (500ml)",
+      "beverageType": "Water",
+      "beverageVolumeMl": "500",
+      "calories": "0",
+      "loggedAt": "2026-01-05 03:11:53"
+    },
+    {
+      "id": "60007",
+      "clientId": "60005",
+      "mealType": "lunch",
+      "aiDescription": "Cappuccino (250ml)",
+      "beverageType": "Cappuccino",
+      "beverageVolumeMl": "250",
+      "calories": "0",
+      "loggedAt": "2026-01-05 03:11:51"
+    },
+    {
+      "id": "60006",
+      "clientId": "60004",
+      "mealType": "lunch",
+      "aiDescription": "English breakfast tea with milk (350ml)",
+      "beverageType": "English breakfast tea with milk",
+      "beverageVolumeMl": "350",
+      "calories": "0",
+      "loggedAt": "2026-01-05 03:11:50"
+    },
+    {
+      "id": "60005",
+      "clientId": "60001",
+      "mealType": "lunch",
+      "aiDescription": "English breakfast tea with milk (350ml)",
+      "beverageType": "English breakfast tea with milk",
+      "beverageVolumeMl": "350",
+      "calories": "0",
+      "loggedAt": "2026-01-05 03:11:30"
+    },
+    {
+      "id": "60003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "aiDescription": "English breakfast tea with milk (350ml)",
+      "beverageType": "English breakfast tea with milk",
+      "beverageVolumeMl": "350",
+      "calories": "0",
+      "loggedAt": "2026-01-05 02:53:12"
+    },
+    {
+      "id": "60002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "aiDescription": "English breakfast tea with milk (350ml)",
+      "beverageType": "English breakfast tea with milk",
+      "beverageVolumeMl": "350",
+      "calories": "0",
+      "loggedAt": "2026-01-05 02:53:10"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\taiDescription\tbeverageType\tbeverageVolumeMl\tcalories\tloggedAt\n60008\t60006\tlunch\tWater (500ml)\tWater\t500\t0\t2026-01-05 03:11:53\n60007\t60005\tlunch\tCappuccino (250ml)\tCappuccino\t250\t0\t2026-01-05 03:11:51\n60006\t60004\tlunch\tEnglish breakfast tea with milk (350ml)\tEnglish breakfast tea with milk\t350\t0\t2026-01-05 03:11:50\n60005\t60001\tlunch\tEnglish breakfast tea with milk (350ml)\tEnglish breakfast tea with milk\t350\t0\t2026-01-05 03:11:30\n60003\t1\tlunch\tEnglish breakfast tea with milk (350ml)\tEnglish breakfast tea with milk\t350\t0\t2026-01-05 02:53:12\n60002\t1\tlunch\tEnglish breakfast tea with milk (350ml)\tEnglish breakfast tea with milk\t350\t0\t2026-01-05 02:53:10\n",
+  "stderr": "",
+  "execution_time_ms": 1610
+}

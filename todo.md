@@ -144,3 +144,9 @@
 - [x] Implement drink logging functionality
 - [x] Implement body metrics logging functionality
 - [x] Test with fresh drink entry after implementation
+
+## Duplicate Drink Entries Bug (Jan 5, 2026)
+- [x] Identified root cause: saveMeal creates meal entries with beverage data but doesn't create drinks/body_metrics entries
+- [x] Fixed saveMeal procedure to create drinks and body_metrics entries when beverage is included
+- [x] Test fix with fresh drink entry
+- [x] Clean up duplicate meal entries in database (removed 6 beverage-only entries)
