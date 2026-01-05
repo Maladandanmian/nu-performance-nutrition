@@ -366,6 +366,85 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
         </CardContent>
       </Card>
 
+      {/* Hydration Trend Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="text-xl">💧</span>
+            Hydration Trend
+          </CardTitle>
+          <CardDescription>
+            Last {days} days | Daily water intake vs target
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dailyTotals}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                label={{ value: 'ml', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                formatter={(value: any) => [`${value} ml`, 'Hydration']}
+              />
+              <Legend />
+              
+              {/* Target line (dashed) */}
+              <Line 
+                type="monotone" 
+                dataKey={() => goals.hydration}
+                stroke="#06B6D4"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                name={`Target (${goals.hydration} ml)`}
+                dot={false}
+              />
+              
+              {/* Actual hydration line */}
+              <Line 
+                type="monotone" 
+                dataKey="hydration"
+                stroke="#06B6D4"
+                strokeWidth={3}
+                name="Actual Hydration"
+                dot={{ fill: '#06B6D4', r: 3 }}
+                activeDot={{ r: 5 }}
+                connectNulls={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          
+          {/* Summary stats */}
+          <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
+            <div>
+              <p className="text-gray-600">Average</p>
+              <p className="text-lg font-semibold" style={{ color: '#06B6D4' }}>
+                {hasAnyData ? <>{calculateAverage('hydration')} ml</> : <span className="text-gray-400">-</span>}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-600">Target</p>
+              <p className="text-lg font-semibold text-gray-700">
+                {goals.hydration} ml
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-600">Achievement</p>
+              <p className="text-lg font-semibold" style={{ 
+                color: hasAnyData && calculateAverage('hydration') >= goals.hydration ? '#10b981' : '#f59e0b'
+              }}>
+                {hasAnyData ? <>{Math.round((calculateAverage('hydration') / goals.hydration) * 100)}%</> : <span className="text-gray-400">-</span>}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Bodyweight Trend Chart */}
       <Card>
         <CardHeader>

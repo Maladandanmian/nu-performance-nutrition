@@ -269,3 +269,8 @@
 - [x] Update trainer UI to allow setting weight target
 - [x] Add dotted target line to bodyweight chart
 - [x] Push database migration
+
+## Hydration Tracking Chart (Jan 5, 2026)
+- [x] Add hydration chart similar to calories chart with target line
+- [x] Position between macronutrients and bodyweight charts
+- [x] Include summary stats showing average vs target
