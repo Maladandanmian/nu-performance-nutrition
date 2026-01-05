@@ -326,15 +326,50 @@ export default function ClientDashboard() {
     }
   };
 
+  const logDrinkMutation = trpc.drinks.create.useMutation({
+    onSuccess: () => {
+      toast.success("Drink logged successfully!");
+      setDrinkType("");
+      setVolumeMl("");
+      // Refetch today's summary to update hydration
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error(`Failed to log drink: ${error.message}`);
+    },
+  });
+
   const handleLogDrink = async () => {
     if (!drinkType || !volumeMl) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    toast.info("Drink logging will be available after client association");
-    // TODO: Implement drink logging
+    const clientId = clientSession?.clientId;
+    if (!clientId) {
+      toast.error("Client session not found");
+      return;
+    }
+
+    await logDrinkMutation.mutateAsync({
+      clientId,
+      drinkType,
+      volumeMl: parseInt(volumeMl),
+    });
   };
+
+  const logMetricsMutation = trpc.bodyMetrics.create.useMutation({
+    onSuccess: () => {
+      toast.success("Metrics logged successfully!");
+      setWeight("");
+      setHydration("");
+      // Refetch today's summary to update metrics
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error(`Failed to log metrics: ${error.message}`);
+    },
+  });
 
   const handleLogMetrics = async () => {
     if (!weight && !hydration) {
@@ -342,8 +377,17 @@ export default function ClientDashboard() {
       return;
     }
 
-    toast.info("Metrics logging will be available after client association");
-    // TODO: Implement metrics logging
+    const clientId = clientSession?.clientId;
+    if (!clientId) {
+      toast.error("Client session not found");
+      return;
+    }
+
+    await logMetricsMutation.mutateAsync({
+      clientId,
+      weight: weight ? parseFloat(weight) : undefined,
+      hydration: hydration ? parseInt(hydration) : undefined,
+    });
   };
 
   const handleLogout = async () => {
