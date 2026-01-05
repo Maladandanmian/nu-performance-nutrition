@@ -274,3 +274,9 @@
 - [x] Add hydration chart similar to calories chart with target line
 - [x] Position between macronutrients and bodyweight charts
 - [x] Include summary stats showing average vs target
+
+## Time Range Selector for Trends (Jan 5, 2026)
+- [x] Add time range selector UI (Today, Last 7 Days, Last 30 Days, All Time)
+- [x] Update NutrientTrendGraphs to accept and use selected time range
+- [x] Apply time range to all charts (calories, macronutrients, hydration, bodyweight)
+- [x] Update chart descriptions to reflect selected time range

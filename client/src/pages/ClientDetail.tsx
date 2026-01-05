@@ -29,6 +29,7 @@ export default function ClientDetail() {
   const [fibreTarget, setFibreTarget] = useState("");
   const [hydrationTarget, setHydrationTarget] = useState("");
   const [weightTarget, setWeightTarget] = useState("");
+  const [timeRange, setTimeRange] = useState<"today" | "7days" | "30days" | "all">("30days");
 
   const utils = trpc.useUtils();
   const { data: client } = trpc.clients.get.useQuery(
@@ -367,16 +368,54 @@ export default function ClientDetail() {
             <TabsContent value="trends" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-xl">📈</span>
-                    Daily Nutrient Trends
-                  </CardTitle>
-                  <CardDescription>
-                    {client.name}'s daily consumption vs targets (last 30 days)
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="text-xl">📈</span>
+                        Daily Nutrient Trends
+                      </CardTitle>
+                      <CardDescription>
+                        {client.name}'s daily consumption vs targets
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={timeRange === "today" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTimeRange("today")}
+                        style={timeRange === "today" ? {backgroundColor: '#578DB3'} : {}}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant={timeRange === "7days" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTimeRange("7days")}
+                        style={timeRange === "7days" ? {backgroundColor: '#578DB3'} : {}}
+                      >
+                        7 Days
+                      </Button>
+                      <Button
+                        variant={timeRange === "30days" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTimeRange("30days")}
+                        style={timeRange === "30days" ? {backgroundColor: '#578DB3'} : {}}
+                      >
+                        30 Days
+                      </Button>
+                      <Button
+                        variant={timeRange === "all" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTimeRange("all")}
+                        style={timeRange === "all" ? {backgroundColor: '#578DB3'} : {}}
+                      >
+                        All Time
+                      </Button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <NutrientTrendGraphs clientId={clientId!} days={30} />
+                  <NutrientTrendGraphs clientId={clientId!} days={timeRange === "today" ? 1 : timeRange === "7days" ? 7 : timeRange === "30days" ? 30 : 365} />
                 </CardContent>
               </Card>
             </TabsContent>
