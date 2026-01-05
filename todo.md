@@ -258,3 +258,8 @@
 - [x] Fix "beverage could not be logged" error for plain water
 - [x] Add special handling to skip estimation for water
 - [x] Allow logging water directly without Analyse button
+
+## Trends Section Update (Jan 5, 2026)
+- [x] Create combined nutrients chart (protein, fat, carbs, fiber) with target lines
+- [x] Keep calorie trend at top
+- [x] Add bodyweight trend chart with weight persistence (no drop to 0)
