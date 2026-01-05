@@ -48,12 +48,23 @@ Return your estimate in JSON format with these exact fields:
   "description": "<brief description of the beverage and assumptions made>"
 }
 
-**Important:**
+**CRITICAL RULES:**
 - Scale nutrition proportionally to the volume provided
-- For water or zero-calorie drinks, return all zeros
-- For ambiguous drinks (e.g., "coffee"), assume black coffee unless specified
-- If drink includes milk/sugar, mention assumptions in description
-- Confidence should reflect certainty (100 for water, 70-80 for common drinks, 50-60 for unusual drinks)`;
+- ONLY return zero calories for plain water, black tea, black coffee, or diet/zero-calorie sodas
+- ANY drink containing milk, cream, sugar, juice, or other caloric ingredients MUST have calories > 0
+- For "tea with milk" or "coffee with milk": use CONSERVATIVE milk estimates
+  * 250ml drink → assume 30ml milk (~19 kcal, 1g protein, 1g fat, 1.5g carbs)
+  * 350ml drink → assume 40ml milk (~26 kcal, 1.3g protein, 1.3g fat, 2g carbs)
+  * Scale proportionally for other volumes
+  * Do NOT assume more than 15% of drink volume is milk unless explicitly stated
+- For ambiguous drinks (e.g., "coffee"), assume black coffee unless milk/sugar is mentioned
+- If you are uncertain about exact values, provide a reasonable estimate rather than returning zeros
+- Confidence should reflect certainty (100 for water, 70-80 for common drinks, 50-60 for unusual drinks)
+
+**VALIDATION CHECK:**
+Before returning your answer, verify:
+- If the drink mentions milk, cream, sugar, honey, or any sweetener → calories MUST be > 0
+- If unsure, err on the side of overestimating rather than underestimating`;
 
   const response = await invokeLLM({
     messages: [
@@ -93,6 +104,34 @@ Return your estimate in JSON format with these exact fields:
   console.log('[beverageNutrition] AI response for', drinkType, ':', content);
   const parsed = typeof content === 'string' ? JSON.parse(content) : content;
   console.log('[beverageNutrition] Parsed nutrition:', parsed);
+
+  // Validation: Detect suspicious 0-calorie estimates for milk-based drinks
+  const lowerDrink = drinkType.toLowerCase();
+  const hasMilk = lowerDrink.includes('milk') || lowerDrink.includes('latte') || lowerDrink.includes('cappuccino') || lowerDrink.includes('cream');
+  const hasSugar = lowerDrink.includes('sugar') || lowerDrink.includes('sweet') || lowerDrink.includes('honey');
+  const isPlainWater = lowerDrink === 'water' || lowerDrink === 'plain water';
+  const isBlackTea = (lowerDrink.includes('tea') && !hasMilk && !hasSugar);
+  const isBlackCoffee = (lowerDrink.includes('coffee') && !hasMilk && !hasSugar);
+  
+  if (parsed.calories === 0 && !isPlainWater && !isBlackTea && !isBlackCoffee) {
+    console.warn('[beverageNutrition] WARNING: AI returned 0 calories for non-water drink:', drinkType);
+    
+    // Apply fallback calculation for milk-based drinks
+    if (hasMilk) {
+      console.log('[beverageNutrition] Applying fallback calculation for milk-based drink');
+      // Conservative estimate: 12% of drink volume is milk (typical splash)
+      // For 250ml → 30ml milk, for 350ml → 42ml milk
+      const milkMl = volumeMl * 0.12;
+      // Whole milk: ~0.64 kcal/ml, 0.033g protein/ml, 0.033g fat/ml, 0.05g carbs/ml
+      parsed.calories = Math.round(milkMl * 0.64);
+      parsed.protein = Math.round(milkMl * 0.033 * 10) / 10;
+      parsed.fat = Math.round(milkMl * 0.033 * 10) / 10;
+      parsed.carbs = Math.round(milkMl * 0.05 * 10) / 10;
+      parsed.fibre = 0;
+      parsed.confidence = 60;
+      parsed.description = `Fallback estimate: assumed ${Math.round(milkMl)}ml whole milk in ${volumeMl}ml drink (AI returned invalid 0 calories)`;
+    }
+  }
 
   return {
     drinkType,

@@ -1,0 +1,28 @@
+{
+  "query": "SELECT * FROM drinks ORDER BY id DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM drinks ORDER BY id DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "30002",
+      "clientId": "1",
+      "drinkType": "English breakfast tea with milk",
+      "volumeMl": "350",
+      "notes": "NULL",
+      "loggedAt": "2026-01-05 04:32:25",
+      "createdAt": "2026-01-05 04:32:25"
+    },
+    {
+      "id": "30001",
+      "clientId": "1",
+      "drinkType": "English breakfast tea with milk",
+      "volumeMl": "350",
+      "notes": "NULL",
+      "loggedAt": "2026-01-05 04:31:46",
+      "createdAt": "2026-01-05 04:31:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tdrinkType\tvolumeMl\tnotes\tloggedAt\tcreatedAt\n30002\t1\tEnglish breakfast tea with milk\t350\tNULL\t2026-01-05 04:32:25\t2026-01-05 04:32:25\n30001\t1\tEnglish breakfast tea with milk\t350\tNULL\t2026-01-05 04:31:46\t2026-01-05 04:31:46\n",
+  "stderr": "",
+  "execution_time_ms": 1524
+}

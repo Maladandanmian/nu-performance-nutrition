@@ -288,77 +288,30 @@ export default function ClientDashboard() {
 
     // Drink-only logging
     if (!selectedFile && (beverageNutrition || (drinkType && volumeMl))) {
-      // Ensure beverage nutrition is estimated
-      let bevNutrition = beverageNutrition;
-      if (!bevNutrition && drinkType && volumeMl) {
-        try {
-          const result = await estimateBeverageMutation.mutateAsync({
-            drinkType,
-            volumeMl: parseInt(volumeMl),
-          });
-          setBeverageNutrition(result.nutrition);
-          bevNutrition = result.nutrition;
-        } catch (error) {
-          toast.error("Failed to estimate beverage nutrition");
-          return;
-        }
-      }
-      
-      if (!bevNutrition) {
-        toast.error("Please estimate beverage nutrition first");
+      if (!drinkType || !volumeMl) {
+        toast.error("Please fill in drink type and volume");
         return;
       }
       
-      // For beverage-only, save directly and show result with score
+      // For beverage-only, create a drink entry (not a meal entry)
       try {
-        const saveResult = await saveMealMutation.mutateAsync({
+        await logDrinkMutation.mutateAsync({
           clientId: currentClientId,
-          imageUrl: "",
-          imageKey: "",
-          mealType,
-          calories: 0,
-          protein: 0,
-          fat: 0,
-          carbs: 0,
-          fibre: 0,
-          aiDescription: `${bevNutrition.drinkType} (${bevNutrition.volumeMl}ml)`,
-          aiConfidence: 100,
-          notes: mealNotes || undefined,
-          beverageType: bevNutrition.drinkType,
-          beverageVolumeMl: bevNutrition.volumeMl,
-          beverageCalories: bevNutrition.calories,
-          beverageProtein: bevNutrition.protein,
-          beverageFat: bevNutrition.fat,
-          beverageCarbs: bevNutrition.carbs,
-          beverageFibre: bevNutrition.fibre,
-          components: [],
+          drinkType,
+          volumeMl: parseInt(volumeMl),
+          notes: "",
         });
-        
-        // Show analysis modal with the calculated score
-        setAnalysisResult({
-          description: `${bevNutrition.drinkType} (${bevNutrition.volumeMl}ml)`,
-          calories: 0,
-          protein: 0,
-          fat: 0,
-          carbs: 0,
-          fibre: 0,
-          confidence: 100,
-          components: [],
-          score: saveResult.score, // Use the score returned from backend
-        });
-        setEditedComponents([]);
-        setImageUrl("");
-        setImageKey("");
-        setBeverageNutrition(bevNutrition); // Keep beverage data for display
-        setShowAnalysisModal(true);
         
         // Clear form
         setDrinkType("");
         setVolumeMl("");
-        setMealNotes("");
+        setBeverageNutrition(null);
+        
+        toast.success("Beverage logged successfully!");
+        window.location.reload();
       } catch (error) {
-        console.error('Error saving beverage:', error);
-        toast.error("Failed to save beverage");
+        console.error('Error logging beverage:', error);
+        toast.error("Failed to log beverage");
       }
       return;
     }

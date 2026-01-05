@@ -207,3 +207,22 @@
 - [x] Test client PIN login on iOS webapp (login forms now always visible)
 - [x] Test trainer login on iOS webapp (login forms now always visible)
 - [ ] Test beverage estimation with tea and milk (needs user testing)
+
+## AI Returning 0 Calories for Tea with Milk (Jan 5, 2026)
+- [x] Improve prompt to explicitly prevent 0-calorie estimates for milk-based drinks
+- [x] Add validation to reject suspicious 0-calorie responses
+- [x] Implement fallback calculation for common milk-based beverages
+- [ ] Test with "english breakfast tea with milk"
+- [ ] Update existing 0-calorie tea entries in database
+
+## Tea with Milk Calorie Overestimation (Jan 5, 2026)
+- [x] Refine prompt with specific milk ratios (30ml per 250ml, 40ml per 350ml)
+- [x] Adjust fallback calculation to 12% of drink volume (conservative estimate)
+- [ ] Test with 350ml tea with milk (should be ~27 kcal, not 42)
+
+## Duplicate Beverage Entries (Jan 5, 2026)
+- [x] Investigate why logging beverages creates both meal and drink entries
+- [x] Fix to create only drink entries for beverage-only logs (removed saveMealMutation call)
+- [x] Ensure beverage nutrition is saved correctly (drinks now use logDrinkMutation)
+- [x] Test beverage logging to verify single entry (ready for user testing)
+- [x] Clean up duplicate beverage entries in database (deleted beverage-only meal entries)
