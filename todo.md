@@ -175,3 +175,10 @@
 - [x] Move deleteMealMutation and other hooks to top of ClientDashboard
 - [x] Ensure all hooks are called before any conditional returns
 - [x] Test that error is resolved
+
+## Hydration Display and Tab Merge (Jan 5, 2026)
+- [x] Investigate why hydration circle in Today's Summary is empty despite logged drinks
+- [x] Fix hydration tracking to display correctly (changed from body_metrics to drinks table)
+- [x] Merge Meals and Drinks tabs into unified Nutrition tab
+- [x] Create NutritionHistoryFeed to show both meals and drinks chronologically
+- [x] Test hydration display and unified nutrition view

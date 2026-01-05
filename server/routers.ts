@@ -559,8 +559,8 @@ export const appRouter = router({
         const meals = await db.getMealsByClientId(input.clientId);
         const goals = await db.getNutritionGoalByClientId(input.clientId);
         
-        // Get body metrics for hydration data
-        const bodyMetrics = await db.getBodyMetricsByClientId(input.clientId);
+        // Get drinks for hydration data
+        const drinks = await db.getDrinksByClientId(input.clientId);
         
         // Group meals by date and sum nutrients
         const dailyMap = new Map<string, {
@@ -629,17 +629,15 @@ export const appRouter = router({
           dailyMap.set(dateKey, existing);
         });
         
-        // Add hydration data from body metrics
-        bodyMetrics.forEach(metric => {
-          if (!metric.hydration) return;
-          
-          const metricDate = new Date(metric.recordedAt);
-          const metricDateUTC = new Date(metricDate.getTime() - (timezoneOffset * 60 * 1000));
-          const dateKey = metricDateUTC.toISOString().split('T')[0];
+        // Add hydration data from drinks table
+        drinks.forEach(drink => {
+          const drinkDate = new Date(drink.loggedAt);
+          const drinkDateUTC = new Date(drinkDate.getTime() - (timezoneOffset * 60 * 1000));
+          const dateKey = drinkDateUTC.toISOString().split('T')[0];
           
           const existing = dailyMap.get(dateKey);
           if (existing) {
-            existing.hydration += metric.hydration;
+            existing.hydration += drink.volumeMl;
           }
         });
         

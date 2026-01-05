@@ -10,14 +10,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Progress } from "@/components/ui/progress";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MealHistoryFeed } from "@/components/MealHistoryFeed";
-import { DrinkHistoryFeed } from "@/components/DrinkHistoryFeed";
+import { NutritionHistoryFeed } from "@/components/NutritionHistoryFeed";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import TodaysSummary from "@/components/TodaysSummary";
 import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
 import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
-import { Camera, Droplets, LogOut, Scale, Upload } from "lucide-react";
+import { Camera, Droplets, History, LogOut, Scale, Upload } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -183,6 +182,17 @@ export default function ClientDashboard() {
     },
     onError: (error) => {
       toast.error(`Failed to log drink: ${error.message}`);
+    },
+  });
+
+  const deleteDrinkMutation = trpc.drinks.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Drink deleted successfully!");
+      utils.drinks.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete drink: ${error.message}`);
     },
   });
 
@@ -436,6 +446,17 @@ export default function ClientDashboard() {
     (window as any).editingMealId = meal.id;
   };
 
+  const handleEditDrink = (drink: any) => {
+    // TODO: Implement drink editing modal
+    toast.info("Drink editing coming soon!");
+  };
+
+  const handleDeleteDrink = async (drinkId: number) => {
+    if (confirm("Are you sure you want to delete this drink? This action cannot be undone.")) {
+      await deleteDrinkMutation.mutateAsync({ drinkId });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -467,10 +488,9 @@ export default function ClientDashboard() {
           <TodaysSummary clientId={clientSession?.clientId || 0} />
           
           <Tabs defaultValue="log-meal">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
-            <TabsTrigger value="history">Meals</TabsTrigger>
-            <TabsTrigger value="drinks">Drinks</TabsTrigger>
+            <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
           </TabsList>
@@ -613,42 +633,26 @@ export default function ClientDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Meal History Tab */}
-          <TabsContent value="history">
+          {/* Nutrition History Tab (Meals + Drinks) */}
+          <TabsContent value="nutrition">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="text-xl">📋</span>
-                  Meal History
+                  <History className="h-5 w-5" />
+                  Nutrition History
                 </CardTitle>
                 <CardDescription>
-                  View and edit your logged meals with nutrition details
+                  View and edit all your logged meals and drinks
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <MealHistoryFeed 
+                <NutritionHistoryFeed 
                   clientId={clientSession?.clientId || 0} 
                   onEditMeal={handleEditMeal}
                   onDeleteMeal={handleDeleteMeal}
+                  onEditDrink={handleEditDrink}
+                  onDeleteDrink={handleDeleteDrink}
                 />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Drink History Tab */}
-          <TabsContent value="drinks">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Droplets className="h-5 w-5 text-blue-600" />
-                  Drink History
-                </CardTitle>
-                <CardDescription>
-                  View and edit your logged beverages
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DrinkHistoryFeed clientId={clientSession?.clientId || 0} />
               </CardContent>
             </Card>
           </TabsContent>
