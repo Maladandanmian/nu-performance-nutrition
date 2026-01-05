@@ -946,19 +946,24 @@ export const appRouter = router({
         clientId: z.number(),
         drinkType: z.string(),
         volumeMl: z.number(),
+        calories: z.number(),
+        protein: z.number(),
+        fat: z.number(),
+        carbs: z.number(),
+        fibre: z.number(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Estimate beverage nutrition
-        const nutrition = await estimateBeverageNutrition(input.drinkType, input.volumeMl);
-        
         const result = await db.createDrink({
-          ...input,
-          calories: nutrition.calories,
-          protein: nutrition.protein,
-          fat: nutrition.fat,
-          carbs: nutrition.carbs,
-          fibre: nutrition.fibre,
+          clientId: input.clientId,
+          drinkType: input.drinkType,
+          volumeMl: input.volumeMl,
+          calories: input.calories,
+          protein: input.protein,
+          fat: input.fat,
+          carbs: input.carbs,
+          fibre: input.fibre,
+          notes: input.notes,
           loggedAt: new Date(),
         });
         

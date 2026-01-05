@@ -315,6 +315,11 @@ export default function ClientDashboard() {
           clientId: currentClientId,
           drinkType,
           volumeMl: parseInt(volumeMl),
+          calories: beverageNutrition.calories,
+          protein: beverageNutrition.protein,
+          fat: beverageNutrition.fat,
+          carbs: beverageNutrition.carbs,
+          fibre: beverageNutrition.fibre,
           notes: "",
         });
         
@@ -379,6 +384,11 @@ export default function ClientDashboard() {
       return;
     }
 
+    if (!beverageNutrition) {
+      toast.error("Please estimate beverage nutrition first");
+      return;
+    }
+
     const clientId = clientSession?.clientId;
     if (!clientId) {
       toast.error("Client session not found");
@@ -389,6 +399,11 @@ export default function ClientDashboard() {
       clientId,
       drinkType,
       volumeMl: parseInt(volumeMl),
+      calories: beverageNutrition.calories,
+      protein: beverageNutrition.protein,
+      fat: beverageNutrition.fat,
+      carbs: beverageNutrition.carbs,
+      fibre: beverageNutrition.fibre,
     });
   };
 

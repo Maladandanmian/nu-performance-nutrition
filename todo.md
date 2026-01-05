@@ -244,3 +244,7 @@
 - [x] Restore drink editing functionality in nutrition history
 - [ ] Test drink logging shows summary with score
 - [ ] Test drink editing works from history
+
+## Drink Estimation Error (Jan 5, 2026)
+- [x] Fix "error logging drink" when clicking Analyse button (removed double estimation)
+- [x] Prevent form from clearing if estimation fails (now requires pre-estimated nutrition)
