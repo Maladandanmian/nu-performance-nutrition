@@ -632,16 +632,39 @@ export const appRouter = router({
           dailyMap.set(dateKey, existing);
         });
         
-        // Add hydration data from drinks table
+        // Add hydration and nutrition data from drinks table
         drinks.forEach(drink => {
           const drinkDate = new Date(drink.loggedAt);
-          const drinkDateUTC = new Date(drinkDate.getTime() - (timezoneOffset * 60 * 1000));
-          const dateKey = drinkDateUTC.toISOString().split('T')[0];
+          if (drinkDate < cutoffDate) return;
           
-          const existing = dailyMap.get(dateKey);
-          if (existing) {
-            existing.hydration += drink.volumeMl;
-          }
+          const drinkDateUTC = new Date(drinkDate.getTime() - (timezoneOffset * 60 * 1000));
+          const dateKey = new Date(Date.UTC(
+            drinkDateUTC.getUTCFullYear(),
+            drinkDateUTC.getUTCMonth(),
+            drinkDateUTC.getUTCDate()
+          )).toISOString().split('T')[0];
+          
+          const existing = dailyMap.get(dateKey) || {
+            date: dateKey,
+            calories: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            fibre: 0,
+            hydration: 0,
+          };
+          
+          // Add drink hydration
+          existing.hydration += drink.volumeMl;
+          
+          // Add drink nutrition (if available)
+          existing.calories += drink.calories || 0;
+          existing.protein += drink.protein || 0;
+          existing.fat += drink.fat || 0;
+          existing.carbs += drink.carbs || 0;
+          existing.fibre += drink.fibre || 0;
+          
+          dailyMap.set(dateKey, existing);
         });
         
         // Convert to array and sort by date

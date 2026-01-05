@@ -233,3 +233,8 @@
 - [x] Update NutritionHistoryFeed to display drink nutrition like meals
 - [x] Migrate existing drinks to have nutrition data (28 cal for 350ml tea with milk)
 - [x] Test drink nutrition display (28 cal showing for tea with milk)
+
+## Include Drink Nutrition in Daily Totals (Jan 5, 2026)
+- [x] Update dailyTotals procedure to sum drink nutrition from drinks table
+- [x] Test that standalone drink calories/macros appear in Today's Summary
+- [x] Verify drink nutrition is included in trends (code updated, ready for user testing)
