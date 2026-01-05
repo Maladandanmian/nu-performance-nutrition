@@ -238,3 +238,9 @@
 - [x] Update dailyTotals procedure to sum drink nutrition from drinks table
 - [x] Test that standalone drink calories/macros appear in Today's Summary
 - [x] Verify drink nutrition is included in trends (code updated, ready for user testing)
+
+## Drink Logging Regression (Jan 5, 2026)
+- [x] Restore drink summary page with nutrition score after logging
+- [x] Restore drink editing functionality in nutrition history
+- [ ] Test drink logging shows summary with score
+- [ ] Test drink editing works from history

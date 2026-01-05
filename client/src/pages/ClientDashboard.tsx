@@ -195,7 +195,7 @@ export default function ClientDashboard() {
       setDrinkType("");
       setVolumeMl("");
       // Refetch today's summary to update hydration
-      window.location.reload();
+      // Show summary instead of reloading
     },
     onError: (error) => {
       toast.error(`Failed to log drink: ${error.message}`);
@@ -213,13 +213,29 @@ export default function ClientDashboard() {
     },
   });
 
+  const updateDrinkMutation = trpc.drinks.update.useMutation({
+    onSuccess: () => {
+      toast.success("Drink updated successfully!");
+      setShowAnalysisModal(false);
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
+      setEditingMealId(null);
+      utils.drinks.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to update drink: ${error.message}`);
+    },
+  });
+
   const logMetricsMutation = trpc.bodyMetrics.create.useMutation({
     onSuccess: () => {
       toast.success("Metrics logged successfully!");
       setWeight("");
       setHydration("");
       // Refetch today's summary to update metrics
-      window.location.reload();
+      // Show summary instead of reloading
     },
     onError: (error) => {
       toast.error(`Failed to log metrics: ${error.message}`);
@@ -308,7 +324,19 @@ export default function ClientDashboard() {
         setBeverageNutrition(null);
         
         toast.success("Beverage logged successfully!");
-        window.location.reload();
+        // Show summary modal with drink nutrition
+        const drinkScore = Math.max(1, Math.min(10, Math.round((beverageNutrition.calories < 50 ? 9 : beverageNutrition.calories < 100 ? 7 : 5))));
+        setAnalysisResult({
+          description: drinkType,
+          calories: beverageNutrition.calories,
+          protein: beverageNutrition.protein,
+          fat: beverageNutrition.fat,
+          carbs: beverageNutrition.carbs,
+          fibre: beverageNutrition.fibre,
+          score: drinkScore,
+          isDrink: true,
+        });
+        setShowAnalysisModal(true);
       } catch (error) {
         console.error('Error logging beverage:', error);
         toast.error("Failed to log beverage");
@@ -437,8 +465,33 @@ export default function ClientDashboard() {
   };
 
   const handleEditDrink = (drink: any) => {
-    // TODO: Implement drink editing modal
-    toast.info("Drink editing coming soon!");
+    // Set drink data for editing
+    setDrinkType(drink.drinkType);
+    setVolumeMl(drink.volumeMl.toString());
+    setBeverageNutrition({
+      drinkType: drink.drinkType,
+      volumeMl: drink.volumeMl,
+      calories: drink.calories,
+      protein: drink.protein,
+      fat: drink.fat,
+      carbs: drink.carbs,
+      fibre: drink.fibre,
+    });
+    // Set analysis result for the modal
+    const drinkScore = Math.max(1, Math.min(10, Math.round((drink.calories < 50 ? 9 : drink.calories < 100 ? 7 : 5))));
+    setAnalysisResult({
+      description: drink.drinkType,
+      calories: drink.calories,
+      protein: drink.protein,
+      fat: drink.fat,
+      carbs: drink.carbs,
+      fibre: drink.fibre,
+      score: drinkScore,
+      isDrink: true,
+    });
+    // Mark as editing drink
+    setEditingMealId(-drink.id);
+    setShowAnalysisModal(true);
   };
 
   const handleDeleteDrink = async (drinkId: number) => {
@@ -1008,7 +1061,15 @@ export default function ClientDashboard() {
 
             <Button 
               onClick={() => {
-                if (isEditMode && editingMealId) {
+                // Check if editing a drink (negative ID)
+                if (editingMealId && editingMealId < 0) {
+                  // Update existing drink
+                  updateDrinkMutation.mutate({
+                    drinkId: -editingMealId,
+                    drinkType,
+                    volumeMl: parseInt(volumeMl),
+                  });
+                } else if (isEditMode && editingMealId) {
                   // Update existing meal
                   updateMealMutation.mutate({
                     mealId: editingMealId,
@@ -1058,15 +1119,15 @@ export default function ClientDashboard() {
               }} 
               className="w-full"
               style={{backgroundColor: '#578DB3'}}
-              disabled={saveMealMutation.isPending || updateMealMutation.isPending}
+              disabled={saveMealMutation.isPending || updateMealMutation.isPending || updateDrinkMutation.isPending}
             >
-              {(saveMealMutation.isPending || updateMealMutation.isPending) ? (
+              {(saveMealMutation.isPending || updateMealMutation.isPending || updateDrinkMutation.isPending) ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Saving...
                 </>
               ) : (
-                isEditMode ? 'Update Meal' : 'Log Meal'
+                (editingMealId && editingMealId < 0) ? 'Update Drink' : (isEditMode ? 'Update Meal' : 'Log Meal')
               )}
             </Button>
           </div>
