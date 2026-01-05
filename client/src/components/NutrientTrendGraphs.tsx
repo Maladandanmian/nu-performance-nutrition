@@ -108,6 +108,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
         date: format(new Date(date), 'MMM d'),
         fullDate: date,
         weight: lastKnownWeight,
+        weightTarget: goals.weightTarget ? parseFloat(goals.weightTarget) : null,
       };
     });
   })();
@@ -401,6 +402,19 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                     formatter={(value: any) => [`${value} kg`, 'Weight']}
                   />
                   <Legend />
+                  
+                  {/* Target line (dashed) - only show if weightTarget is set */}
+                  {goals.weightTarget && (
+                    <Line 
+                      type="monotone" 
+                      dataKey="weightTarget"
+                      stroke="#8B5CF6"
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      name={`Target (${parseFloat(goals.weightTarget).toFixed(1)} kg)`}
+                      dot={false}
+                    />
+                  )}
                   
                   {/* Bodyweight line */}
                   <Line 

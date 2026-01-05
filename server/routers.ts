@@ -200,10 +200,15 @@ export const appRouter = router({
         carbsTarget: z.number().optional(),
         fibreTarget: z.number().optional(),
         hydrationTarget: z.number().optional(),
+        weightTarget: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
-        const { clientId, ...data } = input;
-        await db.updateNutritionGoal(clientId, data);
+        const { clientId, weightTarget, ...data } = input;
+        const updateData = {
+          ...data,
+          ...(weightTarget !== undefined && { weightTarget: weightTarget.toString() }),
+        };
+        await db.updateNutritionGoal(clientId, updateData);
         return { success: true };
       }),
   }),
@@ -680,6 +685,7 @@ export const appRouter = router({
             carbs: goals?.carbsTarget || 0,
             fibre: goals?.fibreTarget || 0,
             hydration: goals?.hydrationTarget || 0,
+            weightTarget: goals?.weightTarget || null,
           },
         };
       }),

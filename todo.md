@@ -263,3 +263,9 @@
 - [x] Create combined nutrients chart (protein, fat, carbs, fiber) with target lines
 - [x] Keep calorie trend at top
 - [x] Add bodyweight trend chart with weight persistence (no drop to 0)
+
+## Bodyweight Target Feature (Jan 5, 2026)
+- [x] Add weightTarget field to nutrition goals schema
+- [x] Update trainer UI to allow setting weight target
+- [x] Add dotted target line to bodyweight chart
+- [x] Push database migration

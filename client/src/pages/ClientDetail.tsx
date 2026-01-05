@@ -28,6 +28,7 @@ export default function ClientDetail() {
   const [carbsTarget, setCarbsTarget] = useState("");
   const [fibreTarget, setFibreTarget] = useState("");
   const [hydrationTarget, setHydrationTarget] = useState("");
+  const [weightTarget, setWeightTarget] = useState("");
 
   const utils = trpc.useUtils();
   const { data: client } = trpc.clients.get.useQuery(
@@ -88,6 +89,7 @@ export default function ClientDetail() {
     setCarbsTarget(goals.carbsTarget.toString());
     setFibreTarget(goals.fibreTarget.toString());
     setHydrationTarget(goals.hydrationTarget.toString());
+    setWeightTarget(goals.weightTarget ? goals.weightTarget.toString() : "");
     setIsEditGoalsOpen(true);
   };
 
@@ -100,6 +102,7 @@ export default function ClientDetail() {
       carbsTarget: parseInt(carbsTarget),
       fibreTarget: parseInt(fibreTarget),
       hydrationTarget: parseInt(hydrationTarget),
+      weightTarget: weightTarget ? parseFloat(weightTarget) : undefined,
     });
   };
 
@@ -228,6 +231,17 @@ export default function ClientDetail() {
                           type="number"
                           value={hydrationTarget}
                           onChange={(e) => setHydrationTarget(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="weight">Target Weight (kg) - Optional</Label>
+                        <Input
+                          id="weight"
+                          type="number"
+                          step="0.1"
+                          placeholder="e.g., 75.5"
+                          value={weightTarget}
+                          onChange={(e) => setWeightTarget(e.target.value)}
                         />
                       </div>
                       <Button 

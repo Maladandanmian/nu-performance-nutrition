@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -57,6 +57,7 @@ export const nutritionGoals = mysqlTable("nutrition_goals", {
   carbsTarget: int("carbsTarget").notNull().default(250), // grams
   fibreTarget: int("fibreTarget").notNull().default(25), // grams
   hydrationTarget: int("hydrationTarget").notNull().default(2000), // ml per day
+  weightTarget: decimal("weightTarget", { precision: 5, scale: 1 }), // kg (optional target weight)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
