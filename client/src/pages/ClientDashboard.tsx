@@ -166,10 +166,36 @@ export default function ClientDashboard() {
   const estimateBeverageMutation = trpc.meals.estimateBeverage.useMutation({
     onSuccess: (data) => {
       setBeverageNutrition(data.nutrition);
-      toast.success(`Beverage estimated: ${data.nutrition.calories} kcal`);
+      toast.success('Beverage estimated successfully!');
     },
     onError: (error) => {
       toast.error(`Failed to estimate beverage: ${error.message}`);
+    },
+  });
+
+  const logDrinkMutation = trpc.drinks.create.useMutation({
+    onSuccess: () => {
+      toast.success("Drink logged successfully!");
+      setDrinkType("");
+      setVolumeMl("");
+      // Refetch today's summary to update hydration
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error(`Failed to log drink: ${error.message}`);
+    },
+  });
+
+  const logMetricsMutation = trpc.bodyMetrics.create.useMutation({
+    onSuccess: () => {
+      toast.success("Metrics logged successfully!");
+      setWeight("");
+      setHydration("");
+      // Refetch today's summary to update metrics
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error(`Failed to log metrics: ${error.message}`);
     },
   });
 
@@ -338,19 +364,6 @@ export default function ClientDashboard() {
     }
   };
 
-  const logDrinkMutation = trpc.drinks.create.useMutation({
-    onSuccess: () => {
-      toast.success("Drink logged successfully!");
-      setDrinkType("");
-      setVolumeMl("");
-      // Refetch today's summary to update hydration
-      window.location.reload();
-    },
-    onError: (error) => {
-      toast.error(`Failed to log drink: ${error.message}`);
-    },
-  });
-
   const handleLogDrink = async () => {
     if (!drinkType || !volumeMl) {
       toast.error("Please fill in all fields");
@@ -369,19 +382,6 @@ export default function ClientDashboard() {
       volumeMl: parseInt(volumeMl),
     });
   };
-
-  const logMetricsMutation = trpc.bodyMetrics.create.useMutation({
-    onSuccess: () => {
-      toast.success("Metrics logged successfully!");
-      setWeight("");
-      setHydration("");
-      // Refetch today's summary to update metrics
-      window.location.reload();
-    },
-    onError: (error) => {
-      toast.error(`Failed to log metrics: ${error.message}`);
-    },
-  });
 
   const handleLogMetrics = async () => {
     if (!weight && !hydration) {
