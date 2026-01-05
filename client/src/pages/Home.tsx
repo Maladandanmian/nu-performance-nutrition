@@ -31,18 +31,17 @@ export default function Home() {
     },
   });
 
-  // Redirect authenticated users to their dashboard
+  // Redirect authenticated trainers to their dashboard
+  // Clients can stay on home page to see login screen
   useEffect(() => {
     if (isAuthenticated && user) {
       if (user.role === 'admin') {
         setLocation('/trainer');
-      } else {
-        setLocation('/client');
       }
-    } else if (clientSession) {
-      setLocation('/client');
+      // Don't auto-redirect regular users, let them use the page
     }
-  }, [isAuthenticated, user, clientSession, setLocation]);
+    // Don't auto-redirect client sessions either
+  }, [isAuthenticated, user, setLocation]);
 
   const handlePINLogin = async (e: React.FormEvent) => {
     e.preventDefault();

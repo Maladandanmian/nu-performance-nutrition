@@ -165,3 +165,8 @@
 - [x] Test meal deletion
 - [x] Test drink editing
 - [x] Test drink deletion
+
+## Logout Redirect Fix (Jan 5, 2026)
+- [x] Update ClientDashboard logout to redirect to home page instead of Manus OAuth
+- [x] Remove auto-redirect from home page for client sessions
+- [ ] Test logout flow from client dashboard

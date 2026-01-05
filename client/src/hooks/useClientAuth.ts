@@ -6,7 +6,9 @@ export function useClientAuth() {
 
   const logout = async () => {
     await logoutMutation.mutateAsync();
+    // Force a full page reload to ensure cookies are cleared
     window.location.href = '/';
+    window.location.reload();
   };
 
   return {
