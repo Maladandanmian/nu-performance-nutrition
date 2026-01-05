@@ -129,3 +129,10 @@
 - [x] Add Octopus card detection instruction (look for figure-8 logo)
 - [x] Update UI hints to mention all three card types
 - [x] Test with images containing different reference cards
+
+## Hydration Tracking Bug
+- [x] Investigate why logged drinks don't appear in Today's Summary
+- [x] Check if drinks are being saved to database correctly
+- [x] Verify dailyTotals hydration aggregation logic
+- [x] Fix the hydration display issue
+- [x] Test with multiple drink entries

@@ -779,6 +779,14 @@ export const appRouter = router({
           ...input,
           loggedAt: new Date(),
         });
+        
+        // Also log hydration in body_metrics for Today's Summary
+        await db.createBodyMetric({
+          clientId: input.clientId,
+          hydration: input.volumeMl,
+          recordedAt: new Date(),
+        });
+        
         return { success: true, drinkId: Number(result[0].insertId) };
       }),
 
