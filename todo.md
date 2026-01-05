@@ -123,3 +123,9 @@
 - [x] Include 6 typical containers with ml equivalents
 - [x] Style as compact reference list
 - [x] Test visibility and usability
+
+## Scaling Reference Card Detection
+- [x] Update AI prompt to include credit card, business card, and Octopus card
+- [x] Add Octopus card detection instruction (look for figure-8 logo)
+- [x] Update UI hints to mention all three card types
+- [x] Test with images containing different reference cards

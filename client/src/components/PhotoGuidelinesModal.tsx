@@ -28,10 +28,10 @@ export function PhotoGuidelinesModal({ open, onOpenChange }: PhotoGuidelinesModa
               <CreditCard className="h-6 w-6 mt-1 flex-shrink-0" style={{color: '#578DB3'}} />
               <div>
                 <h3 className="font-semibold text-lg mb-2" style={{color: '#578DB3'}}>
-                  📏 Include a Credit Card for Scale
+                  📏 Include a Reference Card for Scale
                 </h3>
                 <p className="text-sm text-gray-700 mb-2">
-                  Place a standard credit card (8.6cm × 5.4cm) next to your meal in every photo. 
+                  Place a <strong>credit card</strong>, <strong>business card</strong>, or <strong>Octopus card</strong> next to your meal in every photo. 
                   This helps the AI calculate actual portion sizes accurately.
                 </p>
                 <div className="bg-white p-2 rounded border border-blue-300 text-xs text-gray-600 mt-2">
@@ -89,7 +89,7 @@ export function PhotoGuidelinesModal({ open, onOpenChange }: PhotoGuidelinesModa
                 Do This
               </h4>
               <ul className="text-sm text-gray-700 space-y-1">
-                <li>✓ Include credit card for scale</li>
+                <li>✓ Include reference card for scale</li>
                 <li>✓ Show entire plate/bowl</li>
                 <li>✓ Use good lighting</li>
                 <li>✓ Take from 30-45cm away</li>

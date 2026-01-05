@@ -430,7 +430,7 @@ export default function ClientDashboard() {
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    💡 Include a credit card for accurate portion sizing
+                    💡 Include a credit card, business card, or Octopus card for accurate portion sizing
                   </p>
                 </div>
 

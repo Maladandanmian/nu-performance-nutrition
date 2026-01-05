@@ -80,11 +80,13 @@ export async function analyzeMealImage(imageUrl: string): Promise<NutritionalAna
 IMPORTANT: Break down the meal into individual food components for better accuracy, especially for carbohydrates.
 
 PORTION SIZE CALIBRATION:
-- Look for a credit card (8.6cm × 5.4cm) in the image as a reference object
-- If present, use it to calculate the actual scale and portion sizes
-- A standard credit card is 8.6cm wide and 5.4cm tall
-- Use this known size to estimate the real dimensions of food items
-- If no credit card is visible, estimate portions based on typical serving sizes
+- Look for a scaling reference object in the image: credit card, business card, or Hong Kong Octopus card
+- Credit card: 8.6cm × 5.4cm (signature side up preferred)
+- Business card: 9cm × 5cm (standard size)
+- Octopus card: 8.6cm × 5.4cm (look for the distinctive figure-8 logo, as cards come in various colors)
+- If any reference card is present, use it to calculate the actual scale and portion sizes
+- Use the known dimensions to estimate the real size of food items
+- If no reference card is visible, estimate portions based on typical serving sizes
 
 For each visible food item, estimate:
 - Main protein source (meat, fish, tofu, etc.)
