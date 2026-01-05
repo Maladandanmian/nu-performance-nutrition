@@ -226,3 +226,10 @@
 - [x] Ensure beverage nutrition is saved correctly (drinks now use logDrinkMutation)
 - [x] Test beverage logging to verify single entry (ready for user testing)
 - [x] Clean up duplicate beverage entries in database (deleted beverage-only meal entries)
+
+## Drink Nutrition Data Display (Jan 5, 2026)
+- [x] Add nutrition columns (calories, protein, fat, carbs, fibre) to drinks table schema
+- [x] Update drink creation to estimate and save nutrition data
+- [x] Update NutritionHistoryFeed to display drink nutrition like meals
+- [x] Migrate existing drinks to have nutrition data (28 cal for 350ml tea with milk)
+- [x] Test drink nutrition display (28 cal showing for tea with milk)

@@ -109,6 +109,12 @@ export const drinks = mysqlTable("drinks", {
   clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
   drinkType: varchar("drinkType", { length: 100 }).notNull(), // water, coffee, tea, etc.
   volumeMl: int("volumeMl").notNull(), // volume in milliliters
+  // Nutritional data (estimated by AI)
+  calories: int("calories"),
+  protein: int("protein"), // grams
+  fat: int("fat"), // grams
+  carbs: int("carbs"), // grams
+  fibre: int("fibre"), // grams
   notes: text("notes"),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

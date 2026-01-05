@@ -336,10 +336,22 @@ function DrinkEntry({
           </div>
         </div>
         
+        {/* Nutrition Info */}
         <div className="flex gap-3 text-xs flex-wrap">
           <span className="font-medium">{drink.volumeMl}ml</span>
           <span className="text-muted-foreground">Hydration</span>
         </div>
+        
+        {/* Show nutrition if available */}
+        {drink.calories !== null && drink.calories !== undefined && (
+          <div className="flex gap-3 text-xs flex-wrap mt-2">
+            <span><strong>{drink.calories}</strong> cal</span>
+            <span>P: <strong>{drink.protein || 0}</strong>g</span>
+            <span>C: <strong>{drink.carbs || 0}</strong>g</span>
+            <span>F: <strong>{drink.fat || 0}</strong>g</span>
+            {drink.fibre > 0 && <span>Fiber: <strong>{drink.fibre}</strong>g</span>}
+          </div>
+        )}
       </div>
     </div>
   );

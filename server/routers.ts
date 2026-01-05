@@ -926,8 +926,16 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
+        // Estimate beverage nutrition
+        const nutrition = await estimateBeverageNutrition(input.drinkType, input.volumeMl);
+        
         const result = await db.createDrink({
           ...input,
+          calories: nutrition.calories,
+          protein: nutrition.protein,
+          fat: nutrition.fat,
+          carbs: nutrition.carbs,
+          fibre: nutrition.fibre,
           loggedAt: new Date(),
         });
         
