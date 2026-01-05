@@ -182,3 +182,10 @@
 - [x] Merge Meals and Drinks tabs into unified Nutrition tab
 - [x] Create NutritionHistoryFeed to show both meals and drinks chronologically
 - [x] Test hydration display and unified nutrition view
+
+## Meal Editing and Beverage Hydration (Jan 5, 2026)
+- [x] Fix hydration tracking to include beverages logged with meals (beverageVolumeMl field)
+- [x] Implement meal editing modal to allow modifying meal entries
+- [x] Add beverage editing capability in meal edit flow
+- [x] Test that meal beverages contribute to hydration circle
+- [x] Test meal editing functionality end-to-end

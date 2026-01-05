@@ -626,6 +626,9 @@ export const appRouter = router({
           existing.carbs += meal.beverageCarbs || 0;
           existing.fibre += meal.beverageFibre || 0;
           
+          // Add beverage volume to hydration
+          existing.hydration += meal.beverageVolumeMl || 0;
+          
           dailyMap.set(dateKey, existing);
         });
         

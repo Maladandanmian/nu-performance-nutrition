@@ -44,6 +44,7 @@ export default function ClientDashboard() {
   const [showAddComponent, setShowAddComponent] = useState(false);
   const [improvementAdvice, setImprovementAdvice] = useState<string>("");
   const [showAdvice, setShowAdvice] = useState(false);
+  const [editingMealId, setEditingMealId] = useState<number | null>(null);
   const [beverageNutrition, setBeverageNutrition] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +122,22 @@ export default function ClientDashboard() {
     },
     onError: (error) => {
       toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
+  const updateMealMutation = trpc.meals.update.useMutation({
+    onSuccess: () => {
+      toast.success("Meal updated successfully!");
+      setShowAnalysisModal(false);
+      setIsEditMode(false);
+      setShowAdvice(false);
+      setImprovementAdvice("");
+      setEditingMealId(null);
+      utils.meals.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to update meal: ${error.message}`);
     },
   });
   
@@ -441,9 +458,14 @@ export default function ClientDashboard() {
     setImageKey(meal.imageKey || "");
     setIsEditMode(true);
     setShowAnalysisModal(true);
+    setEditingMealId(meal.id);
+    setMealType(meal.mealType);
     
-    // Store the meal ID for updating
-    (window as any).editingMealId = meal.id;
+    // Set beverage data if present
+    if (meal.beverageType) {
+      setDrinkType(meal.beverageType);
+      setVolumeMl(meal.beverageVolumeMl?.toString() || "");
+    }
   };
 
   const handleEditDrink = (drink: any) => {
@@ -951,41 +973,65 @@ export default function ClientDashboard() {
 
             <Button 
               onClick={() => {
-                saveMealMutation.mutate({
-                  clientId: currentClientId,
-                  imageUrl,
-                  imageKey,
-                  mealType,
-                  calories: calculatedTotals.calories,
-                  protein: calculatedTotals.protein,
-                  fat: calculatedTotals.fat,
-                  carbs: calculatedTotals.carbs,
-                  fibre: calculatedTotals.fibre,
-                  aiDescription: analysisResult?.description || '',
-                  aiConfidence: analysisResult?.confidence || 0,
-                  notes: mealNotes || undefined,
-                  components: editedComponents,
-                  // Include beverage data if available
-                  beverageType: beverageNutrition?.drinkType,
-                  beverageVolumeMl: beverageNutrition?.volumeMl,
-                  beverageCalories: beverageNutrition?.calories,
-                  beverageProtein: beverageNutrition?.protein,
-                  beverageFat: beverageNutrition?.fat,
-                  beverageCarbs: beverageNutrition?.carbs,
-                  beverageFibre: beverageNutrition?.fibre,
-                });
+                if (isEditMode && editingMealId) {
+                  // Update existing meal
+                  updateMealMutation.mutate({
+                    mealId: editingMealId,
+                    clientId: currentClientId,
+                    imageUrl,
+                    imageKey,
+                    mealType,
+                    calories: calculatedTotals.calories,
+                    protein: calculatedTotals.protein,
+                    fat: calculatedTotals.fat,
+                    carbs: calculatedTotals.carbs,
+                    fibre: calculatedTotals.fibre,
+                    aiDescription: analysisResult?.description || '',
+                    aiConfidence: analysisResult?.confidence || 0,
+                    beverageType: beverageNutrition?.drinkType,
+                    beverageVolumeMl: beverageNutrition?.volumeMl,
+                    beverageCalories: beverageNutrition?.calories,
+                    beverageProtein: beverageNutrition?.protein,
+                    beverageFat: beverageNutrition?.fat,
+                    beverageCarbs: beverageNutrition?.carbs,
+                    beverageFibre: beverageNutrition?.fibre,
+                  });
+                } else {
+                  // Create new meal
+                  saveMealMutation.mutate({
+                    clientId: currentClientId,
+                    imageUrl,
+                    imageKey,
+                    mealType,
+                    calories: calculatedTotals.calories,
+                    protein: calculatedTotals.protein,
+                    fat: calculatedTotals.fat,
+                    carbs: calculatedTotals.carbs,
+                    fibre: calculatedTotals.fibre,
+                    aiDescription: analysisResult?.description || '',
+                    aiConfidence: analysisResult?.confidence || 0,
+                    beverageType: beverageNutrition?.drinkType,
+                    beverageVolumeMl: beverageNutrition?.volumeMl,
+                    beverageCalories: beverageNutrition?.calories,
+                    beverageProtein: beverageNutrition?.protein,
+                    beverageFat: beverageNutrition?.fat,
+                    beverageCarbs: beverageNutrition?.carbs,
+                    beverageFibre: beverageNutrition?.fibre,
+                  });
+                }
+                setEditingMealId(null);
               }} 
               className="w-full"
               style={{backgroundColor: '#578DB3'}}
-              disabled={saveMealMutation.isPending}
+              disabled={saveMealMutation.isPending || updateMealMutation.isPending}
             >
-              {saveMealMutation.isPending ? (
+              {(saveMealMutation.isPending || updateMealMutation.isPending) ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Saving...
                 </>
               ) : (
-                isEditMode ? 'Save & Log Meal' : 'Log Meal'
+                isEditMode ? 'Update Meal' : 'Log Meal'
               )}
             </Button>
           </div>
