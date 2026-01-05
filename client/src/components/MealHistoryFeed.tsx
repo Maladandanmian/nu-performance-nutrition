@@ -1,16 +1,18 @@
 import { trpc } from "@/lib/trpc";
 import { format, isToday, isYesterday, startOfWeek, startOfMonth, subDays } from "date-fns";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 
 interface MealHistoryFeedProps {
   clientId: number;
+  onEditMeal?: (meal: any) => void;
+  onDeleteMeal?: (mealId: number) => void;
 }
 
 type TimePeriod = 'week' | 'month' | '30days' | 'all';
 
-export function MealHistoryFeed({ clientId }: MealHistoryFeedProps) {
+export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHistoryFeedProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
   const { data: mealsData, isLoading, error } = trpc.meals.list.useQuery({ clientId });
 
@@ -257,6 +259,32 @@ export function MealHistoryFeed({ clientId }: MealHistoryFeedProps) {
                 Note: {meal.notes}
               </div>
             )}
+
+            {/* Action Buttons */}
+            <div className="mt-2 flex gap-2">
+              {onEditMeal && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEditMeal(meal)}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <Edit2 className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+              )}
+              {onDeleteMeal && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDeleteMeal(meal.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
         </div>
           ))}

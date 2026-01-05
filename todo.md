@@ -150,3 +150,18 @@
 - [x] Fixed saveMeal procedure to create drinks and body_metrics entries when beverage is included
 - [x] Test fix with fresh drink entry
 - [x] Clean up duplicate meal entries in database (removed 6 beverage-only entries)
+
+## Meal and Drink History Editing/Deletion (Jan 5, 2026)
+- [x] Add edit and delete buttons to MealHistoryFeed component
+- [ ] Create meal editing modal that reuses existing meal analysis interface
+- [x] Implement backend deleteMeal procedure
+- [x] Implement backend updateMeal procedure with AI re-evaluation
+- [x] Add drink history view in client dashboard
+- [x] Add edit and delete buttons to drink history entries
+- [x] Implement backend deleteDrink procedure
+- [x] Implement backend updateDrink procedure
+- [x] Ensure daily totals recalculate after edits/deletions
+- [x] Test meal editing with AI re-evaluation
+- [x] Test meal deletion
+- [x] Test drink editing
+- [x] Test drink deletion

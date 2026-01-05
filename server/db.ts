@@ -176,6 +176,18 @@ export async function getMealById(mealId: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function deleteMeal(mealId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(meals).where(eq(meals.id, mealId));
+}
+
+export async function updateMeal(mealId: number, data: Partial<InsertMeal>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(meals).set(data).where(eq(meals.id, mealId));
+}
+
 // Drink queries
 export async function createDrink(drink: InsertDrink) {
   const db = await getDb();
@@ -187,6 +199,18 @@ export async function getDrinksByClientId(clientId: number, limit: number = 50) 
   const db = await getDb();
   if (!db) return [];
   return db.select().from(drinks).where(eq(drinks.clientId, clientId)).orderBy(drinks.loggedAt).limit(limit);
+}
+
+export async function deleteDrink(drinkId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(drinks).where(eq(drinks.id, drinkId));
+}
+
+export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(drinks).set(data).where(eq(drinks.id, drinkId));
 }
 
 // Body metrics queries

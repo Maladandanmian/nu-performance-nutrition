@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
+import { DrinkHistoryFeed } from "@/components/DrinkHistoryFeed";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import TodaysSummary from "@/components/TodaysSummary";
 import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
@@ -395,6 +396,46 @@ export default function ClientDashboard() {
     setLocation('/');
   };
 
+  const deleteMealMutation = trpc.meals.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meal deleted successfully!");
+      utils.meals.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
+  const handleDeleteMeal = async (mealId: number) => {
+    if (confirm("Are you sure you want to delete this meal? This action cannot be undone.")) {
+      await deleteMealMutation.mutateAsync({ mealId });
+    }
+  };
+
+  const handleEditMeal = (meal: any) => {
+    // Populate the analysis modal with the meal data
+    setAnalysisResult({
+      description: meal.aiDescription,
+      calories: meal.calories,
+      protein: meal.protein,
+      fat: meal.fat,
+      carbs: meal.carbs,
+      fibre: meal.fibre,
+      confidence: meal.aiConfidence,
+      components: [], // We'll need to fetch components if stored
+      score: meal.nutritionScore,
+    });
+    setEditedComponents([]); // Initialize empty, will need to parse from meal data
+    setImageUrl(meal.imageUrl || "");
+    setImageKey(meal.imageKey || "");
+    setIsEditMode(true);
+    setShowAnalysisModal(true);
+    
+    // Store the meal ID for updating
+    (window as any).editingMealId = meal.id;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -426,11 +467,12 @@ export default function ClientDashboard() {
           <TodaysSummary clientId={clientSession?.clientId || 0} />
           
           <Tabs defaultValue="log-meal">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="history">Meals</TabsTrigger>
+            <TabsTrigger value="drinks">Drinks</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
-            <TabsTrigger value="log-metrics">Body Metrics</TabsTrigger>
+            <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -571,7 +613,7 @@ export default function ClientDashboard() {
             </Card>
           </TabsContent>
 
-          {/* History Tab */}
+          {/* Meal History Tab */}
           <TabsContent value="history">
             <Card>
               <CardHeader>
@@ -580,11 +622,33 @@ export default function ClientDashboard() {
                   Meal History
                 </CardTitle>
                 <CardDescription>
-                  View all your logged meals with nutrition details
+                  View and edit your logged meals with nutrition details
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <MealHistoryFeed clientId={clientSession?.clientId || 0} />
+                <MealHistoryFeed 
+                  clientId={clientSession?.clientId || 0} 
+                  onEditMeal={handleEditMeal}
+                  onDeleteMeal={handleDeleteMeal}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Drink History Tab */}
+          <TabsContent value="drinks">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Droplets className="h-5 w-5 text-blue-600" />
+                  Drink History
+                </CardTitle>
+                <CardDescription>
+                  View and edit your logged beverages
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DrinkHistoryFeed clientId={clientSession?.clientId || 0} />
               </CardContent>
             </Card>
           </TabsContent>

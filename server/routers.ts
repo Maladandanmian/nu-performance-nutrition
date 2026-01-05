@@ -781,6 +781,138 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return db.getMealById(input.mealId);
       }),
+
+    delete: authenticatedProcedure
+      .input(z.object({ mealId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteMeal(input.mealId);
+        return { success: true };
+      }),
+
+    update: authenticatedProcedure
+      .input(z.object({
+        mealId: z.number(),
+        clientId: z.number(),
+        imageUrl: z.string().optional(),
+        imageKey: z.string().optional(),
+        mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional(),
+        calories: z.number(),
+        protein: z.number(),
+        fat: z.number(),
+        carbs: z.number(),
+        fibre: z.number(),
+        aiDescription: z.string(),
+        aiConfidence: z.number().optional(),
+        notes: z.string().optional(),
+        beverageType: z.string().optional(),
+        beverageVolumeMl: z.number().optional(),
+        beverageCalories: z.number().optional(),
+        beverageProtein: z.number().optional(),
+        beverageFat: z.number().optional(),
+        beverageCarbs: z.number().optional(),
+        beverageFibre: z.number().optional(),
+        components: z.array(z.object({
+          name: z.string(),
+          calories: z.number(),
+          protein: z.number(),
+          fat: z.number(),
+          carbs: z.number(),
+          fibre: z.number(),
+        })).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // Get client's nutrition goals for scoring
+          const goals = await db.getNutritionGoalByClientId(input.clientId);
+          if (!goals) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Nutrition goals not found for this client' 
+            });
+          }
+
+          // Get the original meal to find its date
+          const originalMeal = await db.getMealById(input.mealId);
+          if (!originalMeal) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Meal not found' 
+            });
+          }
+
+          // Calculate that day's totals (excluding the meal being edited)
+          const allMeals = await db.getMealsByClientId(input.clientId);
+          const mealDate = new Date(originalMeal.loggedAt);
+          mealDate.setHours(0, 0, 0, 0);
+          
+          const dayMeals = allMeals.filter(meal => {
+            if (meal.id === input.mealId) return false; // Exclude current meal
+            const mDate = new Date(meal.loggedAt);
+            mDate.setHours(0, 0, 0, 0);
+            return mDate.getTime() === mealDate.getTime();
+          });
+          
+          const dayTotals = dayMeals.reduce(
+            (totals, meal) => ({
+              calories: totals.calories + (meal.calories || 0) + (meal.beverageCalories || 0),
+              protein: totals.protein + (meal.protein || 0) + (meal.beverageProtein || 0),
+              fat: totals.fat + (meal.fat || 0) + (meal.beverageFat || 0),
+              carbs: totals.carbs + (meal.carbs || 0) + (meal.beverageCarbs || 0),
+              fibre: totals.fibre + (meal.fibre || 0) + (meal.beverageFibre || 0),
+            }),
+            { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
+          );
+
+          // Calculate nutrition score (include beverage if present)
+          const totalNutrition = {
+            calories: input.calories + (input.beverageCalories || 0),
+            protein: input.protein + (input.beverageProtein || 0),
+            fat: input.fat + (input.beverageFat || 0),
+            carbs: input.carbs + (input.beverageCarbs || 0),
+            fibre: input.fibre + (input.beverageFibre || 0),
+          };
+          
+          const score = calculateNutritionScore(
+            totalNutrition,
+            goals,
+            dayTotals
+          );
+
+          // Update meal in database
+          await db.updateMeal(input.mealId, {
+            imageUrl: input.imageUrl,
+            imageKey: input.imageKey,
+            mealType: input.mealType,
+            calories: input.calories,
+            protein: input.protein,
+            fat: input.fat,
+            carbs: input.carbs,
+            fibre: input.fibre,
+            aiDescription: input.aiDescription,
+            aiConfidence: input.aiConfidence,
+            nutritionScore: score,
+            notes: input.notes,
+            beverageType: input.beverageType,
+            beverageVolumeMl: input.beverageVolumeMl,
+            beverageCalories: input.beverageCalories,
+            beverageProtein: input.beverageProtein,
+            beverageFat: input.beverageFat,
+            beverageCarbs: input.beverageCarbs,
+            beverageFibre: input.beverageFibre,
+          });
+
+          return {
+            success: true,
+            score,
+          };
+        } catch (error) {
+          console.error('Error in updateMeal:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to update meal',
+          });
+        }
+      }),
   }),
 
   // Drinks
@@ -812,6 +944,26 @@ export const appRouter = router({
       .input(z.object({ clientId: z.number() }))
       .query(async ({ input }) => {
         return db.getDrinksByClientId(input.clientId);
+      }),
+
+    delete: authenticatedProcedure
+      .input(z.object({ drinkId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteDrink(input.drinkId);
+        return { success: true };
+      }),
+
+    update: authenticatedProcedure
+      .input(z.object({
+        drinkId: z.number(),
+        drinkType: z.string().optional(),
+        volumeMl: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { drinkId, ...data } = input;
+        await db.updateDrink(drinkId, data);
+        return { success: true };
       }),
   }),
 
