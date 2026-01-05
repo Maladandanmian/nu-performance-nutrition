@@ -225,3 +225,22 @@ export async function getBodyMetricsByClientId(clientId: number, limit: number =
   if (!db) return [];
   return db.select().from(bodyMetrics).where(eq(bodyMetrics.clientId, clientId)).orderBy(bodyMetrics.recordedAt).limit(limit);
 }
+
+
+// Test cleanup function - deletes all data for a client
+export async function deleteClientAndData(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    // Delete in order of dependencies
+    await db.delete(bodyMetrics).where(eq(bodyMetrics.clientId, clientId));
+    await db.delete(drinks).where(eq(drinks.clientId, clientId));
+    await db.delete(meals).where(eq(meals.clientId, clientId));
+    await db.delete(nutritionGoals).where(eq(nutritionGoals.clientId, clientId));
+    await db.delete(clients).where(eq(clients.id, clientId));
+  } catch (error) {
+    console.error(`[Database] Failed to delete client ${clientId}:`, error);
+    throw error;
+  }
+}

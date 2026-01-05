@@ -1,8 +1,19 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as db from './db';
 
 describe('Beverage Logging in saveMeal', () => {
   let testClientId: number;
+
+  afterEach(async () => {
+    // Clean up test data
+    if (testClientId) {
+      try {
+        await db.deleteClientAndData(testClientId);
+      } catch (error) {
+        console.error('Failed to clean up test client:', error);
+      }
+    }
+  });
 
   beforeEach(async () => {
     // Create a test client with nutrition goals

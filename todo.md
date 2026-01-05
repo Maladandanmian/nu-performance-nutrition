@@ -248,3 +248,8 @@
 ## Drink Estimation Error (Jan 5, 2026)
 - [x] Fix "error logging drink" when clicking Analyse button (removed double estimation)
 - [x] Prevent form from clearing if estimation fails (now requires pre-estimated nutrition)
+
+## Test Database Separation (Jan 5, 2026)
+- [x] Add cleanup function to delete test clients after tests
+- [x] Update test files to use cleanup in afterEach
+- [x] Verify main database remains clean after test runs

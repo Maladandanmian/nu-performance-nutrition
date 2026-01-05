@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import * as db from './db';
 
 describe('Drink logging and editing', () => {
@@ -18,23 +18,16 @@ describe('Drink logging and editing', () => {
 
   afterAll(async () => {
     // Cleanup - delete test data
-    if (drinkId) {
-      await db.deleteDrink(drinkId);
-    }
     if (clientId) {
-      // Delete client and related data
-      const meals = await db.getMealsByClientId(clientId);
-      for (const meal of meals) {
-        await db.deleteMeal(meal.id);
+      try {
+        await db.deleteClientAndData(clientId);
+      } catch (error) {
+        console.error('Failed to clean up test client:', error);
       }
-      const drinks = await db.getDrinksByClientId(clientId);
-      for (const drink of drinks) {
-        await db.deleteDrink(drink.id);
-      }
-      // Delete client
-      await db.deleteClient(clientId);
     }
   });
+
+
 
   it('should create a drink with nutrition data', async () => {
     const result = await db.createDrink({
