@@ -189,3 +189,11 @@
 - [x] Add beverage editing capability in meal edit flow
 - [x] Test that meal beverages contribute to hydration circle
 - [x] Test meal editing functionality end-to-end
+
+## Fix Meal Editing Modal (Jan 5, 2026)
+- [x] Show meal type selector in edit modal
+- [x] Show beverage section in edit modal
+- [x] Pre-populate beverage fields with existing data
+- [x] Allow changing meal type from dropdown
+- [x] Allow modifying beverage volume and type
+- [x] Test editing meal type and beverage volume

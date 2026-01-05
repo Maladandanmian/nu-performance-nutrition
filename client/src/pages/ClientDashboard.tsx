@@ -465,6 +465,21 @@ export default function ClientDashboard() {
     if (meal.beverageType) {
       setDrinkType(meal.beverageType);
       setVolumeMl(meal.beverageVolumeMl?.toString() || "");
+      // Set beverage nutrition from meal data
+      setBeverageNutrition({
+        drinkType: meal.beverageType,
+        volumeMl: meal.beverageVolumeMl,
+        calories: meal.beverageCalories || 0,
+        protein: meal.beverageProtein || 0,
+        fat: meal.beverageFat || 0,
+        carbs: meal.beverageCarbs || 0,
+        fibre: meal.beverageFibre || 0,
+      });
+    } else {
+      // Clear beverage fields if no beverage
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
     }
   };
 
@@ -757,6 +772,73 @@ export default function ClientDashboard() {
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
+            {/* Meal Type Selector */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-meal-type">Meal Type</Label>
+              <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                <SelectTrigger id="edit-meal-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="snack">Snack</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Beverage Section */}
+            <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-sm" style={{color: '#578DB3'}}>Beverage (Optional)</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="edit-drink-type" className="text-xs">Drink Type</Label>
+                  <Input
+                    id="edit-drink-type"
+                    placeholder="e.g., Water, Tea"
+                    value={drinkType}
+                    onChange={(e) => setDrinkType(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-volume" className="text-xs">Volume (ml)</Label>
+                  <Input
+                    id="edit-volume"
+                    type="number"
+                    placeholder="e.g., 350"
+                    value={volumeMl}
+                    onChange={(e) => setVolumeMl(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+              {drinkType && volumeMl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    estimateBeverageMutation.mutate({
+                      drinkType,
+                      volumeMl: parseInt(volumeMl),
+                    });
+                  }}
+                  disabled={estimateBeverageMutation.isPending}
+                  className="w-full text-xs"
+                >
+                  {estimateBeverageMutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
+                      Estimating...
+                    </>
+                  ) : (
+                    beverageNutrition ? '✓ Beverage Estimated' : 'Estimate Beverage Nutrition'
+                  )}
+                </Button>
+              )}
+            </div>
+
             {/* Nutrition Score */}
             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200">
               <div className="text-sm font-medium text-gray-600 mb-2">Nutrition Score</div>
