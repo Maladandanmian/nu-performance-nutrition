@@ -377,3 +377,10 @@
 
 ## Mug Volume Correction (Jan 6, 2026)
 - [x] Update mug volume reference from 350ml to 250ml in drink logging guide
+
+## Reference Card Detection Indicator (Jan 6, 2026)
+- [x] Update AI meal analysis prompt to detect and report reference card presence
+- [x] Modify analysis response schema to include `referenceCardDetected` boolean field
+- [x] Add checkbox indicator UI below meal description showing card detection status
+- [x] Update meal analysis modal to display the indicator
+- [x] Test with images containing reference cards

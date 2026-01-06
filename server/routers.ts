@@ -290,6 +290,7 @@ export const appRouter = router({
               carbs: analysis.carbs,
               fibre: analysis.fibre,
               confidence: analysis.confidence,
+              referenceCardDetected: analysis.referenceCardDetected,
               score,
               components: (analysis as any).components || [],
               validationWarnings: (analysis as any).validationWarnings || [],

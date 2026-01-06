@@ -17,6 +17,7 @@ export interface NutritionalAnalysis {
   carbs: number; // grams
   fibre: number; // grams
   confidence: number; // 0-100
+  referenceCardDetected: boolean; // Whether a reference card was detected for portion sizing
   components?: FoodComponent[]; // Itemized breakdown of food components
   validationWarnings?: string[]; // Any validation issues detected
 }
@@ -113,7 +114,10 @@ Be realistic with portion sizes. If you see a nutrition label, read it carefully
               type: "text",
               text: `Please analyze this meal or nutrition label and provide detailed nutritional information.
 
-IMPORTANT: If you see a credit card (8.6cm × 5.4cm) in the image, use it as a reference to calculate accurate portion sizes. The credit card's known dimensions will help you estimate the actual size of food items.
+REFERENCE CARD DETECTION:
+- Look carefully for a reference card in the image: credit card, business card, or Octopus card
+- If you see ANY of these cards, set referenceCardDetected to true and use the card's known dimensions to calculate accurate portion sizes
+- If NO reference card is visible, set referenceCardDetected to false and estimate portions based on typical serving sizes
 
 Break down the meal into individual food components (e.g., "grilled chicken breast", "steamed rice", "stir-fried vegetables", "teriyaki sauce", etc.) and estimate nutrition for each component separately.
 
@@ -205,8 +209,12 @@ Then sum up the totals.`,
                 type: "integer",
                 description: "Confidence level 0-100",
               },
+              referenceCardDetected: {
+                type: "boolean",
+                description: "Whether a reference card (credit card, business card, or Octopus card) was detected in the image for portion size calibration",
+              },
             },
-            required: ["description", "components", "calories", "protein", "fat", "carbs", "fibre", "confidence"],
+            required: ["description", "components", "calories", "protein", "fat", "carbs", "fibre", "confidence", "referenceCardDetected"],
             additionalProperties: false,
           },
         },
