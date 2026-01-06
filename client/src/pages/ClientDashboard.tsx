@@ -71,7 +71,6 @@ export default function ClientDashboard() {
   });
   const [justLoggedDrinkId, setJustLoggedDrinkId] = useState<number | null>(null);
   const [weight, setWeight] = useState("");
-  const [hydration, setHydration] = useState("");
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [showPhotoGuide, setShowPhotoGuide] = useState(false);
@@ -274,7 +273,6 @@ export default function ClientDashboard() {
     onSuccess: () => {
       toast.success("Metrics logged successfully!");
       setWeight("");
-      setHydration("");
       // Refetch today's summary to update metrics
       // Show summary instead of reloading
     },
@@ -472,8 +470,8 @@ export default function ClientDashboard() {
   };
 
   const handleLogMetrics = async () => {
-    if (!weight && !hydration) {
-      toast.error("Please enter at least one metric");
+    if (!weight) {
+      toast.error("Please enter weight");
       return;
     }
 
@@ -486,7 +484,6 @@ export default function ClientDashboard() {
     await logMetricsMutation.mutateAsync({
       clientId,
       weight: weight ? parseFloat(weight) : undefined,
-      hydration: hydration ? parseInt(hydration) : undefined,
     });
   };
 
@@ -820,7 +817,7 @@ export default function ClientDashboard() {
                   Body Metrics
                 </CardTitle>
                 <CardDescription>
-                  Track your weight and daily hydration
+                  Track your weight over time
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -833,17 +830,6 @@ export default function ClientDashboard() {
                     placeholder="e.g., 75.5"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="hydration">Total Hydration Today (ml)</Label>
-                  <Input
-                    id="hydration"
-                    type="number"
-                    placeholder="e.g., 2000"
-                    value={hydration}
-                    onChange={(e) => setHydration(e.target.value)}
                   />
                 </div>
 

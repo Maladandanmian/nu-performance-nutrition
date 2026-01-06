@@ -361,3 +361,7 @@
 - [x] Update time period options to match Trends tab (Today, Last 7 Days, Last 30 Days, All Time)
 - [x] Keep category filter buttons unchanged
 - [x] Test dropdown functionality
+
+## Remove Obsolete Hydration Metric (Jan 6, 2026)
+- [x] Remove "Total Hydration Today" metric from Metrics tab
+- [x] Verify Metrics tab displays correctly without hydration metric
