@@ -330,3 +330,12 @@
 - [x] Implement table view for Hydration trend
 - [x] Ensure toggle state persists across all three charts
 - [x] Test switching between graph and table views
+
+## Date Range Selector for Trends (Jan 6, 2026)
+- [x] Add date range state to NutrientTrendGraphs component
+- [x] Add Select dropdown for date range (All Time, Last 30 Days, Last 7 Days, Today)
+- [x] Update dailyTotals query to accept dynamic days parameter
+- [x] Implement "All Time" option to fetch all available data
+- [x] Implement "Today" option to show only current day
+- [x] Update chart data generation to handle variable date ranges
+- [x] Test all date range options

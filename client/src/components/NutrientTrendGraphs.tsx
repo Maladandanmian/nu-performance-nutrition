@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { format } from "date-fns";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, Table } from "lucide-react";
 
 interface NutrientTrendGraphsProps {
@@ -13,10 +14,15 @@ interface NutrientTrendGraphsProps {
 
 export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphsProps) {
   const [viewMode, setViewMode] = useState<'graph' | 'table'>('graph');
+  const [selectedDateRange, setSelectedDateRange] = useState<'today' | '7days' | '30days' | 'all'>('7days');
+  
+  // Calculate days based on selected range
+  const calculatedDays = selectedDateRange === 'today' ? 1 : selectedDateRange === '7days' ? 7 : selectedDateRange === '30days' ? 30 : 365; // Use 365 for "all time"
+  
   const timezoneOffset = new Date().getTimezoneOffset();
   const { data, isLoading, error } = trpc.meals.dailyTotals.useQuery({ 
     clientId, 
-    days,
+    days: calculatedDays,
     timezoneOffset
   });
 
@@ -61,7 +67,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
     return dates;
   };
 
-  const dateRange = generateDateRange(days);
+  const dateRange = generateDateRange(calculatedDays);
 
   // Create a map of existing data
   const dataMap = new Map(dailyTotals.map(day => [day.date, day]));
@@ -129,6 +135,22 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
 
   return (
     <div className="space-y-6">
+      {/* Date Range Selector */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Nutrition Trends</h3>
+        <Select value={selectedDateRange} onValueChange={(value) => setSelectedDateRange(value as 'today' | '7days' | '30days' | 'all')}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="today">Today</SelectItem>
+            <SelectItem value="7days">Last 7 Days</SelectItem>
+            <SelectItem value="30days">Last 30 Days</SelectItem>
+            <SelectItem value="all">All Time</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Calories Chart */}
       <Card>
         <CardHeader>
@@ -139,7 +161,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                 Calories Trend
               </CardTitle>
               <CardDescription>
-                Last {days} days | Target: {goals.calories} kcal/day
+                {selectedDateRange === 'today' ? 'Today' : selectedDateRange === '7days' ? 'Last 7 days' : selectedDateRange === '30days' ? 'Last 30 days' : 'All time'} | Target: {goals.calories} kcal/day
               </CardDescription>
             </div>
             <Button
@@ -284,7 +306,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                 Macronutrients Trend
               </CardTitle>
               <CardDescription>
-                Last {days} days | Protein: {goals.protein}g, Fat: {goals.fat}g, Carbs: {goals.carbs}g, Fiber: {goals.fibre}g
+                {selectedDateRange === 'today' ? 'Today' : selectedDateRange === '7days' ? 'Last 7 days' : selectedDateRange === '30days' ? 'Last 30 days' : 'All time'} | Protein: {goals.protein}g, Fat: {goals.fat}g, Carbs: {goals.carbs}g, Fiber: {goals.fibre}g
               </CardDescription>
             </div>
             <Button
@@ -496,7 +518,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                 Hydration Trend
               </CardTitle>
               <CardDescription>
-                Last {days} days | Daily water intake vs target
+                {selectedDateRange === 'today' ? 'Today' : selectedDateRange === '7days' ? 'Last 7 days' : selectedDateRange === '30days' ? 'Last 30 days' : 'All time'} | Daily water intake vs target
               </CardDescription>
             </div>
             <Button
