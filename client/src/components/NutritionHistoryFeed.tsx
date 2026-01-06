@@ -3,6 +3,7 @@ import { format, isToday, isYesterday, startOfWeek, startOfMonth, subDays } from
 import { Calendar, Clock, Edit2, Trash2, Droplet, Utensils } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface NutritionHistoryFeedProps {
   clientId: number;
@@ -12,7 +13,7 @@ interface NutritionHistoryFeedProps {
   onDeleteDrink?: (drinkId: number) => void;
 }
 
-type TimePeriod = 'week' | 'month' | '30days' | 'all';
+type TimePeriod = 'today' | '7days' | '30days' | 'all';
 type EntryType = 'meal' | 'drink';
 type CategoryFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'beverage';
 
@@ -70,13 +71,14 @@ export function NutritionHistoryFeed({
     const now = new Date();
     let filtered = combined;
     switch (timePeriod) {
-      case 'week':
-        const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-        filtered = combined.filter(e => e.loggedAt >= weekStart);
+      case 'today':
+        const todayStart = new Date(now);
+        todayStart.setHours(0, 0, 0, 0);
+        filtered = combined.filter(e => e.loggedAt >= todayStart);
         break;
-      case 'month':
-        const monthStart = startOfMonth(now);
-        filtered = combined.filter(e => e.loggedAt >= monthStart);
+      case '7days':
+        const sevenDaysAgo = subDays(now, 7);
+        filtered = combined.filter(e => e.loggedAt >= sevenDaysAgo);
         break;
       case '30days':
         const thirtyDaysAgo = subDays(now, 30);
@@ -184,20 +186,19 @@ export function NutritionHistoryFeed({
   return (
     <div className="space-y-6">
       {/* Time Period Filter */}
-      <div className="flex gap-2 flex-wrap">
-        {(['week', 'month', '30days', 'all'] as TimePeriod[]).map(period => (
-          <Button
-            key={period}
-            variant={timePeriod === period ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimePeriod(period)}
-          >
-            {period === 'week' && 'This Week'}
-            {period === 'month' && 'This Month'}
-            {period === '30days' && 'Last 30 Days'}
-            {period === 'all' && 'All Time'}
-          </Button>
-        ))}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Time Period</h3>
+        <Select value={timePeriod} onValueChange={(value) => setTimePeriod(value as TimePeriod)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="today">Today</SelectItem>
+            <SelectItem value="7days">Last 7 Days</SelectItem>
+            <SelectItem value="30days">Last 30 Days</SelectItem>
+            <SelectItem value="all">All Time</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Category Filter */}

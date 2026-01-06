@@ -355,3 +355,9 @@
 - [x] Update mealType state initialization to use smart pre-selection
 - [x] Ensure user can still manually change the pre-selected meal type
 - [x] Test pre-selection at different times of day
+
+## Nutrition History Time Period Filter UI Update (Jan 6, 2026)
+- [x] Replace time period buttons with Select dropdown in NutritionHistoryFeed
+- [x] Update time period options to match Trends tab (Today, Last 7 Days, Last 30 Days, All Time)
+- [x] Keep category filter buttons unchanged
+- [x] Test dropdown functionality
