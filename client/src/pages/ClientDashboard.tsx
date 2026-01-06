@@ -397,6 +397,10 @@ export default function ClientDashboard() {
           notes: "",
         });
         
+        // Store drink details before clearing
+        const currentDrinkType = drinkType;
+        const currentVolumeMl = volumeMl;
+        
         // Clear form
         setDrinkType("");
         setVolumeMl("");
@@ -407,7 +411,7 @@ export default function ClientDashboard() {
         // Score drinks 1-5: low-cal drinks score higher (5 is best)
         const drinkScore = nutritionToUse.calories < 50 ? 5 : nutritionToUse.calories < 100 ? 4 : nutritionToUse.calories < 150 ? 3 : nutritionToUse.calories < 200 ? 2 : 1;
         setAnalysisResult({
-          description: drinkType,
+          description: currentDrinkType,
           calories: nutritionToUse.calories,
           protein: nutritionToUse.protein,
           fat: nutritionToUse.fat,
@@ -415,7 +419,12 @@ export default function ClientDashboard() {
           fibre: nutritionToUse.fibre,
           score: drinkScore,
           isDrink: true,
+          drinkType: currentDrinkType,
+          volumeMl: currentVolumeMl,
         });
+        // Set the modal state variables with the drink details
+        setDrinkType(currentDrinkType);
+        setVolumeMl(currentVolumeMl);
         setShowAnalysisModal(true);
       } catch (error) {
         console.error('Error logging beverage:', error);

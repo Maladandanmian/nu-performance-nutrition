@@ -406,3 +406,7 @@
 - [x] Remove "Jasmine Tea" text (meal analysis description) for beverage-only entries
 - [x] Hide "Card Detected for Portion Estimation" checkbox for beverage-only entries
 - [x] Test beverage logging modal displays correctly
+
+## Drink Details Population Fix (Jan 6, 2026)
+- [x] Initialize drinkType and volumeMl state when beverage modal opens
+- [x] Verify drink type and volume display in modal
