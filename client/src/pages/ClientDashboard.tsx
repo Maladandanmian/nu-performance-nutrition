@@ -878,25 +878,15 @@ export default function ClientDashboard() {
 
           {/* Reference Card Detection Indicator */}
           {analysisResult && (
-            <div className="flex items-center gap-2 px-1 py-2 text-sm">
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-md ${
-                analysisResult.referenceCardDetected 
-                  ? 'bg-green-50 border border-green-200 text-green-800' 
-                  : 'bg-gray-50 border border-gray-200 text-gray-600'
-              }`}>
-                <input 
-                  type="checkbox" 
-                  checked={analysisResult.referenceCardDetected} 
-                  readOnly 
-                  className="h-4 w-4 rounded border-gray-300"
-                  style={{ accentColor: analysisResult.referenceCardDetected ? '#10b981' : '#9ca3af' }}
-                />
-                <span className="font-medium">
-                  {analysisResult.referenceCardDetected 
-                    ? 'Reference card detected - portion sizes calibrated' 
-                    : 'No reference card detected - using standard portion estimates'}
-                </span>
-              </div>
+            <div className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700">
+              <input 
+                type="checkbox" 
+                checked={analysisResult.referenceCardDetected} 
+                readOnly 
+                className="h-4 w-4 rounded border-gray-300"
+                style={{ accentColor: '#10b981' }}
+              />
+              <span>Card Detected for Portion Estimation</span>
             </div>
           )}
 
