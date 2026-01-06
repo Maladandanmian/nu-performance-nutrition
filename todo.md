@@ -394,3 +394,9 @@
 - [x] Find where drink logging sends nutrition data
 - [x] Add default values (0) for calories, protein, fat, carbs, fibre when undefined
 - [x] Test logging zero-calorie beverages like tea
+
+## Zero-Calorie Drink Default Values (Jan 6, 2026)
+- [x] Check drinks table schema for nutrition field defaults
+- [x] Ensure drinks.create procedure defaults nutrition fields to 0
+- [x] Verify beverage estimation returns 0 (not null) for water, black coffee, tea
+- [x] Test hydration tracking with zero-calorie beverages

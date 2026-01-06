@@ -111,11 +111,11 @@ export const drinks = mysqlTable("drinks", {
   drinkType: varchar("drinkType", { length: 100 }).notNull(), // water, coffee, tea, etc.
   volumeMl: int("volumeMl").notNull(), // volume in milliliters
   // Nutritional data (estimated by AI)
-  calories: int("calories"),
-  protein: int("protein"), // grams
-  fat: int("fat"), // grams
-  carbs: int("carbs"), // grams
-  fibre: int("fibre"), // grams
+  calories: int("calories").default(0).notNull(),
+  protein: int("protein").default(0).notNull(), // grams
+  fat: int("fat").default(0).notNull(), // grams
+  carbs: int("carbs").default(0).notNull(), // grams
+  fibre: int("fibre").default(0).notNull(), // grams
   notes: text("notes"),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
