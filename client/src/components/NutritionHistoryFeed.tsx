@@ -14,6 +14,7 @@ interface NutritionHistoryFeedProps {
 
 type TimePeriod = 'week' | 'month' | '30days' | 'all';
 type EntryType = 'meal' | 'drink';
+type CategoryFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'beverage';
 
 interface NutritionEntry {
   id: number;
@@ -30,6 +31,7 @@ export function NutritionHistoryFeed({
   onDeleteDrink 
 }: NutritionHistoryFeedProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const { data: mealsData, isLoading: mealsLoading } = trpc.meals.list.useQuery({ clientId });
   const { data: drinksData, isLoading: drinksLoading } = trpc.drinks.list.useQuery({ clientId });
 
@@ -66,21 +68,64 @@ export function NutritionHistoryFeed({
     
     // Filter by time period
     const now = new Date();
+    let filtered = combined;
     switch (timePeriod) {
       case 'week':
         const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-        return combined.filter(e => e.loggedAt >= weekStart);
+        filtered = combined.filter(e => e.loggedAt >= weekStart);
+        break;
       case 'month':
         const monthStart = startOfMonth(now);
-        return combined.filter(e => e.loggedAt >= monthStart);
+        filtered = combined.filter(e => e.loggedAt >= monthStart);
+        break;
       case '30days':
         const thirtyDaysAgo = subDays(now, 30);
-        return combined.filter(e => e.loggedAt >= thirtyDaysAgo);
+        filtered = combined.filter(e => e.loggedAt >= thirtyDaysAgo);
+        break;
       case 'all':
       default:
-        return combined;
+        filtered = combined;
     }
-  }, [mealsData, drinksData, timePeriod]);
+    
+    // Filter by category
+    if (categoryFilter !== 'all') {
+      if (categoryFilter === 'beverage') {
+        // Show standalone drinks AND drinks from meals (as separate entries)
+        const beverageEntries: NutritionEntry[] = [];
+        filtered.forEach(entry => {
+          if (entry.type === 'drink') {
+            // Standalone drink
+            beverageEntries.push(entry);
+          } else if (entry.type === 'meal' && entry.data.beverageType) {
+            // Meal with beverage - create a drink-only entry
+            beverageEntries.push({
+              id: entry.id,
+              type: 'drink',
+              loggedAt: entry.loggedAt,
+              data: {
+                drinkType: entry.data.beverageType,
+                volumeMl: entry.data.beverageVolumeMl,
+                calories: entry.data.beverageCalories,
+                protein: entry.data.beverageProtein,
+                fat: entry.data.beverageFat,
+                carbs: entry.data.beverageCarbs,
+                fibre: entry.data.beverageFibre,
+                loggedAt: entry.data.loggedAt,
+              },
+            });
+          }
+        });
+        return beverageEntries;
+      } else {
+        // Filter by meal type
+        return filtered.filter(entry => 
+          entry.type === 'meal' && entry.data.mealType === categoryFilter
+        );
+      }
+    }
+    
+    return filtered;
+  }, [mealsData, drinksData, timePeriod, categoryFilter]);
 
   // Group entries by date
   const groupedEntries = useMemo(() => {
@@ -151,6 +196,25 @@ export function NutritionHistoryFeed({
             {period === 'month' && 'This Month'}
             {period === '30days' && 'Last 30 Days'}
             {period === 'all' && 'All Time'}
+          </Button>
+        ))}
+      </div>
+
+      {/* Category Filter */}
+      <div className="flex gap-2 flex-wrap">
+        {(['all', 'breakfast', 'lunch', 'dinner', 'snack', 'beverage'] as CategoryFilter[]).map(category => (
+          <Button
+            key={category}
+            variant={categoryFilter === category ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCategoryFilter(category)}
+          >
+            {category === 'all' && 'All'}
+            {category === 'breakfast' && 'Breakfast'}
+            {category === 'lunch' && 'Lunch'}
+            {category === 'dinner' && 'Dinner'}
+            {category === 'snack' && 'Snack'}
+            {category === 'beverage' && 'Beverages'}
           </Button>
         ))}
       </div>

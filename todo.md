@@ -339,3 +339,12 @@
 - [x] Implement "Today" option to show only current day
 - [x] Update chart data generation to handle variable date ranges
 - [x] Test all date range options
+
+## Nutrition History Category Filters (Jan 6, 2026)
+- [x] Add category filter state to NutritionHistoryFeed component
+- [x] Add filter buttons UI (All, Breakfast, Lunch, Dinner, Snack, Beverage)
+- [x] Implement filtering logic for meal types
+- [x] Implement beverage filtering to show standalone drinks
+- [x] Include drinks logged with meals in beverage filter (show only drink portion)
+- [x] Update NutritionHistoryFeed to accept and apply category filter
+- [x] Test all category filters
