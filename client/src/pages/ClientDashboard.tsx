@@ -32,6 +32,8 @@ export default function ClientDashboard() {
   const [mealNotes, setMealNotes] = useState("");
   const [drinkType, setDrinkType] = useState("");
   const [volumeMl, setVolumeMl] = useState("");
+  const [drinkDateTime, setDrinkDateTime] = useState(new Date().toISOString().slice(0, 16));
+  const [justLoggedDrinkId, setJustLoggedDrinkId] = useState<number | null>(null);
   const [weight, setWeight] = useState("");
   const [hydration, setHydration] = useState("");
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -190,10 +192,13 @@ export default function ClientDashboard() {
   });
 
   const logDrinkMutation = trpc.drinks.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Drink logged successfully!");
-      setDrinkType("");
-      setVolumeMl("");
+      // Store the drink ID for potential editing in summary modal
+      if (data && data.drinkId) {
+        setJustLoggedDrinkId(data.drinkId);
+      }
+      // Don't clear form yet - user might want to edit in summary modal
       // Refetch today's summary to update hydration
       // Show summary instead of reloading
     },
@@ -818,6 +823,44 @@ export default function ClientDashboard() {
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
+            {/* Drink Details Section - show for drink-only */}
+            {analysisResult?.isDrink && (
+              <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="font-semibold text-sm" style={{color: '#578DB3'}}>Drink Details</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="drink-type-display" className="text-xs">Drink Type</Label>
+                    <Input
+                      id="drink-type-display"
+                      value={drinkType}
+                      onChange={(e) => setDrinkType(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="volume-display" className="text-xs">Volume (ml)</Label>
+                    <Input
+                      id="volume-display"
+                      type="number"
+                      value={volumeMl}
+                      onChange={(e) => setVolumeMl(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="drink-date" className="text-xs">Date & Time</Label>
+                  <Input
+                    id="drink-date"
+                    type="datetime-local"
+                    value={drinkDateTime}
+                    onChange={(e) => setDrinkDateTime(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Meal Type Selector - hide for drink-only */}
             {!analysisResult?.isDrink && (
               <div className="space-y-2">
@@ -1135,6 +1178,25 @@ export default function ClientDashboard() {
 
             <Button 
               onClick={() => {
+                // If this is a drink-only summary (just logged), save any edits
+                if (analysisResult?.isDrink && !editingMealId && justLoggedDrinkId) {
+                  // Update the just-logged drink with any changes
+                  updateDrinkMutation.mutate({
+                    drinkId: justLoggedDrinkId,
+                    drinkType,
+                    volumeMl: parseInt(volumeMl),
+                  });
+                  setJustLoggedDrinkId(null);
+                  return;
+                }
+                
+                // If drink-only summary with no edits, just close
+                if (analysisResult?.isDrink && !editingMealId) {
+                  setShowAnalysisModal(false);
+                  setJustLoggedDrinkId(null);
+                  return;
+                }
+                
                 // Check if editing a drink (negative ID)
                 if (editingMealId && editingMealId < 0) {
                   // Update existing drink
@@ -1201,7 +1263,7 @@ export default function ClientDashboard() {
                   Saving...
                 </>
               ) : (
-                (editingMealId && editingMealId < 0) ? 'Update Drink' : (isEditMode ? 'Update Meal' : 'Log Meal')
+                analysisResult?.isDrink && !editingMealId && justLoggedDrinkId ? 'Save Changes' : analysisResult?.isDrink && !editingMealId ? 'Done' : (editingMealId && editingMealId < 0) ? 'Update Drink' : (isEditMode ? 'Update Meal' : 'Log Meal')
               )}
             </Button>
           </div>

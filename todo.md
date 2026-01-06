@@ -295,3 +295,10 @@
 - [x] Hide "Meal Type" section in summary modal for drink-only logging
 - [x] Hide "Beverage (Optional)" section in summary modal for drink-only logging
 - [x] Show simplified drink summary instead
+
+## Drink Summary Modal Missing Features (Jan 6, 2026)
+- [x] Add volume display in drink summary modal
+- [x] Add volume editor to change drink amount
+- [x] Add date/time picker to change when drink was consumed
+- [x] Add Save/Update button to apply changes
+- [x] Show drink type and volume prominently in modal
