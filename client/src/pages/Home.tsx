@@ -82,7 +82,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="bg-white rounded-full p-4 shadow-lg">
+            <div className="bg-white rounded-full px-12 py-4 shadow-lg">
               <img src="/nu-logo.png" alt="Nu Performance" className="h-32 w-auto" />
             </div>
           </div>

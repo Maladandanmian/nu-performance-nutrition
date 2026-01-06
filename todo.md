@@ -384,3 +384,8 @@
 - [x] Add checkbox indicator UI below meal description showing card detection status
 - [x] Update meal analysis modal to display the indicator
 - [x] Test with images containing reference cards
+
+## Logo White Oval Width Adjustment (Jan 6, 2026)
+- [x] Find logo file in project
+- [x] Widen white oval background to fully contain "NU PERFORMANCE" text
+- [x] Verify logo displays correctly
