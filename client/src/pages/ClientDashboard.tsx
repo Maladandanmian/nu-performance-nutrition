@@ -285,8 +285,8 @@ export default function ClientDashboard() {
     onSuccess: () => {
       toast.success("Metrics logged successfully!");
       setWeight("");
-      // Refetch today's summary to update metrics
-      // Show summary instead of reloading
+      // Invalidate bodyMetrics query to refetch data in the graph
+      trpc.useUtils().bodyMetrics.list.invalidate();
     },
     onError: (error) => {
       toast.error(`Failed to log metrics: ${error.message}`);

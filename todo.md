@@ -410,3 +410,8 @@
 ## Drink Details Population Fix (Jan 6, 2026)
 - [x] Initialize drinkType and volumeMl state when beverage modal opens
 - [x] Verify drink type and volume display in modal
+
+## Weight Logging Graph Issue (Jan 6, 2026)
+- [x] Investigate weight logging success but graph remains empty
+- [x] Fix weight data fetching or display in BodyweightTrendChart
+- [x] Test weight logging appears in graph
