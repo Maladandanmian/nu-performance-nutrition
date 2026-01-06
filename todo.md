@@ -374,3 +374,6 @@
 - [x] Implement table view for bodyweight data
 - [x] Remove bodyweight trend from Trends tab
 - [x] Test time span filtering and view toggle
+
+## Mug Volume Correction (Jan 6, 2026)
+- [x] Update mug volume reference from 350ml to 250ml in drink logging guide
