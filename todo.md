@@ -302,3 +302,9 @@
 - [x] Add date/time picker to change when drink was consumed
 - [x] Add Save/Update button to apply changes
 - [x] Show drink type and volume prominently in modal
+
+## Datetime and Timezone Issues (Jan 6, 2026)
+- [x] Fix datetime-local input to allow time editing (split into separate date/time inputs)
+- [x] Implement Hong Kong timezone (Asia/Hong_Kong, GMT+8) throughout app
+- [x] Ensure all timestamps display in Hong Kong time
+- [x] Store timestamps with timezone awareness

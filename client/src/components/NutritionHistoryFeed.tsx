@@ -222,7 +222,12 @@ function MealEntry({
               <div className="font-medium capitalize">{meal.mealType}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {format(new Date(meal.loggedAt), 'h:mm a')}
+                {new Date(meal.loggedAt).toLocaleTimeString('en-US', { 
+                  hour: 'numeric', 
+                  minute: '2-digit',
+                  hour12: true,
+                  timeZone: 'Asia/Hong_Kong'
+                })}
               </div>
             </div>
           </div>
@@ -307,7 +312,12 @@ function DrinkEntry({
             <div className="font-medium">{drink.drinkType}</div>
             <div className="text-xs text-muted-foreground flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {format(new Date(drink.loggedAt), 'h:mm a')}
+              {new Date(drink.loggedAt).toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Hong_Kong'
+              })}
             </div>
           </div>
           

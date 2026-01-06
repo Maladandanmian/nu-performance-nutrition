@@ -175,7 +175,8 @@ export default function TodaysSummary({ clientId }: TodaysSummaryProps) {
           {new Date().toLocaleDateString('en-US', { 
             weekday: 'long', 
             month: 'short', 
-            day: 'numeric' 
+            day: 'numeric',
+            timeZone: 'Asia/Hong_Kong'
           })}
         </span>
       </div>

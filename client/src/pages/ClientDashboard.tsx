@@ -32,7 +32,16 @@ export default function ClientDashboard() {
   const [mealNotes, setMealNotes] = useState("");
   const [drinkType, setDrinkType] = useState("");
   const [volumeMl, setVolumeMl] = useState("");
-  const [drinkDateTime, setDrinkDateTime] = useState(new Date().toISOString().slice(0, 16));
+  const [drinkDateTime, setDrinkDateTime] = useState(() => {
+    const now = new Date();
+    const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+    const year = hongKongTime.getFullYear();
+    const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+    const day = String(hongKongTime.getDate()).padStart(2, '0');
+    const hours = String(hongKongTime.getHours()).padStart(2, '0');
+    const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  });
   const [justLoggedDrinkId, setJustLoggedDrinkId] = useState<number | null>(null);
   const [weight, setWeight] = useState("");
   const [hydration, setHydration] = useState("");
@@ -848,15 +857,33 @@ export default function ClientDashboard() {
                     />
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="drink-date" className="text-xs">Date & Time</Label>
-                  <Input
-                    id="drink-date"
-                    type="datetime-local"
-                    value={drinkDateTime}
-                    onChange={(e) => setDrinkDateTime(e.target.value)}
-                    className="text-sm"
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label htmlFor="drink-date" className="text-xs">Date</Label>
+                    <Input
+                      id="drink-date"
+                      type="date"
+                      value={drinkDateTime.split('T')[0]}
+                      onChange={(e) => {
+                        const time = drinkDateTime.split('T')[1] || '00:00';
+                        setDrinkDateTime(`${e.target.value}T${time}`);
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="drink-time" className="text-xs">Time</Label>
+                    <Input
+                      id="drink-time"
+                      type="time"
+                      value={drinkDateTime.split('T')[1] || '00:00'}
+                      onChange={(e) => {
+                        const date = drinkDateTime.split('T')[0];
+                        setDrinkDateTime(`${date}T${e.target.value}`);
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
               </div>
             )}
