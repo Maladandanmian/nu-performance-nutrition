@@ -869,15 +869,18 @@ export default function ClientDashboard() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-2xl">
               <span className="text-3xl">🎉</span>
-              Meal Analysis Complete!
+              {analysisResult?.isDrink ? 'Beverage Logged!' : 'Meal Analysis Complete!'}
             </DialogTitle>
-            <DialogDescription>
-              {analysisResult?.description}
-            </DialogDescription>
+            {/* Only show description for meal entries, not beverage-only */}
+            {!analysisResult?.isDrink && (
+              <DialogDescription>
+                {analysisResult?.description}
+              </DialogDescription>
+            )}
           </DialogHeader>
 
-          {/* Reference Card Detection Indicator */}
-          {analysisResult && (
+          {/* Reference Card Detection Indicator - only for meal entries */}
+          {analysisResult && !analysisResult.isDrink && (
             <div className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700">
               <input 
                 type="checkbox" 

@@ -400,3 +400,9 @@
 - [x] Ensure drinks.create procedure defaults nutrition fields to 0
 - [x] Verify beverage estimation returns 0 (not null) for water, black coffee, tea
 - [x] Test hydration tracking with zero-calorie beverages
+
+## Beverage Logging Modal Fix (Jan 6, 2026)
+- [x] Populate drink type and volume fields in success modal for beverage-only entries
+- [x] Remove "Jasmine Tea" text (meal analysis description) for beverage-only entries
+- [x] Hide "Card Detected for Portion Estimation" checkbox for beverage-only entries
+- [x] Test beverage logging modal displays correctly
