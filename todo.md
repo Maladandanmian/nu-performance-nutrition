@@ -285,3 +285,8 @@
 - [x] Fix "can't access property 'calories', beverageNutrition is null" error
 - [x] Add validation to ensure beverageNutrition exists before logging
 - [x] Test beverage logging flow
+
+## Water Logging Validation Error (Jan 6, 2026)
+- [x] Fix undefined nutrition values when logging plain water
+- [x] Ensure water gets proper zero nutrition values
+- [x] Test water logging flow

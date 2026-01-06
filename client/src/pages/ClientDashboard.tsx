@@ -290,16 +290,33 @@ export default function ClientDashboard() {
     // Auto-estimate beverage if fields filled but not estimated yet
     let nutritionToUse = beverageNutrition;
     if (drinkType && volumeMl && !beverageNutrition) {
-      try {
-        const result = await estimateBeverageMutation.mutateAsync({
-          drinkType,
+      // Special handling for plain water - no API call needed
+      if (drinkType.toLowerCase().trim() === 'water') {
+        const waterNutrition = {
+          drinkType: 'Water',
           volumeMl: parseInt(volumeMl),
-        });
-        setBeverageNutrition(result);
-        nutritionToUse = result; // Use the result directly, don't wait for state update
-      } catch (error) {
-        toast.error("Failed to estimate beverage nutrition");
-        return;
+          calories: 0,
+          protein: 0,
+          fat: 0,
+          carbs: 0,
+          fibre: 0,
+          confidence: 100,
+          description: 'Plain water has no calories or nutrients'
+        };
+        setBeverageNutrition(waterNutrition);
+        nutritionToUse = waterNutrition;
+      } else {
+        try {
+          const result = await estimateBeverageMutation.mutateAsync({
+            drinkType,
+            volumeMl: parseInt(volumeMl),
+          });
+          setBeverageNutrition(result);
+          nutritionToUse = result; // Use the result directly, don't wait for state update
+        } catch (error) {
+          toast.error("Failed to estimate beverage nutrition");
+          return;
+        }
       }
     }
 
