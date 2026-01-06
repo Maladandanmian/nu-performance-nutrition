@@ -43,6 +43,16 @@ export default function ClientDashboard() {
     const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   });
+  const [mealDateTime, setMealDateTime] = useState(() => {
+    const now = new Date();
+    const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+    const year = hongKongTime.getFullYear();
+    const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+    const day = String(hongKongTime.getDate()).padStart(2, '0');
+    const hours = String(hongKongTime.getHours()).padStart(2, '0');
+    const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  });
   const [justLoggedDrinkId, setJustLoggedDrinkId] = useState<number | null>(null);
   const [weight, setWeight] = useState("");
   const [hydration, setHydration] = useState("");
@@ -496,6 +506,18 @@ export default function ClientDashboard() {
     setEditingMealId(meal.id);
     setMealType(meal.mealType);
     
+    // Set meal date/time from loggedAt
+    if (meal.loggedAt) {
+      const mealDate = new Date(meal.loggedAt);
+      const hongKongTime = new Date(mealDate.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+      const year = hongKongTime.getFullYear();
+      const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+      const day = String(hongKongTime.getDate()).padStart(2, '0');
+      const hours = String(hongKongTime.getHours()).padStart(2, '0');
+      const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+      setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+    }
+    
     // Set beverage data if present
     if (meal.beverageType) {
       setDrinkType(meal.beverageType);
@@ -891,19 +913,49 @@ export default function ClientDashboard() {
 
             {/* Meal Type Selector - hide for drink-only */}
             {!analysisResult?.isDrink && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-meal-type">Meal Type</Label>
-                <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
-                  <SelectTrigger id="edit-meal-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="breakfast">Breakfast</SelectItem>
-                    <SelectItem value="lunch">Lunch</SelectItem>
-                    <SelectItem value="dinner">Dinner</SelectItem>
-                    <SelectItem value="snack">Snack</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="edit-meal-type">Meal Type</Label>
+                  <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                    <SelectTrigger id="edit-meal-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="breakfast">Breakfast</SelectItem>
+                      <SelectItem value="lunch">Lunch</SelectItem>
+                      <SelectItem value="dinner">Dinner</SelectItem>
+                      <SelectItem value="snack">Snack</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label htmlFor="meal-date" className="text-xs">Date</Label>
+                    <Input
+                      id="meal-date"
+                      type="date"
+                      value={mealDateTime.split('T')[0]}
+                      onChange={(e) => {
+                        const time = mealDateTime.split('T')[1] || '00:00';
+                        setMealDateTime(`${e.target.value}T${time}`);
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="meal-time" className="text-xs">Time</Label>
+                    <Input
+                      id="meal-time"
+                      type="time"
+                      value={mealDateTime.split('T')[1] || '00:00'}
+                      onChange={(e) => {
+                        const date = mealDateTime.split('T')[0];
+                        setMealDateTime(`${date}T${e.target.value}`);
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1250,6 +1302,7 @@ export default function ClientDashboard() {
                     fibre: calculatedTotals.fibre,
                     aiDescription: analysisResult?.description || '',
                     aiConfidence: analysisResult?.confidence || 0,
+                    loggedAt: fromHongKongDateTimeLocal(mealDateTime),
                     beverageType: beverageNutrition?.drinkType,
                     beverageVolumeMl: beverageNutrition?.volumeMl,
                     beverageCalories: beverageNutrition?.calories,

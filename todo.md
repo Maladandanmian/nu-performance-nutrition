@@ -314,3 +314,10 @@
 - [x] Convert drinkDateTime string to proper timestamp format
 - [x] Verify date/time changes persist in database
 - [x] Test drink date/time editing in UI
+
+## Meal Date/Time Editing (Jan 6, 2026)
+- [x] Add mealDateTime state variable to ClientDashboard
+- [x] Add date/time picker inputs to meal editing modal
+- [x] Update meals.update procedure to accept loggedAt field
+- [x] Update updateMealMutation call to include loggedAt timestamp
+- [x] Test meal date/time editing in UI

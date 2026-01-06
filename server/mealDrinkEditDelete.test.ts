@@ -175,4 +175,26 @@ describe('Meal and Drink Editing/Deletion', () => {
     const updatedMeal = await db.getMealById(testMealId);
     expect(updatedMeal?.nutritionScore).toBe(5);
   });
+
+  it('should update meal date and time successfully', async () => {
+    // Create a new timestamp for yesterday at 6:30 PM Hong Kong time
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(18, 30, 0, 0);
+
+    // Update the meal with new date/time
+    await db.updateMeal(testMealId, {
+      loggedAt: yesterday,
+    });
+
+    // Verify meal timestamp is updated
+    const updatedMeal = await db.getMealById(testMealId);
+    expect(updatedMeal).toBeDefined();
+    expect(updatedMeal?.loggedAt).toBeDefined();
+    
+    // Verify the date matches (within 1 minute to account for processing time)
+    const loggedDate = new Date(updatedMeal!.loggedAt);
+    const timeDiff = Math.abs(loggedDate.getTime() - yesterday.getTime());
+    expect(timeDiff).toBeLessThan(60000); // Less than 1 minute difference
+  });
 });
