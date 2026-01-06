@@ -26,8 +26,6 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
     timezoneOffset
   });
 
-  const { data: bodyMetricsData } = trpc.bodyMetrics.list.useQuery({ clientId });
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -91,40 +89,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
     };
   });
 
-  // Prepare bodyweight data with persistence (carry forward last known weight)
-  const bodyweightData = (() => {
-    if (!bodyMetricsData || bodyMetricsData.length === 0) return [];
-    
-    // Create a map of weight entries by date
-    const weightMap = new Map<string, number>();
-    bodyMetricsData.forEach(metric => {
-      if (metric.weight) {
-        const date = new Date(metric.recordedAt).toISOString().split('T')[0];
-        // Keep the latest weight for each day
-        if (!weightMap.has(date) || metric.weight) {
-          weightMap.set(date, metric.weight);
-        }
-      }
-    });
-
-    // Fill in the date range with carried-forward weights
-    let lastKnownWeight: number | null = null;
-    return dateRange.map(date => {
-      const recordedWeight = weightMap.get(date);
-      if (recordedWeight !== undefined) {
-        lastKnownWeight = recordedWeight;
-      }
-      return {
-        date: format(new Date(date), 'MMM d'),
-        fullDate: date,
-        weight: lastKnownWeight,
-        weightTarget: goals.weightTarget ? parseFloat(goals.weightTarget) : null,
-      };
-    });
-  })();
-
   const hasAnyData = dailyTotals.length > 0;
-  const hasWeightData = bodyweightData.some(d => d.weight !== null);
 
   // Calculate average for a nutrient
   const calculateAverage = (key: string) => {
@@ -640,113 +605,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
         </CardContent>
       </Card>
 
-      {/* Bodyweight Trend Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-xl">⚖️</span>
-            Bodyweight Trend
-          </CardTitle>
-          <CardDescription>
-            Last {days} days | Weight is carried forward when not recorded
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {hasWeightData ? (
-            <>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={bodyweightData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    label={{ value: 'kg', angle: -90, position: 'insideLeft' }}
-                    domain={['dataMin - 2', 'dataMax + 2']}
-                  />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
-                    labelFormatter={(label, payload) => {
-                      if (payload && payload[0]) {
-                        return format(new Date(payload[0].payload.fullDate), 'MMM d, yyyy');
-                      }
-                      return label;
-                    }}
-                    formatter={(value: any) => [`${value} kg`, 'Weight']}
-                  />
-                  <Legend />
-                  
-                  {/* Target line (dashed) - only show if weightTarget is set */}
-                  {goals.weightTarget && (
-                    <Line 
-                      type="monotone" 
-                      dataKey="weightTarget"
-                      stroke="#8B5CF6"
-                      strokeWidth={2}
-                      strokeDasharray="5 5"
-                      name={`Target (${parseFloat(goals.weightTarget).toFixed(1)} kg)`}
-                      dot={false}
-                    />
-                  )}
-                  
-                  {/* Bodyweight line */}
-                  <Line 
-                    type="monotone" 
-                    dataKey="weight"
-                    stroke="#8B5CF6"
-                    strokeWidth={3}
-                    name="Bodyweight"
-                    dot={{ fill: '#8B5CF6', r: 4 }}
-                    activeDot={{ r: 6 }}
-                    connectNulls={true}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-              
-              {/* Summary stats */}
-              <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
-                <div>
-                  <p className="text-gray-600">Current</p>
-                  <p className="text-lg font-semibold" style={{ color: '#8B5CF6' }}>
-                    {bodyweightData[bodyweightData.length - 1]?.weight?.toFixed(1)} kg
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Starting</p>
-                  <p className="text-lg font-semibold text-gray-700">
-                    {bodyweightData.find(d => d.weight !== null)?.weight?.toFixed(1)} kg
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">Change</p>
-                  <p className="text-lg font-semibold" style={{ 
-                    color: (() => {
-                      const start = bodyweightData.find(d => d.weight !== null)?.weight || 0;
-                      const current = bodyweightData[bodyweightData.length - 1]?.weight || 0;
-                      const change = current - start;
-                      return change < 0 ? '#10b981' : change > 0 ? '#f59e0b' : '#9ca3af';
-                    })()
-                  }}>
-                    {(() => {
-                      const start = bodyweightData.find(d => d.weight !== null)?.weight || 0;
-                      const current = bodyweightData[bodyweightData.length - 1]?.weight || 0;
-                      const change = current - start;
-                      return `${change > 0 ? '+' : ''}${change.toFixed(1)} kg`;
-                    })()}
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              <span className="text-4xl mb-4 block">⚖️</span>
-              <p className="text-lg font-medium">No weight data recorded yet</p>
-              <p className="text-sm mt-2">Log your weight in the Metrics tab to see trends</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
     </div>
   );
 }

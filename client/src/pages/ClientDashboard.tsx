@@ -22,6 +22,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { fromHongKongDateTimeLocal } from "@/lib/timezone";
+import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -44,6 +45,17 @@ export default function ClientDashboard() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { clientSession, loading: clientLoading, logout: clientLogout } = useClientAuth();
   const [, setLocation] = useLocation();
+  
+  // Fetch goals data for bodyweight trend
+  const timezoneOffset = new Date().getTimezoneOffset();
+  const { data: goalsData } = trpc.meals.dailyTotals.useQuery(
+    { 
+      clientId: clientSession?.clientId || 0, 
+      days: 1,
+      timezoneOffset
+    },
+    { enabled: !!clientSession?.clientId }
+  );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">(() => getMealTypeFromTime());
   const [mealNotes, setMealNotes] = useState("");
@@ -809,7 +821,7 @@ export default function ClientDashboard() {
           </TabsContent>
 
           {/* Log Metrics Tab */}
-          <TabsContent value="log-metrics">
+          <TabsContent value="log-metrics" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -838,6 +850,14 @@ export default function ClientDashboard() {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Bodyweight Trend Chart */}
+            {clientSession?.clientId && goalsData?.goals && (
+              <BodyweightTrendChart 
+                clientId={clientSession.clientId} 
+                goals={goalsData.goals}
+              />
+            )}
           </TabsContent>
         </Tabs>
         </div>

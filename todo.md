@@ -365,3 +365,12 @@
 ## Remove Obsolete Hydration Metric (Jan 6, 2026)
 - [x] Remove "Total Hydration Today" metric from Metrics tab
 - [x] Verify Metrics tab displays correctly without hydration metric
+
+## Move Bodyweight Trend to Metrics Tab (Jan 6, 2026)
+- [x] Find and extract bodyweight trend graph code from Trends tab
+- [x] Add bodyweight trend graph to Metrics tab below weight input
+- [x] Add time span dropdown (Today, Last 7 Days, Last 30 Days, All Time)
+- [x] Add table view toggle button
+- [x] Implement table view for bodyweight data
+- [x] Remove bodyweight trend from Trends tab
+- [x] Test time span filtering and view toggle
