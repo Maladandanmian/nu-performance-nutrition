@@ -2,6 +2,9 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format } from "date-fns";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { BarChart3, Table } from "lucide-react";
 
 interface NutrientTrendGraphsProps {
   clientId: number;
@@ -9,6 +12,7 @@ interface NutrientTrendGraphsProps {
 }
 
 export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphsProps) {
+  const [viewMode, setViewMode] = useState<'graph' | 'table'>('graph');
   const timezoneOffset = new Date().getTimezoneOffset();
   const { data, isLoading, error } = trpc.meals.dailyTotals.useQuery({ 
     clientId, 
@@ -128,60 +132,113 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
       {/* Calories Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-xl">🔥</span>
-            Calories Trend
-          </CardTitle>
-          <CardDescription>
-            Last {days} days | Target: {goals.calories} kcal/day
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-xl">🔥</span>
+                Calories Trend
+              </CardTitle>
+              <CardDescription>
+                Last {days} days | Target: {goals.calories} kcal/day
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode(viewMode === 'graph' ? 'table' : 'graph')}
+              className="flex items-center gap-2"
+            >
+              {viewMode === 'graph' ? (
+                <><Table className="h-4 w-4" /> Table</>
+              ) : (
+                <><BarChart3 className="h-4 w-4" /> Graph</>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis 
-                label={{ value: 'kcal', angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
-                labelFormatter={(label, payload) => {
-                  if (payload && payload[0]) {
-                    return format(new Date(payload[0].payload.fullDate), 'MMM d, yyyy');
-                  }
-                  return label;
-                }}
-              />
-              <Legend />
-              
-              {/* Target line (dashed) */}
-              <Line 
-                type="monotone" 
-                dataKey="caloriesTarget"
-                stroke="#CE4C27"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                name={`Target (${goals.calories} kcal)`}
-                dot={false}
-              />
-              
-              {/* Actual consumption line (solid) */}
-              <Line 
-                type="monotone" 
-                dataKey="calories"
-                stroke="#CE4C27"
-                strokeWidth={3}
-                name="Actual Calories"
-                dot={{ fill: '#CE4C27', r: 4 }}
-                activeDot={{ r: 6 }}
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {viewMode === 'graph' ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  label={{ value: 'kcal', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload[0]) {
+                      return format(new Date(payload[0].payload.fullDate), 'MMM d, yyyy');
+                    }
+                    return label;
+                  }}
+                />
+                <Legend />
+                
+                {/* Target line (dashed) */}
+                <Line 
+                  type="monotone" 
+                  dataKey="caloriesTarget"
+                  stroke="#CE4C27"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  name={`Target (${goals.calories} kcal)`}
+                  dot={false}
+                />
+                
+                {/* Actual consumption line (solid) */}
+                <Line 
+                  type="monotone" 
+                  dataKey="calories"
+                  stroke="#CE4C27"
+                  strokeWidth={3}
+                  name="Actual Calories"
+                  dot={{ fill: '#CE4C27', r: 4 }}
+                  activeDot={{ r: 6 }}
+                  connectNulls={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-3 font-semibold">Date</th>
+                    <th className="text-right py-2 px-3 font-semibold">Actual (kcal)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Target (kcal)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chartData.map((day, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="py-2 px-3">{day.date}</td>
+                      <td className="text-right py-2 px-3 font-medium" style={{ color: '#CE4C27' }}>
+                        {day.calories !== null ? day.calories.toFixed(0) : '-'}
+                      </td>
+                      <td className="text-right py-2 px-3 text-gray-600">
+                        {day.caloriesTarget.toFixed(0)}
+                      </td>
+                      <td className={`text-right py-2 px-3 font-medium ${
+                        day.calories === null ? 'text-gray-400' :
+                        day.calories >= day.caloriesTarget ? 'text-green-600' : 'text-amber-600'
+                      }`}>
+                        {day.calories !== null 
+                          ? `${day.calories >= day.caloriesTarget ? '+' : ''}${(day.calories - day.caloriesTarget).toFixed(0)}`
+                          : '-'
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           
           {/* Summary stats */}
           <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
@@ -220,117 +277,180 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
       {/* Combined Macronutrients Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-xl">🍽️</span>
-            Macronutrients Trend
-          </CardTitle>
-          <CardDescription>
-            Last {days} days | Protein: {goals.protein}g, Fat: {goals.fat}g, Carbs: {goals.carbs}g, Fiber: {goals.fibre}g
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-xl">🍽️</span>
+                Macronutrients Trend
+              </CardTitle>
+              <CardDescription>
+                Last {days} days | Protein: {goals.protein}g, Fat: {goals.fat}g, Carbs: {goals.carbs}g, Fiber: {goals.fibre}g
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode(viewMode === 'graph' ? 'table' : 'graph')}
+              className="flex items-center gap-2"
+            >
+              {viewMode === 'graph' ? (
+                <><Table className="h-4 w-4" /> Table</>
+              ) : (
+                <><BarChart3 className="h-4 w-4" /> Graph</>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis 
-                label={{ value: 'grams', angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
-                labelFormatter={(label, payload) => {
-                  if (payload && payload[0]) {
-                    return format(new Date(payload[0].payload.fullDate), 'MMM d, yyyy');
-                  }
-                  return label;
-                }}
-              />
-              <Legend />
-              
-              {/* Target lines (dashed) */}
-              <Line 
-                type="monotone" 
-                dataKey="proteinTarget"
-                stroke="#578DB3"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
-                name={`Protein Target (${goals.protein}g)`}
-                dot={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="fatTarget"
-                stroke="#86BBD8"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
-                name={`Fat Target (${goals.fat}g)`}
-                dot={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="carbsTarget"
-                stroke="#F2CC8F"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
-                name={`Carbs Target (${goals.carbs}g)`}
-                dot={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="fibreTarget"
-                stroke="#81B29A"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
-                name={`Fiber Target (${goals.fibre}g)`}
-                dot={false}
-              />
-              
-              {/* Actual consumption lines (solid) */}
-              <Line 
-                type="monotone" 
-                dataKey="protein"
-                stroke="#578DB3"
-                strokeWidth={3}
-                name="Protein"
-                dot={{ fill: '#578DB3', r: 3 }}
-                activeDot={{ r: 5 }}
-                connectNulls={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="fat"
-                stroke="#86BBD8"
-                strokeWidth={3}
-                name="Fat"
-                dot={{ fill: '#86BBD8', r: 3 }}
-                activeDot={{ r: 5 }}
-                connectNulls={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="carbs"
-                stroke="#F2CC8F"
-                strokeWidth={3}
-                name="Carbohydrates"
-                dot={{ fill: '#F2CC8F', r: 3 }}
-                activeDot={{ r: 5 }}
-                connectNulls={false}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="fibre"
-                stroke="#81B29A"
-                strokeWidth={3}
-                name="Fiber"
-                dot={{ fill: '#81B29A', r: 3 }}
-                activeDot={{ r: 5 }}
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {viewMode === 'graph' ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  label={{ value: 'grams', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload[0]) {
+                      return format(new Date(payload[0].payload.fullDate), 'MMM d, yyyy');
+                    }
+                    return label;
+                  }}
+                />
+                <Legend />
+                
+                {/* Target lines (dashed) */}
+                <Line 
+                  type="monotone" 
+                  dataKey="proteinTarget"
+                  stroke="#578DB3"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 5"
+                  name={`Protein Target (${goals.protein}g)`}
+                  dot={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="fatTarget"
+                  stroke="#86BBD8"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 5"
+                  name={`Fat Target (${goals.fat}g)`}
+                  dot={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="carbsTarget"
+                  stroke="#F2CC8F"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 5"
+                  name={`Carbs Target (${goals.carbs}g)`}
+                  dot={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="fibreTarget"
+                  stroke="#81B29A"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 5"
+                  name={`Fiber Target (${goals.fibre}g)`}
+                  dot={false}
+                />
+                
+                {/* Actual consumption lines (solid) */}
+                <Line 
+                  type="monotone" 
+                  dataKey="protein"
+                  stroke="#578DB3"
+                  strokeWidth={3}
+                  name="Protein"
+                  dot={{ fill: '#578DB3', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  connectNulls={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="fat"
+                  stroke="#86BBD8"
+                  strokeWidth={3}
+                  name="Fat"
+                  dot={{ fill: '#86BBD8', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  connectNulls={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="carbs"
+                  stroke="#F2CC8F"
+                  strokeWidth={3}
+                  name="Carbohydrates"
+                  dot={{ fill: '#F2CC8F', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  connectNulls={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="fibre"
+                  stroke="#81B29A"
+                  strokeWidth={3}
+                  name="Fiber"
+                  dot={{ fill: '#81B29A', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  connectNulls={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-3 font-semibold">Date</th>
+                    <th className="text-right py-2 px-3 font-semibold">Protein (g)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Fat (g)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Carbs (g)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Fiber (g)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chartData.map((day, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="py-2 px-3">{day.date}</td>
+                      <td className="text-right py-2 px-3">
+                        <div className="font-medium" style={{ color: '#578DB3' }}>
+                          {day.protein !== null ? day.protein.toFixed(1) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-500">Target: {day.proteinTarget}g</div>
+                      </td>
+                      <td className="text-right py-2 px-3">
+                        <div className="font-medium" style={{ color: '#86BBD8' }}>
+                          {day.fat !== null ? day.fat.toFixed(1) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-500">Target: {day.fatTarget}g</div>
+                      </td>
+                      <td className="text-right py-2 px-3">
+                        <div className="font-medium" style={{ color: '#F2CC8F' }}>
+                          {day.carbs !== null ? day.carbs.toFixed(1) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-500">Target: {day.carbsTarget}g</div>
+                      </td>
+                      <td className="text-right py-2 px-3">
+                        <div className="font-medium" style={{ color: '#81B29A' }}>
+                          {day.fibre !== null ? day.fibre.toFixed(1) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-500">Target: {day.fibreTarget}g</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           
           {/* Summary stats */}
           <div className="mt-4 grid grid-cols-4 gap-3 text-center text-sm">
@@ -369,17 +489,34 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
       {/* Hydration Trend Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-xl">💧</span>
-            Hydration Trend
-          </CardTitle>
-          <CardDescription>
-            Last {days} days | Daily water intake vs target
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-xl">💧</span>
+                Hydration Trend
+              </CardTitle>
+              <CardDescription>
+                Last {days} days | Daily water intake vs target
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode(viewMode === 'graph' ? 'table' : 'graph')}
+              className="flex items-center gap-2"
+            >
+              {viewMode === 'graph' ? (
+                <><Table className="h-4 w-4" /> Table</>
+              ) : (
+                <><BarChart3 className="h-4 w-4" /> Graph</>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={dailyTotals}>
+          {viewMode === 'graph' ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={dailyTotals}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="date" 
@@ -416,8 +553,44 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                 activeDot={{ r: 5 }}
                 connectNulls={false}
               />
-            </LineChart>
-          </ResponsiveContainer>
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-3 font-semibold">Date</th>
+                    <th className="text-right py-2 px-3 font-semibold">Actual (ml)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Target (ml)</th>
+                    <th className="text-right py-2 px-3 font-semibold">Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailyTotals.map((day, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="py-2 px-3">{day.date}</td>
+                      <td className="text-right py-2 px-3 font-medium" style={{ color: '#06B6D4' }}>
+                        {day.hydration !== null && day.hydration !== undefined ? day.hydration.toFixed(0) : '-'}
+                      </td>
+                      <td className="text-right py-2 px-3 text-gray-600">
+                        {goals.hydration}
+                      </td>
+                      <td className={`text-right py-2 px-3 font-medium ${
+                        day.hydration === null || day.hydration === undefined ? 'text-gray-400' :
+                        day.hydration >= goals.hydration ? 'text-green-600' : 'text-amber-600'
+                      }`}>
+                        {day.hydration !== null && day.hydration !== undefined
+                          ? `${day.hydration >= goals.hydration ? '+' : ''}${(day.hydration - goals.hydration).toFixed(0)}`
+                          : '-'
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           
           {/* Summary stats */}
           <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">

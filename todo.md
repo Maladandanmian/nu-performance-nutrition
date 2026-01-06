@@ -321,3 +321,12 @@
 - [x] Update meals.update procedure to accept loggedAt field
 - [x] Update updateMealMutation call to include loggedAt timestamp
 - [x] Test meal date/time editing in UI
+
+## Trend View Toggle (Jan 6, 2026)
+- [x] Add view state (graph/table) to NutrientTrendGraphs component
+- [x] Add toggle button in top right of trend section
+- [x] Implement table view for Calories trend
+- [x] Implement table view for Macronutrients trend
+- [x] Implement table view for Hydration trend
+- [x] Ensure toggle state persists across all three charts
+- [x] Test switching between graph and table views
