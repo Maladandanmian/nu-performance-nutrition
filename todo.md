@@ -280,3 +280,8 @@
 - [x] Update NutrientTrendGraphs to accept and use selected time range
 - [x] Apply time range to all charts (calories, macronutrients, hydration, bodyweight)
 - [x] Update chart descriptions to reflect selected time range
+
+## Beverage Logging Error (Jan 5, 2026)
+- [x] Fix "can't access property 'calories', beverageNutrition is null" error
+- [x] Add validation to ensure beverageNutrition exists before logging
+- [x] Test beverage logging flow

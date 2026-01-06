@@ -288,6 +288,7 @@ export default function ClientDashboard() {
 
   const handleLogMeal = async () => {
     // Auto-estimate beverage if fields filled but not estimated yet
+    let nutritionToUse = beverageNutrition;
     if (drinkType && volumeMl && !beverageNutrition) {
       try {
         const result = await estimateBeverageMutation.mutateAsync({
@@ -295,7 +296,7 @@ export default function ClientDashboard() {
           volumeMl: parseInt(volumeMl),
         });
         setBeverageNutrition(result);
-        // Continue with logging after estimation
+        nutritionToUse = result; // Use the result directly, don't wait for state update
       } catch (error) {
         toast.error("Failed to estimate beverage nutrition");
         return;
@@ -303,9 +304,14 @@ export default function ClientDashboard() {
     }
 
     // Drink-only logging
-    if (!selectedFile && (beverageNutrition || (drinkType && volumeMl))) {
+    if (!selectedFile && (nutritionToUse || (drinkType && volumeMl))) {
       if (!drinkType || !volumeMl) {
         toast.error("Please fill in drink type and volume");
+        return;
+      }
+      
+      if (!nutritionToUse) {
+        toast.error("Please estimate beverage nutrition first");
         return;
       }
       
@@ -315,11 +321,11 @@ export default function ClientDashboard() {
           clientId: currentClientId,
           drinkType,
           volumeMl: parseInt(volumeMl),
-          calories: beverageNutrition.calories,
-          protein: beverageNutrition.protein,
-          fat: beverageNutrition.fat,
-          carbs: beverageNutrition.carbs,
-          fibre: beverageNutrition.fibre,
+          calories: nutritionToUse.calories,
+          protein: nutritionToUse.protein,
+          fat: nutritionToUse.fat,
+          carbs: nutritionToUse.carbs,
+          fibre: nutritionToUse.fibre,
           notes: "",
         });
         
@@ -331,14 +337,14 @@ export default function ClientDashboard() {
         toast.success("Beverage logged successfully!");
         // Show summary modal with drink nutrition
         // Score drinks 1-5: low-cal drinks score higher (5 is best)
-        const drinkScore = beverageNutrition.calories < 50 ? 5 : beverageNutrition.calories < 100 ? 4 : beverageNutrition.calories < 150 ? 3 : beverageNutrition.calories < 200 ? 2 : 1;
+        const drinkScore = nutritionToUse.calories < 50 ? 5 : nutritionToUse.calories < 100 ? 4 : nutritionToUse.calories < 150 ? 3 : nutritionToUse.calories < 200 ? 2 : 1;
         setAnalysisResult({
           description: drinkType,
-          calories: beverageNutrition.calories,
-          protein: beverageNutrition.protein,
-          fat: beverageNutrition.fat,
-          carbs: beverageNutrition.carbs,
-          fibre: beverageNutrition.fibre,
+          calories: nutritionToUse.calories,
+          protein: nutritionToUse.protein,
+          fat: nutritionToUse.fat,
+          carbs: nutritionToUse.carbs,
+          fibre: nutritionToUse.fibre,
           score: drinkScore,
           isDrink: true,
         });
