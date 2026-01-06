@@ -818,24 +818,27 @@ export default function ClientDashboard() {
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
-            {/* Meal Type Selector */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-meal-type">Meal Type</Label>
-              <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
-                <SelectTrigger id="edit-meal-type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="breakfast">Breakfast</SelectItem>
-                  <SelectItem value="lunch">Lunch</SelectItem>
-                  <SelectItem value="dinner">Dinner</SelectItem>
-                  <SelectItem value="snack">Snack</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Meal Type Selector - hide for drink-only */}
+            {!analysisResult?.isDrink && (
+              <div className="space-y-2">
+                <Label htmlFor="edit-meal-type">Meal Type</Label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                  <SelectTrigger id="edit-meal-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">Breakfast</SelectItem>
+                    <SelectItem value="lunch">Lunch</SelectItem>
+                    <SelectItem value="dinner">Dinner</SelectItem>
+                    <SelectItem value="snack">Snack</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            {/* Beverage Section */}
-            <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            {/* Beverage Section - hide for drink-only */}
+            {!analysisResult?.isDrink && (
+              <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <h3 className="font-semibold text-sm" style={{color: '#578DB3'}}>Beverage (Optional)</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -914,6 +917,7 @@ export default function ClientDashboard() {
                 <div className="text-xs text-green-600 font-medium text-center py-2">✓ Beverage Estimated</div>
               )}
             </div>
+            )}
 
             {/* Nutrition Score */}
             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200">

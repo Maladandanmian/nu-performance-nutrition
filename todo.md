@@ -290,3 +290,8 @@
 - [x] Fix undefined nutrition values when logging plain water
 - [x] Ensure water gets proper zero nutrition values
 - [x] Test water logging flow
+
+## Beverage Summary Modal Issue (Jan 6, 2026)
+- [x] Hide "Meal Type" section in summary modal for drink-only logging
+- [x] Hide "Beverage (Optional)" section in summary modal for drink-only logging
+- [x] Show simplified drink summary instead
