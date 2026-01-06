@@ -348,3 +348,10 @@
 - [x] Include drinks logged with meals in beverage filter (show only drink portion)
 - [x] Update NutritionHistoryFeed to accept and apply category filter
 - [x] Test all category filters
+
+## Smart Meal Type Pre-selection (Jan 6, 2026)
+- [x] Create time-based meal type logic function
+- [x] Define time ranges for each meal type (breakfast: 5am-10am, lunch: 11am-2pm, dinner: 5pm-9pm, snack: other times)
+- [x] Update mealType state initialization to use smart pre-selection
+- [x] Ensure user can still manually change the pre-selected meal type
+- [x] Test pre-selection at different times of day

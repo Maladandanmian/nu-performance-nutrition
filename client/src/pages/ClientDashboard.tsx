@@ -23,13 +23,29 @@ import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 
+// Helper function to determine meal type based on current time
+const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
+  const now = new Date();
+  const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+  const hour = hongKongTime.getHours();
+  
+  // Breakfast: 5am - 10am
+  if (hour >= 5 && hour < 11) return 'breakfast';
+  // Lunch: 11am - 2pm
+  if (hour >= 11 && hour < 15) return 'lunch';
+  // Dinner: 5pm - 9pm
+  if (hour >= 17 && hour < 22) return 'dinner';
+  // Snack: all other times
+  return 'snack';
+};
+
 export default function ClientDashboard() {
   // ALL HOOKS MUST BE CALLED AT THE TOP BEFORE ANY RETURNS
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { clientSession, loading: clientLoading, logout: clientLogout } = useClientAuth();
   const [, setLocation] = useLocation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">("lunch");
+  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">(() => getMealTypeFromTime());
   const [mealNotes, setMealNotes] = useState("");
   const [drinkType, setDrinkType] = useState("");
   const [volumeMl, setVolumeMl] = useState("");
