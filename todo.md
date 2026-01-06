@@ -389,3 +389,8 @@
 - [x] Find logo file in project
 - [x] Widen white oval background to fully contain "NU PERFORMANCE" text
 - [x] Verify logo displays correctly
+
+## Beverage Logging Error Fix (Jan 6, 2026)
+- [x] Find where drink logging sends nutrition data
+- [x] Add default values (0) for calories, protein, fat, carbs, fibre when undefined
+- [x] Test logging zero-calorie beverages like tea

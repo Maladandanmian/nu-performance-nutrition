@@ -362,8 +362,8 @@ export default function ClientDashboard() {
             drinkType,
             volumeMl: parseInt(volumeMl),
           });
-          setBeverageNutrition(result);
-          nutritionToUse = result; // Use the result directly, don't wait for state update
+          setBeverageNutrition(result.nutrition);
+          nutritionToUse = result.nutrition; // Use the nutrition object from the result
         } catch (error) {
           toast.error("Failed to estimate beverage nutrition");
           return;
