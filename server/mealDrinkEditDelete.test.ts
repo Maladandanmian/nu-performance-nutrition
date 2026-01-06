@@ -118,6 +118,29 @@ describe('Meal and Drink Editing/Deletion', () => {
     expect(updatedDrink?.volumeMl).toBe(350);
   });
 
+  it('should update drink date and time successfully', async () => {
+    // Create a new timestamp for yesterday at 5:35 PM Hong Kong time
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(17, 35, 0, 0);
+
+    // Update the drink with new date/time
+    await db.updateDrink(testDrinkId, {
+      loggedAt: yesterday,
+    });
+
+    // Verify drink timestamp is updated
+    const drinks = await db.getDrinksByClientId(testClientId);
+    const updatedDrink = drinks.find(d => d.id === testDrinkId);
+    expect(updatedDrink).toBeDefined();
+    expect(updatedDrink?.loggedAt).toBeDefined();
+    
+    // Verify the date matches (within 1 minute to account for processing time)
+    const loggedDate = new Date(updatedDrink!.loggedAt);
+    const timeDiff = Math.abs(loggedDate.getTime() - yesterday.getTime());
+    expect(timeDiff).toBeLessThan(60000); // Less than 1 minute difference
+  });
+
   it('should maintain meal history after update', async () => {
     // Get initial meal count
     const initialMeals = await db.getMealsByClientId(testClientId);

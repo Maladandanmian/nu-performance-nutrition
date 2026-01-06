@@ -21,6 +21,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
+import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 
 export default function ClientDashboard() {
   // ALL HOOKS MUST BE CALLED AT THE TOP BEFORE ANY RETURNS
@@ -1212,6 +1213,7 @@ export default function ClientDashboard() {
                     drinkId: justLoggedDrinkId,
                     drinkType,
                     volumeMl: parseInt(volumeMl),
+                    loggedAt: fromHongKongDateTimeLocal(drinkDateTime),
                   });
                   setJustLoggedDrinkId(null);
                   return;
@@ -1231,6 +1233,7 @@ export default function ClientDashboard() {
                     drinkId: -editingMealId,
                     drinkType,
                     volumeMl: parseInt(volumeMl),
+                    loggedAt: fromHongKongDateTimeLocal(drinkDateTime),
                   });
                 } else if (isEditMode && editingMealId) {
                   // Update existing meal

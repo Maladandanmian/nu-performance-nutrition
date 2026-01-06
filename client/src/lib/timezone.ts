@@ -57,3 +57,29 @@ export function formatHongKongDate(date: Date, options?: Intl.DateTimeFormatOpti
 export function getHongKongOffset(): number {
   return 8;
 }
+
+/**
+ * Convert datetime-local string (YYYY-MM-DDTHH:mm) to Date object in Hong Kong timezone
+ * @param dateTimeLocal String in format YYYY-MM-DDTHH:mm
+ * @returns Date object representing that time in Hong Kong timezone
+ */
+export function fromHongKongDateTimeLocal(dateTimeLocal: string): Date {
+  // Parse the datetime-local string
+  const [datePart, timePart] = dateTimeLocal.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  
+  // Create a date string in Hong Kong timezone
+  // We need to manually adjust for the timezone offset
+  const hongKongDate = new Date(year, month - 1, day, hours, minutes);
+  
+  // Get the timezone offset difference between local and HK time
+  const localOffset = hongKongDate.getTimezoneOffset(); // in minutes, negative for ahead of UTC
+  const hongKongOffset = -480; // HK is UTC+8, which is -480 minutes from UTC
+  
+  // Adjust the date by the difference
+  const offsetDiff = localOffset - hongKongOffset;
+  hongKongDate.setMinutes(hongKongDate.getMinutes() - offsetDiff);
+  
+  return hongKongDate;
+}

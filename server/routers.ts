@@ -1002,6 +1002,7 @@ export const appRouter = router({
         drinkType: z.string().optional(),
         volumeMl: z.number().optional(),
         notes: z.string().optional(),
+        loggedAt: z.date().optional(),
       }))
       .mutation(async ({ input }) => {
         const { drinkId, ...data } = input;

@@ -308,3 +308,9 @@
 - [x] Implement Hong Kong timezone (Asia/Hong_Kong, GMT+8) throughout app
 - [x] Ensure all timestamps display in Hong Kong time
 - [x] Store timestamps with timezone awareness
+
+## Drink Date/Time Update Bug (Jan 6, 2026)
+- [x] Fix updateDrinkMutation to include loggedAt timestamp
+- [x] Convert drinkDateTime string to proper timestamp format
+- [x] Verify date/time changes persist in database
+- [x] Test drink date/time editing in UI
