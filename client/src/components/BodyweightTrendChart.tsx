@@ -59,9 +59,11 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
     bodyMetricsData.forEach(metric => {
       if (metric.weight) {
         const date = new Date(metric.recordedAt).toISOString().split('T')[0];
+        // Convert from stored integer (e.g., 684) to decimal (e.g., 68.4)
+        const weightInKg = metric.weight / 10;
         // Keep the latest weight for each day
         if (!weightMap.has(date) || metric.weight) {
-          weightMap.set(date, metric.weight);
+          weightMap.set(date, weightInKg);
         }
       }
     });
@@ -147,7 +149,7 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
                         }
                         return label;
                       }}
-                      formatter={(value: any) => [`${value} kg`, 'Weight']}
+                      formatter={(value: any) => [`${value?.toFixed(1) || 'N/A'} kg`, 'Weight']}
                     />
                     <Legend />
                     

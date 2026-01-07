@@ -415,3 +415,18 @@
 - [x] Investigate weight logging success but graph remains empty
 - [x] Fix weight data fetching or display in BodyweightTrendChart
 - [x] Test weight logging appears in graph
+
+## React Error #321 Fix (Jan 7, 2026)
+- [x] Fix React error when logging weight (calling useUtils inside mutation callback)
+- [x] Move trpc.useUtils() call to component level instead of inside onSuccess handler
+- [x] Verify weight logging works without React errors
+- [x] Test query invalidation properly refreshes bodyweight graph
+
+## Weight Rounding Issue (Jan 7, 2026)
+- [x] Identify root cause: weight stored as INT, decimals truncated (68.4 -> 68)
+- [x] Fix weight storage by multiplying by 10 before saving (68.4 -> 684)
+- [x] Fix weight display by dividing by 10 when showing (684 -> 68.4)
+- [x] Update createBodyMetric function to convert weight values
+- [x] Update BodyweightTrendChart to convert stored values for display
+- [x] Test weight logging preserves decimal places (68.4 displays as 68.4)
+- [x] Verify all tests pass with weight conversion logic
