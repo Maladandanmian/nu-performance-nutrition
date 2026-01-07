@@ -451,3 +451,10 @@
 - [x] Test meal + drink logging end-to-end
 - [x] Root cause: uploadAndAnalyze didn't accept or pass drink data to backend
 - [x] Fixed by: (1) Adding drink fields to uploadAndAnalyze input schema, (2) Sending drink data from frontend with meal upload, (3) Ensuring drink estimation happens before meal upload
+
+## Score Display Format Fix (Jan 7, 2026)
+- [x] Find where nutrition history displays scores
+- [x] Change score display from "X/10" to "X/5" format
+- [x] Ensure consistency with post-analysis summary page
+- [x] Test score display on nutrition history
+- [x] Fixed NutritionHistoryFeed to display scores as /5 instead of /10

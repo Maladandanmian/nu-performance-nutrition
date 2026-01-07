@@ -337,7 +337,7 @@ function MealEntry({
           )}
           {meal.nutritionScore && (
             <span className="font-medium text-primary">
-              Score: {meal.nutritionScore}/10
+              Score: {meal.nutritionScore}/5
             </span>
           )}
         </div>
