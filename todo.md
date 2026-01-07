@@ -440,3 +440,14 @@
 - [x] Test meal with drink logging end-to-end
 - [x] Root cause: saveMeal was not passing nutrition data to createDrink function
 - [x] Fixed by adding beverage nutrition fields to createDrink call in saveMeal procedure
+
+## Drink Estimation Broken for Meal + Drink Logging (Jan 7, 2026)
+- [x] Trace where drink estimation is called when logging meal with drink
+- [x] Check if estimateBeverageMutation is being called correctly
+- [x] Verify drink nutrition is being calculated before saveMeal is called
+- [x] Check if beverageNutrition state is properly populated
+- [x] Fix drink estimation to work correctly with meal logging
+- [x] Ensure drink nutrition is saved to database
+- [x] Test meal + drink logging end-to-end
+- [x] Root cause: uploadAndAnalyze didn't accept or pass drink data to backend
+- [x] Fixed by: (1) Adding drink fields to uploadAndAnalyze input schema, (2) Sending drink data from frontend with meal upload, (3) Ensuring drink estimation happens before meal upload

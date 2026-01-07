@@ -221,6 +221,14 @@ export const appRouter = router({
         imageBase64: z.string(),
         mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
         notes: z.string().optional(),
+        // Optional beverage data
+        beverageType: z.string().optional(),
+        beverageVolumeMl: z.number().optional(),
+        beverageCalories: z.number().optional(),
+        beverageProtein: z.number().optional(),
+        beverageFat: z.number().optional(),
+        beverageCarbs: z.number().optional(),
+        beverageFibre: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -294,6 +302,14 @@ export const appRouter = router({
               score,
               components: (analysis as any).components || [],
               validationWarnings: (analysis as any).validationWarnings || [],
+              // Include beverage data if provided
+              beverageType: input.beverageType,
+              beverageVolumeMl: input.beverageVolumeMl,
+              beverageCalories: input.beverageCalories,
+              beverageProtein: input.beverageProtein,
+              beverageFat: input.beverageFat,
+              beverageCarbs: input.beverageCarbs,
+              beverageFibre: input.beverageFibre,
             },
           };
         } catch (error) {

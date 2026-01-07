@@ -439,6 +439,34 @@ export default function ClientDashboard() {
       return;
     }
 
+    // If drink fields are filled but not estimated, estimate now
+    if (drinkType && volumeMl && !nutritionToUse) {
+      if (drinkType.toLowerCase().trim() === 'water') {
+        nutritionToUse = {
+          drinkType: 'Water',
+          volumeMl: parseInt(volumeMl),
+          calories: 0,
+          protein: 0,
+          fat: 0,
+          carbs: 0,
+          fibre: 0,
+          confidence: 100,
+          description: 'Plain water has no calories or nutrients'
+        };
+      } else {
+        try {
+          const result = await estimateBeverageMutation.mutateAsync({
+            drinkType,
+            volumeMl: parseInt(volumeMl),
+          });
+          nutritionToUse = result.nutrition;
+        } catch (error) {
+          toast.error("Failed to estimate beverage nutrition");
+          return;
+        }
+      }
+    }
+
     const clientId = currentClientId;
 
     try {
@@ -453,6 +481,14 @@ export default function ClientDashboard() {
           imageBase64: base64Data,
           mealType,
           notes: mealNotes || undefined,
+          // Include beverage data if present
+          beverageType: nutritionToUse?.drinkType,
+          beverageVolumeMl: nutritionToUse?.volumeMl,
+          beverageCalories: nutritionToUse?.calories,
+          beverageProtein: nutritionToUse?.protein,
+          beverageFat: nutritionToUse?.fat,
+          beverageCarbs: nutritionToUse?.carbs,
+          beverageFibre: nutritionToUse?.fibre,
         });
       };
       reader.readAsDataURL(selectedFile);
