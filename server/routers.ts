@@ -416,6 +416,11 @@ export const appRouter = router({
               clientId: input.clientId,
               drinkType: input.beverageType,
               volumeMl: input.beverageVolumeMl,
+              calories: input.beverageCalories || 0,
+              protein: input.beverageProtein || 0,
+              fat: input.beverageFat || 0,
+              carbs: input.beverageCarbs || 0,
+              fibre: input.beverageFibre || 0,
               notes: input.notes,
               loggedAt: new Date(),
             });

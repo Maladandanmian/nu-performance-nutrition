@@ -430,3 +430,13 @@
 - [x] Update BodyweightTrendChart to convert stored values for display
 - [x] Test weight logging preserves decimal places (68.4 displays as 68.4)
 - [x] Verify all tests pass with weight conversion logic
+
+## Meal with Drink Logging Bug (Jan 7, 2026)
+- [x] Investigate why drinks added to meals during photo analysis are not being saved
+- [x] Check if drink data is being sent from frontend to backend
+- [x] Verify saveMeal procedure properly handles beverageVolumeMl and drink data
+- [x] Check if hydration is being updated when meal with drink is logged
+- [x] Fix drink data not appearing in nutrition history for meals
+- [x] Test meal with drink logging end-to-end
+- [x] Root cause: saveMeal was not passing nutrition data to createDrink function
+- [x] Fixed by adding beverage nutrition fields to createDrink call in saveMeal procedure
