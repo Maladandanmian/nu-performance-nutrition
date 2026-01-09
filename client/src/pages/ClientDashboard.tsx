@@ -94,6 +94,11 @@ export default function ClientDashboard() {
   const [improvementAdvice, setImprovementAdvice] = useState<string>("");
   const [showAdvice, setShowAdvice] = useState(false);
   const [editingMealId, setEditingMealId] = useState<number | null>(null);
+  
+  // NEW FLOW: State for item identification and editing
+  const [identifiedItems, setIdentifiedItems] = useState<string[]>([]);
+  const [showItemEditor, setShowItemEditor] = useState(false);
+  const [overallDescription, setOverallDescription] = useState("");
   const [beverageNutrition, setBeverageNutrition] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,25 +141,47 @@ export default function ClientDashboard() {
   }, [editedComponents, analysisResult, beverageNutrition]);
 
   // ALL TRPC HOOKS MUST BE CALLED UNCONDITIONALLY
-  const uploadAndAnalyzeMutation = trpc.meals.uploadAndAnalyze.useMutation({
+  // NEW FLOW: Step 2 - Identify items in meal image
+  const identifyItemsMutation = trpc.meals.identifyItems.useMutation({
     onSuccess: (data) => {
-      setAnalysisResult(data.analysis);
-      setEditedComponents((data.analysis as any).components || []);
+      setIdentifiedItems(data.items);
+      setOverallDescription(data.overallDescription);
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
-      setIsEditMode(false);
+      setShowItemEditor(true);
+      // Reset file input but keep other form fields for beverage entry
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+    onError: (error) => {
+      toast.error(`Failed to identify meal items: ${error.message}`);
+    },
+  });
+
+  // NEW FLOW: Step 4-6 - Analyze meal with drink and save
+  const analyzeMealWithDrinkMutation = trpc.meals.analyzeMealWithDrink.useMutation({
+    onSuccess: (data) => {
+      setShowItemEditor(false);
+      setAnalysisResult({
+        ...data.mealAnalysis,
+        score: data.finalScore,
+        combinedNutrition: data.combinedNutrition,
+        drinkNutrition: data.drinkNutrition,
+      });
       setShowAnalysisModal(true);
       // Reset all form fields
-      setSelectedFile(null);
+      setIdentifiedItems([]);
+      setOverallDescription("");
       setMealType("lunch");
       setMealNotes("");
       setDrinkType("");
       setVolumeMl("");
       setBeverageNutrition(null);
-      // Reset file input element
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      setImageUrl("");
+      setImageKey("");
+      toast.success("Meal logged successfully!");
     },
     onError: (error) => {
       toast.error(`Failed to analyze meal: ${error.message}`);
@@ -433,38 +460,10 @@ export default function ClientDashboard() {
       return;
     }
 
-    // Meal logging (with or without beverage)
+    // NEW FLOW: Meal logging - Step 1: Upload and identify items
     if (!selectedFile) {
-      toast.error("Please select an image or add a beverage");
+      toast.error("Please select an image");
       return;
-    }
-
-    // If drink fields are filled but not estimated, estimate now
-    if (drinkType && volumeMl && !nutritionToUse) {
-      if (drinkType.toLowerCase().trim() === 'water') {
-        nutritionToUse = {
-          drinkType: 'Water',
-          volumeMl: parseInt(volumeMl),
-          calories: 0,
-          protein: 0,
-          fat: 0,
-          carbs: 0,
-          fibre: 0,
-          confidence: 100,
-          description: 'Plain water has no calories or nutrients'
-        };
-      } else {
-        try {
-          const result = await estimateBeverageMutation.mutateAsync({
-            drinkType,
-            volumeMl: parseInt(volumeMl),
-          });
-          nutritionToUse = result.nutrition;
-        } catch (error) {
-          toast.error("Failed to estimate beverage nutrition");
-          return;
-        }
-      }
     }
 
     const clientId = currentClientId;
@@ -476,19 +475,10 @@ export default function ClientDashboard() {
         const base64 = reader.result as string;
         const base64Data = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
 
-        await uploadAndAnalyzeMutation.mutateAsync({
+        // Step 2: Identify items in the image
+        await identifyItemsMutation.mutateAsync({
           clientId,
           imageBase64: base64Data,
-          mealType,
-          notes: mealNotes || undefined,
-          // Include beverage data if present
-          beverageType: nutritionToUse?.drinkType,
-          beverageVolumeMl: nutritionToUse?.volumeMl,
-          beverageCalories: nutritionToUse?.calories,
-          beverageProtein: nutritionToUse?.protein,
-          beverageFat: nutritionToUse?.fat,
-          beverageCarbs: nutritionToUse?.carbs,
-          beverageFibre: nutritionToUse?.fibre,
         });
       };
       reader.readAsDataURL(selectedFile);
@@ -805,12 +795,12 @@ export default function ClientDashboard() {
                 <Button 
                   onClick={handleLogMeal} 
                   className="w-full"
-                  disabled={uploadAndAnalyzeMutation.isPending || (!selectedFile && !(drinkType && volumeMl))}
+                  disabled={identifyItemsMutation.isPending || !selectedFile}
                 >
-                  {uploadAndAnalyzeMutation.isPending ? (
+                  {identifyItemsMutation.isPending ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Analyzing...
+                      Identifying Items...
                     </>
                   ) : (
                     <>
@@ -907,6 +897,156 @@ export default function ClientDashboard() {
         </Tabs>
         </div>
       </main>
+
+      {/* NEW FLOW: Item Editor Modal (Step 3) */}
+      <Dialog open={showItemEditor} onOpenChange={setShowItemEditor}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Review and Edit Meal Items</DialogTitle>
+            <DialogDescription>
+              {overallDescription}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Meal Items List */}
+            <div>
+              <Label>Detected Food Items</Label>
+              <div className="space-y-2 mt-2">
+                {identifiedItems.map((item, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      value={item}
+                      onChange={(e) => {
+                        const newItems = [...identifiedItems];
+                        newItems[index] = e.target.value;
+                        setIdentifiedItems(newItems);
+                      }}
+                      placeholder="e.g., 2 fried eggs"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = identifiedItems.filter((_, i) => i !== index);
+                        setIdentifiedItems(newItems);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                className="mt-2"
+                onClick={() => setIdentifiedItems([...identifiedItems, ""])}
+              >
+                + Add Item
+              </Button>
+            </div>
+
+            {/* Beverage Section */}
+            <div className="border-t pt-4">
+              <Label>Add Beverage (Optional)</Label>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div>
+                  <Label htmlFor="drink-type">Drink Description</Label>
+                  <Input
+                    id="drink-type"
+                    placeholder="e.g., English breakfast tea with milk"
+                    value={drinkType}
+                    onChange={(e) => setDrinkType(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="volume">Volume (ml)</Label>
+                  <Input
+                    id="volume"
+                    type="number"
+                    placeholder="250"
+                    value={volumeMl}
+                    onChange={(e) => setVolumeMl(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Meal Notes */}
+            <div>
+              <Label htmlFor="meal-notes">Notes (Optional)</Label>
+              <Textarea
+                id="meal-notes"
+                placeholder="Any additional notes..."
+                value={mealNotes}
+                onChange={(e) => setMealNotes(e.target.value)}
+              />
+            </div>
+
+            {/* Analyse Meal Button */}
+            <Button
+              className="w-full"
+              onClick={async () => {
+                // Filter out empty items
+                const filteredItems = identifiedItems.filter(item => item.trim() !== "");
+                
+                if (filteredItems.length === 0) {
+                  toast.error("Please add at least one food item");
+                  return;
+                }
+
+                // Estimate beverage nutrition if provided
+                let drinkNutrition = null;
+                if (drinkType && volumeMl) {
+                  if (drinkType.toLowerCase().trim() === 'water') {
+                    // Water has no nutrition
+                    drinkNutrition = {
+                      calories: 0,
+                      protein: 0,
+                      fat: 0,
+                      carbs: 0,
+                      fibre: 0,
+                    };
+                  } else {
+                    try {
+                      const result = await estimateBeverageMutation.mutateAsync({
+                        drinkType,
+                        volumeMl: parseInt(volumeMl),
+                      });
+                      drinkNutrition = result.nutrition;
+                    } catch (error) {
+                      toast.error("Failed to estimate beverage nutrition");
+                      return;
+                    }
+                  }
+                }
+
+                // Call analyzeMealWithDrink
+                await analyzeMealWithDrinkMutation.mutateAsync({
+                  clientId: currentClientId,
+                  imageUrl,
+                  imageKey,
+                  mealType,
+                  itemDescriptions: filteredItems,
+                  notes: mealNotes || undefined,
+                  drinkType: drinkType || undefined,
+                  volumeMl: volumeMl ? parseInt(volumeMl) : undefined,
+                });
+              }}
+              disabled={analyzeMealWithDrinkMutation.isPending}
+            >
+              {analyzeMealWithDrinkMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Analyzing Meal...
+                </>
+              ) : (
+                "Analyse Meal"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Nutrition Analysis Modal */}
       <Dialog open={showAnalysisModal} onOpenChange={setShowAnalysisModal}>

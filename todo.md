@@ -458,3 +458,15 @@
 - [x] Ensure consistency with post-analysis summary page
 - [x] Test score display on nutrition history
 - [x] Fixed NutritionHistoryFeed to display scores as /5 instead of /10
+
+## Meal Logging Flow Redesign (Jan 7, 2026)
+- [x] Create new AI procedure for item identification (returns list of items only)
+- [x] Create meal item editing UI allowing users to modify detected items
+- [x] Add beverage selection UI in the item editing screen
+- [x] Create combined meal + drink analysis procedure
+- [x] Implement final score calculation for complete meal
+- [x] Update meal logging UI to follow new 6-step flow
+- [x] Test new flow end-to-end
+- [x] Verify meal and drink data are correctly logged to separate tables
+- [x] Ensure final score reflects both meal and drink quality
+- [x] All 4 unit tests passing (identifyItems, analyzeMealWithDrink with/without drink, separate table storage)

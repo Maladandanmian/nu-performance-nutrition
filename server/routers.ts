@@ -11,6 +11,8 @@ import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvemen
 import { estimateBeverageNutrition } from "./beverageNutrition";
 import { reEstimateComponentNutrition } from "./componentReEstimation";
 import { estimateFoodNutrition } from "./foodQuantityEstimation";
+import { identifyMealItems } from "./mealItemIdentification";
+import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -964,6 +966,198 @@ export const appRouter = router({
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : 'Failed to update meal',
+          });
+        }
+      }),
+
+    // NEW FLOW: Step 2 - Identify items in meal image
+    identifyItems: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        imageBase64: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 1. Upload image to S3
+          const imageBuffer = Buffer.from(input.imageBase64, 'base64');
+          const randomSuffix = Math.random().toString(36).substring(7);
+          const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
+          const { url: imageUrl } = await storagePut(imageKey, imageBuffer, "image/jpeg");
+
+          // 2. Identify items in the image
+          const identification = await identifyMealItems(imageUrl);
+
+          return {
+            success: true,
+            imageUrl,
+            imageKey,
+            overallDescription: identification.overallDescription,
+            items: identification.items.map(item => item.description),
+            referenceCardDetected: identification.referenceCardDetected,
+          };
+        } catch (error) {
+          console.error('Error in identifyItems:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to identify meal items',
+          });
+        }
+      }),
+
+    // NEW FLOW: Step 4-6 - Analyze meal with drink and save
+    analyzeMealWithDrink: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        imageUrl: z.string(),
+        imageKey: z.string(),
+        mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+        itemDescriptions: z.array(z.string()),
+        notes: z.string().optional(),
+        // Optional beverage data
+        drinkType: z.string().optional(),
+        volumeMl: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 1. Analyze meal nutrition from item descriptions
+          const mealAnalysis = await analyzeMealNutrition(input.itemDescriptions, input.imageUrl);
+
+          // 2. If drink is provided, estimate its nutrition
+          let drinkNutrition = null;
+          if (input.drinkType && input.volumeMl) {
+            drinkNutrition = await estimateBeverageNutrition(input.drinkType, input.volumeMl);
+          }
+
+          // 3. Get client's nutrition goals
+          const goals = await db.getNutritionGoalByClientId(input.clientId);
+          if (!goals) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Nutrition goals not found for this client' 
+            });
+          }
+
+          // 4. Calculate today's totals (before this meal)
+          const allMeals = await db.getMealsByClientId(input.clientId);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const todaysMeals = allMeals.filter(meal => {
+            const mealDate = new Date(meal.loggedAt);
+            mealDate.setHours(0, 0, 0, 0);
+            return mealDate.getTime() === today.getTime();
+          });
+          
+          const todaysTotals = todaysMeals.reduce(
+            (totals, meal) => ({
+              calories: totals.calories + (meal.calories || 0) + (meal.beverageCalories || 0),
+              protein: totals.protein + (meal.protein || 0) + (meal.beverageProtein || 0),
+              fat: totals.fat + (meal.fat || 0) + (meal.beverageFat || 0),
+              carbs: totals.carbs + (meal.carbs || 0) + (meal.beverageCarbs || 0),
+              fibre: totals.fibre + (meal.fibre || 0) + (meal.beverageFibre || 0),
+            }),
+            { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
+          );
+
+          // 5. Calculate combined nutrition (meal + drink)
+          const combinedCalories = mealAnalysis.calories + (drinkNutrition?.calories || 0);
+          const combinedProtein = mealAnalysis.protein + (drinkNutrition?.protein || 0);
+          const combinedFat = mealAnalysis.fat + (drinkNutrition?.fat || 0);
+          const combinedCarbs = mealAnalysis.carbs + (drinkNutrition?.carbs || 0);
+          const combinedFibre = mealAnalysis.fibre + (drinkNutrition?.fibre || 0);
+
+          // 6. Calculate final score based on combined nutrition
+          const finalScore = calculateNutritionScore(
+            {
+              calories: combinedCalories,
+              protein: combinedProtein,
+              fat: combinedFat,
+              carbs: combinedCarbs,
+              fibre: combinedFibre,
+            },
+            goals,
+            todaysTotals
+          );
+
+          // 7. Save meal to database
+          const mealResult = await db.createMeal({
+            clientId: input.clientId,
+            imageUrl: input.imageUrl,
+            imageKey: input.imageKey,
+            mealType: input.mealType,
+            aiDescription: mealAnalysis.description,
+            calories: mealAnalysis.calories,
+            protein: mealAnalysis.protein,
+            fat: mealAnalysis.fat,
+            carbs: mealAnalysis.carbs,
+            fibre: mealAnalysis.fibre,
+            nutritionScore: finalScore,
+            aiConfidence: mealAnalysis.confidence,
+            notes: input.notes,
+            loggedAt: new Date(),
+          });
+
+          const mealId = Number(mealResult[0].insertId);
+
+          // 8. Save drink to database if provided
+          let drinkId = null;
+          if (drinkNutrition && input.drinkType && input.volumeMl) {
+            const drinkResult = await db.createDrink({
+              clientId: input.clientId,
+              drinkType: input.drinkType,
+              volumeMl: input.volumeMl,
+              calories: drinkNutrition.calories,
+              protein: drinkNutrition.protein,
+              fat: drinkNutrition.fat,
+              carbs: drinkNutrition.carbs,
+              fibre: drinkNutrition.fibre,
+              notes: `Logged with meal`,
+              loggedAt: new Date(),
+            });
+            drinkId = Number(drinkResult[0].insertId);
+
+            // Also log hydration
+            await db.createBodyMetric({
+              clientId: input.clientId,
+              hydration: input.volumeMl,
+              recordedAt: new Date(),
+            });
+          }
+
+          return {
+            success: true,
+            mealId,
+            drinkId,
+            finalScore,
+            mealAnalysis: {
+              description: mealAnalysis.description,
+              calories: mealAnalysis.calories,
+              protein: mealAnalysis.protein,
+              fat: mealAnalysis.fat,
+              carbs: mealAnalysis.carbs,
+              fibre: mealAnalysis.fibre,
+              components: mealAnalysis.components,
+            },
+            drinkNutrition: drinkNutrition ? {
+              calories: drinkNutrition.calories,
+              protein: drinkNutrition.protein,
+              fat: drinkNutrition.fat,
+              carbs: drinkNutrition.carbs,
+              fibre: drinkNutrition.fibre,
+            } : null,
+            combinedNutrition: {
+              calories: combinedCalories,
+              protein: combinedProtein,
+              fat: combinedFat,
+              carbs: combinedCarbs,
+              fibre: combinedFibre,
+            },
+          };
+        } catch (error) {
+          console.error('Error in analyzeMealWithDrink:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to analyze meal with drink',
           });
         }
       }),
