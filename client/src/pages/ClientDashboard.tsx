@@ -948,7 +948,9 @@ export default function ClientDashboard() {
 
             {/* Beverage Section */}
             <div className="border-t pt-4">
-              <Label>Add Beverage (Optional)</Label>
+              <Label>
+                {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
+              </Label>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
                   <Label htmlFor="drink-type">Drink Description</Label>
