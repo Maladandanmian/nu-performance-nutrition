@@ -258,7 +258,7 @@ export default function ClientDashboard() {
   const estimateBeverageMutation = trpc.meals.estimateBeverage.useMutation({
     onSuccess: (data) => {
       setBeverageNutrition(data.nutrition);
-      toast.success('Beverage estimated successfully!');
+      // Silent success - no toast to keep flow consistent with meal logging
     },
     onError: (error) => {
       toast.error(`Failed to estimate beverage: ${error.message}`);

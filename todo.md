@@ -470,3 +470,8 @@
 - [x] Verify meal and drink data are correctly logged to separate tables
 - [x] Ensure final score reflects both meal and drink quality
 - [x] All 4 unit tests passing (identifyItems, analyzeMealWithDrink with/without drink, separate table storage)
+
+## Remove Beverage Estimation Popup (Jan 7, 2026)
+- [x] Find where "Beverage estimation complete" popup is triggered
+- [x] Remove the popup to make flow consistent with meal logging
+- [x] Beverage estimation now works silently like meal logging
