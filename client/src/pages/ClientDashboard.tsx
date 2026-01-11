@@ -911,7 +911,7 @@ export default function ClientDashboard() {
           <div className="space-y-4">
             {/* Meal Items List */}
             <div>
-              <Label>Detected Food Items</Label>
+              <Label>Detected Food Items (Approx.)</Label>
               <div className="space-y-2 mt-2">
                 {identifiedItems.map((item, index) => (
                   <div key={index} className="flex gap-2">
