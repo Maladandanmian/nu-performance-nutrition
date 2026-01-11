@@ -1080,12 +1080,17 @@ export const appRouter = router({
           );
 
           // 7. Save meal to database
+          // Append beverage info to description if drink is present
+          const finalDescription = drinkNutrition && input.drinkType
+            ? `${mealAnalysis.description} Consumed with ${input.drinkType}.`
+            : mealAnalysis.description;
+
           const mealResult = await db.createMeal({
             clientId: input.clientId,
             imageUrl: input.imageUrl,
             imageKey: input.imageKey,
             mealType: input.mealType,
-            aiDescription: mealAnalysis.description,
+            aiDescription: finalDescription,
             calories: mealAnalysis.calories,
             protein: mealAnalysis.protein,
             fat: mealAnalysis.fat,

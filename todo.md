@@ -475,3 +475,8 @@
 - [x] Find where "Beverage estimation complete" popup is triggered
 - [x] Remove the popup to make flow consistent with meal logging
 - [x] Beverage estimation now works silently like meal logging
+
+## Include Beverage in Meal Description (Jan 7, 2026)
+- [x] Update analyzeMealWithDrink to append drink info to meal description
+- [x] Format: "...meal description... Consumed with [drink type]."
+- [x] Description now includes beverage when drink is logged with meal
