@@ -480,3 +480,13 @@
 - [x] Update analyzeMealWithDrink to append drink info to meal description
 - [x] Format: "...meal description... Consumed with [drink type]."
 - [x] Description now includes beverage when drink is logged with meal
+
+## Today's Summary Showing Incorrect Totals (Jan 11, 2026)
+- [x] Investigate why Today's Summary shows 2450 calories when only 1 meal logged
+- [x] Check if date filtering is working correctly
+- [x] Check for duplicate meal entries in database
+- [x] Verify timezone handling in date calculations
+- [x] Fix the calculation to show accurate daily totals
+- [x] Root cause: Beverage nutrition was being counted twice (once from meals table, once from drinks table)
+- [x] Solution: Added mealId foreign key to drinks table to link drinks logged with meals
+- [x] Updated dailyTotals to skip drinks with mealId to avoid double-counting

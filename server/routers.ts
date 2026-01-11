@@ -662,7 +662,9 @@ export const appRouter = router({
         });
         
         // Add hydration and nutrition data from drinks table
+        // Skip drinks that are linked to meals (mealId != null) to avoid double-counting
         drinks.forEach(drink => {
+          if (drink.mealId) return; // Skip drinks logged with meals
           const drinkDate = new Date(drink.loggedAt);
           if (drinkDate < cutoffDate) return;
           
@@ -1109,6 +1111,7 @@ export const appRouter = router({
           if (drinkNutrition && input.drinkType && input.volumeMl) {
             const drinkResult = await db.createDrink({
               clientId: input.clientId,
+              mealId: mealId, // Link drink to meal to avoid double-counting
               drinkType: input.drinkType,
               volumeMl: input.volumeMl,
               calories: drinkNutrition.calories,

@@ -108,6 +108,7 @@ export type InsertMeal = typeof meals.$inferInsert;
 export const drinks = mysqlTable("drinks", {
   id: int("id").autoincrement().primaryKey(),
   clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  mealId: int("mealId").references(() => meals.id, { onDelete: "cascade" }), // null if standalone drink, links to meal if logged with meal
   drinkType: varchar("drinkType", { length: 100 }).notNull(), // water, coffee, tea, etc.
   volumeMl: int("volumeMl").notNull(), // volume in milliliters
   // Nutritional data (estimated by AI)
