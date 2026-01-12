@@ -490,3 +490,7 @@
 - [x] Root cause: Beverage nutrition was being counted twice (once from meals table, once from drinks table)
 - [x] Solution: Added mealId foreign key to drinks table to link drinks logged with meals
 - [x] Updated dailyTotals to skip drinks with mealId to avoid double-counting
+
+## UI Text Cleanup (Jan 12, 2026)
+- [x] Remove "Drink Description" label from beverage section
+- [x] Remove "Approximately" prefix from detected food items

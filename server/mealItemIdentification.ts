@@ -119,6 +119,12 @@ Example format:
     const contentString = typeof content === 'string' ? content : JSON.stringify(content);
     const identification = JSON.parse(contentString) as MealItemsIdentification;
     
+    // Remove "Approximately" prefix from item descriptions (since section header already says "Approx.")
+    identification.items = identification.items.map(item => ({
+      ...item,
+      description: item.description.replace(/^Approximately\s+/i, '')
+    }));
+    
     return identification;
   } catch (error) {
     console.error("Error identifying meal items:", error);

@@ -953,7 +953,6 @@ export default function ClientDashboard() {
               </Label>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
-                  <Label htmlFor="drink-type">Drink Description</Label>
                   <Input
                     id="drink-type"
                     placeholder="e.g., English breakfast tea with milk"
