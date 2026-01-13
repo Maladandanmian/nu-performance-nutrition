@@ -494,3 +494,12 @@
 ## UI Text Cleanup (Jan 12, 2026)
 - [x] Remove "Drink Description" label from beverage section
 - [x] Remove "Approximately" prefix from detected food items
+
+## Beverage-Only Logging Broken (Jan 12, 2026)
+- [x] Investigate what broke in beverage-only logging after meal+drink improvements
+- [x] Check if estimateBeverageMutation is still working
+- [x] Check if drink is being saved to database
+- [x] Fix the beverage-only logging flow
+- [x] Root cause: Analyze button was disabled when no photo selected
+- [x] Solution: Added conditional button logic - shows "Log Beverage" when only drink fields filled
+- [x] Beverage-only logging now works independently from meal logging

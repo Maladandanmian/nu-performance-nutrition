@@ -792,23 +792,107 @@ export default function ClientDashboard() {
 
                 </div>
 
-                <Button 
-                  onClick={handleLogMeal} 
-                  className="w-full"
-                  disabled={identifyItemsMutation.isPending || !selectedFile}
-                >
-                  {identifyItemsMutation.isPending ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Identifying Items...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Analyze
-                    </>
-                  )}
-                </Button>
+                {/* Conditional buttons based on what's filled */}
+                {selectedFile && !drinkType && !volumeMl && (
+                  <Button 
+                    onClick={handleLogMeal} 
+                    className="w-full"
+                    disabled={identifyItemsMutation.isPending}
+                  >
+                    {identifyItemsMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Identifying Items...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Analyze Meal
+                      </>
+                    )}
+                  </Button>
+                )}
+                
+                {selectedFile && drinkType && volumeMl && (
+                  <Button 
+                    onClick={handleLogMeal} 
+                    className="w-full"
+                    disabled={identifyItemsMutation.isPending}
+                  >
+                    {identifyItemsMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Identifying Items...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Analyze Meal + Beverage
+                      </>
+                    )}
+                  </Button>
+                )}
+                
+                {!selectedFile && drinkType && volumeMl && (
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        // Estimate beverage nutrition
+                        const result = await estimateBeverageMutation.mutateAsync({
+                          drinkType,
+                          volumeMl: parseInt(volumeMl),
+                        });
+                        
+                        // Save drink directly
+                        await logDrinkMutation.mutateAsync({
+                          clientId: clientSession?.clientId || 0,
+                          drinkType,
+                          volumeMl: parseInt(volumeMl),
+                          calories: result.nutrition.calories,
+                          protein: result.nutrition.protein,
+                          fat: result.nutrition.fat,
+                          carbs: result.nutrition.carbs,
+                          fibre: result.nutrition.fibre,
+                          notes: '',
+                        });
+                        
+                        // Clear form
+                        setDrinkType('');
+                        setVolumeMl('');
+                        setBeverageNutrition(null);
+                        
+                        toast.success('Beverage logged successfully!');
+                      } catch (error) {
+                        console.error('Error logging beverage:', error);
+                        toast.error('Failed to log beverage');
+                      }
+                    }}
+                    className="w-full"
+                    disabled={estimateBeverageMutation.isPending || logDrinkMutation.isPending}
+                  >
+                    {estimateBeverageMutation.isPending || logDrinkMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Logging...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Log Beverage
+                      </>
+                    )}
+                  </Button>
+                )}
+                
+                {!selectedFile && !drinkType && !volumeMl && (
+                  <Button 
+                    className="w-full"
+                    disabled
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Add Photo or Beverage
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
