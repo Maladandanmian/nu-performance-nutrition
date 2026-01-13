@@ -503,3 +503,13 @@
 - [x] Root cause: Analyze button was disabled when no photo selected
 - [x] Solution: Added conditional button logic - shows "Log Beverage" when only drink fields filled
 - [x] Beverage-only logging now works independently from meal logging
+
+## Duplication Bug - Items Appearing Twice (Jan 13, 2026)
+- [x] Investigate why logged items appear twice in nutrition history
+- [x] Check if items are being saved twice to database
+- [x] Check if logDrinkMutation is being called twice
+- [x] Check if analyzeMealWithDrinkMutation creates duplicate entries
+- [x] Fix the duplication issue
+- [x] Root cause: NutritionHistoryFeed was showing drinks with mealId AND extracting beverages from meals
+- [x] Solution: Filter out drinks with mealId since they're already displayed as part of meals
+- [x] Beverages now appear once (either standalone or as part of meal)
