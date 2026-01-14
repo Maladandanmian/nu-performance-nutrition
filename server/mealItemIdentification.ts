@@ -1,4 +1,5 @@
 import { invokeLLM } from "./_core/llm";
+import { readNutritionLabel, NutritionLabelData } from "./nutritionLabelReader";
 
 export interface MealItem {
   description: string; // e.g., "2 fried eggs", "1 slice of toast with butter"
@@ -8,15 +9,37 @@ export interface MealItemsIdentification {
   overallDescription: string; // Brief description of the overall meal
   items: MealItem[]; // List of identified food items
   referenceCardDetected: boolean; // Whether a reference card was detected
+  nutritionLabel?: NutritionLabelData; // If the image is a nutrition label, include the extracted data
 }
 
 /**
  * Identify food items in a meal image without nutritional analysis
  * This is Step 2 of the new meal logging flow
+ * Also detects if the image is a nutrition label and extracts nutrition data
  * @param imageUrl - Public URL of the meal image
- * @returns List of identified meal items with descriptions
+ * @returns List of identified meal items with descriptions, or nutrition label data if detected
  */
 export async function identifyMealItems(imageUrl: string): Promise<MealItemsIdentification> {
+  // First, check if this is a nutrition label
+  try {
+    const labelData = await readNutritionLabel(imageUrl);
+    if (labelData.isNutritionLabel && labelData.confidence > 50) {
+      // This is a nutrition label - return it with the extracted data
+      return {
+        overallDescription: `Nutrition label for ${labelData.productName}`,
+        items: [
+          {
+            description: `${labelData.productName} (${labelData.servingSize})`
+          }
+        ],
+        referenceCardDetected: false,
+        nutritionLabel: labelData
+      };
+    }
+  } catch (labelError) {
+    // If nutrition label reading fails, continue with normal food item identification
+    console.log("Nutrition label detection skipped, proceeding with food item identification");
+  }
   try {
     const response = await invokeLLM({
       messages: [

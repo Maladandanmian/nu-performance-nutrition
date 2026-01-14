@@ -996,6 +996,7 @@ export const appRouter = router({
             overallDescription: identification.overallDescription,
             items: identification.items.map(item => item.description),
             referenceCardDetected: identification.referenceCardDetected,
+            nutritionLabel: identification.nutritionLabel,
           };
         } catch (error) {
           console.error('Error in identifyItems:', error);
