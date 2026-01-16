@@ -144,47 +144,11 @@ export default function ClientDashboard() {
   // NEW FLOW: Step 2 - Identify items in meal image
   const identifyItemsMutation = trpc.meals.identifyItems.useMutation({
     onSuccess: (data) => {
-      // Check if a nutrition label was detected
-      if (data.nutritionLabel && data.nutritionLabel.isNutritionLabel && data.nutritionLabel.confidence > 50) {
-        // Nutrition label detected - auto-fill the nutrition data and skip item editor
-        const labelNutrition = {
-          calories: data.nutritionLabel.calories,
-          protein: data.nutritionLabel.protein,
-          fat: data.nutritionLabel.fat,
-          carbs: data.nutritionLabel.carbs,
-          fibre: data.nutritionLabel.fibre,
-        };
-        
-        // Set the identified items to just the product name
-        setIdentifiedItems([data.nutritionLabel.productName]);
-        setOverallDescription(`${data.nutritionLabel.productName} (${data.nutritionLabel.servingSize})`);
-        setImageUrl(data.imageUrl);
-        setImageKey(data.imageKey);
-        
-        // Set the nutrition data directly from the label
-        setEditedComponents([{
-          name: data.nutritionLabel.productName,
-          calories: data.nutritionLabel.calories,
-          protein: data.nutritionLabel.protein,
-          fat: data.nutritionLabel.fat,
-          carbs: data.nutritionLabel.carbs,
-          fibre: data.nutritionLabel.fibre,
-        }]);
-        
-        // Show a success toast
-        toast.success(`Nutrition label detected! ${data.nutritionLabel.productName} nutrition data loaded.`);
-        
-        // Skip the item editor and go straight to showing the beverage option
-        setShowItemEditor(false);
-      } else {
-        // Regular meal photo - show item editor for user to confirm items
-        setIdentifiedItems(data.items);
-        setOverallDescription(data.overallDescription);
-        setImageUrl(data.imageUrl);
-        setImageKey(data.imageKey);
-        setShowItemEditor(true);
-      }
-      
+      setIdentifiedItems(data.items);
+      setOverallDescription(data.overallDescription);
+      setImageUrl(data.imageUrl);
+      setImageKey(data.imageKey);
+      setShowItemEditor(true);
       // Reset file input but keep other form fields for beverage entry
       setSelectedFile(null);
       if (fileInputRef.current) {
@@ -920,47 +884,7 @@ export default function ClientDashboard() {
                   </Button>
                 )}
                 
-                {!selectedFile && editedComponents.length > 0 && !drinkType && !volumeMl && (
-                  <Button 
-                    onClick={handleLogMeal} 
-                    className="w-full"
-                    disabled={analyzeMealWithDrinkMutation.isPending}
-                  >
-                    {analyzeMealWithDrinkMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Analyze Meal
-                      </>
-                    )}
-                  </Button>
-                )}
-                
-                {!selectedFile && editedComponents.length > 0 && drinkType && volumeMl && (
-                  <Button 
-                    onClick={handleLogMeal} 
-                    className="w-full"
-                    disabled={analyzeMealWithDrinkMutation.isPending}
-                  >
-                    {analyzeMealWithDrinkMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Analyze Meal + Beverage
-                      </>
-                    )}
-                  </Button>
-                )}
-                
-                {!selectedFile && !drinkType && !volumeMl && editedComponents.length === 0 && (
+                {!selectedFile && !drinkType && !volumeMl && (
                   <Button 
                     className="w-full"
                     disabled

@@ -52,18 +52,15 @@ export function NutritionHistoryFeed({
       });
     }
     
-    // Add drinks (but skip drinks that are linked to meals via mealId)
+    // Add drinks
     if (drinksData) {
       drinksData.forEach(drink => {
-        // Skip drinks that have a mealId - they're already shown as part of the meal
-        if (!drink.mealId) {
-          combined.push({
-            id: drink.id,
-            type: 'drink',
-            loggedAt: new Date(drink.loggedAt),
-            data: drink,
-          });
-        }
+        combined.push({
+          id: drink.id,
+          type: 'drink',
+          loggedAt: new Date(drink.loggedAt),
+          data: drink,
+        });
       });
     }
     
