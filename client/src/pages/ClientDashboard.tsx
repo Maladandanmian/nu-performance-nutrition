@@ -217,7 +217,7 @@ export default function ClientDashboard() {
       setBeverageNutrition(null);
       setImageUrl("");
       setImageKey("");
-      toast.success("Meal logged successfully!");
+      // Don't show success toast here - meal hasn't been saved yet
     },
     onError: (error) => {
       toast.error(`Failed to analyze meal: ${error.message}`);

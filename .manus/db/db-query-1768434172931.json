@@ -1,0 +1,190 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, imageUrl, imageKey, createdAt FROM meals WHERE clientId = 1 ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, imageUrl, imageKey, createdAt FROM meals WHERE clientId = 1 ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1800001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "810",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768377038737-orwoz5.jpg",
+      "imageKey": "meals/1/1768377038737-orwoz5.jpg",
+      "createdAt": "2026-01-14 07:51:19"
+    },
+    {
+      "id": "1770001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768349287647-w7fio.jpg",
+      "imageKey": "meals/1/1768349287647-w7fio.jpg",
+      "createdAt": "2026-01-14 00:08:21"
+    },
+    {
+      "id": "1740001",
+      "clientId": "1",
+      "mealType": "dinner",
+      "calories": "757",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768306996726-llrgfg.jpg",
+      "imageKey": "meals/1/1768306996726-llrgfg.jpg",
+      "createdAt": "2026-01-13 12:24:16"
+    },
+    {
+      "id": "1680001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "770",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768283720760-1epbbb.jpg",
+      "imageKey": "meals/1/1768283720760-1epbbb.jpg",
+      "createdAt": "2026-01-13 05:55:37"
+    },
+    {
+      "id": "1650001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768261636704-ekyba.jpg",
+      "imageKey": "meals/1/1768261636704-ekyba.jpg",
+      "createdAt": "2026-01-12 23:47:32"
+    },
+    {
+      "id": "1620001",
+      "clientId": "1",
+      "mealType": "dinner",
+      "calories": "545",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768219887308-iqwgi9.jpg",
+      "imageKey": "meals/1/1768219887308-iqwgi9.jpg",
+      "createdAt": "2026-01-12 12:11:53"
+    },
+    {
+      "id": "1590001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "33",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768199627162-cr459y8.jpg",
+      "imageKey": "meals/1/1768199627162-cr459y8.jpg",
+      "createdAt": "2026-01-12 06:34:17"
+    },
+    {
+      "id": "1560001",
+      "clientId": "1",
+      "mealType": "snack",
+      "calories": "100",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768192754730-w68w5s.jpg",
+      "imageKey": "meals/1/1768192754730-w68w5s.jpg",
+      "createdAt": "2026-01-12 04:39:31"
+    },
+    {
+      "id": "1530001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "475",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768190545821-rvwko.jpg",
+      "imageKey": "meals/1/1768190545821-rvwko.jpg",
+      "createdAt": "2026-01-12 04:02:42"
+    },
+    {
+      "id": "1500005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "400",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768181166506-ydvxj5.jpg",
+      "imageKey": "meals/1/1768181166506-ydvxj5.jpg",
+      "createdAt": "2026-01-12 01:26:37"
+    },
+    {
+      "id": "1500003",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "308",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768180995922-r6kbwn.jpg",
+      "imageKey": "meals/1/1768180995922-r6kbwn.jpg",
+      "createdAt": "2026-01-12 01:23:50"
+    },
+    {
+      "id": "1470001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768178842064-th4csq.jpg",
+      "imageKey": "meals/1/1768178842064-th4csq.jpg",
+      "createdAt": "2026-01-12 00:47:36"
+    },
+    {
+      "id": "1350003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "194",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022786174-poyqwg.jpg",
+      "imageKey": "meals/1/1768022786174-poyqwg.jpg",
+      "createdAt": "2026-01-10 05:26:36"
+    },
+    {
+      "id": "1350002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "194",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022763345-67qyzk.jpg",
+      "imageKey": "meals/1/1768022763345-67qyzk.jpg",
+      "createdAt": "2026-01-10 05:26:14"
+    },
+    {
+      "id": "1350001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "194",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022734921-k5l5p.jpg",
+      "imageKey": "meals/1/1768022734921-k5l5p.jpg",
+      "createdAt": "2026-01-10 05:25:47"
+    },
+    {
+      "id": "1320001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768014456998-4yzgj7.jpg",
+      "imageKey": "meals/1/1768014456998-4yzgj7.jpg",
+      "createdAt": "2026-01-10 03:09:56"
+    },
+    {
+      "id": "1290002",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "77",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768009773421-su2l6s.jpg",
+      "imageKey": "meals/1/1768009773421-su2l6s.jpg",
+      "createdAt": "2026-01-10 01:49:45"
+    },
+    {
+      "id": "1290001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "77",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768009522315-8scf4p.jpg",
+      "imageKey": "meals/1/1768009522315-8scf4p.jpg",
+      "createdAt": "2026-01-10 01:45:40"
+    },
+    {
+      "id": "1170001",
+      "clientId": "1",
+      "mealType": "dinner",
+      "calories": "420",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1767964199846-wx9h44.jpg",
+      "imageKey": "meals/1/1767964199846-wx9h44.jpg",
+      "createdAt": "2026-01-09 13:10:22"
+    },
+    {
+      "id": "1140001",
+      "clientId": "1",
+      "mealType": "dinner",
+      "calories": "530",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1767963026992-iakhwq.jpg",
+      "imageKey": "meals/1/1767963026992-iakhwq.jpg",
+      "createdAt": "2026-01-09 12:50:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\timageUrl\timageKey\tcreatedAt\n1800001\t1\tlunch\t810\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768377038737-orwoz5.jpg\tmeals/1/1768377038737-orwoz5.jpg\t2026-01-14 07:51:19\n1770001\t1\tbreakfast\t104\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768349287647-w7fio.jpg\tmeals/1/1768349287647-w7fio.jpg\t2026-01-14 00:08:21\n1740001\t1\tdinner\t757\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768306996726-llrgfg.jpg\tmeals/1/1768306996726-llrgfg.jpg\t2026-01-13 12:24:16\n1680001\t1\tlunch\t770\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768283720760-1epbbb.jpg\tmeals/1/1768283720760-1epbbb.jpg\t2026-01-13 05:55:37\n1650001\t1\tbreakfast\t104\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768261636704-ekyba.jpg\tmeals/1/1768261636704-ekyba.jpg\t2026-01-12 23:47:32\n1620001\t1\tdinner\t545\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768219887308-iqwgi9.jpg\tmeals/1/1768219887308-iqwgi9.jpg\t2026-01-12 12:11:53\n1590001\t1\tlunch\t33\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768199627162-cr459y8.jpg\tmeals/1/1768199627162-cr459y8.jpg\t2026-01-12 06:34:17\n1560001\t1\tsnack\t100\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768192754730-w68w5s.jpg\tmeals/1/1768192754730-w68w5s.jpg\t2026-01-12 04:39:31\n1530001\t1\tlunch\t475\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768190545821-rvwko.jpg\tmeals/1/1768190545821-rvwko.jpg\t2026-01-12 04:02:42\n1500005\t1\tbreakfast\t400\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768181166506-ydvxj5.jpg\tmeals/1/1768181166506-ydvxj5.jpg\t2026-01-12 01:26:37\n1500003\t1\tbreakfast\t308\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768180995922-r6kbwn.jpg\tmeals/1/1768180995922-r6kbwn.jpg\t2026-01-12 01:23:50\n1470001\t1\tbreakfast\t104\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768178842064-th4csq.jpg\tmeals/1/1768178842064-th4csq.jpg\t2026-01-12 00:47:36\n1350003\t1\tlunch\t194\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022786174-poyqwg.jpg\tmeals/1/1768022786174-poyqwg.jpg\t2026-01-10 05:26:36\n1350002\t1\tlunch\t194\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022763345-67qyzk.jpg\tmeals/1/1768022763345-67qyzk.jpg\t2026-01-10 05:26:14\n1350001\t1\tlunch\t194\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768022734921-k5l5p.jpg\tmeals/1/1768022734921-k5l5p.jpg\t2026-01-10 05:25:47\n1320001\t1\tbreakfast\t104\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768014456998-4yzgj7.jpg\tmeals/1/1768014456998-4yzgj7.jpg\t2026-01-10 03:09:56\n1290002\t1\tbreakfast\t77\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768009773421-su2l6s.jpg\tmeals/1/1768009773421-su2l6s.jpg\t2026-01-10 01:49:45\n1290001\t1\tbreakfast\t77\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1768009522315-8scf4p.jpg\tmeals/1/1768009522315-8scf4p.jpg\t2026-01-10 01:45:40\n1170001\t1\tdinner\t420\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1767964199846-wx9h44.jpg\tmeals/1/1767964199846-wx9h44.jpg\t2026-01-09 13:10:22\n1140001\t1\tdinner\t530\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/1/1767963026992-iakhwq.jpg\tmeals/1/1767963026992-iakhwq.jpg\t2026-01-09 12:50:46\n",
+  "stderr": "",
+  "execution_time_ms": 1512
+}

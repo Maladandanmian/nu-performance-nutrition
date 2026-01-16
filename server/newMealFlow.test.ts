@@ -91,8 +91,8 @@ describe('New Meal Logging Flow', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.mealId).toBeDefined();
-    expect(result.drinkId).toBeDefined();
+    // Note: mealId and drinkId are NOT returned from analyzeMealWithDrink anymore
+    // The procedure only analyzes, it doesn't save. Saving happens in saveMeal.
     expect(result.finalScore).toBeGreaterThan(0);
     expect(result.finalScore).toBeLessThanOrEqual(5);
     expect(result.mealAnalysis).toBeDefined();
@@ -125,8 +125,7 @@ describe('New Meal Logging Flow', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.mealId).toBeDefined();
-    expect(result.drinkId).toBeNull();
+    // Note: mealId and drinkId are NOT returned from analyzeMealWithDrink anymore
     expect(result.finalScore).toBeGreaterThan(0);
     expect(result.mealAnalysis).toBeDefined();
     expect(result.drinkNutrition).toBeNull();
@@ -156,19 +155,13 @@ describe('New Meal Logging Flow', () => {
       volumeMl: 500,
     });
 
-    // Verify meal was saved
-    const meal = await db.getMealById(result.mealId);
-    expect(meal).toBeDefined();
-    expect(meal?.clientId).toBe(testClientId);
-    expect(meal?.mealType).toBe('dinner');
-    expect(meal?.calories).toBeGreaterThan(0);
-
-    // Verify drink was saved
-    const drinks = await db.getDrinksByClientId(testClientId, 10);
-    const drink = drinks.find(d => d.id === result.drinkId);
-    expect(drink).toBeDefined();
-    expect(drink?.clientId).toBe(testClientId);
-    expect(drink?.drinkType).toBe('Water');
-    expect(drink?.volumeMl).toBe(500);
+    // Verify analysis completed successfully
+    // Note: analyzeMealWithDrink no longer saves meals/drinks
+    // This test verifies the analysis returns correct data
+    expect(result.mealAnalysis).toBeDefined();
+    expect(result.mealAnalysis.calories).toBeGreaterThan(0);
+    expect(result.drinkNutrition).toBeDefined();
+    expect(result.drinkNutrition.calories).toBeGreaterThanOrEqual(0);
+    expect(result.combinedNutrition.calories).toBeGreaterThan(0);
   });
 });

@@ -1,0 +1,9 @@
+{
+  "query": "SELECT m1.id as id1, m2.id as id2, m1.calories, m1.protein, m1.fat, m1.carbs, m1.imageUrl IS NOT NULL as m1_hasImage, m2.imageUrl IS NOT NULL as m2_hasImage, m1.loggedAt, m2.loggedAt FROM meals m1 JOIN meals m2 ON m1.clientId = m2.clientId AND m1.calories = m2.calories AND m1.protein = m2.protein AND m1.fat = m2.fat AND m1.carbs = m2.carbs AND m1.id < m2.id AND ABS(UNIX_TIMESTAMP(m1.loggedAt) - UNIX_TIMESTAMP(m2.loggedAt)) < 2 WHERE m1.clientId = 1 LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT m1.id as id1, m2.id as id2, m1.calories, m1.protein, m1.fat, m1.carbs, m1.imageUrl IS NOT NULL as m1_hasImage, m2.imageUrl IS NOT NULL as m2_hasImage, m1.loggedAt, m2.loggedAt FROM meals m1 JOIN meals m2 ON m1.clientId = m2.clientId AND m1.calories = m2.calories AND m1.protein = m2.protein AND m1.fat = m2.fat AND m1.carbs = m2.carbs AND m1.id < m2.id AND ABS(UNIX_TIMESTAMP(m1.loggedAt) - UNIX_TIMESTAMP(m2.loggedAt)) < 2 WHERE m1.clientId = 1 LIMIT 20;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

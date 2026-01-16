@@ -533,3 +533,15 @@
 - [x] Write tests for meal item identification with label detection (6 tests)
 - [x] All 55 tests passing (1 pre-existing auth.logout failure unrelated to this fix)
 - [x] Nutrition labels now automatically extract nutrition data without manual editing
+
+## Duplicate Meal Entry Bug (Jan 14, 2026) - FIXED
+- [x] Investigate why meal photos create two entries (one with photo, one without)
+- [x] Check analyzeMealWithDrink procedure for duplicate saves - FOUND THE BUG!
+- [x] Root cause: analyzeMealWithDrink was SAVING the meal to database
+- [x] Then saveMeal procedure was called again, creating a SECOND entry
+- [x] Fix: Removed all meal/drink saving logic from analyzeMealWithDrink
+- [x] Fix: analyzeMealWithDrink now only analyzes and returns data
+- [x] Fix: Actual saving happens in saveMeal procedure only
+- [x] Updated client-side toast message (removed from analysis step)
+- [x] Updated tests to reflect new workflow (analysis-only pattern)
+- [x] Verified no duplicate meals are created
