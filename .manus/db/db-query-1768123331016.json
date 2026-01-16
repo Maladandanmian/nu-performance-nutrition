@@ -1,0 +1,61 @@
+{
+  "query": "\nSELECT 'MEALS' as source, id, mealType, calories, protein, fat, carbs, fibre, \n       beverageCalories, beverageProtein, beverageFat, beverageCarbs, beverageFibre, beverageVolumeMl,\n       loggedAt\nFROM meals \nWHERE clientId = 1 AND DATE(loggedAt) = CURDATE()\nUNION ALL\nSELECT 'DRINKS' as source, id, drinkType as mealType, calories, protein, fat, carbs, fibre,\n       0 as beverageCalories, 0 as beverageProtein, 0 as beverageFat, 0 as beverageCarbs, 0 as beverageFibre, volumeMl as beverageVolumeMl,\n       loggedAt\nFROM drinks\nWHERE clientId = 1 AND DATE(loggedAt) = CURDATE()\nORDER BY loggedAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT 'MEALS' as source, id, mealType, calories, protein, fat, carbs, fibre, \n       beverageCalories, beverageProtein, beverageFat, beverageCarbs, beverageFibre, beverageVolumeMl,\n       loggedAt\nFROM meals \nWHERE clientId = 1 AND DATE(loggedAt) = CURDATE()\nUNION ALL\nSELECT 'DRINKS' as source, id, drinkType as mealType, calories, protein, fat, carbs, fibre,\n       0 as beverageCalories, 0 as beverageProtein, 0 as beverageFat, 0 as beverageCarbs, 0 as beverageFibre, volumeMl as beverageVolumeMl,\n       loggedAt\nFROM drinks\nWHERE clientId = 1 AND DATE(loggedAt) = CURDATE()\nORDER BY loggedAt DESC;\n",
+  "rows": [
+    {
+      "source": "MEALS",
+      "id": "1410002",
+      "mealType": "lunch",
+      "calories": "1075",
+      "protein": "40",
+      "fat": "68",
+      "carbs": "77",
+      "fibre": "6",
+      "beverageCalories": "NULL",
+      "beverageProtein": "NULL",
+      "beverageFat": "NULL",
+      "beverageCarbs": "NULL",
+      "beverageFibre": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-11 09:19:27"
+    },
+    {
+      "source": "DRINKS",
+      "id": "960001",
+      "mealType": "Hong Kong milk tea",
+      "calories": "300",
+      "protein": "10",
+      "fat": "15",
+      "carbs": "30",
+      "fibre": "0",
+      "beverageCalories": "0",
+      "beverageProtein": "0",
+      "beverageFat": "0",
+      "beverageCarbs": "0",
+      "beverageFibre": "0",
+      "beverageVolumeMl": "500",
+      "loggedAt": "2026-01-11 09:19:09"
+    },
+    {
+      "source": "MEALS",
+      "id": "1410001",
+      "mealType": "dinner",
+      "calories": "1075",
+      "protein": "40",
+      "fat": "68",
+      "carbs": "77",
+      "fibre": "6",
+      "beverageCalories": "NULL",
+      "beverageProtein": "NULL",
+      "beverageFat": "NULL",
+      "beverageCarbs": "NULL",
+      "beverageFibre": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-11 09:19:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "source\tid\tmealType\tcalories\tprotein\tfat\tcarbs\tfibre\tbeverageCalories\tbeverageProtein\tbeverageFat\tbeverageCarbs\tbeverageFibre\tbeverageVolumeMl\tloggedAt\nMEALS\t1410002\tlunch\t1075\t40\t68\t77\t6\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t2026-01-11 09:19:27\nDRINKS\t960001\tHong Kong milk tea\t300\t10\t15\t30\t0\t0\t0\t0\t0\t0\t500\t2026-01-11 09:19:09\nMEALS\t1410001\tdinner\t1075\t40\t68\t77\t6\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t2026-01-11 09:19:09\n",
+  "stderr": "",
+  "execution_time_ms": 2012
+}
