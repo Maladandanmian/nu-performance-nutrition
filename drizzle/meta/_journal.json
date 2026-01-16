@@ -1,48 +1,5 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "5",
-      "when": 1767329874047,
-      "tag": "0000_tidy_dragon_lord",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1767329978080,
-      "tag": "0001_public_ulik",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1767588635253,
-      "tag": "0002_narrow_old_lace",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1767656467887,
-      "tag": "0003_sparkling_princess_powerful",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1767663736855,
-      "tag": "0004_amused_callisto",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1768175320662,
-      "tag": "0005_slippery_sentry",
-      "breakpoints": true
-    }
-  ]
+  "entries": []
 }

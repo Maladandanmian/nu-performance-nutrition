@@ -1,1 +1,0 @@
-ALTER TABLE `nutrition_goals` ADD `weightTarget` decimal(5,1);

@@ -1,14 +1,7 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { 
-  InsertUser, users,
-  InsertClient, clients,
-  InsertNutritionGoal, nutritionGoals,
-  InsertMeal, meals,
-  InsertDrink, drinks,
-  InsertBodyMetric, bodyMetrics
-} from "../drizzle/schema";
-import { ENV, isAdminEmail } from './_core/env';
+import { InsertUser, users } from "../drizzle/schema";
+import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -62,7 +55,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId || isAdminEmail(user.email)) {
+    } else if (user.openId === ENV.ownerOpenId) {
       values.role = 'admin';
       updateSet.role = 'admin';
     }
@@ -96,157 +89,4 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// Client management queries
-export async function createClient(client: InsertClient) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(clients).values(client);
-  return result;
-}
-
-export async function getClientsByTrainerId(trainerId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(clients).where(eq(clients.trainerId, trainerId));
-}
-
-export async function getClientById(clientId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(clients).where(eq(clients.id, clientId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function getClientByPIN(pin: string) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(clients).where(eq(clients.pin, pin)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function updateClient(clientId: number, data: Partial<InsertClient>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.update(clients).set(data).where(eq(clients.id, clientId));
-}
-
-export async function deleteClient(clientId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.delete(clients).where(eq(clients.id, clientId));
-}
-
-// Nutrition goals queries
-export async function createNutritionGoal(goal: InsertNutritionGoal) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.insert(nutritionGoals).values(goal);
-}
-
-export async function getNutritionGoalByClientId(clientId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(nutritionGoals).where(eq(nutritionGoals.clientId, clientId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function updateNutritionGoal(clientId: number, data: Partial<InsertNutritionGoal>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.update(nutritionGoals).set(data).where(eq(nutritionGoals.clientId, clientId));
-}
-
-// Meal queries
-export async function createMeal(meal: InsertMeal) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.insert(meals).values(meal);
-}
-
-export async function getMealsByClientId(clientId: number, limit: number = 50) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(meals).where(eq(meals.clientId, clientId)).orderBy(meals.loggedAt).limit(limit);
-}
-
-export async function getMealById(mealId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(meals).where(eq(meals.id, mealId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function deleteMeal(mealId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.delete(meals).where(eq(meals.id, mealId));
-}
-
-export async function updateMeal(mealId: number, data: Partial<InsertMeal>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.update(meals).set(data).where(eq(meals.id, mealId));
-}
-
-// Drink queries
-export async function createDrink(drink: InsertDrink) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.insert(drinks).values(drink);
-}
-
-export async function getDrinksByClientId(clientId: number, limit: number = 50) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(drinks).where(eq(drinks.clientId, clientId)).orderBy(drinks.loggedAt).limit(limit);
-}
-
-export async function deleteDrink(drinkId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.delete(drinks).where(eq(drinks.id, drinkId));
-}
-
-export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.update(drinks).set(data).where(eq(drinks.id, drinkId));
-}
-
-// Body metrics queries
-export async function createBodyMetric(metric: InsertBodyMetric) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  // Convert weight from kg to integer (multiply by 10)
-  // e.g., 68.4 kg -> 684
-  const convertedMetric = {
-    ...metric,
-    weight: metric.weight ? Math.round(metric.weight * 10) : undefined,
-  };
-  return db.insert(bodyMetrics).values(convertedMetric);
-}
-
-export async function getBodyMetricsByClientId(clientId: number, limit: number = 50) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(bodyMetrics).where(eq(bodyMetrics.clientId, clientId)).orderBy(bodyMetrics.recordedAt).limit(limit);
-}
-
-
-// Test cleanup function - deletes all data for a client
-export async function deleteClientAndData(clientId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  try {
-    // Delete in order of dependencies
-    await db.delete(bodyMetrics).where(eq(bodyMetrics.clientId, clientId));
-    await db.delete(drinks).where(eq(drinks.clientId, clientId));
-    await db.delete(meals).where(eq(meals.clientId, clientId));
-    await db.delete(nutritionGoals).where(eq(nutritionGoals.clientId, clientId));
-    await db.delete(clients).where(eq(clients.id, clientId));
-  } catch (error) {
-    console.error(`[Database] Failed to delete client ${clientId}:`, error);
-    throw error;
-  }
-}
+// TODO: add feature queries here as your schema grows.

@@ -1,9 +1,0 @@
-{
-  "query": "DELETE FROM meals WHERE imageUrl = '' AND imageKey = '' AND calories = 0 AND beverageType IS NOT NULL",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute DELETE FROM meals WHERE imageUrl = '' AND imageKey = '' AND calories = 0 AND beverageType IS NOT NULL",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1666
-}
