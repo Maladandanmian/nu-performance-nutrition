@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, loggedAt FROM meals WHERE loggedAt LIKE '2026-01-15%' ORDER BY loggedAt;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, loggedAt FROM meals WHERE loggedAt LIKE '2026-01-15%' ORDER BY loggedAt;",
+  "rows": [
+    {
+      "id": "1890001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "300",
+      "loggedAt": "2026-01-15 03:21:45"
+    },
+    {
+      "id": "1890002",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "loggedAt": "2026-01-15 03:22:00"
+    },
+    {
+      "id": "1920001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "593",
+      "loggedAt": "2026-01-15 06:53:42"
+    },
+    {
+      "id": "1920002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "430",
+      "loggedAt": "2026-01-15 06:54:12"
+    },
+    {
+      "id": "1920003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "480",
+      "loggedAt": "2026-01-15 06:55:40"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tloggedAt\n1890001\t1\tbreakfast\t300\t2026-01-15 03:21:45\n1890002\t1\tbreakfast\t104\t2026-01-15 03:22:00\n1920001\t1\tlunch\t593\t2026-01-15 06:53:42\n1920002\t1\tlunch\t430\t2026-01-15 06:54:12\n1920003\t1\tlunch\t480\t2026-01-15 06:55:40\n",
+  "stderr": "",
+  "execution_time_ms": 1620
+}

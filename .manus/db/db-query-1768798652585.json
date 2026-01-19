@@ -1,0 +1,90 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, \n       loggedAt,\n       createdAt\nFROM meals \nWHERE clientId = 1 \nORDER BY id DESC \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, \n       loggedAt,\n       createdAt\nFROM meals \nWHERE clientId = 1 \nORDER BY id DESC \nLIMIT 10;",
+  "rows": [
+    {
+      "id": "2040006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:46",
+      "createdAt": "2026-01-17 02:34:45"
+    },
+    {
+      "id": "2040005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:42",
+      "createdAt": "2026-01-17 02:34:42"
+    },
+    {
+      "id": "2040004",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:41",
+      "createdAt": "2026-01-17 02:27:40"
+    },
+    {
+      "id": "2040003",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:37",
+      "createdAt": "2026-01-17 02:27:37"
+    },
+    {
+      "id": "2040002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:30",
+      "createdAt": "2026-01-17 02:18:30"
+    },
+    {
+      "id": "2040001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:13",
+      "createdAt": "2026-01-17 02:18:13"
+    },
+    {
+      "id": "2010002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:34",
+      "createdAt": "2026-01-16 02:15:34"
+    },
+    {
+      "id": "2010001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:31",
+      "createdAt": "2026-01-16 02:15:30"
+    },
+    {
+      "id": "1980008",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:22",
+      "createdAt": "2026-01-16 01:56:22"
+    },
+    {
+      "id": "1980007",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:15",
+      "createdAt": "2026-01-16 01:56:15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tloggedAt\tcreatedAt\n2040006\t1\tlunch\t185\t2026-01-17 02:34:46\t2026-01-17 02:34:45\n2040005\t1\tbreakfast\t185\t2026-01-17 02:34:42\t2026-01-17 02:34:42\n2040004\t1\tlunch\t195\t2026-01-17 02:27:41\t2026-01-17 02:27:40\n2040003\t1\tbreakfast\t195\t2026-01-17 02:27:37\t2026-01-17 02:27:37\n2040002\t1\tlunch\t32\t2026-01-17 02:18:30\t2026-01-17 02:18:30\n2040001\t1\tbreakfast\t32\t2026-01-17 02:18:13\t2026-01-17 02:18:13\n2010002\t1\tlunch\t466\t2026-01-16 02:15:34\t2026-01-16 02:15:34\n2010001\t1\tbreakfast\t466\t2026-01-16 02:15:31\t2026-01-16 02:15:30\n1980008\t1\tlunch\t468\t2026-01-16 01:56:22\t2026-01-16 01:56:22\n1980007\t1\tbreakfast\t468\t2026-01-16 01:56:15\t2026-01-16 01:56:15\n",
+  "stderr": "",
+  "execution_time_ms": 1496
+}

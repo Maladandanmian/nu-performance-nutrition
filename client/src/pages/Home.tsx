@@ -10,6 +10,7 @@ import { useLocation } from "wouter";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { setClientSessionInStorage } from "@/lib/clientSession";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -19,7 +20,12 @@ export default function Home() {
 
   const utils = trpc.useUtils();
   const loginWithPINMutation = trpc.auth.loginWithPIN.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      // Store session token in localStorage as fallback for cookies
+      if (data.sessionToken) {
+        setClientSessionInStorage(data.sessionToken);
+        console.log('[Home] Stored session token in localStorage');
+      }
       toast.success("Login successful! Redirecting...");
       // Use window.location to ensure proper redirect with cookie
       setTimeout(() => {

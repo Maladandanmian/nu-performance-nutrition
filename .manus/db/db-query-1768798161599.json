@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM clients WHERE pin = '222222';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM clients WHERE pin = '222222';",
+  "rows": [
+    {
+      "id": "1",
+      "trainerId": "13",
+      "name": "Andy Knight ",
+      "email": "NULL",
+      "phone": "NULL",
+      "pin": "222222",
+      "notes": "NULL",
+      "createdAt": "2026-01-03 00:10:06",
+      "updatedAt": "2026-01-03 00:10:06"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tname\temail\tphone\tpin\tnotes\tcreatedAt\tupdatedAt\n1\t13\tAndy Knight \tNULL\tNULL\t222222\tNULL\t2026-01-03 00:10:06\t2026-01-03 00:10:06\n",
+  "stderr": "",
+  "execution_time_ms": 1686
+}

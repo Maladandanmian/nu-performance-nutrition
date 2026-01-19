@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total_meals, MIN(loggedAt) as oldest, MAX(loggedAt) as newest FROM meals;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT COUNT(*) as total_meals, MIN(loggedAt) as oldest, MAX(loggedAt) as newest FROM meals;",
+  "rows": [
+    {
+      "total_meals": "95",
+      "oldest": "2026-01-04 02:53:17",
+      "newest": "2026-01-16 01:56:22"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_meals\toldest\tnewest\n95\t2026-01-04 02:53:17\t2026-01-16 01:56:22\n",
+  "stderr": "",
+  "execution_time_ms": 1501
+}

@@ -10,6 +10,42 @@ const t = initTRPC.context<TrpcContext>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
+// Helper function to get client session from either cookie or header
+function getClientSessionData(ctx: TrpcContext): { clientId: number; name: string } | null {
+  // First, try to get from cookie
+  const clientCookie = ctx.req.cookies?.['client_session'];
+  if (clientCookie) {
+    try {
+      const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
+      console.log('[getClientSessionData] Found session in cookie:', decoded.clientId);
+      return {
+        clientId: decoded.clientId,
+        name: decoded.name,
+      };
+    } catch (e) {
+      console.log('[getClientSessionData] Failed to decode cookie');
+    }
+  }
+
+  // Fallback: try to get from X-Client-Session header
+  const sessionHeader = ctx.req.headers['x-client-session'] as string | undefined;
+  if (sessionHeader) {
+    try {
+      const decoded = JSON.parse(Buffer.from(sessionHeader, 'base64').toString());
+      console.log('[getClientSessionData] Found session in header:', decoded.clientId);
+      return {
+        clientId: decoded.clientId,
+        name: decoded.name,
+      };
+    } catch (e) {
+      console.log('[getClientSessionData] Failed to decode header');
+    }
+  }
+
+  console.log('[getClientSessionData] No session found in cookie or header');
+  return null;
+}
+
 const requireUser = t.middleware(async opts => {
   const { ctx, next } = opts;
 
@@ -31,26 +67,18 @@ export const protectedProcedure = t.procedure.use(requireUser);
 const requireClientSession = t.middleware(async opts => {
   const { ctx, next } = opts;
 
-  // Check for client_session cookie
-  const clientCookie = ctx.req.cookies?.['client_session'];
-  if (!clientCookie) {
+  // Check for client session from cookie or header
+  const sessionData = getClientSessionData(ctx);
+  if (!sessionData) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Client session required" });
   }
 
-  try {
-    const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
-    return next({
-      ctx: {
-        ...ctx,
-        clientSession: {
-          clientId: decoded.clientId,
-          name: decoded.name,
-        },
-      },
-    });
-  } catch (e) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid client session" });
-  }
+  return next({
+    ctx: {
+      ...ctx,
+      clientSession: sessionData,
+    },
+  });
 });
 
 export const clientProcedure = t.procedure.use(requireClientSession);
@@ -70,24 +98,16 @@ const requireUserOrClient = t.middleware(async opts => {
     });
   }
 
-  // Check for client session
-  const clientCookie = ctx.req.cookies?.['client_session'];
-  if (clientCookie) {
-    try {
-      const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
-      return next({
-        ctx: {
-          ...ctx,
-          user: undefined,
-          clientSession: {
-            clientId: decoded.clientId,
-            name: decoded.name,
-          },
-        },
-      });
-    } catch (e) {
-      // Fall through to unauthorized
-    }
+  // Check for client session from cookie or header
+  const sessionData = getClientSessionData(ctx);
+  if (sessionData) {
+    return next({
+      ctx: {
+        ...ctx,
+        user: undefined,
+        clientSession: sessionData,
+      },
+    });
   }
 
   throw new TRPCError({ code: "UNAUTHORIZED", message: "Authentication required" });

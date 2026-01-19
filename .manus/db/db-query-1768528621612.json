@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, loggedAt FROM meals ORDER BY loggedAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, loggedAt FROM meals ORDER BY loggedAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1980008",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:22"
+    },
+    {
+      "id": "1980007",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:15"
+    },
+    {
+      "id": "1980006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:25"
+    },
+    {
+      "id": "1980005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:18"
+    },
+    {
+      "id": "1980004",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "527",
+      "loggedAt": "2026-01-16 01:42:37"
+    },
+    {
+      "id": "1980003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "1015",
+      "loggedAt": "2026-01-16 01:26:58"
+    },
+    {
+      "id": "1980002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "47",
+      "loggedAt": "2026-01-16 01:22:47"
+    },
+    {
+      "id": "1980001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "765",
+      "loggedAt": "2026-01-16 01:14:46"
+    },
+    {
+      "id": "1920003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "480",
+      "loggedAt": "2026-01-15 06:55:40"
+    },
+    {
+      "id": "1920002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "430",
+      "loggedAt": "2026-01-15 06:54:12"
+    },
+    {
+      "id": "1920001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "593",
+      "loggedAt": "2026-01-15 06:53:42"
+    },
+    {
+      "id": "1890002",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "loggedAt": "2026-01-15 03:22:00"
+    },
+    {
+      "id": "1890001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "300",
+      "loggedAt": "2026-01-15 03:21:45"
+    },
+    {
+      "id": "1830014",
+      "clientId": "420003",
+      "mealType": "dinner",
+      "calories": "507",
+      "loggedAt": "2026-01-14 23:36:33"
+    },
+    {
+      "id": "1830013",
+      "clientId": "420003",
+      "mealType": "lunch",
+      "calories": "435",
+      "loggedAt": "2026-01-14 23:36:22"
+    },
+    {
+      "id": "1830010",
+      "clientId": "420003",
+      "mealType": "breakfast",
+      "calories": "540",
+      "loggedAt": "2026-01-14 23:36:12"
+    },
+    {
+      "id": "1800001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "810",
+      "loggedAt": "2026-01-14 07:51:19"
+    },
+    {
+      "id": "1770001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "loggedAt": "2026-01-14 00:08:21"
+    },
+    {
+      "id": "1740001",
+      "clientId": "1",
+      "mealType": "dinner",
+      "calories": "757",
+      "loggedAt": "2026-01-13 12:24:00"
+    },
+    {
+      "id": "1680001",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "770",
+      "loggedAt": "2026-01-13 05:55:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tloggedAt\n1980008\t1\tlunch\t468\t2026-01-16 01:56:22\n1980007\t1\tbreakfast\t468\t2026-01-16 01:56:15\n1980006\t1\tlunch\t537\t2026-01-16 01:50:25\n1980005\t1\tbreakfast\t537\t2026-01-16 01:50:18\n1980004\t1\tbreakfast\t527\t2026-01-16 01:42:37\n1980003\t1\tlunch\t1015\t2026-01-16 01:26:58\n1980002\t1\tlunch\t47\t2026-01-16 01:22:47\n1980001\t1\tbreakfast\t765\t2026-01-16 01:14:46\n1920003\t1\tlunch\t480\t2026-01-15 06:55:40\n1920002\t1\tlunch\t430\t2026-01-15 06:54:12\n1920001\t1\tlunch\t593\t2026-01-15 06:53:42\n1890002\t1\tbreakfast\t104\t2026-01-15 03:22:00\n1890001\t1\tbreakfast\t300\t2026-01-15 03:21:45\n1830014\t420003\tdinner\t507\t2026-01-14 23:36:33\n1830013\t420003\tlunch\t435\t2026-01-14 23:36:22\n1830010\t420003\tbreakfast\t540\t2026-01-14 23:36:12\n1800001\t1\tlunch\t810\t2026-01-14 07:51:19\n1770001\t1\tbreakfast\t104\t2026-01-14 00:08:21\n1740001\t1\tdinner\t757\t2026-01-13 12:24:00\n1680001\t1\tlunch\t770\t2026-01-13 05:55:38\n",
+  "stderr": "",
+  "execution_time_ms": 1515
+}

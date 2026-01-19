@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users,
@@ -163,10 +163,11 @@ export async function createMeal(meal: InsertMeal) {
   return db.insert(meals).values(meal);
 }
 
-export async function getMealsByClientId(clientId: number, limit: number = 50) {
+export async function getMealsByClientId(clientId: number, limit: number = 500) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(meals).where(eq(meals.clientId, clientId)).orderBy(meals.loggedAt).limit(limit);
+  // Order by loggedAt DESC to get newest meals first
+  return db.select().from(meals).where(eq(meals.clientId, clientId)).orderBy(desc(meals.loggedAt)).limit(limit);
 }
 
 export async function getMealById(mealId: number) {
@@ -195,10 +196,11 @@ export async function createDrink(drink: InsertDrink) {
   return db.insert(drinks).values(drink);
 }
 
-export async function getDrinksByClientId(clientId: number, limit: number = 50) {
+export async function getDrinksByClientId(clientId: number, limit: number = 500) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(drinks).where(eq(drinks.clientId, clientId)).orderBy(drinks.loggedAt).limit(limit);
+  // Order by loggedAt DESC to get newest drinks first
+  return db.select().from(drinks).where(eq(drinks.clientId, clientId)).orderBy(desc(drinks.loggedAt)).limit(limit);
 }
 
 export async function deleteDrink(drinkId: number) {

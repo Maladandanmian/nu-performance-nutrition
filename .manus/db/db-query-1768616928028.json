@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, clientId, aiDescription, loggedAt FROM meals WHERE clientId = 1 ORDER BY loggedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, aiDescription, loggedAt FROM meals WHERE clientId = 1 ORDER BY loggedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2040004",
+      "clientId": "1",
+      "aiDescription": "A small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).",
+      "loggedAt": "2026-01-17 02:27:41"
+    },
+    {
+      "id": "2040003",
+      "clientId": "1",
+      "aiDescription": "A small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).",
+      "loggedAt": "2026-01-17 02:27:37"
+    },
+    {
+      "id": "2040002",
+      "clientId": "1",
+      "aiDescription": "A very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.",
+      "loggedAt": "2026-01-17 02:18:30"
+    },
+    {
+      "id": "2040001",
+      "clientId": "1",
+      "aiDescription": "A very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.",
+      "loggedAt": "2026-01-17 02:18:13"
+    },
+    {
+      "id": "2010002",
+      "clientId": "1",
+      "aiDescription": "A nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber.",
+      "loggedAt": "2026-01-16 02:15:34"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\taiDescription\tloggedAt\n2040004\t1\tA small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).\t2026-01-17 02:27:41\n2040003\t1\tA small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).\t2026-01-17 02:27:37\n2040002\t1\tA very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.\t2026-01-17 02:18:30\n2040001\t1\tA very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.\t2026-01-17 02:18:13\n2010002\t1\tA nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber.\t2026-01-16 02:15:34\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

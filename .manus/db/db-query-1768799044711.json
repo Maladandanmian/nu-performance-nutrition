@@ -1,0 +1,88 @@
+{
+  "query": "SELECT id, name, email, pin FROM clients;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, pin FROM clients;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "email": "NULL",
+      "pin": "222222"
+    },
+    {
+      "id": "30001",
+      "name": "Noad",
+      "email": "NULL",
+      "pin": "401483"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "email": "NULL",
+      "pin": "555555"
+    },
+    {
+      "id": "330001",
+      "name": "Luke Davey ",
+      "email": "NULL",
+      "pin": "777777"
+    },
+    {
+      "id": "360001",
+      "name": "Test Client",
+      "email": "client-1767999857197@test.com",
+      "pin": "838929"
+    },
+    {
+      "id": "360002",
+      "name": "Test Client",
+      "email": "client-1767999911122@test.com",
+      "pin": "183765"
+    },
+    {
+      "id": "360003",
+      "name": "Test Client",
+      "email": "client-1768000062226@test.com",
+      "pin": "770660"
+    },
+    {
+      "id": "360004",
+      "name": "Test Client",
+      "email": "client-1768000203079@test.com",
+      "pin": "285470"
+    },
+    {
+      "id": "390003",
+      "name": "Test Client",
+      "email": "client-1768175382539@test.com",
+      "pin": "247060"
+    },
+    {
+      "id": "420003",
+      "name": "Test Client",
+      "email": "client-1768433757347@test.com",
+      "pin": "315380"
+    },
+    {
+      "id": "450003",
+      "name": "Test Client",
+      "email": "client-1768522386981@test.com",
+      "pin": "444149"
+    },
+    {
+      "id": "450016",
+      "name": "Test Client",
+      "email": "client-1768522509222@test.com",
+      "pin": "264418"
+    },
+    {
+      "id": "450029",
+      "name": "Test Client",
+      "email": "client-1768522581080@test.com",
+      "pin": "398451"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tpin\n1\tAndy Knight \tNULL\t222222\n30001\tNoad\tNULL\t401483\n270001\tDavid Benskin \tNULL\t555555\n330001\tLuke Davey \tNULL\t777777\n360001\tTest Client\tclient-1767999857197@test.com\t838929\n360002\tTest Client\tclient-1767999911122@test.com\t183765\n360003\tTest Client\tclient-1768000062226@test.com\t770660\n360004\tTest Client\tclient-1768000203079@test.com\t285470\n390003\tTest Client\tclient-1768175382539@test.com\t247060\n420003\tTest Client\tclient-1768433757347@test.com\t315380\n450003\tTest Client\tclient-1768522386981@test.com\t444149\n450016\tTest Client\tclient-1768522509222@test.com\t264418\n450029\tTest Client\tclient-1768522581080@test.com\t398451\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}

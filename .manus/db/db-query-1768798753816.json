@@ -1,0 +1,154 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, loggedAt, aiDescription \nFROM meals \nWHERE loggedAt > '2026-01-15 06:53:42'\nORDER BY loggedAt ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, loggedAt, aiDescription \nFROM meals \nWHERE loggedAt > '2026-01-15 06:53:42'\nORDER BY loggedAt ASC;",
+  "rows": [
+    {
+      "id": "1920002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "430",
+      "loggedAt": "2026-01-15 06:54:12",
+      "aiDescription": "A serving of seasoned french fries served in a metal cup, accompanied by a small side of ketchup."
+    },
+    {
+      "id": "1920003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "480",
+      "loggedAt": "2026-01-15 06:55:40",
+      "aiDescription": "A side serving of deep-fried French fries, lightly seasoned, served in a metal cup. Includes a small side of ketchup."
+    },
+    {
+      "id": "1980001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "765",
+      "loggedAt": "2026-01-16 01:14:46",
+      "aiDescription": "A bowl of spicy, savory noodles topped with seasoned minced meat, peanuts, and bok choy (likely Dan Dan style or similar Sichuan noodle dish). This meal is high in carbohydrates and fat, primarily from the noodles and the chili oil/sauce base."
+    },
+    {
+      "id": "1980002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "47",
+      "loggedAt": "2026-01-16 01:22:47",
+      "aiDescription": "A very low-calorie, high-volume side salad consisting of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing or oil was added."
+    },
+    {
+      "id": "1980003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "1015",
+      "loggedAt": "2026-01-16 01:26:58",
+      "aiDescription": "A serving of spicy Asian noodles (likely Dandan style) featuring thick white noodles, seasoned minced meat (pork/beef), a generous amount of chili oil, chopped peanuts, and blanched bok choy."
+    },
+    {
+      "id": "1980004",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "527",
+      "loggedAt": "2026-01-16 01:42:37",
+      "aiDescription": "A nutrient-dense breakfast bowl featuring a berry-based smoothie/yogurt base, topped with toasted oat cereal, almonds, hemp seeds, and fresh mixed berries."
+    },
+    {
+      "id": "1980005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:18",
+      "aiDescription": "A berry smoothie or yogurt bowl topped with toasted oat cereal, sliced almonds, hemp seeds, blackberries, raspberries, and strawberries. This is a high-fiber, nutrient-dense breakfast."
+    },
+    {
+      "id": "1980006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:25",
+      "aiDescription": "A berry smoothie or yogurt bowl topped with toasted oat cereal, sliced almonds, hemp seeds, blackberries, raspberries, and strawberries. This is a high-fiber, nutrient-dense breakfast."
+    },
+    {
+      "id": "1980007",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:15",
+      "aiDescription": "A nutritious breakfast bowl featuring a berry smoothie/yogurt base topped with cereal, nuts, seeds, and fresh berries."
+    },
+    {
+      "id": "1980008",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:22",
+      "aiDescription": "A nutritious breakfast bowl featuring a berry smoothie/yogurt base topped with cereal, nuts, seeds, and fresh berries."
+    },
+    {
+      "id": "2010001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:31",
+      "aiDescription": "A nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber."
+    },
+    {
+      "id": "2010002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:34",
+      "aiDescription": "A nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber."
+    },
+    {
+      "id": "2040001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:13",
+      "aiDescription": "A very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added."
+    },
+    {
+      "id": "2040002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:30",
+      "aiDescription": "A very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added."
+    },
+    {
+      "id": "2040003",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:37",
+      "aiDescription": "A small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet)."
+    },
+    {
+      "id": "2040004",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:41",
+      "aiDescription": "A small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet)."
+    },
+    {
+      "id": "2040005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:42",
+      "aiDescription": "A single small Asian bakery bun with a savory filling (likely meat floss or sausage) and topped with sesame seeds. This item is high in refined carbohydrates and fats typical of sweet dough bakery items."
+    },
+    {
+      "id": "2040006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:46",
+      "aiDescription": "A single small Asian bakery bun with a savory filling (likely meat floss or sausage) and topped with sesame seeds. This item is high in refined carbohydrates and fats typical of sweet dough bakery items."
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tloggedAt\taiDescription\n1920002\t1\tlunch\t430\t2026-01-15 06:54:12\tA serving of seasoned french fries served in a metal cup, accompanied by a small side of ketchup.\n1920003\t1\tlunch\t480\t2026-01-15 06:55:40\tA side serving of deep-fried French fries, lightly seasoned, served in a metal cup. Includes a small side of ketchup.\n1980001\t1\tbreakfast\t765\t2026-01-16 01:14:46\tA bowl of spicy, savory noodles topped with seasoned minced meat, peanuts, and bok choy (likely Dan Dan style or similar Sichuan noodle dish). This meal is high in carbohydrates and fat, primarily from the noodles and the chili oil/sauce base.\n1980002\t1\tlunch\t47\t2026-01-16 01:22:47\tA very low-calorie, high-volume side salad consisting of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing or oil was added.\n1980003\t1\tlunch\t1015\t2026-01-16 01:26:58\tA serving of spicy Asian noodles (likely Dandan style) featuring thick white noodles, seasoned minced meat (pork/beef), a generous amount of chili oil, chopped peanuts, and blanched bok choy.\n1980004\t1\tbreakfast\t527\t2026-01-16 01:42:37\tA nutrient-dense breakfast bowl featuring a berry-based smoothie/yogurt base, topped with toasted oat cereal, almonds, hemp seeds, and fresh mixed berries.\n1980005\t1\tbreakfast\t537\t2026-01-16 01:50:18\tA berry smoothie or yogurt bowl topped with toasted oat cereal, sliced almonds, hemp seeds, blackberries, raspberries, and strawberries. This is a high-fiber, nutrient-dense breakfast.\n1980006\t1\tlunch\t537\t2026-01-16 01:50:25\tA berry smoothie or yogurt bowl topped with toasted oat cereal, sliced almonds, hemp seeds, blackberries, raspberries, and strawberries. This is a high-fiber, nutrient-dense breakfast.\n1980007\t1\tbreakfast\t468\t2026-01-16 01:56:15\tA nutritious breakfast bowl featuring a berry smoothie/yogurt base topped with cereal, nuts, seeds, and fresh berries.\n1980008\t1\tlunch\t468\t2026-01-16 01:56:22\tA nutritious breakfast bowl featuring a berry smoothie/yogurt base topped with cereal, nuts, seeds, and fresh berries.\n2010001\t1\tbreakfast\t466\t2026-01-16 02:15:31\tA nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber.\n2010002\t1\tlunch\t466\t2026-01-16 02:15:34\tA nutritious smoothie or yogurt bowl topped with toasted oat cereal, mixed berries, sliced almonds, and hemp seeds, providing a good balance of protein, healthy fats, and fiber.\n2040001\t1\tbreakfast\t32\t2026-01-17 02:18:13\tA very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.\n2040002\t1\tlunch\t32\t2026-01-17 02:18:30\tA very light, low-calorie side salad composed primarily of mixed leafy greens, cherry tomatoes, cucumber, and radish. This analysis assumes no dressing has been added.\n2040003\t1\tbreakfast\t195\t2026-01-17 02:27:37\tA small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).\n2040004\t1\tlunch\t195\t2026-01-17 02:27:41\tA small Asian-style baked bun with a glossy top, sesame seeds, and an indeterminate filling (likely savory or sweet).\n2040005\t1\tbreakfast\t185\t2026-01-17 02:34:42\tA single small Asian bakery bun with a savory filling (likely meat floss or sausage) and topped with sesame seeds. This item is high in refined carbohydrates and fats typical of sweet dough bakery items.\n2040006\t1\tlunch\t185\t2026-01-17 02:34:46\tA single small Asian bakery bun with a savory filling (likely meat floss or sausage) and topped with sesame seeds. This item is high in refined carbohydrates and fats typical of sweet dough bakery items.\n",
+  "stderr": "",
+  "execution_time_ms": 1540
+}

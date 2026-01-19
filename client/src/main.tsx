@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { getClientSessionFromStorage } from "@/lib/clientSession";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
@@ -43,8 +44,18 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       fetch(input, init) {
+        // Get client session from localStorage as fallback for cookies
+        const clientSession = getClientSessionFromStorage();
+        
+        // Add custom header if we have a stored session
+        const headers = new Headers(init?.headers);
+        if (clientSession) {
+          headers.set('X-Client-Session', clientSession);
+        }
+        
         return globalThis.fetch(input, {
           ...(init ?? {}),
+          headers,
           credentials: "include",
         });
       },

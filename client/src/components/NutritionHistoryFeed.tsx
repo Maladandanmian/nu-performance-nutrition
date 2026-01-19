@@ -33,8 +33,16 @@ export function NutritionHistoryFeed({
 }: NutritionHistoryFeedProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
-  const { data: mealsData, isLoading: mealsLoading } = trpc.meals.list.useQuery({ clientId });
-  const { data: drinksData, isLoading: drinksLoading } = trpc.drinks.list.useQuery({ clientId });
+  const { data: mealsData, isLoading: mealsLoading } = trpc.meals.list.useQuery(
+    { clientId },
+    { enabled: clientId > 0 }
+  );
+  const { data: drinksData, isLoading: drinksLoading } = trpc.drinks.list.useQuery(
+    { clientId },
+    { enabled: clientId > 0 }
+  );
+  
+  console.log('[NutritionHistoryFeed] clientId:', clientId, 'mealsData:', mealsData, 'mealsLoading:', mealsLoading);
 
   // Combine and sort meals and drinks
   const entries = useMemo(() => {

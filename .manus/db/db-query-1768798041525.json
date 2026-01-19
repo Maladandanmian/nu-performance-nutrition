@@ -1,0 +1,88 @@
+{
+  "query": "SELECT id, name, pin, trainerId FROM clients ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, pin, trainerId FROM clients ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "pin": "222222",
+      "trainerId": "13"
+    },
+    {
+      "id": "30001",
+      "name": "Noad",
+      "pin": "401483",
+      "trainerId": "1"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "pin": "555555",
+      "trainerId": "13"
+    },
+    {
+      "id": "330001",
+      "name": "Luke Davey ",
+      "pin": "777777",
+      "trainerId": "13"
+    },
+    {
+      "id": "360001",
+      "name": "Test Client",
+      "pin": "838929",
+      "trainerId": "1530015"
+    },
+    {
+      "id": "360002",
+      "name": "Test Client",
+      "pin": "183765",
+      "trainerId": "1530018"
+    },
+    {
+      "id": "360003",
+      "name": "Test Client",
+      "pin": "770660",
+      "trainerId": "1530020"
+    },
+    {
+      "id": "360004",
+      "name": "Test Client",
+      "pin": "285470",
+      "trainerId": "1530023"
+    },
+    {
+      "id": "390003",
+      "name": "Test Client",
+      "pin": "247060",
+      "trainerId": "1650008"
+    },
+    {
+      "id": "420003",
+      "name": "Test Client",
+      "pin": "315380",
+      "trainerId": "1770005"
+    },
+    {
+      "id": "450003",
+      "name": "Test Client",
+      "pin": "444149",
+      "trainerId": "1830022"
+    },
+    {
+      "id": "450016",
+      "name": "Test Client",
+      "pin": "264418",
+      "trainerId": "1830024"
+    },
+    {
+      "id": "450029",
+      "name": "Test Client",
+      "pin": "398451",
+      "trainerId": "1830025"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tpin\ttrainerId\n1\tAndy Knight \t222222\t13\n30001\tNoad\t401483\t1\n270001\tDavid Benskin \t555555\t13\n330001\tLuke Davey \t777777\t13\n360001\tTest Client\t838929\t1530015\n360002\tTest Client\t183765\t1530018\n360003\tTest Client\t770660\t1530020\n360004\tTest Client\t285470\t1530023\n390003\tTest Client\t247060\t1650008\n420003\tTest Client\t315380\t1770005\n450003\tTest Client\t444149\t1830022\n450016\tTest Client\t264418\t1830024\n450029\tTest Client\t398451\t1830025\n",
+  "stderr": "",
+  "execution_time_ms": 1544
+}

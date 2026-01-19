@@ -503,3 +503,15 @@
 - [x] Root cause: Analyze button was disabled when no photo selected
 - [x] Solution: Added conditional button logic - shows "Log Beverage" when only drink fields filled
 - [x] Beverage-only logging now works independently from meal logging
+
+## Critical Bug Fix: Meals Not Displaying After January 15 (Jan 19, 2026)
+- [x] Investigated bug report from Manus 1.6 Lite
+- [x] Confirmed meals ARE being saved to database (18 meals after Jan 15)
+- [x] Confirmed API was only returning 50 oldest meals (not newest)
+- [x] Root cause: getMealsByClientId ordered by loggedAt ASC with LIMIT 50
+- [x] Fixed getMealsByClientId to order by loggedAt DESC (newest first)
+- [x] Increased limit from 50 to 500 meals
+- [x] Applied same fix to getDrinksByClientId
+- [x] Verified API now returns 68 meals including all dates up to Jan 17
+- [x] Added localStorage fallback for client session (backup for cookie issues)
+- [x] Created separate clientSession.ts module to avoid circular imports

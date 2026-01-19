@@ -28,27 +28,40 @@ export const appRouter = router({
     me: publicProcedure.query(opts => opts.ctx.user),
     
     clientSession: publicProcedure.query(({ ctx }) => {
-      console.log('[clientSession] Checking session, cookies:', ctx.req.cookies);
-      if (!ctx.req.cookies) {
-        console.log('[clientSession] No cookies object');
-        return null;
+      console.log('[clientSession] Checking session...');
+      
+      // First, try to get from cookie
+      const clientCookie = ctx.req.cookies?.['client_session'];
+      if (clientCookie) {
+        console.log('[clientSession] Found cookie');
+        try {
+          const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
+          return {
+            clientId: decoded.clientId,
+            name: decoded.name,
+          };
+        } catch (e) {
+          console.log('[clientSession] Failed to decode cookie');
+        }
       }
       
-      const clientCookie = ctx.req.cookies['client_session'];
-      console.log('[clientSession] client_session cookie:', clientCookie);
-      if (!clientCookie) {
-        return null;
+      // Fallback: try to get from X-Client-Session header
+      const sessionHeader = ctx.req.headers['x-client-session'] as string | undefined;
+      if (sessionHeader) {
+        console.log('[clientSession] Found header');
+        try {
+          const decoded = JSON.parse(Buffer.from(sessionHeader, 'base64').toString());
+          return {
+            clientId: decoded.clientId,
+            name: decoded.name,
+          };
+        } catch (e) {
+          console.log('[clientSession] Failed to decode header');
+        }
       }
       
-      try {
-        const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
-        return {
-          clientId: decoded.clientId,
-          name: decoded.name,
-        };
-      } catch (e) {
-        return null;
-      }
+      console.log('[clientSession] No session found');
+      return null;
     }),
     
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -109,6 +122,8 @@ export const appRouter = router({
             id: client.id,
             name: client.name,
           },
+          // Return the session token so client can store it in localStorage as fallback
+          sessionToken: cookieValue,
         };
       }),
   }),

@@ -1,0 +1,136 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, loggedAt \nFROM meals \nWHERE loggedAt > '2026-01-15 06:53:42'\nORDER BY loggedAt DESC \nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, loggedAt \nFROM meals \nWHERE loggedAt > '2026-01-15 06:53:42'\nORDER BY loggedAt DESC \nLIMIT 20;",
+  "rows": [
+    {
+      "id": "2040006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:46"
+    },
+    {
+      "id": "2040005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "185",
+      "loggedAt": "2026-01-17 02:34:42"
+    },
+    {
+      "id": "2040004",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:41"
+    },
+    {
+      "id": "2040003",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "195",
+      "loggedAt": "2026-01-17 02:27:37"
+    },
+    {
+      "id": "2040002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:30"
+    },
+    {
+      "id": "2040001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "32",
+      "loggedAt": "2026-01-17 02:18:13"
+    },
+    {
+      "id": "2010002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:34"
+    },
+    {
+      "id": "2010001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "466",
+      "loggedAt": "2026-01-16 02:15:31"
+    },
+    {
+      "id": "1980008",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:22"
+    },
+    {
+      "id": "1980007",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "468",
+      "loggedAt": "2026-01-16 01:56:15"
+    },
+    {
+      "id": "1980006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:25"
+    },
+    {
+      "id": "1980005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "537",
+      "loggedAt": "2026-01-16 01:50:18"
+    },
+    {
+      "id": "1980004",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "527",
+      "loggedAt": "2026-01-16 01:42:37"
+    },
+    {
+      "id": "1980003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "1015",
+      "loggedAt": "2026-01-16 01:26:58"
+    },
+    {
+      "id": "1980002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "47",
+      "loggedAt": "2026-01-16 01:22:47"
+    },
+    {
+      "id": "1980001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "765",
+      "loggedAt": "2026-01-16 01:14:46"
+    },
+    {
+      "id": "1920003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "480",
+      "loggedAt": "2026-01-15 06:55:40"
+    },
+    {
+      "id": "1920002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "430",
+      "loggedAt": "2026-01-15 06:54:12"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tloggedAt\n2040006\t1\tlunch\t185\t2026-01-17 02:34:46\n2040005\t1\tbreakfast\t185\t2026-01-17 02:34:42\n2040004\t1\tlunch\t195\t2026-01-17 02:27:41\n2040003\t1\tbreakfast\t195\t2026-01-17 02:27:37\n2040002\t1\tlunch\t32\t2026-01-17 02:18:30\n2040001\t1\tbreakfast\t32\t2026-01-17 02:18:13\n2010002\t1\tlunch\t466\t2026-01-16 02:15:34\n2010001\t1\tbreakfast\t466\t2026-01-16 02:15:31\n1980008\t1\tlunch\t468\t2026-01-16 01:56:22\n1980007\t1\tbreakfast\t468\t2026-01-16 01:56:15\n1980006\t1\tlunch\t537\t2026-01-16 01:50:25\n1980005\t1\tbreakfast\t537\t2026-01-16 01:50:18\n1980004\t1\tbreakfast\t527\t2026-01-16 01:42:37\n1980003\t1\tlunch\t1015\t2026-01-16 01:26:58\n1980002\t1\tlunch\t47\t2026-01-16 01:22:47\n1980001\t1\tbreakfast\t765\t2026-01-16 01:14:46\n1920003\t1\tlunch\t480\t2026-01-15 06:55:40\n1920002\t1\tlunch\t430\t2026-01-15 06:54:12\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}
