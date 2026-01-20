@@ -219,12 +219,23 @@ export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
 export async function createBodyMetric(metric: InsertBodyMetric) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Convert weight from kg to integer (multiply by 10)
-  // e.g., 68.4 kg -> 684
-  const convertedMetric = {
-    ...metric,
-    weight: metric.weight ? Math.round(metric.weight * 10) : undefined,
+  // Build insert object with only provided fields
+  const convertedMetric: any = {
+    clientId: metric.clientId,
+    recordedAt: metric.recordedAt || new Date(),
   };
+  
+  // Only include optional fields if they have values
+  if (metric.weight) {
+    convertedMetric.weight = Math.round(metric.weight * 10);
+  }
+  if (metric.hydration) {
+    convertedMetric.hydration = metric.hydration;
+  }
+  if (metric.notes) {
+    convertedMetric.notes = metric.notes;
+  }
+  
   return db.insert(bodyMetrics).values(convertedMetric);
 }
 

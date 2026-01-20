@@ -515,3 +515,10 @@
 - [x] Verified API now returns 68 meals including all dates up to Jan 17
 - [x] Added localStorage fallback for client session (backup for cookie issues)
 - [x] Created separate clientSession.ts module to avoid circular imports
+
+## Meal Logging Failure After Rollback (Jan 20, 2026)
+- [x] Investigated "Failed to analyze meal" error when logging meals with beverages
+- [x] Root cause: body_metrics table didn't exist in database (migration state mismatch)
+- [x] Fixed createBodyMetric function to only include provided fields (avoid inserting default values)
+- [x] Created body_metrics table in database with proper schema
+- [x] Verified meal logging now works correctly with beverages
