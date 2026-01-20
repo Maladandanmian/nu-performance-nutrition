@@ -522,3 +522,11 @@
 - [x] Fixed createBodyMetric function to only include provided fields (avoid inserting default values)
 - [x] Created body_metrics table in database with proper schema
 - [x] Verified meal logging now works correctly with beverages
+
+## Body Metrics Table Restoration (Jan 20, 2026)
+- [x] Investigate missing body_metrics table after rollback
+- [x] Identify root cause: migration state mismatch from rollback
+- [x] Create body_metrics table from scratch (preserving all other data)
+- [x] Verify weight logging API works correctly
+- [x] Verify weight retrieval API works correctly
+- [x] Test weight tracking functionality end-to-end
