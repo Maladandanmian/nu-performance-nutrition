@@ -1196,6 +1196,12 @@ export const appRouter = router({
         volumeMl: z.number().optional(),
         notes: z.string().optional(),
         loggedAt: z.date().optional(),
+        // Nutrition fields from AI re-analysis
+        calories: z.number().optional(),
+        protein: z.number().optional(),
+        fat: z.number().optional(),
+        carbs: z.number().optional(),
+        fibre: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
         const { drinkId, ...data } = input;

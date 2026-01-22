@@ -1753,12 +1753,18 @@ export default function ClientDashboard() {
                 
                 // Check if editing a drink (negative ID)
                 if (editingMealId && editingMealId < 0) {
-                  // Update existing drink
+                  // Update existing drink with nutrition values from analysis
                   updateDrinkMutation.mutate({
                     drinkId: -editingMealId,
                     drinkType,
                     volumeMl: parseInt(volumeMl),
                     loggedAt: fromHongKongDateTimeLocal(mealDateTime),
+                    // Include nutrition values from AI re-analysis
+                    calories: analysisResult?.calories || 0,
+                    protein: analysisResult?.protein || 0,
+                    fat: analysisResult?.fat || 0,
+                    carbs: analysisResult?.carbs || 0,
+                    fibre: analysisResult?.fibre || 0,
                   });
                 } else if (isEditMode && editingMealId) {
                   // Update existing meal

@@ -667,3 +667,11 @@
 - [x] Ensure updated nutrition values replace old values in the analysis modal (fixed: added setEditedComponents call in analyzeMealWithDrinkMutation.onSuccess line 181)
 - [x] Test meal edit flow: edit meal → add "2 fried eggs" → click "Analyse Meal" → verify nutrition includes eggs (~180 kcal, ~12g protein) (test passes: mealEditReanalysis.test.ts)
 - [x] Ensure meal description, nutrition values, and score are all updated based on edited components (all working correctly after fix, tests pass 46/47)
+
+## Fix Drink Edit Nutrition Values Not Updating (Jan 22, 2026)
+- [x] Investigate updateDrink procedure to see if it recalculates nutrition when drink type changes (found: procedure only accepted drinkType/volumeMl, not nutrition fields)
+- [x] Verify that updateDrink saves calories, protein, carbs, fat, fiber to database (found: nutrition fields were not in input schema)
+- [x] Fix updateDrink to accept nutrition fields in backend procedure (added calories, protein, fat, carbs, fibre to input schema lines 1200-1204)
+- [x] Fix frontend to pass nutrition values from analysisResult when updating drink (added nutrition fields to updateDrinkMutation.mutate call lines 1763-1767)
+- [x] Ensure nutrition history displays updated nutrition values after drink edit (fixed: nutrition values now saved to database and displayed correctly)
+- [x] Test: edit "Full fat dairy milk 300ml" to "oat milk 300ml" → verify nutrition changes from 198 cal to 165 cal (test passes: drinkEditNutrition.test.ts, 47/48 tests passing)
