@@ -109,9 +109,9 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
     return bodyweightData.map((point, index) => {
       if (point.weight === null) return point;
       
-      // Calculate 3-day moving average (current + previous 2 days)
+      // Calculate 7-day moving average (current + previous 6 days)
       const window = [];
-      for (let i = Math.max(0, index - 2); i <= index; i++) {
+      for (let i = Math.max(0, index - 6); i <= index; i++) {
         if (bodyweightData[i].weight !== null) {
           window.push(bodyweightData[i].weight!);
         }

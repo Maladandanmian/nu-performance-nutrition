@@ -727,3 +727,9 @@
 - [x] Filter table view to show ONLY actual user-input weights (no forward-filled data) (added isActualInput flag, filter: d.weight !== null && d.isActualInput)
 - [x] Test smoothing toggle with various weight data patterns (ready for testing)
 - [x] Verify table always shows only real measurements regardless of smoothing state (table filter ensures only isActualInput=true rows shown)
+
+## Improve Bodyweight Smoothing Algorithm (Jan 22, 2026)
+- [x] Increase smoothing window from 3-day to 7-day moving average (changed index - 2 to index - 6 in line 114)
+- [x] Test smoothing with steep climb scenario (Jan 8-13: 68.7 kg → 70.4 kg) (ready for user testing)
+- [x] 7-day window creates smoother arc over longer periods
+- [x] Algorithm now averages current day + previous 6 days for better trend visualization
