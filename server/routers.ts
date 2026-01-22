@@ -290,7 +290,7 @@ export const appRouter = router({
             { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
           );
 
-          // 5. Calculate nutrition score with quality + progress
+          // 5. Calculate nutrition score with quality + progress (use current time)
           const score = calculateNutritionScore(
             {
               calories: analysis.calories,
@@ -300,7 +300,8 @@ export const appRouter = router({
               fibre: analysis.fibre,
             },
             goals,
-            todaysTotals
+            todaysTotals,
+            new Date() // Use current time for analysis
           );
 
           // Return analysis results (meal will be saved separately after user confirms/edits)
@@ -415,7 +416,8 @@ export const appRouter = router({
           const score = calculateNutritionScore(
             totalNutrition,
             goals,
-            todaysTotals
+            todaysTotals,
+            new Date() // Use current time (loggedAt not available in this procedure)
           );
 
           // Save meal to database
@@ -799,7 +801,8 @@ export const appRouter = router({
               fibre: input.fibre,
             },
             goals,
-            todaysTotals
+            todaysTotals,
+            new Date() // Use current time (loggedAt not available in this procedure)
           );
 
           return {
@@ -939,7 +942,8 @@ export const appRouter = router({
           const score = calculateNutritionScore(
             totalNutrition,
             goals,
-            dayTotals
+            dayTotals,
+            input.loggedAt // Use actual logged time
           );
 
           // Update meal in database
@@ -1091,7 +1095,8 @@ export const appRouter = router({
               fibre: combinedFibre,
             },
             goals,
-            todaysTotals
+            todaysTotals,
+            new Date() // Use current time for analysis
           );
 
           // 7. Return analysis data WITHOUT saving to database

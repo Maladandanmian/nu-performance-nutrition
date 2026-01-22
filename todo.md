@@ -787,3 +787,32 @@
 - [x] Prevent meal type from reverting to "Lunch" after analysis
 - [x] Test meal type selection at different times of day
 - [x] Test meal type persistence when user manually changes selection
+
+## Adjust Nutrition Scoring Algorithm (Jan 22, 2026)
+- [x] Locate nutrition scoring logic in backend (server/qwenVision.ts lines 247-415)
+- [x] Analyze current scoring algorithm to understand how it calculates scores
+- [x] Identify why high-calorie/high-fat meals receive moderate scores (3/5)
+  - Issue: Progress score averages across all 5 nutrients, diluting the impact of exceeding any single nutrient
+  - Issue: 60% weight on intrinsic quality means a "healthy" burger can still score well even when over targets
+- [x] Implement time-aware contextual scoring:
+  - [x] Morning (6am-12pm): More forgiving - full day ahead to balance
+  - [x] Afternoon (12pm-6pm): Moderate - check if over 70% of daily budget
+  - [x] Evening (6pm-11pm): Strict - little time left, penalize heavy meals when near/over target
+  - [x] Late night (11pm+): Very strict - day is over, penalize any significant calories
+- [x] Add "time remaining in day" factor to progress score calculation
+- [x] Penalize meals more aggressively when ANY critical nutrient (calories, fat) exceeds 120% of daily target
+- [x] Implement "budget exhaustion" penalty: if already at 80%+ of target and it's evening, heavily penalize calorie-dense meals
+- [x] Reward meals that fit context: burger in morning = OK, salad in evening when full = good choice
+- [x] Test scoring with time-aware scenarios:
+  - [x] Burger at 8am when at 0% of targets → Should score 3-4/5 (acceptable, can adjust later)
+  - [x] Burger at 8pm when at 90% of targets → Should score 1-2/5 (very bad timing)
+  - [x] Salad at 8pm when at 95% of targets → Should score 4-5/5 (good choice)
+  - [x] Large meal at 12pm when at 30% of targets → Should score 4-5/5 (reasonable)
+  - [x] Snack at 11pm when at 100% of targets → Should score 1-2/5 (day is over)
+- [x] Ensure score reflects "how well does this meal fit my goals RIGHT NOW" considering time and progress
+
+## Enhance Calorie and Fat Penalty Priority (Jan 22, 2026)
+- [x] Add heavier penalties for calorie and fat overages compared to other macros
+- [x] Calories and fat violations should be weighted more heavily in the scoring algorithm
+- [x] Going over on calories/fat is worse than going over on protein/carbs/fiber
+- [x] Added Factor 3 with dedicated calorie/fat overage penalties (>120% = 1-3/5 depending on severity)

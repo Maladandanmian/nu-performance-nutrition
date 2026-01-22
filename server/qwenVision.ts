@@ -245,13 +245,16 @@ Then sum up the totals.`,
 }
 
 /**
- * Calculate nutrition score (1-5) using hybrid approach:
- * - 60% Intrinsic Quality: How healthy is the meal itself?
- * - 40% Daily Progress: How does it fit within daily targets?
+ * Calculate nutrition score (1-5) using time-aware contextual approach:
+ * - 40% Intrinsic Quality: How healthy is the meal itself?
+ * - 60% Contextual Fit: How well does it fit current time + daily progress?
+ * 
+ * Key insight: A burger at 8am with 0% progress is different from a burger at 8pm with 90% progress.
  * 
  * @param actual - Actual nutritional values from the meal
  * @param goals - Target nutritional goals (daily)
  * @param todaysTotals - Nutrients already consumed today (before this meal)
+ * @param mealTime - Time when meal is logged (defaults to now)
  * @returns Score from 1 (poor) to 5 (excellent)
  */
 export function calculateNutritionScore(
@@ -275,7 +278,8 @@ export function calculateNutritionScore(
     fat: number;
     carbs: number;
     fibre: number;
-  } = { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
+  } = { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 },
+  mealTime: Date = new Date()
 ): number {
   // Special case: Zero-calorie beverages (tea, black coffee, water)
   // Return neutral score (3/5) as they have no nutritional impact
@@ -356,59 +360,158 @@ export function calculateNutritionScore(
   const avgQualityScore = qualityScore / qualityFactors;
   
   // ============================================
-  // PART 2: DAILY PROGRESS SCORE (40% weight)
+  // PART 2: CONTEXTUAL FIT SCORE (60% weight)
   // ============================================
   
-  // Calculate remaining budget for today
-  const remaining = {
-    calories: goals.caloriesTarget - todaysTotals.calories,
-    protein: goals.proteinTarget - todaysTotals.protein,
-    fat: goals.fatTarget - todaysTotals.fat,
-    carbs: goals.carbsTarget - todaysTotals.carbs,
-    fibre: goals.fibreTarget - todaysTotals.fibre,
-  };
+  // Get time of day in Hong Kong timezone
+  const hongKongTime = new Date(mealTime.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+  const hour = hongKongTime.getHours();
   
-  // Calculate how well this meal fits the remaining budget
-  let progressScore = 0;
-  let progressFactors = 0;
+  // Determine time period and strictness multiplier
+  let timePeriod: 'morning' | 'afternoon' | 'evening' | 'late-night';
+  let strictnessMultiplier: number;
   
-  // For each nutrient, score based on fit
-  const nutrients = ['calories', 'protein', 'fat', 'carbs', 'fibre'] as const;
-  
-  for (const nutrient of nutrients) {
-    const actualValue = actual[nutrient];
-    const remainingValue = remaining[nutrient];
-    const targetValue = goals[`${nutrient}Target` as keyof typeof goals];
-    
-    if (remainingValue <= 0) {
-      // Already over target - any more is bad
-      progressScore += 1;
-    } else if (actualValue <= remainingValue * 0.4) {
-      // Well within budget (using <40% of remaining)
-      progressScore += 5;
-    } else if (actualValue <= remainingValue * 0.7) {
-      // Good fit (using 40-70% of remaining)
-      progressScore += 4;
-    } else if (actualValue <= remainingValue) {
-      // Fits but uses most of budget (70-100%)
-      progressScore += 3;
-    } else if (actualValue <= remainingValue * 1.2) {
-      // Slightly over remaining budget (100-120%)
-      progressScore += 2;
-    } else {
-      // Significantly over budget (>120%)
-      progressScore += 1;
-    }
-    progressFactors++;
+  if (hour >= 6 && hour < 12) {
+    timePeriod = 'morning';
+    strictnessMultiplier = 0.7; // More forgiving - full day ahead
+  } else if (hour >= 12 && hour < 18) {
+    timePeriod = 'afternoon';
+    strictnessMultiplier = 1.0; // Normal strictness
+  } else if (hour >= 18 && hour < 23) {
+    timePeriod = 'evening';
+    strictnessMultiplier = 1.5; // Stricter - little time left
+  } else {
+    timePeriod = 'late-night';
+    strictnessMultiplier = 2.0; // Very strict - day is over
   }
   
-  const avgProgressScore = progressScore / progressFactors;
+  // Calculate current progress as % of daily targets
+  const currentProgress = {
+    calories: todaysTotals.calories / goals.caloriesTarget,
+    protein: todaysTotals.protein / goals.proteinTarget,
+    fat: todaysTotals.fat / goals.fatTarget,
+    carbs: todaysTotals.carbs / goals.carbsTarget,
+    fibre: todaysTotals.fibre / goals.fibreTarget,
+  };
+  
+  // Calculate progress AFTER this meal
+  const progressAfterMeal = {
+    calories: (todaysTotals.calories + actual.calories) / goals.caloriesTarget,
+    protein: (todaysTotals.protein + actual.protein) / goals.proteinTarget,
+    fat: (todaysTotals.fat + actual.fat) / goals.fatTarget,
+    carbs: (todaysTotals.carbs + actual.carbs) / goals.carbsTarget,
+    fibre: (todaysTotals.fibre + actual.fibre) / goals.fibreTarget,
+  };
+  
+  // Check for critical nutrient violations (calories and fat are most important)
+  const criticalViolations = [
+    progressAfterMeal.calories > 1.2 ? 'calories' : null,
+    progressAfterMeal.fat > 1.2 ? 'fat' : null,
+  ].filter(Boolean);
+  
+  // Calculate contextual fit score
+  let contextScore = 0;
+  let contextFactors = 0;
+  
+  // Factor 1: Budget exhaustion penalty (weighted by time of day)
+  const avgProgress = (currentProgress.calories + currentProgress.fat + currentProgress.carbs) / 3;
+  
+  // Late night is especially strict
+  if (avgProgress >= 1.0 && timePeriod === 'late-night') {
+    // Already at 100% late at night - any calories are bad
+    contextScore += 1; // Very bad - shouldn't be eating
+  } else if (avgProgress >= 0.9 && (timePeriod === 'evening' || timePeriod === 'late-night')) {
+    // Already at 90%+ in evening/late-night - heavily penalize calorie-dense meals
+    const calorieIntensity = actual.calories / 300; // Normalize to typical meal size
+    if (calorieIntensity > 2) {
+      contextScore += 1; // Very bad - large meal when budget exhausted
+    } else if (calorieIntensity > 1) {
+      contextScore += 1; // Very bad - medium meal when budget exhausted
+    } else {
+      contextScore += 4; // Good - light meal when budget exhausted
+    }
+  } else if (avgProgress >= 0.8 && timePeriod === 'evening') {
+    // At 80-90% in evening - penalize heavy meals
+    const calorieIntensity = actual.calories / 300;
+    if (calorieIntensity > 2) {
+      contextScore += 1; // Bad timing for large meal
+    } else if (calorieIntensity > 1) {
+      contextScore += 2; // Acceptable but not ideal
+    } else {
+      contextScore += 5; // Good - light meal
+    }
+  } else if (avgProgress < 0.5 && timePeriod === 'morning') {
+    // Morning with lots of budget left - very forgiving
+    contextScore += 5; // Any meal is fine in morning with budget
+  } else {
+    // Normal scoring based on fit
+    const remaining = goals.caloriesTarget - todaysTotals.calories;
+    if (remaining <= 0) {
+      contextScore += 1; // Already over
+    } else if (actual.calories <= remaining * 0.4) {
+      contextScore += 5; // Well within budget
+    } else if (actual.calories <= remaining * 0.7) {
+      contextScore += 4; // Good fit
+    } else if (actual.calories <= remaining) {
+      contextScore += 3; // Uses most of budget
+    } else {
+      contextScore += 2; // Over budget
+    }
+  }
+  contextFactors++;
+  
+  // Factor 2: Critical nutrient violations (apply strictness multiplier)
+  if (criticalViolations.length > 0) {
+    // Penalize based on time of day - more aggressive
+    const basePenalty = criticalViolations.length * 3; // 3 points per violation (was 2)
+    const adjustedPenalty = basePenalty * strictnessMultiplier;
+    contextScore += Math.max(1, 5 - adjustedPenalty); // Heavily penalize violations
+  } else {
+    // No violations - reward based on how well it fits
+    const fatFit = progressAfterMeal.fat <= 1.0 ? 5 : progressAfterMeal.fat <= 1.1 ? 3 : 1;
+    const carbFit = progressAfterMeal.carbs <= 1.0 ? 5 : progressAfterMeal.carbs <= 1.1 ? 3 : 1;
+    contextScore += (fatFit + carbFit) / 2;
+  }
+  contextFactors++;
+  
+  // Factor 3: Additional penalty for calorie and fat overages (most important macros)
+  // Going over on calories/fat is worse than going over on protein/carbs/fiber
+  if (progressAfterMeal.calories > 1.2 || progressAfterMeal.fat > 1.2) {
+    // Severe overage on critical nutrients
+    const calorieOverage = Math.max(0, progressAfterMeal.calories - 1.2);
+    const fatOverage = Math.max(0, progressAfterMeal.fat - 1.2);
+    const totalOverage = calorieOverage + fatOverage;
+    
+    if (totalOverage > 0.3) {
+      contextScore += 1; // Very bad - major calorie/fat overage
+    } else if (totalOverage > 0.1) {
+      contextScore += 2; // Bad - moderate calorie/fat overage
+    } else {
+      contextScore += 3; // Slight overage
+    }
+  } else if (progressAfterMeal.calories > 1.1 || progressAfterMeal.fat > 1.1) {
+    // Moderate overage on critical nutrients
+    contextScore += 3; // Acceptable but not ideal
+  } else {
+    // Within limits or under - reward based on protein utilization
+    if (currentProgress.protein < 0.8 && actual.protein > 20) {
+      contextScore += 5; // Good - high protein when needed
+    } else if (currentProgress.protein < 0.9 && actual.protein > 15) {
+      contextScore += 4; // Good protein contribution
+    } else {
+      contextScore += 4; // Good - staying within calorie/fat limits
+    }
+  }
+  contextFactors++;
+  
+  const avgContextScore = contextScore / contextFactors;
   
   // ============================================
   // FINAL SCORE: Weighted average
   // ============================================
   
-  const finalScore = (avgQualityScore * 0.6) + (avgProgressScore * 0.4);
+  // 40% intrinsic quality, 60% contextual fit (time + progress)
+  const finalScore = (avgQualityScore * 0.4) + (avgContextScore * 0.6);
   
   // Round to nearest integer (1-5)
   return Math.max(1, Math.min(5, Math.round(finalScore)));
