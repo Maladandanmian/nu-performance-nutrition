@@ -42,8 +42,11 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
     }
   }
   
-  // Create alternating dash pattern: 10 units dash, 10 units gap
-  const dashPattern = useDashedStroke ? "10 10" : undefined;
+  // Create alternating dash pattern that divides evenly into circumference
+  // Circumference ≈ 251.3, use 12 segments of ~20.94 units each (10.47 dash + 10.47 gap)
+  const segmentCount = 12;
+  const dashLength = circumference / (segmentCount * 2); // Half segment for dash, half for gap
+  const dashPattern = useDashedStroke ? `${dashLength} ${dashLength}` : undefined;
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -80,8 +83,8 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
               stroke={warningColor}
               strokeWidth="8"
               fill="none"
-              strokeDasharray={`0 10 10 10`}
-              strokeDashoffset={strokeDashoffset - 10}
+              strokeDasharray={`0 ${dashLength} ${dashLength} ${dashLength}`}
+              strokeDashoffset={strokeDashoffset - dashLength}
               strokeLinecap="butt"
               className="transition-all duration-500"
             />

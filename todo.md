@@ -822,3 +822,9 @@
 - [x] Remove small segment at 12 o'clock position
 - [x] Ensure alternating green-red/green-orange dashes are evenly distributed
 - [x] Test with various over-target percentages (117%, 140%, 220%)
+
+## Fix Grey Gap in Dashed Circles (Jan 22, 2026)
+- [x] Investigate why grey background shows through in upper right quarter
+- [x] Ensure dash pattern covers full 100% of circle circumference
+- [x] Adjust strokeDasharray pattern to eliminate gaps (calculated dashLength = circumference / 24)
+- [x] Test with various over-target percentages (117%, 140%, 220%)
