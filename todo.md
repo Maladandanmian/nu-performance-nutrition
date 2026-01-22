@@ -816,3 +816,9 @@
 - [x] Calories and fat violations should be weighted more heavily in the scoring algorithm
 - [x] Going over on calories/fat is worse than going over on protein/carbs/fiber
 - [x] Added Factor 3 with dedicated calorie/fat overage penalties (>120% = 1-3/5 depending on severity)
+
+## Fix Dashed Circle Alignment (Jan 22, 2026)
+- [x] Adjust strokeDashoffset to align dashed pattern symmetrically
+- [x] Remove small segment at 12 o'clock position
+- [x] Ensure alternating green-red/green-orange dashes are evenly distributed
+- [x] Test with various over-target percentages (117%, 140%, 220%)

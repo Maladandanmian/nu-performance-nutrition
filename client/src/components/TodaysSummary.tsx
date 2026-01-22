@@ -81,7 +81,7 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
               strokeWidth="8"
               fill="none"
               strokeDasharray={`0 10 10 10`}
-              strokeDashoffset={strokeDashoffset}
+              strokeDashoffset={strokeDashoffset - 10}
               strokeLinecap="butt"
               className="transition-all duration-500"
             />
