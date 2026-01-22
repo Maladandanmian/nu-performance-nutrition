@@ -893,3 +893,7 @@
 - [x] Frontend now passes analysisResult.score to backend
 - [x] Backend uses provided score if available, otherwise calculates
 - [x] Test that meal history refreshes with new score after edit
+
+## Remove Duplicate Hydration Trend from Body Metrics (Jan 22, 2026)
+- [x] Remove Hydration Trend graph from Body Metrics tab (already in Daily Trends)
+- [x] Keep only bodyweight tracking in Body Metrics tab

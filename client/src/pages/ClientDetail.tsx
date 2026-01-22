@@ -471,29 +471,6 @@ export default function ClientDetail() {
                   )}
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hydration Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bodyMetricsChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={bodyMetricsChartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="hydration" fill="#86BBD8" name="Hydration (ml)" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No hydration data yet</p>
-                  )}
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>
