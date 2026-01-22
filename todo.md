@@ -635,3 +635,10 @@
 - [x] Clear beverage state when starting a new meal photo upload (added to identifyItemsMutation.onSuccess lines 158-160)
 - [x] Ensure beverage fields are empty/reset for each new meal entry
 - [x] Test that logging meal with beverage, then meal without beverage works correctly (tests pass 45/46)
+
+## Fix Nutrition History Calorie Display for Meals with Beverages (Jan 22, 2026)
+- [x] Identify where NutritionHistoryFeed displays meal calories (found in MealEntry component lines 338-351)
+- [x] Update calorie display to show meal + beverage combined total when beverage is present (lines 339-343)
+- [x] Update protein, fat, carbs, fiber displays to show combined totals as well (lines 344-365)
+- [x] Ensure daily totals calculation includes beverage nutrition (already implemented in routers.ts lines 658-663)
+- [x] Test that meals with beverages show correct combined nutrition values (tests pass 44/46 - same pre-existing failures)

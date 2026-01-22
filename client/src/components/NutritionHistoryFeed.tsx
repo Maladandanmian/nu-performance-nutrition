@@ -336,12 +336,32 @@ function MealEntry({
         
         {/* Nutrition Info */}
         <div className="flex gap-3 text-xs flex-wrap">
-          <span className="font-medium">{meal.calories} cal</span>
-          <span className="text-muted-foreground">P: {meal.protein}g</span>
-          <span className="text-muted-foreground">C: {meal.carbs}g</span>
-          <span className="text-muted-foreground">F: {meal.fat}g</span>
-          {meal.fibre > 0 && (
-            <span className="text-muted-foreground">Fiber: {meal.fibre}g</span>
+          <span className="font-medium">
+            {meal.beverageCalories 
+              ? (meal.calories + meal.beverageCalories) 
+              : meal.calories} cal
+          </span>
+          <span className="text-muted-foreground">
+            P: {meal.beverageProtein 
+              ? (meal.protein + meal.beverageProtein) 
+              : meal.protein}g
+          </span>
+          <span className="text-muted-foreground">
+            C: {meal.beverageCarbs 
+              ? (meal.carbs + meal.beverageCarbs) 
+              : meal.carbs}g
+          </span>
+          <span className="text-muted-foreground">
+            F: {meal.beverageFat 
+              ? (meal.fat + meal.beverageFat) 
+              : meal.fat}g
+          </span>
+          {(meal.fibre > 0 || (meal.beverageFibre && meal.beverageFibre > 0)) && (
+            <span className="text-muted-foreground">
+              Fiber: {meal.beverageFibre 
+                ? (meal.fibre + meal.beverageFibre) 
+                : meal.fibre}g
+            </span>
           )}
           {meal.nutritionScore && (
             <span className="font-medium text-primary">
