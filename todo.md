@@ -693,3 +693,13 @@
 - [x] Lines use monotone curve smoothing for natural flow across gaps
 - [x] Dots only appear on days with actual data (null days have no dots)
 - [x] Target line remains continuous across all dates (already working correctly)
+
+## Review and Improve Adherence Calculation Logic (Jan 22, 2026)
+- [x] Investigate current adherence calculation in NutrientTrendGraphs component (found: Math.round(calculateAverage('calories') / goals.calories * 100))
+- [x] Identify why adherence shows 93% (7-day) and 84% (30-day) despite wide variance in actual values (old calculation only measured if average was close to target, not daily consistency)
+- [x] Propose improved calculation method that better reflects deviation from targets (proposed Weighted MAPE with asymmetric penalty)
+- [x] Implement Weighted MAPE adherence calculation (calculateAdherence function)
+- [x] Apply asymmetric weighting: over-eating penalized 1.5x, under-eating 1.0x
+- [x] Update color coding: Green (≥80%), Amber (60-79%), Red (<60%)
+- [x] Replace old adherence calculation with new weighted MAPE in Calories chart
+- [ ] Test with various scenarios and verify accuracy

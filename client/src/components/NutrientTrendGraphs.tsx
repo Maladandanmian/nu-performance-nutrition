@@ -98,6 +98,32 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
     return Math.round(values.reduce((sum, d) => sum + ((d[key as keyof typeof d] as number) || 0), 0) / values.length);
   };
 
+  // Calculate adherence using Weighted MAPE (Mean Absolute Percentage Error)
+  // Over-eating is penalized 1.5x more than under-eating
+  const calculateAdherence = (key: string, targetKey: string) => {
+    const daysWithData = chartData.filter(d => d[key as keyof typeof d] !== null);
+    if (daysWithData.length === 0) return 0;
+
+    const totalWeightedError = daysWithData.reduce((sum, day) => {
+      const actual = (day[key as keyof typeof day] as number) || 0;
+      const target = (day[targetKey as keyof typeof day] as number) || 1;
+      
+      const deviation = actual - target;
+      const percentageError = Math.abs(deviation) / target;
+      
+      // Apply asymmetric weighting: over-eating penalized 1.5x
+      const weight = deviation > 0 ? 1.5 : 1.0;
+      const weightedError = percentageError * weight;
+      
+      return sum + weightedError;
+    }, 0);
+
+    const averageWeightedError = totalWeightedError / daysWithData.length;
+    const adherence = Math.max(0, 100 - (averageWeightedError * 100));
+    
+    return Math.round(adherence);
+  };
+
   return (
     <div className="space-y-6">
       {/* Date Range Selector */}
@@ -248,10 +274,10 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
             <div>
               <p className="text-gray-600">Adherence</p>
               <p className="text-lg font-semibold" style={{ 
-                color: hasAnyData ? (Math.abs(calculateAverage('calories') - goals.calories) / goals.calories < 0.1 ? '#10b981' : '#f59e0b') : '#9ca3af'
+                color: hasAnyData ? (calculateAdherence('calories', 'caloriesTarget') >= 80 ? '#10b981' : calculateAdherence('calories', 'caloriesTarget') >= 60 ? '#f59e0b' : '#ef4444') : '#9ca3af'
               }}>
                 {hasAnyData ? (
-                  <>{Math.round(calculateAverage('calories') / goals.calories * 100)}%</>
+                  <>{calculateAdherence('calories', 'caloriesTarget')}%</>
                 ) : (
                   <span className="text-gray-400">-</span>
                 )}
