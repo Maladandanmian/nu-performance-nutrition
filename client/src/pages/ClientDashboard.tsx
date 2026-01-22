@@ -495,34 +495,52 @@ export default function ClientDashboard() {
     try {
       // Convert image to JPEG using Canvas (handles HEIF/HEIC from iPhone)
       const convertToJpeg = async (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          const reader = new FileReader();
+        try {
+          // Use createImageBitmap for better format support (including HEIF)
+          const imageBitmap = await createImageBitmap(file);
           
-          reader.onload = (e) => {
-            img.onload = () => {
-              // Create canvas and draw image
-              const canvas = document.createElement('canvas');
-              canvas.width = img.width;
-              canvas.height = img.height;
-              const ctx = canvas.getContext('2d');
-              if (!ctx) {
-                reject(new Error('Failed to get canvas context'));
-                return;
-              }
-              ctx.drawImage(img, 0, 0);
-              
-              // Convert to JPEG base64
-              const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
-              const base64Data = jpegBase64.split(',')[1];
-              resolve(base64Data);
+          // Create canvas and draw image
+          const canvas = document.createElement('canvas');
+          canvas.width = imageBitmap.width;
+          canvas.height = imageBitmap.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            throw new Error('Failed to get canvas context');
+          }
+          ctx.drawImage(imageBitmap, 0, 0);
+          
+          // Convert to JPEG base64
+          const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          const base64Data = jpegBase64.split(',')[1];
+          return base64Data;
+        } catch (error) {
+          // Fallback: If createImageBitmap fails, try traditional method
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  reject(new Error('Failed to get canvas context'));
+                  return;
+                }
+                ctx.drawImage(img, 0, 0);
+                const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
+                const base64Data = jpegBase64.split(',')[1];
+                resolve(base64Data);
+              };
+              img.onerror = () => reject(new Error('This image format is not supported. Please try converting to JPEG first or take a new photo.'));
+              img.src = e.target?.result as string;
             };
-            img.onerror = () => reject(new Error('Failed to load image'));
-            img.src = e.target?.result as string;
-          };
-          reader.onerror = () => reject(new Error('Failed to read file'));
-          reader.readAsDataURL(file);
-        });
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);
+          });
+        }
       };
 
       // Convert and upload
@@ -535,6 +553,7 @@ export default function ClientDashboard() {
       });
     } catch (error) {
       console.error('Error uploading meal:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to process image. Please try again.');
     }
   };
 
