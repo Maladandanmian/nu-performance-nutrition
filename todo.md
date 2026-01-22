@@ -612,3 +612,11 @@
 - [x] Ensure all three scenarios (meal only, meal+beverage, beverage only) use same edit interface
 - [x] Analysis modal should only appear AFTER clicking "Analyse Meal" button, not on initial edit
 - [x] Test unified interface with all three editing scenarios (tests pass 45/46)
+
+## Fix Drink-Only Edit Re-Analysis (Jan 22, 2026)
+- [x] Remove "Update Drink" button that saves without re-analysis
+- [x] Add "Analyse Beverage" button for drink-only edits to trigger beverage re-estimation
+- [x] Ensure analysis modal appears after clicking "Analyse" with updated nutrition and score
+- [x] After analysis, show "Update Drink" button in analysis modal to save changes
+- [x] Fix datetime bug: use mealDateTime instead of drinkDateTime for drink updates
+- [x] Test drink edit flow: edit drink type/volume → click Analyse → see updated nutrition → click Update Drink (tests pass 45/46)

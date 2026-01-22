@@ -1205,38 +1205,77 @@ export default function ClientDashboard() {
             </Button>
             )}
 
-            {/* Save/Update Button for drink-only edits */}
+            {/* Analyse Button for drink-only edits */}
             {identifiedItems.length === 0 && editingMealId && editingMealId < 0 && (
               <Button
                 className="w-full"
-                style={{backgroundColor: '#578DB3'}}
                 onClick={async () => {
                   if (!drinkType || !volumeMl) {
                     toast.error("Please provide drink type and volume");
                     return;
                   }
                   
-                  // Update drink directly without analysis
-                  updateDrinkMutation.mutate({
-                    drinkId: -editingMealId,
+                  // Estimate beverage nutrition
+                  let drinkNutrition = null;
+                  if (drinkType.toLowerCase().trim() === 'water') {
+                    drinkNutrition = {
+                      calories: 0,
+                      protein: 0,
+                      fat: 0,
+                      carbs: 0,
+                      fibre: 0,
+                    };
+                  } else {
+                    try {
+                      const result = await estimateBeverageMutation.mutateAsync({
+                        drinkType,
+                        volumeMl: parseInt(volumeMl),
+                      });
+                      drinkNutrition = result.nutrition;
+                    } catch (error) {
+                      toast.error("Failed to estimate beverage nutrition");
+                      return;
+                    }
+                  }
+                  
+                  // Set beverage nutrition for display
+                  setBeverageNutrition({
+                    ...drinkNutrition,
                     drinkType,
                     volumeMl: parseInt(volumeMl),
-                    loggedAt: fromHongKongDateTimeLocal(mealDateTime),
                   });
                   
+                  // Calculate drink score (1-5: low-cal drinks score higher)
+                  const drinkScore = drinkNutrition.calories < 50 ? 5 : 
+                                    drinkNutrition.calories < 100 ? 4 : 
+                                    drinkNutrition.calories < 150 ? 3 : 
+                                    drinkNutrition.calories < 200 ? 2 : 1;
+                  
+                  // Set analysis result for the modal
+                  setAnalysisResult({
+                    description: drinkType,
+                    calories: drinkNutrition.calories,
+                    protein: drinkNutrition.protein,
+                    fat: drinkNutrition.fat,
+                    carbs: drinkNutrition.carbs,
+                    fibre: drinkNutrition.fibre,
+                    score: drinkScore,
+                    isDrink: true,
+                  });
+                  
+                  // Close item editor and open analysis modal
                   setShowItemEditor(false);
-                  setEditingMealId(null);
-                  setIsEditMode(false);
+                  setShowAnalysisModal(true);
                 }}
-                disabled={updateDrinkMutation.isPending}
+                disabled={estimateBeverageMutation.isPending}
               >
-                {updateDrinkMutation.isPending ? (
+                {estimateBeverageMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Updating...
+                    Analyzing...
                   </>
                 ) : (
-                  "Update Drink"
+                  "Analyse Beverage"
                 )}
               </Button>
             )}
@@ -1705,7 +1744,7 @@ export default function ClientDashboard() {
                     drinkId: -editingMealId,
                     drinkType,
                     volumeMl: parseInt(volumeMl),
-                    loggedAt: fromHongKongDateTimeLocal(drinkDateTime),
+                    loggedAt: fromHongKongDateTimeLocal(mealDateTime),
                   });
                 } else if (isEditMode && editingMealId) {
                   // Update existing meal
