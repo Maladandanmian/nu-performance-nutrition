@@ -541,4 +541,8 @@
 
 ## Body Metrics Table Keeps Disappearing (Jan 22, 2026)
 - [x] Recreated body_metrics table after it disappeared again
-- [ ] Investigate why the table keeps disappearing (possible migration or database reset issue)
+- [x] Investigate why the table keeps disappearing (possible migration or database reset issue)
+- [x] Root cause found: Migrations 0006 and 0007 were dropping and recreating all tables
+- [x] Removed problematic migrations 0006 and 0007 from migration history
+- [x] Manually created body_metrics table with correct schema
+- [x] Verified beverage logging works end-to-end

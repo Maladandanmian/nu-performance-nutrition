@@ -43,20 +43,6 @@
       "when": 1768175320662,
       "tag": "0005_slippery_sentry",
       "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1768527881488,
-      "tag": "0006_low_vengeance",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1768528168753,
-      "tag": "0007_strong_siren",
-      "breakpoints": true
     }
   ]
 }
