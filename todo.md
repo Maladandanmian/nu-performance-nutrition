@@ -750,3 +750,10 @@
 - [x] Missing dates should have null weight values to preserve X-axis spacing
 - [x] Test: Last 7 Days should show Jan 16-22 on X-axis, not just Jan 20 and Jan 22
 - [x] Test: Last 30 Days should show full 30-day range on X-axis, not just 5 dates
+
+## Extend Smoothing Curve to Include Previous Weight Entry (Jan 22, 2026)
+- [x] When smoothing is ON, look back beyond the selected date range for the most recent weight entry
+- [x] Include that previous weight entry in the smoothed dataset
+- [x] This allows the curve to extend from the previous entry into the current window
+- [x] Example: Last 7 Days (Jan 16-22) should include Jan 15 entry (69.4 kg) to draw curve from Jan 15 → Jan 20 → Jan 22
+- [x] Only apply this when smoothing is ON (not for normal forward-fill view)

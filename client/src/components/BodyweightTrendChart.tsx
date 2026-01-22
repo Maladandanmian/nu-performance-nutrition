@@ -102,14 +102,23 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
     });
   }, [bodyMetricsData, dateRange, goals.weightTarget]);
 
-  // Apply smoothing if enabled (3-day moving average)
+  // Apply smoothing if enabled
   // When smoothing is ON: show only actual user-input weights (no forward-filled points)
   // But preserve full date range with null values for proper X-axis spacing
+  // Also include the most recent weight entry BEFORE the date range for curve continuity
   const smoothedBodyweightData = useMemo(() => {
     if (!smoothing || bodyweightData.length === 0) return bodyweightData;
     
+    // Find the most recent weight entry BEFORE the date range starts
+    const firstDateInRange = new Date(dateRange[0]);
+    const previousEntry = bodyMetricsData && bodyMetricsData.length > 0
+      ? bodyMetricsData
+          .filter(metric => metric.weight && new Date(metric.recordedAt) < firstDateInRange)
+          .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime())[0]
+      : undefined;
+    
     // Map over all dates, but set weight to null for forward-filled points
-    return bodyweightData.map(point => {
+    const result = bodyweightData.map(point => {
       if (point.isActualInput && point.weight !== null) {
         // Keep actual user-input weights
         return point;
@@ -118,7 +127,22 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
         return { ...point, weight: null };
       }
     });
-  }, [bodyweightData, smoothing]);
+    
+    // If there's a previous entry, prepend it to show curve extending from before the window
+    if (previousEntry && previousEntry.weight) {
+      const recordedDate = new Date(previousEntry.recordedAt);
+      const previousPoint = {
+        date: format(recordedDate, 'MMM d'),
+        fullDate: `${recordedDate.getFullYear()}-${String(recordedDate.getMonth() + 1).padStart(2, '0')}-${String(recordedDate.getDate()).padStart(2, '0')}`,
+        weight: previousEntry.weight / 10, // Convert from stored integer to decimal
+        weightTarget: goals.weightTarget ? parseFloat(goals.weightTarget) : null,
+        isActualInput: true,
+      };
+      return [previousPoint, ...result];
+    }
+    
+    return result;
+  }, [bodyweightData, smoothing, bodyMetricsData, dateRange, goals.weightTarget]);
   
   const displayData = smoothing ? smoothedBodyweightData : bodyweightData;
   const hasWeightData = bodyweightData.some(d => d.weight !== null);
