@@ -149,15 +149,12 @@ export default function ClientDashboard() {
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
       setShowItemEditor(true);
-      // Reset file input and clear beverage state for fresh meal entry
+      // Reset file input only (keep beverage data from upload screen)
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      // Clear beverage fields to prevent persistence from previous meal
-      setDrinkType("");
-      setVolumeMl("");
-      setBeverageNutrition(null);
+      // Note: beverage fields (drinkType, volumeMl) are preserved from upload screen
     },
     onError: (error) => {
       toast.error(`Failed to identify meal items: ${error.message}`);

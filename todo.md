@@ -652,3 +652,10 @@
 - [x] Identify why beverage indicator (droplet icon + drink name/volume) is not displaying (beverage nutrition not being set to state in Analyse Meal button)
 - [x] Fix beverage display logic by adding setBeverageNutrition call in Analyse Meal button handler (lines 1186-1191)
 - [x] Test that beverages display correctly for all meals with beverages (tests pass 45/46 - only pre-existing auth.logout failure)
+
+## Fix Beverage Data Loss Between Upload Screen and Item Editor (Jan 22, 2026)
+- [x] Identify where beverage data (drinkType, volumeMl) is lost when transitioning from upload screen to item editor modal (found in identifyItemsMutation.onSuccess lines 157-160)
+- [x] Modify identifyItemsMutation.onSuccess to preserve beverage data from upload screen instead of clearing it (removed beverage clearing, lines 152-157)
+- [x] Pre-fill beverage fields in item editor modal with data from upload screen (automatic - state preserved)
+- [x] Change "Add Beverage (Optional)" label to "Accompanying Beverage" when beverage data is already present (already implemented on line 1110)
+- [x] Test complete flow: enter beverage on upload screen → click "Analyze Meal + Beverage" → item editor opens with beverage pre-filled → save meal (tests pass 45/46 - only pre-existing auth.logout failure)
