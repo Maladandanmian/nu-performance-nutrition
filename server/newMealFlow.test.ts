@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { appRouter } from './routers';
 import * as db from './db';
 
@@ -40,6 +40,17 @@ describe('New Meal Logging Flow', () => {
       fibreTarget: 25,
       hydrationTarget: 2000,
     });
+  });
+
+  afterAll(async () => {
+    // Cleanup test data
+    if (testClientId) {
+      try {
+        await db.deleteClientAndData(testClientId);
+      } catch (error) {
+        console.error('Failed to clean up test client:', error);
+      }
+    }
   });
 
   it('should identify items from meal image', { timeout: testTimeout }, async () => {

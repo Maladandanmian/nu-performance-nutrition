@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as db from './db';
 import { estimateBeverageNutrition } from './beverageNutrition';
+import { TestClientTracker } from './testCleanup';
 
 describe('Drink Edit Nutrition Update', () => {
   let testClientId: number;
   let testDrinkId: number;
+  const tracker = new TestClientTracker();
 
   beforeAll(async () => {
     // Create a test client with random PIN to avoid duplicates
@@ -16,6 +18,7 @@ describe('Drink Edit Nutrition Update', () => {
       trainerId: 1,
     });
     testClientId = Number(clientResult[0].insertId);
+    tracker.track(testClientId); // Track for cleanup
 
     // Create initial drink: Full fat dairy milk 300ml
     const initialNutrition = await estimateBeverageNutrition('Full fat dairy milk', 300);
@@ -92,4 +95,8 @@ describe('Drink Edit Nutrition Update', () => {
     
     console.log('[Test] ✅ Nutrition values successfully updated from dairy milk to oat milk');
   }, 30000); // 30 second timeout for AI calls
+
+  afterAll(async () => {
+    await tracker.cleanup();
+  });
 });

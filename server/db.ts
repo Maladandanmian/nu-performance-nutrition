@@ -237,6 +237,17 @@ export async function getBodyMetricsByClientId(clientId: number, limit: number =
   return db.select().from(bodyMetrics).where(eq(bodyMetrics.clientId, clientId)).orderBy(bodyMetrics.recordedAt).limit(limit);
 }
 
+export async function deleteBodyMetric(metricId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(bodyMetrics).where(eq(bodyMetrics.id, metricId));
+}
+
+export async function deleteNutritionGoalByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(nutritionGoals).where(eq(nutritionGoals.clientId, clientId));
+}
 
 // Test cleanup function - deletes all data for a client
 export async function deleteClientAndData(clientId: number) {

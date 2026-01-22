@@ -675,3 +675,12 @@
 - [x] Fix frontend to pass nutrition values from analysisResult when updating drink (added nutrition fields to updateDrinkMutation.mutate call lines 1763-1767)
 - [x] Ensure nutrition history displays updated nutrition values after drink edit (fixed: nutrition values now saved to database and displayed correctly)
 - [x] Test: edit "Full fat dairy milk 300ml" to "oat milk 300ml" → verify nutrition changes from 198 cal to 165 cal (test passes: drinkEditNutrition.test.ts, 47/48 tests passing)
+
+## Create Automated Test Client Cleanup System (Jan 22, 2026)
+- [x] Create test cleanup utility functions in server/testCleanup.ts (created isTestClient, deleteTestClient, findTestClients, cleanupAllTestClients, TestClientTracker)
+- [x] Add deleteTestClient function to db.ts that cascades to all related data (added deleteBodyMetric and deleteNutritionGoalByClientId, existing deleteClientAndData handles cascade)
+- [x] Update existing tests to use afterAll cleanup hooks (updated drinkEditNutrition.test.ts and newMealFlow.test.ts, others already had cleanup)
+- [x] Create manual cleanup script for orphaned test data (created scripts/cleanupTestClients.ts)
+- [x] Add cleanup script to package.json scripts (added "cleanup:test-clients" command)
+- [x] Test cleanup system to verify all test data is removed (tested successfully, cleaned up 8 orphaned test clients)
+- [x] Document cleanup system in README or test documentation (created docs/TEST_CLEANUP.md with comprehensive guide)
