@@ -247,6 +247,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -329,6 +330,7 @@ export const appRouter = router({
               beverageFat: input.beverageFat,
               beverageCarbs: input.beverageCarbs,
               beverageFibre: input.beverageFibre,
+              beverageCategory: input.beverageCategory,
             },
           };
         } catch (error) {
@@ -362,6 +364,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
         components: z.array(z.object({
           name: z.string(),
           calories: z.number(),
@@ -444,6 +447,7 @@ export const appRouter = router({
             beverageFat: input.beverageFat,
             beverageCarbs: input.beverageCarbs,
             beverageFibre: input.beverageFibre,
+            beverageCategory: input.beverageCategory,
             // Itemized food components
             components: input.components,
             loggedAt: new Date(),
@@ -878,6 +882,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
         components: z.array(z.object({
           name: z.string(),
           calories: z.number(),
@@ -968,6 +973,7 @@ export const appRouter = router({
             beverageFat: input.beverageFat,
             beverageCarbs: input.beverageCarbs,
             beverageFibre: input.beverageFibre,
+            beverageCategory: input.beverageCategory,
           });
 
           return {
@@ -1111,7 +1117,8 @@ export const appRouter = router({
             },
             goals,
             todaysTotals,
-            new Date() // Use current time for analysis
+            new Date(), // Use current time for analysis
+            drinkNutrition?.category // Pass beverage category for quality adjustment
           );
 
           // 7. Return analysis data WITHOUT saving to database

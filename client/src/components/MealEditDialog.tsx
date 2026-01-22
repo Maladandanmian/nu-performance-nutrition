@@ -268,6 +268,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
       beverageFat: beverageNutrition?.fat,
       beverageCarbs: beverageNutrition?.carbs,
       beverageFibre: beverageNutrition?.fibre,
+      beverageCategory: beverageNutrition?.category,
       components: editedComponents,
     });
   };

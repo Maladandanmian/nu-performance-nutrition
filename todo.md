@@ -873,3 +873,15 @@
 - [x] Fixed frontend to read score from `data.finalScore` instead of `data.mealAnalysis.score`
 - [x] Score now properly updates when beverage is changed and re-analyzed
 - [x] Star display automatically updates based on score value
+
+## Fix Beverage Scoring Accuracy (Jan 22, 2026)
+- [x] Investigate why Red Bull (500ml) and vegetable juice (500ml) get same 3-star score
+- [x] Root cause: Scoring only sees macros, can't differentiate refined sugar vs natural carbs
+- [x] Add beverage category field to BeverageNutrition interface
+- [x] Update AI prompt to classify beverages into 18 categories
+- [x] Modify scoring algorithm to apply category-based modifiers (-2 to +0.5)
+- [x] Update database schema to store beverage category
+- [x] Update frontend to pass category through entire chain
+- [x] Test Red Bull (energy_drink, -2 penalty) vs vegetable juice (juice_vegetable, +0.5 reward)
+- [x] Verified: Red Bull meal = 2/5, Vegetable juice meal = 5/5 (3-point difference!)
+- [x] Verify consumption tracking unchanged (still just macros)

@@ -1799,6 +1799,7 @@ export default function ClientDashboard() {
                     beverageFat: beverageNutrition?.fat,
                     beverageCarbs: beverageNutrition?.carbs,
                     beverageFibre: beverageNutrition?.fibre,
+                    beverageCategory: beverageNutrition?.category,
                     components: analysisResult?.components,
                   });
                 } else {
@@ -1824,6 +1825,7 @@ export default function ClientDashboard() {
                     beverageFat: beverageNutrition?.fat,
                     beverageCarbs: beverageNutrition?.carbs,
                     beverageFibre: beverageNutrition?.fibre,
+                    beverageCategory: beverageNutrition?.category,
                     components: analysisResult?.components,
                   });
                 }

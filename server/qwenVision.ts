@@ -279,7 +279,8 @@ export function calculateNutritionScore(
     carbs: number;
     fibre: number;
   } = { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 },
-  mealTime: Date = new Date()
+  mealTime: Date = new Date(),
+  beverageCategory?: string // Optional beverage category for quality adjustment
 ): number {
   // Special case: Zero-calorie beverages (tea, black coffee, water)
   // Return neutral score (3/5) as they have no nutritional impact
@@ -507,11 +508,73 @@ export function calculateNutritionScore(
   const avgContextScore = contextScore / contextFactors;
   
   // ============================================
-  // FINAL SCORE: Weighted average
+  // BEVERAGE CATEGORY ADJUSTMENT
+  // ============================================
+  
+  let beverageModifier = 0;
+  if (beverageCategory) {
+    switch (beverageCategory) {
+      // Heavy penalties for unhealthy beverages
+      case 'energy_drink':
+      case 'soda':
+      case 'alcohol_spirits':
+        beverageModifier = -2; // Major penalty
+        break;
+      
+      // Moderate penalties
+      case 'alcohol_beer':
+      case 'alcohol_wine':
+        beverageModifier = -1; // Moderate penalty
+        break;
+      
+      // Light penalties
+      case 'juice_fruit':
+      case 'coffee_milk':
+        beverageModifier = -0.5; // Slight penalty (natural but high sugar/calories)
+        break;
+      
+      // Neutral (no adjustment)
+      case 'milk_dairy':
+      case 'milk_plant':
+      case 'tea_milk':
+      case 'smoothie':
+      case 'other':
+        beverageModifier = 0;
+        break;
+      
+      // Rewards for healthy beverages
+      case 'juice_vegetable':
+      case 'tea_plain':
+      case 'coffee_black':
+        beverageModifier = 0.5; // Small reward
+        break;
+      
+      case 'water':
+        beverageModifier = 0.5; // Reward for hydration
+        break;
+      
+      case 'protein_shake':
+        // Reward if high protein (>15g), otherwise neutral
+        beverageModifier = actual.protein > 15 ? 0.5 : 0;
+        break;
+      
+      case 'sports_drink':
+        // Context-dependent: reward during exercise window, penalty otherwise
+        // For now, neutral (could be enhanced with exercise tracking)
+        beverageModifier = 0;
+        break;
+    }
+  }
+  
+  // ============================================
+  // FINAL SCORE: Weighted average + beverage modifier
   // ============================================
   
   // 40% intrinsic quality, 60% contextual fit (time + progress)
-  const finalScore = (avgQualityScore * 0.4) + (avgContextScore * 0.6);
+  let finalScore = (avgQualityScore * 0.4) + (avgContextScore * 0.6);
+  
+  // Apply beverage category modifier
+  finalScore += beverageModifier;
   
   // Round to nearest integer (1-5)
   return Math.max(1, Math.min(5, Math.round(finalScore)));
