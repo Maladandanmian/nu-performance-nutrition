@@ -352,9 +352,10 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
 
           {/* Beverage Section */}
           <div className="border-t pt-4">
-            <Label>Accompanying Beverage (Optional)</Label>
-            <div className="grid grid-cols-2 gap-4 mt-2">
+            <Label className="mb-2 block">Accompanying Beverage (Optional)</Label>
+            <div className="grid grid-cols-2 gap-4">
               <div>
+                <Label className="text-sm mb-1 block">Drink Type</Label>
                 <Input
                   placeholder="e.g., Coffee with milk"
                   value={drinkType}
@@ -362,9 +363,10 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
                 />
               </div>
               <div>
+                <Label className="text-sm mb-1 block">Volume (ml)</Label>
                 <Input
                   type="number"
-                  placeholder="Volume (ml)"
+                  placeholder="e.g., 250"
                   value={volumeMl}
                   onChange={(e) => setVolumeMl(e.target.value)}
                 />

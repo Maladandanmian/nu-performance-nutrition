@@ -918,3 +918,13 @@
 - [x] Add iOS/Android app icon meta tags
 - [x] Add Microsoft Tiles and manifest.json
 - [x] Test favicon display in browser
+
+## Fix Beverage Volume Label Alignment (Jan 22, 2026)
+- [ ] Fix "Volume (ml)" label alignment to match "Accompanying Beverage" heading
+- [ ] Ensure both labels are at same vertical level
+
+## Fix Beverage Volume Label Alignment (Jan 22, 2026)
+- [x] Fix "Volume (ml)" label alignment to match "Accompanying Beverage" heading
+- [x] Ensure both labels are at same vertical level
+- [x] Add "Drink Type" label for first input field
+- [x] Apply fix to both MealEditDialog and ClientDashboard

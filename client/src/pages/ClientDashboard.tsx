@@ -1122,11 +1122,12 @@ export default function ClientDashboard() {
 
             {/* Beverage Section */}
             <div className="border-t pt-4">
-              <Label>
+              <Label className="mb-2 block">
                 {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
               </Label>
-              <div className="grid grid-cols-2 gap-4 mt-2">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <Label htmlFor="drink-type" className="text-sm mb-1 block">Drink Type</Label>
                   <Input
                     id="drink-type"
                     placeholder="e.g., English breakfast tea with milk"
@@ -1135,11 +1136,11 @@ export default function ClientDashboard() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="volume">Volume (ml)</Label>
+                  <Label htmlFor="volume" className="text-sm mb-1 block">Volume (ml)</Label>
                   <Input
                     id="volume"
                     type="number"
-                    placeholder="250"
+                    placeholder="e.g., 250"
                     value={volumeMl}
                     onChange={(e) => setVolumeMl(e.target.value)}
                   />
