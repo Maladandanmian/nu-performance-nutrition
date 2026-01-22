@@ -859,3 +859,10 @@
 - [x] Consolidate into single "Re-analyze" button that handles both food and beverage
 - [x] Update handleReanalyze to automatically estimate beverage as part of full analysis
 - [x] Simplified button text from "Re-analyze Meal with AI" to "Re-analyze"
+
+## Fix Nutrition Score Minimum Value (Jan 22, 2026)
+- [x] Investigate why score shows "/5" (0 or undefined) instead of minimum 1
+- [x] Fixed frontend validation to allow beverage-only analysis
+- [x] Fixed backend to handle empty itemDescriptions (beverage-only entries)
+- [x] Added fallback in display to show minimum score of 1 if undefined
+- [x] Backend calculateNutritionScore already enforces 1-5 range

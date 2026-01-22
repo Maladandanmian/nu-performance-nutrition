@@ -1038,8 +1038,23 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Analyze meal nutrition from item descriptions
-          const mealAnalysis = await analyzeMealNutrition(input.itemDescriptions, input.imageUrl);
+          // 1. Analyze meal nutrition from item descriptions (or use zero values for beverage-only)
+          let mealAnalysis;
+          if (input.itemDescriptions.length > 0) {
+            mealAnalysis = await analyzeMealNutrition(input.itemDescriptions, input.imageUrl);
+          } else {
+            // Beverage-only entry - no food components
+            mealAnalysis = {
+              description: "No food items",
+              calories: 0,
+              protein: 0,
+              fat: 0,
+              carbs: 0,
+              fibre: 0,
+              confidence: 1.0,
+              components: [],
+            };
+          }
 
           // 2. If drink is provided, estimate its nutrition
           let drinkNutrition = null;

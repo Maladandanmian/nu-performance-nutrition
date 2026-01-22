@@ -198,8 +198,9 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
   const handleReanalyze = async () => {
     const filteredItems = identifiedItems.filter(item => item.trim() !== "");
     
-    if (filteredItems.length === 0) {
-      toast.error("Please add at least one food item");
+    // Allow analysis if there are food items OR a beverage
+    if (filteredItems.length === 0 && !drinkType) {
+      toast.error("Please add at least one food item or beverage");
       return;
     }
 
@@ -402,7 +403,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200">
               <div className="text-sm font-medium text-gray-600 mb-2">Nutrition Score</div>
               <div className="text-5xl font-bold" style={{color: '#578DB3'}}>
-                {analysisResult.score}/5
+                {analysisResult.score || 1}/5
               </div>
               <div className="flex justify-center gap-1 mt-2">
                 {[1, 2, 3, 4, 5].map((star) => (
