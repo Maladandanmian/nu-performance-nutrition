@@ -7,6 +7,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { analyzeMealImage, calculateNutritionScore } from "./qwenVision";
+import sharp from "sharp";
 import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvementAdvice";
 import { estimateBeverageNutrition } from "./beverageNutrition";
 import { reEstimateComponentNutrition } from "./componentReEstimation";
@@ -995,8 +996,14 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Upload image to S3
-          const imageBuffer = Buffer.from(input.imageBase64, 'base64');
+          // 1. Upload image to S3 (convert HEIF to JPEG if needed)
+          const inputBuffer = Buffer.from(input.imageBase64, 'base64');
+          
+          // Convert to JPEG using sharp (handles HEIF, PNG, WebP, etc.)
+          const imageBuffer = await sharp(inputBuffer)
+            .jpeg({ quality: 90 })
+            .toBuffer();
+          
           const randomSuffix = Math.random().toString(36).substring(7);
           const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
           const { url: imageUrl } = await storagePut(imageKey, imageBuffer, "image/jpeg");

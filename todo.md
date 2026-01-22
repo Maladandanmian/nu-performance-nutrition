@@ -567,3 +567,10 @@
 - [x] Fix the image display issue (removed imageUrl/imageKey clearing from analyzeMealWithDrink onSuccess)
 - [x] Moved image clearing to saveMealMutation onSuccess instead
 - [ ] Test that meal images appear in nutrition history after fix
+
+## HEIF/HEIC Image Format Issue (Jan 22, 2026)
+- [x] Root cause identified: iPhone uploads HEIF images with .jpg extension
+- [x] Browsers cannot display HEIF natively (shows alt text "Meal")
+- [x] Installed sharp npm package for image conversion
+- [x] Added HEIF → JPEG conversion in identifyItems procedure
+- [x] Tests pass (45/46) - ready for user testing
