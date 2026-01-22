@@ -15,25 +15,43 @@ interface CircularProgressProps {
 }
 
 function CircularProgress({ value, max, label, unit, emoji, color }: CircularProgressProps) {
-  const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  const actualPercentage = max > 0 ? (value / max) * 100 : 0;
+  const displayPercentage = Math.min(actualPercentage, 100);
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const strokeDashoffset = circumference - (displayPercentage / 100) * circumference;
   
-  // Color coding: green if within 90-110%, orange if 70-90% or 110-130%, red otherwise
-  let statusColor = color;
-  if (percentage >= 90 && percentage <= 110) {
-    statusColor = "#10b981"; // green
-  } else if ((percentage >= 70 && percentage < 90) || (percentage > 110 && percentage <= 130)) {
-    statusColor = "#f59e0b"; // orange
-  } else {
-    statusColor = "#ef4444"; // red
+  // Determine base color (always green when at or over 100%)
+  let statusColor = "#10b981"; // green
+  if (actualPercentage < 90) {
+    statusColor = "#ef4444"; // red (under target)
+  } else if (actualPercentage < 100) {
+    statusColor = "#f59e0b"; // orange (close to target)
+  }
+  
+  // Determine overlay warning for over-target
+  let overlayColor: string | null = null;
+  let showOverlay = false;
+  
+  if (actualPercentage > 100) {
+    showOverlay = true;
+    if (actualPercentage <= 120) {
+      overlayColor = "#f59e0b"; // yellow/orange (slightly over)
+    } else {
+      overlayColor = "#ef4444"; // red (significantly over)
+    }
   }
 
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative w-24 h-24">
         <svg className="transform -rotate-90 w-24 h-24">
+          <defs>
+            {/* Define dotted pattern for overlay */}
+            <pattern id={`dots-${label}`} x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+              <circle cx="4" cy="4" r="1.5" fill={overlayColor || "transparent"} />
+            </pattern>
+          </defs>
           {/* Background circle */}
           <circle
             cx="48"
@@ -56,10 +74,25 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             strokeLinecap="round"
             className="transition-all duration-500"
           />
+          {/* Overlay warning circle (dotted) for over-target */}
+          {showOverlay && (
+            <circle
+              cx="48"
+              cy="48"
+              r={radius}
+              stroke={`url(#dots-${label})`}
+              strokeWidth="8"
+              fill="none"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              className="transition-all duration-500"
+            />
+          )}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl">{emoji}</span>
-          <span className="text-xs font-semibold">{Math.round(percentage)}%</span>
+          <span className="text-xs font-semibold">{Math.round(actualPercentage)}%</span>
         </div>
       </div>
       <div className="text-center">

@@ -757,3 +757,13 @@
 - [x] This allows the curve to extend from the previous entry into the current window
 - [x] Example: Last 7 Days (Jan 16-22) should include Jan 15 entry (69.4 kg) to draw curve from Jan 15 → Jan 20 → Jan 22
 - [x] Only apply this when smoothing is ON (not for normal forward-fill view)
+
+## Add Visual Warning for Over-Target Nutrition Circles (Jan 22, 2026)
+- [x] Identify where Today's Summary circular progress indicators are rendered
+- [x] Add logic to detect when actual value exceeds target (>100%)
+- [x] Implement color-coded visual warnings for over-target values
+- [x] 100-120% over: Green circle with yellow dotted overlay (slightly over)
+- [x] 120%+ over: Green circle with red dotted overlay (significantly over)
+- [x] Use SVG patterns or CSS to create dotted overlay effect
+- [x] Test with various over-target scenarios (calories 169%, fat 135%, carbs 134%, hydration 128%)
+- [x] Ensure under-target values remain solid green (current behavior)
