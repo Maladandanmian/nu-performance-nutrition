@@ -942,3 +942,10 @@
 - [x] Change file input accept to force iOS automatic conversion
 - [x] Add clear error message for unsupported formats
 - [ ] Test with actual iPhone HEIC photos (requires user testing)
+
+## Fix HEIC File Selection (Jan 22, 2026)
+- [x] Revert accept attribute to allow HEIC file selection
+- [x] Ensure FileReader properly handles HEIC files
+- [x] Discovered sharp was breaking HEIC files
+- [x] Reverted to original approach: upload raw images without conversion
+- [x] HEIC files now work - AI vision model can read them directly

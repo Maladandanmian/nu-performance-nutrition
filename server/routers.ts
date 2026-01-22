@@ -1001,23 +1001,8 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Upload image to S3 (convert HEIF to JPEG if needed)
-          const inputBuffer = Buffer.from(input.imageBase64, 'base64');
-          
-          // Convert to JPEG using sharp
-          let imageBuffer: Buffer;
-          try {
-            imageBuffer = await sharp(inputBuffer)
-              .jpeg({ quality: 90 })
-              .toBuffer();
-          } catch (error: any) {
-            console.error('Failed to convert image:', error?.message);
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: 'Unable to process this image. iPhone users: Please use "Most Compatible" format (Settings > Camera > Formats > Most Compatible) or convert HEIC photos to JPEG before uploading.',
-            });
-          }
-          
+          // 1. Upload image to S3
+          const imageBuffer = Buffer.from(input.imageBase64, 'base64');
           const randomSuffix = Math.random().toString(36).substring(7);
           const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
           const { url: imageUrl } = await storagePut(imageKey, imageBuffer, "image/jpeg");

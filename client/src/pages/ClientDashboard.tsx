@@ -774,7 +774,7 @@ export default function ClientDashboard() {
                     <Input
                       id="meal-image"
                       type="file"
-                      accept="image/jpeg,image/jpg,image/png"
+                      accept="image/*"
                       onChange={handleFileChange}
                       className="flex-1"
                       ref={fileInputRef}
