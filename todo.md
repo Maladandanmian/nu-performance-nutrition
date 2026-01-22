@@ -853,3 +853,9 @@
 - [x] Move deleteMealMutation hook to top of component (before any conditional logic)
 - [x] Ensure all hooks are called in consistent order
 - [x] Test that ClientDetail page loads without errors
+
+## Simplify Meal Editing UI - Remove Redundant Button (Jan 22, 2026)
+- [x] Remove "Estimate Beverage Nutrition" button from MealEditDialog
+- [x] Consolidate into single "Re-analyze" button that handles both food and beverage
+- [x] Update handleReanalyze to automatically estimate beverage as part of full analysis
+- [x] Simplified button text from "Re-analyze Meal with AI" to "Re-analyze"

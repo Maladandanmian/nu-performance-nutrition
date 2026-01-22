@@ -367,22 +367,6 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
                 />
               </div>
             </div>
-            {drinkType && volumeMl && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  estimateBeverageMutation.mutate({
-                    drinkType,
-                    volumeMl: parseInt(volumeMl),
-                  });
-                }}
-                disabled={estimateBeverageMutation.isPending}
-                className="mt-2 text-xs"
-              >
-                {estimateBeverageMutation.isPending ? "Estimating..." : "Estimate Beverage Nutrition"}
-              </Button>
-            )}
           </div>
 
           {/* Notes */}
@@ -409,7 +393,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
                 Re-analyzing...
               </>
             ) : (
-              "🔄 Re-analyze Meal with AI"
+              "🔄 Re-analyze"
             )}
           </Button>
 
