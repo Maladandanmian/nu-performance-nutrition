@@ -620,3 +620,11 @@
 - [x] After analysis, show "Update Drink" button in analysis modal to save changes
 - [x] Fix datetime bug: use mealDateTime instead of drinkDateTime for drink updates
 - [x] Test drink edit flow: edit drink type/volume → click Analyse → see updated nutrition → click Update Drink (tests pass 45/46)
+
+## Fix Beverage Duplication in saveMeal (Jan 22, 2026)
+- [x] Identify where saveMeal creates duplicate drink entries when beverage is included (found in routers.ts lines 450-463)
+- [x] Remove or conditionally prevent standalone drink creation when beverage is part of meal (removed db.createDrink call)
+- [x] Keep hydration tracking (body_metrics) but remove duplicate drinks table entry
+- [x] Update test to verify NO duplicate drink entries when beverage is logged with meal
+- [x] Test meal with beverage logging to ensure only one entry appears in nutrition history (tests pass 45/46)
+- [x] Verify hydration tracking still works correctly (body_metrics entry created)

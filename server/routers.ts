@@ -447,22 +447,10 @@ export const appRouter = router({
             loggedAt: new Date(),
           });
 
-          // If beverage is included, also create drinks table entry for hydration tracking
+          // If beverage is included, create body_metrics entry for hydration tracking
+          // Note: We do NOT create a separate drink entry because the beverage data
+          // is already stored in the meal's beverage fields (beverageType, beverageVolumeMl, etc.)
           if (input.beverageType && input.beverageVolumeMl) {
-            await db.createDrink({
-              clientId: input.clientId,
-              drinkType: input.beverageType,
-              volumeMl: input.beverageVolumeMl,
-              calories: input.beverageCalories || 0,
-              protein: input.beverageProtein || 0,
-              fat: input.beverageFat || 0,
-              carbs: input.beverageCarbs || 0,
-              fibre: input.beverageFibre || 0,
-              notes: input.notes,
-              loggedAt: new Date(),
-            });
-            
-            // Create body_metrics entry for hydration
             await db.createBodyMetric({
               clientId: input.clientId,
               hydration: input.beverageVolumeMl,

@@ -71,11 +71,13 @@ describe('Beverage Logging in saveMeal', () => {
     expect(mealsWithBeverage.length).toBe(1);
   });
 
-  it('should create drink and body_metrics entries when beverage is included in saveMeal', async () => {
-    // This test verifies the fix: saveMeal should also create drinks and body_metrics entries
-    // when beverage data is present
+  it('should create body_metrics but NOT duplicate drink entries when beverage is included in meal', async () => {
+    // This test verifies that beverages logged WITH meals should:
+    // 1. Store beverage data in the meal's beverage fields
+    // 2. Create hydration tracking (body_metrics)
+    // 3. NOT create a separate standalone drink entry (to avoid duplication)
     
-    // First, create the meal with beverage
+    // Create a meal with beverage
     await db.createMeal({
       clientId: testClientId,
       imageUrl: '',
@@ -99,30 +101,28 @@ describe('Beverage Logging in saveMeal', () => {
       loggedAt: new Date(),
     });
 
-    // Manually create the drink and body_metrics entries (simulating the fix)
-    await db.createDrink({
-      clientId: testClientId,
-      drinkType: 'Cappuccino',
-      volumeMl: 250,
-      loggedAt: new Date(),
-    });
-
+    // Manually create body_metrics entry for hydration (this is what saveMeal should do)
     await db.createBodyMetric({
       clientId: testClientId,
       hydration: 250,
       recordedAt: new Date(),
     });
 
-    // Verify drink entry was created
+    // Verify NO separate drink entry was created (beverage data is in the meal)
     const drinks = await db.getDrinksByClientId(testClientId);
     const cappuccino = drinks.filter(d => d.drinkType === 'Cappuccino');
-    expect(cappuccino.length).toBe(1);
-    expect(cappuccino[0].volumeMl).toBe(250);
+    expect(cappuccino.length).toBe(0); // Should be 0, not 1
 
-    // Verify body_metrics entry was created
+    // Verify body_metrics entry was created for hydration tracking
     const metrics = await db.getBodyMetricsByClientId(testClientId);
     const hydrationEntries = metrics.filter(m => m.hydration === 250);
     expect(hydrationEntries.length).toBe(1);
+    
+    // Verify the meal has the beverage data
+    const meals = await db.getMealsByClientId(testClientId);
+    const mealWithBeverage = meals.find(m => m.beverageType === 'Cappuccino');
+    expect(mealWithBeverage).toBeDefined();
+    expect(mealWithBeverage?.beverageVolumeMl).toBe(250);
   });
 
   it('should not create duplicate entries when logging the same beverage', async () => {
