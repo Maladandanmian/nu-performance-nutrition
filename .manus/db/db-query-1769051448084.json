@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, clientId, weight, recordedAt, createdAt FROM body_metrics WHERE clientId = 1 ORDER BY recordedAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, weight, recordedAt, createdAt FROM body_metrics WHERE clientId = 1 ORDER BY recordedAt DESC;",
+  "rows": [
+    {
+      "id": "2",
+      "clientId": "1",
+      "weight": "698",
+      "recordedAt": "2026-01-22 03:06:31",
+      "createdAt": "2026-01-22 03:06:30"
+    },
+    {
+      "id": "1",
+      "clientId": "1",
+      "weight": "NULL",
+      "recordedAt": "2026-01-22 03:01:40",
+      "createdAt": "2026-01-22 03:01:40"
+    },
+    {
+      "id": "3",
+      "clientId": "1",
+      "weight": "697",
+      "recordedAt": "2026-01-20 12:00:00",
+      "createdAt": "2026-01-22 03:09:15"
+    },
+    {
+      "id": "4",
+      "clientId": "1",
+      "weight": "694",
+      "recordedAt": "2026-01-15 12:00:00",
+      "createdAt": "2026-01-22 03:09:15"
+    },
+    {
+      "id": "5",
+      "clientId": "1",
+      "weight": "698",
+      "recordedAt": "2026-01-13 12:00:00",
+      "createdAt": "2026-01-22 03:09:15"
+    },
+    {
+      "id": "6",
+      "clientId": "1",
+      "weight": "687",
+      "recordedAt": "2026-01-08 12:00:00",
+      "createdAt": "2026-01-22 03:09:15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tweight\trecordedAt\tcreatedAt\n2\t1\t698\t2026-01-22 03:06:31\t2026-01-22 03:06:30\n1\t1\tNULL\t2026-01-22 03:01:40\t2026-01-22 03:01:40\n3\t1\t697\t2026-01-20 12:00:00\t2026-01-22 03:09:15\n4\t1\t694\t2026-01-15 12:00:00\t2026-01-22 03:09:15\n5\t1\t698\t2026-01-13 12:00:00\t2026-01-22 03:09:15\n6\t1\t687\t2026-01-08 12:00:00\t2026-01-22 03:09:15\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

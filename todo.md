@@ -546,3 +546,9 @@
 - [x] Removed problematic migrations 0006 and 0007 from migration history
 - [x] Manually created body_metrics table with correct schema
 - [x] Verified beverage logging works end-to-end
+
+## Bodyweight Trend Graph Only Showing One Entry (Jan 22, 2026)
+- [x] Investigated why graph only shows today's entry despite having 4 historical entries in database
+- [x] Root cause found: Timezone mismatch between UTC timestamps from database and local date range generation
+- [x] Fixed date parsing to use local timezone consistently for both data and date range
+- [x] Verified API returns all historical weight entries correctly (Jan 8, 13, 15, 20)

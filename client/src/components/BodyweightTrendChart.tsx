@@ -58,7 +58,9 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
     const weightMap = new Map<string, number>();
     bodyMetricsData.forEach(metric => {
       if (metric.weight) {
-        const date = new Date(metric.recordedAt).toISOString().split('T')[0];
+        // Use local date to match the dateRange format
+        const recordedDate = new Date(metric.recordedAt);
+        const date = `${recordedDate.getFullYear()}-${String(recordedDate.getMonth() + 1).padStart(2, '0')}-${String(recordedDate.getDate()).padStart(2, '0')}`;
         // Convert from stored integer (e.g., 684) to decimal (e.g., 68.4)
         const weightInKg = metric.weight / 10;
         // Keep the latest weight for each day
