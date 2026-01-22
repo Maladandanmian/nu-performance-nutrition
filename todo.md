@@ -905,8 +905,8 @@
 - [x] Ensure consistent UI with client-side graphs
 
 ## Merge feature/trainer-dashboard to main (Jan 22, 2026)
-- [ ] Switch to main branch
-- [ ] Merge feature/trainer-dashboard into main
-- [ ] Verify no merge conflicts
+- [x] Switch to main branch
+- [x] Merge feature/trainer-dashboard into main
+- [x] Verify no merge conflicts (clean merge: 2,444 additions, 62 deletions)
 - [ ] Save checkpoint on main branch
 - [ ] Confirm all trainer features deployed
