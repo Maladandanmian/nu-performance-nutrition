@@ -1,5 +1,25 @@
 import { invokeLLM } from "./_core/llm";
 
+export type BeverageCategory = 
+  | 'energy_drink'      // Red Bull, Monster - heavy penalty
+  | 'soda'              // Coke, Sprite - heavy penalty
+  | 'alcohol_beer'      // Beer - moderate penalty
+  | 'alcohol_wine'      // Wine - moderate penalty
+  | 'alcohol_spirits'   // Vodka, whiskey - heavy penalty
+  | 'juice_fruit'       // Orange juice - light penalty
+  | 'juice_vegetable'   // V8, carrot juice - reward
+  | 'milk_dairy'        // Whole/skim milk - neutral to reward
+  | 'milk_plant'        // Oat/almond milk - neutral
+  | 'coffee_black'      // Black coffee - neutral
+  | 'coffee_milk'       // Latte, cappuccino - slight penalty
+  | 'tea_plain'         // Green/black tea - reward
+  | 'tea_milk'          // Milk tea - neutral
+  | 'water'             // Water, sparkling - reward
+  | 'sports_drink'      // Gatorade - context-dependent
+  | 'protein_shake'     // Protein drinks - reward if high protein
+  | 'smoothie'          // Blended drinks - depends on ingredients
+  | 'other';            // Uncategorized
+
 export interface BeverageNutrition {
   drinkType: string;
   volumeMl: number;
@@ -10,6 +30,7 @@ export interface BeverageNutrition {
   fibre: number;
   confidence: number; // 0-100
   description: string;
+  category: BeverageCategory;
 }
 
 /**
@@ -45,8 +66,30 @@ Return your estimate in JSON format with these exact fields:
   "carbs": <number in grams>,
   "fibre": <number in grams>,
   "confidence": <number 0-100>,
-  "description": "<brief description of the beverage and assumptions made>"
+  "description": "<brief description of the beverage and assumptions made>",
+  "category": "<one of the categories below>"
 }
+
+**BEVERAGE CATEGORIES:**
+Classify the beverage into ONE of these categories:
+- "energy_drink" - Red Bull, Monster, energy drinks
+- "soda" - Coca-Cola, Sprite, Pepsi, soft drinks
+- "alcohol_beer" - Beer, lager, ale
+- "alcohol_wine" - Red wine, white wine, champagne
+- "alcohol_spirits" - Vodka, whiskey, rum, gin
+- "juice_fruit" - Orange juice, apple juice, fruit juices
+- "juice_vegetable" - V8, carrot juice, vegetable juices
+- "milk_dairy" - Whole milk, skim milk, dairy milk
+- "milk_plant" - Oat milk, almond milk, soy milk
+- "coffee_black" - Black coffee, espresso (no milk/sugar)
+- "coffee_milk" - Latte, cappuccino, flat white (with milk)
+- "tea_plain" - Green tea, black tea, herbal tea (no milk/sugar)
+- "tea_milk" - Milk tea, chai latte (with milk)
+- "water" - Water, sparkling water, seltzer
+- "sports_drink" - Gatorade, Powerade, electrolyte drinks
+- "protein_shake" - Protein shakes, meal replacement drinks
+- "smoothie" - Blended fruit/vegetable smoothies
+- "other" - If none of the above fit
 
 **CRITICAL RULES:**
 - Scale nutrition proportionally to the volume provided
@@ -91,9 +134,14 @@ Before returning your answer, verify:
             carbs: { type: "number", description: "Carbohydrates in grams" },
             fibre: { type: "number", description: "Fiber in grams" },
             confidence: { type: "number", description: "Confidence level 0-100" },
-            description: { type: "string", description: "Brief description and assumptions" }
+            description: { type: "string", description: "Brief description and assumptions" },
+            category: { 
+              type: "string", 
+              enum: ["energy_drink", "soda", "alcohol_beer", "alcohol_wine", "alcohol_spirits", "juice_fruit", "juice_vegetable", "milk_dairy", "milk_plant", "coffee_black", "coffee_milk", "tea_plain", "tea_milk", "water", "sports_drink", "protein_shake", "smoothie", "other"],
+              description: "Beverage category for scoring adjustments" 
+            }
           },
-          required: ["calories", "protein", "fat", "carbs", "fibre", "confidence", "description"],
+          required: ["calories", "protein", "fat", "carbs", "fibre", "confidence", "description", "category"],
           additionalProperties: false
         }
       }
@@ -142,6 +190,7 @@ Before returning your answer, verify:
     carbs: Math.round(parsed.carbs * 10) / 10,
     fibre: Math.round(parsed.fibre * 10) / 10,
     confidence: Math.round(parsed.confidence),
-    description: parsed.description
+    description: parsed.description,
+    category: parsed.category || 'other' // Fallback to 'other' if AI doesn't provide category
   };
 }

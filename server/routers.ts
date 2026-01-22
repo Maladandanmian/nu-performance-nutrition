@@ -247,6 +247,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -329,6 +330,7 @@ export const appRouter = router({
               beverageFat: input.beverageFat,
               beverageCarbs: input.beverageCarbs,
               beverageFibre: input.beverageFibre,
+              beverageCategory: input.beverageCategory,
             },
           };
         } catch (error) {
@@ -362,6 +364,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
         components: z.array(z.object({
           name: z.string(),
           calories: z.number(),
@@ -444,6 +447,7 @@ export const appRouter = router({
             beverageFat: input.beverageFat,
             beverageCarbs: input.beverageCarbs,
             beverageFibre: input.beverageFibre,
+            beverageCategory: input.beverageCategory,
             // Itemized food components
             components: input.components,
             loggedAt: new Date(),
@@ -869,6 +873,7 @@ export const appRouter = router({
         fibre: z.number(),
         aiDescription: z.string(),
         aiConfidence: z.number().optional(),
+        nutritionScore: z.number().optional(),
         notes: z.string().optional(),
         loggedAt: z.date().optional(),
         beverageType: z.string().optional(),
@@ -878,6 +883,7 @@ export const appRouter = router({
         beverageFat: z.number().optional(),
         beverageCarbs: z.number().optional(),
         beverageFibre: z.number().optional(),
+        beverageCategory: z.string().optional(),
         components: z.array(z.object({
           name: z.string(),
           calories: z.number(),
@@ -946,6 +952,9 @@ export const appRouter = router({
             input.loggedAt // Use actual logged time
           );
 
+          // Use provided score from re-analysis if available, otherwise use calculated score
+          const finalScore = input.nutritionScore !== undefined ? input.nutritionScore : score;
+
           // Update meal in database
           await db.updateMeal(input.mealId, {
             imageUrl: input.imageUrl,
@@ -958,7 +967,7 @@ export const appRouter = router({
             fibre: input.fibre,
             aiDescription: input.aiDescription,
             aiConfidence: input.aiConfidence,
-            nutritionScore: score,
+            nutritionScore: finalScore,
             notes: input.notes,
             loggedAt: input.loggedAt,
             beverageType: input.beverageType,
@@ -968,11 +977,12 @@ export const appRouter = router({
             beverageFat: input.beverageFat,
             beverageCarbs: input.beverageCarbs,
             beverageFibre: input.beverageFibre,
+            beverageCategory: input.beverageCategory,
           });
 
           return {
             success: true,
-            score,
+            score: finalScore,
           };
         } catch (error) {
           console.error('Error in updateMeal:', error);
@@ -1038,8 +1048,23 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Analyze meal nutrition from item descriptions
-          const mealAnalysis = await analyzeMealNutrition(input.itemDescriptions, input.imageUrl);
+          // 1. Analyze meal nutrition from item descriptions (or use zero values for beverage-only)
+          let mealAnalysis;
+          if (input.itemDescriptions.length > 0) {
+            mealAnalysis = await analyzeMealNutrition(input.itemDescriptions, input.imageUrl);
+          } else {
+            // Beverage-only entry - no food components
+            mealAnalysis = {
+              description: "No food items",
+              calories: 0,
+              protein: 0,
+              fat: 0,
+              carbs: 0,
+              fibre: 0,
+              confidence: 1.0,
+              components: [],
+            };
+          }
 
           // 2. If drink is provided, estimate its nutrition
           let drinkNutrition = null;
@@ -1096,7 +1121,8 @@ export const appRouter = router({
             },
             goals,
             todaysTotals,
-            new Date() // Use current time for analysis
+            new Date(), // Use current time for analysis
+            drinkNutrition?.category // Pass beverage category for quality adjustment
           );
 
           // 7. Return analysis data WITHOUT saving to database

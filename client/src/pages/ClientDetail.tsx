@@ -8,7 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
+import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
+import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -30,6 +32,8 @@ export default function ClientDetail() {
   const [hydrationTarget, setHydrationTarget] = useState("");
   const [weightTarget, setWeightTarget] = useState("");
   const [timeRange, setTimeRange] = useState<"today" | "7days" | "30days" | "all">("30days");
+  const [editingMeal, setEditingMeal] = useState<any | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const utils = trpc.useUtils();
   const { data: client } = trpc.clients.get.useQuery(
@@ -57,6 +61,16 @@ export default function ClientDetail() {
     },
     onError: (error) => {
       toast.error(`Failed to update goals: ${error.message}`);
+    },
+  });
+
+  const deleteMealMutation = trpc.meals.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meal deleted successfully!");
+      utils.meals.list.invalidate({ clientId: clientId! });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete meal: ${error.message}`);
     },
   });
 
@@ -105,6 +119,17 @@ export default function ClientDetail() {
       hydrationTarget: parseInt(hydrationTarget),
       weightTarget: weightTarget ? parseFloat(weightTarget) : undefined,
     });
+  };
+
+  const handleEditMeal = (meal: any) => {
+    setEditingMeal(meal);
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteMeal = async (mealId: number) => {
+    if (confirm("Are you sure you want to delete this meal? This action cannot be undone.")) {
+      await deleteMealMutation.mutateAsync({ mealId });
+    }
   };
 
   // Prepare chart data for nutrition trends
@@ -360,7 +385,11 @@ export default function ClientDetail() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MealHistoryFeed clientId={clientId!} />
+                  <MealHistoryFeed 
+                    clientId={clientId!} 
+                    onEditMeal={handleEditMeal}
+                    onDeleteMeal={handleDeleteMeal}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -421,55 +450,33 @@ export default function ClientDetail() {
             </TabsContent>
 
             <TabsContent value="body" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Weight Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bodyMetricsChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={bodyMetricsChartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="weight" stroke="#CE4C27" strokeWidth={2} name="Weight (kg)" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No body metrics data yet</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hydration Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bodyMetricsChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={bodyMetricsChartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="hydration" fill="#86BBD8" name="Hydration (ml)" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No hydration data yet</p>
-                  )}
-                </CardContent>
-              </Card>
+              <BodyweightTrendChart 
+                clientId={clientId!} 
+                goals={{
+                  calories: goals.caloriesTarget,
+                  protein: goals.proteinTarget,
+                  fat: goals.fatTarget,
+                  carbs: goals.carbsTarget,
+                  fibre: goals.fibreTarget,
+                  hydration: goals.hydrationTarget,
+                  weightTarget: goals.weightTarget
+                }} 
+              />
             </TabsContent>
           </Tabs>
         </div>
       </main>
+
+      {/* Meal Edit Dialog */}
+      <MealEditDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        meal={editingMeal}
+        clientId={clientId!}
+        onSuccess={() => {
+          utils.meals.list.invalidate({ clientId: clientId! });
+        }}
+      />
     </div>
   );
 }

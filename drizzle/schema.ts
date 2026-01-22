@@ -95,6 +95,7 @@ export const meals = mysqlTable("meals", {
   beverageFat: int("beverageFat"),
   beverageCarbs: int("beverageCarbs"),
   beverageFibre: int("beverageFibre"),
+  beverageCategory: varchar("beverageCategory", { length: 50 }), // Category for scoring (energy_drink, soda, juice_vegetable, etc.)
   // Itemized food components (JSON array)
   components: json("components"),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),

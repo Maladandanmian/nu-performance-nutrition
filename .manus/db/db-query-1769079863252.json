@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, mealType, nutritionScore, beverageCategory, beverageType, beverageVolumeMl, createdAt FROM meals WHERE beverageType LIKE '%red bull%' ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, mealType, nutritionScore, beverageCategory, beverageType, beverageVolumeMl, createdAt FROM meals WHERE beverageType LIKE '%red bull%' ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "2250005",
+      "mealType": "dinner",
+      "nutritionScore": "4",
+      "beverageCategory": "energy_drink",
+      "beverageType": "red bull",
+      "beverageVolumeMl": "500",
+      "createdAt": "2026-01-22 09:33:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmealType\tnutritionScore\tbeverageCategory\tbeverageType\tbeverageVolumeMl\tcreatedAt\n2250005\tdinner\t4\tenergy_drink\tred bull\t500\t2026-01-22 09:33:09\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

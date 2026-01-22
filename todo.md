@@ -830,7 +830,83 @@
 - [x] Test with various over-target percentages (117%, 140%, 220%)
 
 ## Eliminate Grey Gap with Single-Circle Approach (Jan 22, 2026)
-- [ ] Grey gap still appears (moved position but not eliminated)
-- [ ] Redesign to use solid green base circle + warning color overlay segments
-- [ ] Ensure perfect synchronization between base and overlay
-- [ ] Test at all positions around circle circumference
+- [x] Grey gap still appears (moved position but not eliminated)
+- [x] Redesign to use solid green base circle + warning color overlay segments
+- [x] Ensure perfect synchronization between base and overlay
+- [x] Test at all positions around circle circumference
+
+## Trainer-Side Meal Editing (Feature Branch)
+- [x] Add test meal data for client Noad (5 meals with components + 3 days weight data)
+- [x] Create shared MealEditDialog component with full AI capabilities
+- [x] Add edit/delete handlers to ClientDetail.tsx
+- [x] Connect MealHistoryFeed with edit/delete callbacks
+- [x] Implement component-level editing (modify, add, delete)
+- [x] Implement AI re-estimation for individual components
+- [x] Implement beverage editing with nutrition estimation
+- [x] Implement date/time and meal type changes
+- [x] Implement nutrition score recalculation
+- [ ] Test editing workflow with AI re-analysis (end-to-end user testing)
+- [ ] Verify trainer can only edit their own clients' meals
+
+## React Hooks Order Violation in ClientDetail (Jan 22, 2026)
+- [x] Fix "Rendered more hooks than during the previous render" error
+- [x] Move deleteMealMutation hook to top of component (before any conditional logic)
+- [x] Ensure all hooks are called in consistent order
+- [x] Test that ClientDetail page loads without errors
+
+## Simplify Meal Editing UI - Remove Redundant Button (Jan 22, 2026)
+- [x] Remove "Estimate Beverage Nutrition" button from MealEditDialog
+- [x] Consolidate into single "Re-analyze" button that handles both food and beverage
+- [x] Update handleReanalyze to automatically estimate beverage as part of full analysis
+- [x] Simplified button text from "Re-analyze Meal with AI" to "Re-analyze"
+
+## Fix Nutrition Score Minimum Value (Jan 22, 2026)
+- [x] Investigate why score shows "/5" (0 or undefined) instead of minimum 1
+- [x] Fixed frontend validation to allow beverage-only analysis
+- [x] Fixed backend to handle empty itemDescriptions (beverage-only entries)
+- [x] Added fallback in display to show minimum score of 1 if undefined
+- [x] Backend calculateNutritionScore already enforces 1-5 range
+
+## Fix Score Not Updating After Re-analysis (Jan 22, 2026)
+- [x] Investigate why score remains unchanged after re-analysis with beverage changes
+- [x] Found mismatch: backend returns `finalScore` at top level, frontend was reading `mealAnalysis.score`
+- [x] Fixed frontend to read score from `data.finalScore` instead of `data.mealAnalysis.score`
+- [x] Score now properly updates when beverage is changed and re-analyzed
+- [x] Star display automatically updates based on score value
+
+## Fix Beverage Scoring Accuracy (Jan 22, 2026)
+- [x] Investigate why Red Bull (500ml) and vegetable juice (500ml) get same 3-star score
+- [x] Root cause: Scoring only sees macros, can't differentiate refined sugar vs natural carbs
+- [x] Add beverage category field to BeverageNutrition interface
+- [x] Update AI prompt to classify beverages into 18 categories
+- [x] Modify scoring algorithm to apply category-based modifiers (-2 to +0.5)
+- [x] Update database schema to store beverage category
+- [x] Update frontend to pass category through entire chain
+- [x] Test Red Bull (energy_drink, -2 penalty) vs vegetable juice (juice_vegetable, +0.5 reward)
+- [x] Verified: Red Bull meal = 2/5, Vegetable juice meal = 5/5 (3-point difference!)
+- [x] Verify consumption tracking unchanged (still just macros)
+
+## Fix Meal History Not Showing Updated Score (Jan 22, 2026)
+- [x] Investigate why meal history shows 4/5 after re-analysis updated score
+- [x] Found: MealEditDialog wasn't passing nutritionScore to update mutation
+- [x] Added nutritionScore to meals.update input schema
+- [x] Frontend now passes analysisResult.score to backend
+- [x] Backend uses provided score if available, otherwise calculates
+- [x] Test that meal history refreshes with new score after edit
+
+## Remove Duplicate Hydration Trend from Body Metrics (Jan 22, 2026)
+- [x] Remove Hydration Trend graph from Body Metrics tab (already in Daily Trends)
+- [x] Keep only bodyweight tracking in Body Metrics tab
+
+## Add Line Smoothing to Trainer-Side Graphs (Jan 22, 2026)
+- [x] Replace inline Weight Trend chart with BodyweightTrendChart component
+- [x] BodyweightTrendChart includes smoothing toggle, date range selector, and table view
+- [x] Nutrition Trends already use NutrientTrendGraphs component (no smoothing needed)
+- [x] Ensure consistent UI with client-side graphs
+
+## Merge feature/trainer-dashboard to main (Jan 22, 2026)
+- [ ] Switch to main branch
+- [ ] Merge feature/trainer-dashboard into main
+- [ ] Verify no merge conflicts
+- [ ] Save checkpoint on main branch
+- [ ] Confirm all trainer features deployed
