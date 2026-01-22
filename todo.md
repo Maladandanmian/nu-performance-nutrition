@@ -742,3 +742,11 @@
 - [x] Keep actual user-input weights fixed at their exact values
 - [x] Test: Jan 8 (68.7) → Jan 9 (68.7) → Jan 13 (69.8) → Jan 15 (69.4) should show smooth arcs
 - [x] Verify dots only appear on actual user-input dates
+
+## Fix Bodyweight Smoothing X-Axis Date Range (Jan 22, 2026)
+- [x] When smoothing is ON, X-axis should still show full date range (7 or 30 days)
+- [x] Only actual weight data points should be plotted (with dots)
+- [x] Recharts should draw smooth curves connecting only the actual data points
+- [x] Missing dates should have null weight values to preserve X-axis spacing
+- [x] Test: Last 7 Days should show Jan 16-22 on X-axis, not just Jan 20 and Jan 22
+- [x] Test: Last 30 Days should show full 30-day range on X-axis, not just 5 dates

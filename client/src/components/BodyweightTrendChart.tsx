@@ -104,12 +104,20 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
 
   // Apply smoothing if enabled (3-day moving average)
   // When smoothing is ON: show only actual user-input weights (no forward-filled points)
-  // Recharts will draw smooth curves between these points using type="monotone"
+  // But preserve full date range with null values for proper X-axis spacing
   const smoothedBodyweightData = useMemo(() => {
     if (!smoothing || bodyweightData.length === 0) return bodyweightData;
     
-    // Filter to show only actual user-input weights
-    return bodyweightData.filter(point => point.isActualInput && point.weight !== null);
+    // Map over all dates, but set weight to null for forward-filled points
+    return bodyweightData.map(point => {
+      if (point.isActualInput && point.weight !== null) {
+        // Keep actual user-input weights
+        return point;
+      } else {
+        // Set weight to null for forward-filled dates (preserves X-axis spacing)
+        return { ...point, weight: null };
+      }
+    });
   }, [bodyweightData, smoothing]);
   
   const displayData = smoothing ? smoothedBodyweightData : bodyweightData;
