@@ -775,3 +775,15 @@
 - [x] 120%+ over: Alternating green-red dashed segments
 - [x] Use strokeDasharray to create dashed pattern with alternating colors
 - [x] Test visibility and clarity of dashed segments
+
+## Fix Meal Type Consistency Issues (Jan 22, 2026)
+- [x] Implement time-based meal type auto-selection on initial load
+- [x] 6-10am: Auto-select "Breakfast"
+- [x] 12-2pm: Auto-select "Lunch"
+- [x] 6-9pm: Auto-select "Dinner"
+- [x] All other times: Auto-select "Snack"
+- [x] Ensure user-selected meal type persists through "Analyse Meal" flow
+- [x] Fix date/time fields to be pre-populated with current date/time
+- [x] Prevent meal type from reverting to "Lunch" after analysis
+- [x] Test meal type selection at different times of day
+- [x] Test meal type persistence when user manually changes selection

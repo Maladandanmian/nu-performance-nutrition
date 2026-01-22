@@ -30,12 +30,12 @@ const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
   const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
   const hour = hongKongTime.getHours();
   
-  // Breakfast: 5am - 10am
-  if (hour >= 5 && hour < 11) return 'breakfast';
-  // Lunch: 11am - 2pm
-  if (hour >= 11 && hour < 15) return 'lunch';
-  // Dinner: 5pm - 9pm
-  if (hour >= 17 && hour < 22) return 'dinner';
+  // Breakfast: 6am - 10am
+  if (hour >= 6 && hour < 10) return 'breakfast';
+  // Lunch: 12pm - 2pm
+  if (hour >= 12 && hour < 14) return 'lunch';
+  // Dinner: 6pm - 9pm
+  if (hour >= 18 && hour < 21) return 'dinner';
   // Snack: all other times
   return 'snack';
 };
@@ -148,6 +148,20 @@ export default function ClientDashboard() {
       setOverallDescription(data.overallDescription);
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
+      
+      // Refresh meal date/time to current time for new meal
+      const now = new Date();
+      const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+      const year = hongKongTime.getFullYear();
+      const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+      const day = String(hongKongTime.getDate()).padStart(2, '0');
+      const hours = String(hongKongTime.getHours()).padStart(2, '0');
+      const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+      setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      
+      // Refresh meal type based on current time
+      setMealType(getMealTypeFromTime());
+      
       setShowItemEditor(true);
       // Reset file input only (keep beverage data from upload screen)
       setSelectedFile(null);
@@ -180,10 +194,10 @@ export default function ClientDashboard() {
       // This ensures calculatedTotals reflects the updated nutrition values
       setEditedComponents(data.mealAnalysis.components || []);
       setShowAnalysisModal(true);
-      // Reset form fields (but keep imageUrl/imageKey for saving later)
+      // Reset form fields (but keep imageUrl/imageKey and mealType for saving later)
       setIdentifiedItems([]);
       setOverallDescription("");
-      setMealType("lunch");
+      // DO NOT reset mealType here - preserve user selection
       setMealNotes("");
       // Note: drinkType, volumeMl, and beverageNutrition are NOT cleared here - they're needed for saveMeal
       // Note: imageUrl and imageKey are NOT cleared here - they're needed for saveMeal
