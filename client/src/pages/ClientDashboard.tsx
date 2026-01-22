@@ -549,7 +549,8 @@ export default function ClientDashboard() {
   };
 
   const handleEditMeal = (meal: any) => {
-    // Populate the analysis modal with the meal data
+    // Populate the analysis modal with the meal data including components
+    const mealComponents = meal.components || [];
     setAnalysisResult({
       description: meal.aiDescription,
       calories: meal.calories,
@@ -558,14 +559,34 @@ export default function ClientDashboard() {
       carbs: meal.carbs,
       fibre: meal.fibre,
       confidence: meal.aiConfidence,
-      components: [], // We'll need to fetch components if stored
+      components: mealComponents,
       score: meal.nutritionScore,
     });
-    setEditedComponents([]); // Initialize empty, will need to parse from meal data
+    setEditedComponents(mealComponents);
     setImageUrl(meal.imageUrl || "");
     setImageKey(meal.imageKey || "");
+    
+    // Load beverage data if present
+    if (meal.beverageType && meal.beverageVolumeMl) {
+      setDrinkType(meal.beverageType);
+      setVolumeMl(meal.beverageVolumeMl.toString());
+      setBeverageNutrition({
+        drinkType: meal.beverageType,
+        volumeMl: meal.beverageVolumeMl,
+        calories: meal.beverageCalories || 0,
+        protein: meal.beverageProtein || 0,
+        fat: meal.beverageFat || 0,
+        carbs: meal.beverageCarbs || 0,
+        fibre: meal.beverageFibre || 0,
+      });
+    } else {
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
+    }
+    
     setIsEditMode(true);
-    setShowAnalysisModal(true);
+    setShowItemEditor(true); // Show item editor instead of analysis modal
     setEditingMealId(meal.id);
     setMealType(meal.mealType);
     

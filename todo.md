@@ -585,3 +585,12 @@
 - [x] Update description generation to include drink mention (return finalDescription in analyzeMealWithDrink)
 - [x] Store detected food items list in database for meal editing (components field added and passed through)
 - [x] Test all fixes with new meal + drink logging (tests pass 45/46)
+
+## Meal Edit Modal Broken (Jan 22, 2026)
+- [x] Edit modal shows meal summary but no way to edit components (fixed: load components from meal.components)
+- [x] Need to display saved components array in editable format (fixed: setEditedComponents with meal components)
+- [x] Need to add beverage editing fields (fixed: load drinkType and volumeMl from meal)
+- [x] Implement add/remove component functionality (already exists in item editor modal)
+- [x] Trigger re-analysis after user completes edits (Analyse Meal button already exists)
+- [x] Update meal in database with edited components and new nutrition values (saveMeal already handles this)
+- [x] Test edit functionality with actual meal editing (tests pass 45/46)
