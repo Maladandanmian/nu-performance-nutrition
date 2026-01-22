@@ -928,3 +928,10 @@
 - [x] Ensure both labels are at same vertical level
 - [x] Add "Drink Type" label for first input field
 - [x] Apply fix to both MealEditDialog and ClientDashboard
+
+## Fix HEIF/HEIC Image Processing Error (Jan 22, 2026)
+- [x] Investigate where HEIF images are being processed
+- [x] Add HEIF format detection and conversion to JPEG
+- [x] Implement client-side Canvas conversion (browser handles HEIF natively)
+- [x] Add server-side fallback error handling
+- [ ] Test with actual iPhone photos (HEIC format) - requires user testing

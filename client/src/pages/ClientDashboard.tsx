@@ -493,19 +493,46 @@ export default function ClientDashboard() {
     const clientId = currentClientId;
 
     try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
-        const base64Data = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
-
-        // Step 2: Identify items in the image
-        await identifyItemsMutation.mutateAsync({
-          clientId,
-          imageBase64: base64Data,
+      // Convert image to JPEG using Canvas (handles HEIF/HEIC from iPhone)
+      const convertToJpeg = async (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const reader = new FileReader();
+          
+          reader.onload = (e) => {
+            img.onload = () => {
+              // Create canvas and draw image
+              const canvas = document.createElement('canvas');
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) {
+                reject(new Error('Failed to get canvas context'));
+                return;
+              }
+              ctx.drawImage(img, 0, 0);
+              
+              // Convert to JPEG base64
+              const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
+              const base64Data = jpegBase64.split(',')[1];
+              resolve(base64Data);
+            };
+            img.onerror = () => reject(new Error('Failed to load image'));
+            img.src = e.target?.result as string;
+          };
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsDataURL(file);
         });
       };
-      reader.readAsDataURL(selectedFile);
+
+      // Convert and upload
+      const base64Data = await convertToJpeg(selectedFile);
+      
+      // Step 2: Identify items in the image
+      await identifyItemsMutation.mutateAsync({
+        clientId,
+        imageBase64: base64Data,
+      });
     } catch (error) {
       console.error('Error uploading meal:', error);
     }

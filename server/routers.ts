@@ -1004,10 +1004,35 @@ export const appRouter = router({
           // 1. Upload image to S3 (convert HEIF to JPEG if needed)
           const inputBuffer = Buffer.from(input.imageBase64, 'base64');
           
-          // Convert to JPEG using sharp (handles HEIF, PNG, WebP, etc.)
-          const imageBuffer = await sharp(inputBuffer)
-            .jpeg({ quality: 90 })
-            .toBuffer();
+          let imageBuffer: Buffer;
+          try {
+            // Try to convert to JPEG using sharp (handles most formats)
+            imageBuffer = await sharp(inputBuffer)
+              .jpeg({ quality: 90 })
+              .toBuffer();
+          } catch (sharpError) {
+            // If sharp fails (e.g., unsupported HEIF compression), try without conversion
+            console.warn('Sharp conversion failed, attempting direct processing:', sharpError);
+            
+            // Check if the input is already a valid image format
+            try {
+              const metadata = await sharp(inputBuffer).metadata();
+              if (metadata.format === 'heif') {
+                throw new TRPCError({
+                  code: 'BAD_REQUEST',
+                  message: 'HEIC/HEIF images from iPhone are not fully supported. Please convert to JPEG in your Photos app first, or take a photo in "Most Compatible" format (Settings > Camera > Formats > Most Compatible).',
+                });
+              }
+              // If it's another format, use the original buffer
+              imageBuffer = inputBuffer;
+            } catch (metadataError) {
+              // If we can't even read metadata, the image is corrupt or unsupported
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Unable to process this image format. Please try taking a new photo or converting to JPEG.',
+              });
+            }
+          }
           
           const randomSuffix = Math.random().toString(36).substring(7);
           const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
