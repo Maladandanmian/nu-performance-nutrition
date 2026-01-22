@@ -1182,6 +1182,13 @@ export default function ClientDashboard() {
                       return;
                     }
                   }
+                  
+                  // Set beverage nutrition state so it's included when saving the meal
+                  setBeverageNutrition({
+                    ...drinkNutrition,
+                    drinkType,
+                    volumeMl: parseInt(volumeMl),
+                  });
                 }
 
                 // Call analyzeMealWithDrink

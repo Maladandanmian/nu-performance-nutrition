@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, mealType, loggedAt, calories, beverageType, beverageVolumeMl, beverageCalories FROM meals ORDER BY loggedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, mealType, loggedAt, calories, beverageType, beverageVolumeMl, beverageCalories FROM meals ORDER BY loggedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2220119",
+      "mealType": "lunch",
+      "loggedAt": "2026-01-22 06:30:12",
+      "calories": "555",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "beverageCalories": "NULL"
+    },
+    {
+      "id": "2220118",
+      "mealType": "dinner",
+      "loggedAt": "2026-01-22 06:27:35",
+      "calories": "626",
+      "beverageType": "Water",
+      "beverageVolumeMl": "500",
+      "beverageCalories": "0"
+    },
+    {
+      "id": "2220106",
+      "mealType": "dinner",
+      "loggedAt": "2026-01-22 06:24:24",
+      "calories": "508",
+      "beverageType": "Water",
+      "beverageVolumeMl": "500",
+      "beverageCalories": "0"
+    },
+    {
+      "id": "2220094",
+      "mealType": "lunch",
+      "loggedAt": "2026-01-22 06:20:53",
+      "calories": "495",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "beverageCalories": "NULL"
+    },
+    {
+      "id": "2220093",
+      "mealType": "dinner",
+      "loggedAt": "2026-01-22 06:18:02",
+      "calories": "391",
+      "beverageType": "Water",
+      "beverageVolumeMl": "500",
+      "beverageCalories": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmealType\tloggedAt\tcalories\tbeverageType\tbeverageVolumeMl\tbeverageCalories\n2220119\tlunch\t2026-01-22 06:30:12\t555\tNULL\tNULL\tNULL\n2220118\tdinner\t2026-01-22 06:27:35\t626\tWater\t500\t0\n2220106\tdinner\t2026-01-22 06:24:24\t508\tWater\t500\t0\n2220094\tlunch\t2026-01-22 06:20:53\t495\tNULL\tNULL\tNULL\n2220093\tdinner\t2026-01-22 06:18:02\t391\tWater\t500\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1570
+}

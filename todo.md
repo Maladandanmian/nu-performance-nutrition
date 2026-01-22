@@ -646,3 +646,9 @@
 ## Fix Flaky componentReEstimation Test Timeout (Jan 22, 2026)
 - [x] Increase timeout for componentReEstimation test that makes actual AI calls (increased from 5s to 15s)
 - [x] Run full test suite to verify all tests pass consistently (45/46 passing, only pre-existing auth.logout failure)
+
+## Fix Missing Beverage Display in Nutrition History (Jan 22, 2026)
+- [x] Check database to verify if beverage data (beverageType, beverageVolumeMl, etc.) was saved for smoothie bowl meal (found NULL values - data not saved)
+- [x] Identify why beverage indicator (droplet icon + drink name/volume) is not displaying (beverage nutrition not being set to state in Analyse Meal button)
+- [x] Fix beverage display logic by adding setBeverageNutrition call in Analyse Meal button handler (lines 1186-1191)
+- [x] Test that beverages display correctly for all meals with beverages (tests pass 45/46 - only pre-existing auth.logout failure)
