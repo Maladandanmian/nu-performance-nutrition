@@ -935,3 +935,10 @@
 - [x] Implement client-side Canvas conversion (browser handles HEIF natively)
 - [x] Add server-side fallback error handling
 - [ ] Test with actual iPhone photos (HEIC format) - requires user testing
+
+## Critical iPhone Photo Support Fix (Jan 22, 2026)
+- [x] Remove failing client-side HEIF conversion
+- [x] Send original image file to server
+- [x] Change file input accept to force iOS automatic conversion
+- [x] Add clear error message for unsupported formats
+- [ ] Test with actual iPhone HEIC photos (requires user testing)

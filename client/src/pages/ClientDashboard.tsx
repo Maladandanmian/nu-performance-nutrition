@@ -493,67 +493,26 @@ export default function ClientDashboard() {
     const clientId = currentClientId;
 
     try {
-      // Convert image to JPEG using Canvas (handles HEIF/HEIC from iPhone)
-      const convertToJpeg = async (file: File): Promise<string> => {
-        try {
-          // Use createImageBitmap for better format support (including HEIF)
-          const imageBitmap = await createImageBitmap(file);
-          
-          // Create canvas and draw image
-          const canvas = document.createElement('canvas');
-          canvas.width = imageBitmap.width;
-          canvas.height = imageBitmap.height;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            throw new Error('Failed to get canvas context');
-          }
-          ctx.drawImage(imageBitmap, 0, 0);
-          
-          // Convert to JPEG base64
-          const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
-          const base64Data = jpegBase64.split(',')[1];
-          return base64Data;
-        } catch (error) {
-          // Fallback: If createImageBitmap fails, try traditional method
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                  reject(new Error('Failed to get canvas context'));
-                  return;
-                }
-                ctx.drawImage(img, 0, 0);
-                const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
-                const base64Data = jpegBase64.split(',')[1];
-                resolve(base64Data);
-              };
-              img.onerror = () => reject(new Error('This image format is not supported. Please try converting to JPEG first or take a new photo.'));
-              img.src = e.target?.result as string;
-            };
-            reader.onerror = () => reject(new Error('Failed to read file'));
-            reader.readAsDataURL(file);
-          });
-        }
-      };
+      // Convert file to base64 and send to server
+      // Server will handle HEIF/HEIC conversion
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result as string;
+        const base64Data = base64.split(',')[1]; // Remove data:image/...;base64, prefix
 
-      // Convert and upload
-      const base64Data = await convertToJpeg(selectedFile);
-      
-      // Step 2: Identify items in the image
-      await identifyItemsMutation.mutateAsync({
-        clientId,
-        imageBase64: base64Data,
-      });
+        // Step 2: Identify items in the image
+        await identifyItemsMutation.mutateAsync({
+          clientId,
+          imageBase64: base64Data,
+        });
+      };
+      reader.onerror = () => {
+        toast.error('Failed to read image file. Please try again.');
+      };
+      reader.readAsDataURL(selectedFile);
     } catch (error) {
       console.error('Error uploading meal:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to process image. Please try again.');
+      toast.error('Failed to upload image. Please try again.');
     }
   };
 
@@ -815,7 +774,7 @@ export default function ClientDashboard() {
                     <Input
                       id="meal-image"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png"
                       onChange={handleFileChange}
                       className="flex-1"
                       ref={fileInputRef}
