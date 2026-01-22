@@ -703,3 +703,9 @@
 - [x] Update color coding: Green (≥80%), Amber (60-79%), Red (<60%)
 - [x] Replace old adherence calculation with new weighted MAPE in Calories chart
 - [ ] Test with various scenarios and verify accuracy
+
+## Fix Duplicate Toast Notifications When Logging Drinks (Jan 22, 2026)
+- [x] Investigate drink logging code to find where duplicate toasts are triggered (found 3 toast locations: line 282 in mutation onSuccess, line 448 manual toast, line 913 manual toast)
+- [x] Identify if both "Drink logged successfully!" and "Beverage logged successfully!" are from the same mutation (yes, logDrinkMutation.mutateAsync triggers onSuccess callback, then code manually shows another toast)
+- [x] Remove duplicate toast notifications (removed manual toasts on lines 448 and 913)
+- [x] Now only shows "Drink logged successfully!" from mutation's onSuccess callback

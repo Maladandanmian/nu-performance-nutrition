@@ -444,8 +444,6 @@ export default function ClientDashboard() {
         setDrinkType("");
         setVolumeMl("");
         setBeverageNutrition(null);
-        
-        toast.success("Beverage logged successfully!");
         // Show summary modal with drink nutrition
         // Score drinks 1-5: low-cal drinks score higher (5 is best)
         const drinkScore = nutritionToUse.calories < 50 ? 5 : nutritionToUse.calories < 100 ? 4 : nutritionToUse.calories < 150 ? 3 : nutritionToUse.calories < 200 ? 2 : 1;
@@ -911,8 +909,6 @@ export default function ClientDashboard() {
                         setDrinkType('');
                         setVolumeMl('');
                         setBeverageNutrition(null);
-                        
-                        toast.success('Beverage logged successfully!');
                       } catch (error) {
                         console.error('Error logging beverage:', error);
                         toast.error('Failed to log beverage');
