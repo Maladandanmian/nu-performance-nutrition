@@ -1,0 +1,76 @@
+{
+  "query": "SHOW CREATE TABLE drinks; SHOW CREATE TABLE body_metrics; SHOW CREATE TABLE nutrition_goals;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SHOW CREATE TABLE drinks; SHOW CREATE TABLE body_metrics; SHOW CREATE TABLE nutrition_goals;",
+  "rows": [
+    {
+      "Table": "drinks",
+      "Create Table": "CREATE TABLE `drinks` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "body_metrics",
+      "Create Table": "CREATE TABLE `body_metrics` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "nutrition_goals",
+      "Create Table": "CREATE TABLE `nutrition_goals` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `clientId` int(11) NOT NULL,",
+    "  `drinkType` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `volumeMl` int(11) NOT NULL,",
+    "  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `loggedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `calories` int(11) NOT NULL DEFAULT '0',",
+    "  `protein` int(11) NOT NULL DEFAULT '0',",
+    "  `fat` int(11) NOT NULL DEFAULT '0',",
+    "  `carbs` int(11) NOT NULL DEFAULT '0',",
+    "  `fibre` int(11) NOT NULL DEFAULT '0',",
+    "  `mealId` int(11) DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `drinks_clientId_clients_id_fk` (`clientId`),",
+    "  KEY `drinks_mealId_meals_id_fk` (`mealId`),",
+    "  CONSTRAINT `drinks_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,",
+    "  CONSTRAINT `drinks_mealId_meals_id_fk` FOREIGN KEY (`mealId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`meals` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1710001",
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `clientId` int(11) NOT NULL,",
+    "  `weight` int(11) DEFAULT NULL,",
+    "  `hydration` int(11) DEFAULT NULL,",
+    "  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `recordedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `body_metrics_clientId_clients_id_fk` (`clientId`),",
+    "  CONSTRAINT `body_metrics_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=120001",
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `clientId` int(11) NOT NULL,",
+    "  `caloriesTarget` int(11) NOT NULL DEFAULT '2000',",
+    "  `proteinTarget` int(11) NOT NULL DEFAULT '150',",
+    "  `fatTarget` int(11) NOT NULL DEFAULT '65',",
+    "  `carbsTarget` int(11) NOT NULL DEFAULT '250',",
+    "  `fibreTarget` int(11) NOT NULL DEFAULT '25',",
+    "  `hydrationTarget` int(11) NOT NULL DEFAULT '2000',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `weightTarget` decimal(5,1) DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `nutrition_goals_clientId_clients_id_fk` (`clientId`),",
+    "  CONSTRAINT `nutrition_goals_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=570001"
+  ],
+  "stdout": "Table\tCreate Table\ndrinks\tCREATE TABLE `drinks` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `clientId` int(11) NOT NULL,\n  `drinkType` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `volumeMl` int(11) NOT NULL,\n  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `loggedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `calories` int(11) NOT NULL DEFAULT '0',\n  `protein` int(11) NOT NULL DEFAULT '0',\n  `fat` int(11) NOT NULL DEFAULT '0',\n  `carbs` int(11) NOT NULL DEFAULT '0',\n  `fibre` int(11) NOT NULL DEFAULT '0',\n  `mealId` int(11) DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `drinks_clientId_clients_id_fk` (`clientId`),\n  KEY `drinks_mealId_meals_id_fk` (`mealId`),\n  CONSTRAINT `drinks_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,\n  CONSTRAINT `drinks_mealId_meals_id_fk` FOREIGN KEY (`mealId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`meals` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1710001\nTable\tCreate Table\nbody_metrics\tCREATE TABLE `body_metrics` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `clientId` int(11) NOT NULL,\n  `weight` int(11) DEFAULT NULL,\n  `hydration` int(11) DEFAULT NULL,\n  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `recordedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `body_metrics_clientId_clients_id_fk` (`clientId`),\n  CONSTRAINT `body_metrics_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=120001\nTable\tCreate Table\nnutrition_goals\tCREATE TABLE `nutrition_goals` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `clientId` int(11) NOT NULL,\n  `caloriesTarget` int(11) NOT NULL DEFAULT '2000',\n  `proteinTarget` int(11) NOT NULL DEFAULT '150',\n  `fatTarget` int(11) NOT NULL DEFAULT '65',\n  `carbsTarget` int(11) NOT NULL DEFAULT '250',\n  `fibreTarget` int(11) NOT NULL DEFAULT '25',\n  `hydrationTarget` int(11) NOT NULL DEFAULT '2000',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `weightTarget` decimal(5,1) DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `nutrition_goals_clientId_clients_id_fk` (`clientId`),\n  CONSTRAINT `nutrition_goals_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=570001\n",
+  "stderr": "",
+  "execution_time_ms": 1911
+}

@@ -1,0 +1,43 @@
+{
+  "query": "SHOW CREATE TABLE meals;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SHOW CREATE TABLE meals;",
+  "rows": [
+    {
+      "Table": "meals",
+      "Create Table": "CREATE TABLE `meals` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `clientId` int(11) NOT NULL,",
+    "  `imageUrl` text COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `imageKey` text COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `mealType` enum('breakfast','lunch','dinner','snack') COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `calories` int(11) DEFAULT NULL,",
+    "  `protein` int(11) DEFAULT NULL,",
+    "  `fat` int(11) DEFAULT NULL,",
+    "  `carbs` int(11) DEFAULT NULL,",
+    "  `fibre` int(11) DEFAULT NULL,",
+    "  `aiDescription` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `aiConfidence` int(11) DEFAULT NULL,",
+    "  `nutritionScore` int(11) DEFAULT NULL,",
+    "  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `beverageType` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `beverageVolumeMl` int(11) DEFAULT NULL,",
+    "  `beverageCalories` int(11) DEFAULT NULL,",
+    "  `beverageProtein` int(11) DEFAULT NULL,",
+    "  `beverageFat` int(11) DEFAULT NULL,",
+    "  `beverageCarbs` int(11) DEFAULT NULL,",
+    "  `beverageFibre` int(11) DEFAULT NULL,",
+    "  `loggedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `components` json DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `meals_clientId_clients_id_fk` (`clientId`),",
+    "  CONSTRAINT `meals_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=2280001"
+  ],
+  "stdout": "Table\tCreate Table\nmeals\tCREATE TABLE `meals` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `clientId` int(11) NOT NULL,\n  `imageUrl` text COLLATE utf8mb4_unicode_ci NOT NULL,\n  `imageKey` text COLLATE utf8mb4_unicode_ci NOT NULL,\n  `mealType` enum('breakfast','lunch','dinner','snack') COLLATE utf8mb4_unicode_ci NOT NULL,\n  `calories` int(11) DEFAULT NULL,\n  `protein` int(11) DEFAULT NULL,\n  `fat` int(11) DEFAULT NULL,\n  `carbs` int(11) DEFAULT NULL,\n  `fibre` int(11) DEFAULT NULL,\n  `aiDescription` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `aiConfidence` int(11) DEFAULT NULL,\n  `nutritionScore` int(11) DEFAULT NULL,\n  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `beverageType` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `beverageVolumeMl` int(11) DEFAULT NULL,\n  `beverageCalories` int(11) DEFAULT NULL,\n  `beverageProtein` int(11) DEFAULT NULL,\n  `beverageFat` int(11) DEFAULT NULL,\n  `beverageCarbs` int(11) DEFAULT NULL,\n  `beverageFibre` int(11) DEFAULT NULL,\n  `loggedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `components` json DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `meals_clientId_clients_id_fk` (`clientId`),\n  CONSTRAINT `meals_clientId_clients_id_fk` FOREIGN KEY (`clientId`) REFERENCES `CVoYWTwV8QMMBSnZsHHM3q`.`clients` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=2280001\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

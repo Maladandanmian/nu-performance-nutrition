@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
+import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +31,8 @@ export default function ClientDetail() {
   const [hydrationTarget, setHydrationTarget] = useState("");
   const [weightTarget, setWeightTarget] = useState("");
   const [timeRange, setTimeRange] = useState<"today" | "7days" | "30days" | "all">("30days");
+  const [editingMeal, setEditingMeal] = useState<any | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const utils = trpc.useUtils();
   const { data: client } = trpc.clients.get.useQuery(
@@ -105,6 +108,27 @@ export default function ClientDetail() {
       hydrationTarget: parseInt(hydrationTarget),
       weightTarget: weightTarget ? parseFloat(weightTarget) : undefined,
     });
+  };
+
+  const deleteMealMutation = trpc.meals.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meal deleted successfully!");
+      utils.meals.list.invalidate({ clientId: clientId! });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
+  const handleEditMeal = (meal: any) => {
+    setEditingMeal(meal);
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteMeal = async (mealId: number) => {
+    if (confirm("Are you sure you want to delete this meal? This action cannot be undone.")) {
+      await deleteMealMutation.mutateAsync({ mealId });
+    }
   };
 
   // Prepare chart data for nutrition trends
@@ -360,7 +384,11 @@ export default function ClientDetail() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MealHistoryFeed clientId={clientId!} />
+                  <MealHistoryFeed 
+                    clientId={clientId!} 
+                    onEditMeal={handleEditMeal}
+                    onDeleteMeal={handleDeleteMeal}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -470,6 +498,17 @@ export default function ClientDetail() {
           </Tabs>
         </div>
       </main>
+
+      {/* Meal Edit Dialog */}
+      <MealEditDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        meal={editingMeal}
+        clientId={clientId!}
+        onSuccess={() => {
+          utils.meals.list.invalidate({ clientId: clientId! });
+        }}
+      />
     </div>
   );
 }

@@ -1,0 +1,18 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users) as users_count,\n  (SELECT COUNT(*) FROM clients) as clients_count,\n  (SELECT COUNT(*) FROM meals) as meals_count,\n  (SELECT COUNT(*) FROM drinks) as drinks_count,\n  (SELECT COUNT(*) FROM body_metrics) as body_metrics_count,\n  (SELECT COUNT(*) FROM nutrition_goals) as nutrition_goals_count;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT \n  (SELECT COUNT(*) FROM users) as users_count,\n  (SELECT COUNT(*) FROM clients) as clients_count,\n  (SELECT COUNT(*) FROM meals) as meals_count,\n  (SELECT COUNT(*) FROM drinks) as drinks_count,\n  (SELECT COUNT(*) FROM body_metrics) as body_metrics_count,\n  (SELECT COUNT(*) FROM nutrition_goals) as nutrition_goals_count;",
+  "rows": [
+    {
+      "users_count": "32",
+      "clients_count": "33",
+      "meals_count": "137",
+      "drinks_count": "75",
+      "body_metrics_count": "37",
+      "nutrition_goals_count": "33"
+    }
+  ],
+  "messages": [],
+  "stdout": "users_count\tclients_count\tmeals_count\tdrinks_count\tbody_metrics_count\tnutrition_goals_count\n32\t33\t137\t75\t37\t33\n",
+  "stderr": "",
+  "execution_time_ms": 1524
+}

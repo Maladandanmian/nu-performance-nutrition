@@ -830,7 +830,20 @@
 - [x] Test with various over-target percentages (117%, 140%, 220%)
 
 ## Eliminate Grey Gap with Single-Circle Approach (Jan 22, 2026)
-- [ ] Grey gap still appears (moved position but not eliminated)
-- [ ] Redesign to use solid green base circle + warning color overlay segments
-- [ ] Ensure perfect synchronization between base and overlay
-- [ ] Test at all positions around circle circumference
+- [x] Grey gap still appears (moved position but not eliminated)
+- [x] Redesign to use solid green base circle + warning color overlay segments
+- [x] Ensure perfect synchronization between base and overlay
+- [x] Test at all positions around circle circumference
+
+## Trainer-Side Meal Editing (Feature Branch)
+- [x] Add test meal data for client Noad (5 meals with components + 3 days weight data)
+- [x] Create shared MealEditDialog component with full AI capabilities
+- [x] Add edit/delete handlers to ClientDetail.tsx
+- [x] Connect MealHistoryFeed with edit/delete callbacks
+- [x] Implement component-level editing (modify, add, delete)
+- [x] Implement AI re-estimation for individual components
+- [x] Implement beverage editing with nutrition estimation
+- [x] Implement date/time and meal type changes
+- [x] Implement nutrition score recalculation
+- [ ] Test editing workflow with AI re-analysis (end-to-end user testing)
+- [ ] Verify trainer can only edit their own clients' meals

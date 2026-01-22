@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, pin FROM clients WHERE name = 'Noad';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, pin FROM clients WHERE name = 'Noad';",
+  "rows": [
+    {
+      "id": "30001",
+      "name": "Noad",
+      "pin": "401483"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tpin\n30001\tNoad\t401483\n",
+  "stderr": "",
+  "execution_time_ms": 1489
+}
