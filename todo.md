@@ -684,3 +684,12 @@
 - [x] Add cleanup script to package.json scripts (added "cleanup:test-clients" command)
 - [x] Test cleanup system to verify all test data is removed (tested successfully, cleaned up 8 orphaned test clients)
 - [x] Document cleanup system in README or test documentation (created docs/TEST_CLEANUP.md with comprehensive guide)
+
+## Fix Gaps in Nutrition Trend Lines (Jan 22, 2026)
+- [x] Investigate current trend chart data fetching and formatting (found NutrientTrendGraphs component with connectNulls={false})
+- [x] Identify why days with no data create gaps in the trend line (Recharts doesn't connect null values when connectNulls=false)
+- [x] Implement solution to connect across missing days smoothly (changed connectNulls to true for all 6 trend lines: Calories, Protein, Fat, Carbs, Fiber, Hydration)
+- [x] Ensure x-axis shows all dates in the selected range even if no data exists (already implemented via generateDateRange function)
+- [x] Lines use monotone curve smoothing for natural flow across gaps
+- [x] Dots only appear on days with actual data (null days have no dots)
+- [x] Target line remains continuous across all dates (already working correctly)

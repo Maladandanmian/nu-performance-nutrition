@@ -186,7 +186,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                   name="Actual Calories"
                   dot={{ fill: '#CE4C27', r: 4 }}
                   activeDot={{ r: 6 }}
-                  connectNulls={false}
+                  connectNulls={true}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -358,7 +358,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                   name="Protein"
                   dot={{ fill: '#578DB3', r: 3 }}
                   activeDot={{ r: 5 }}
-                  connectNulls={false}
+                  connectNulls={true}
                 />
                 <Line 
                   type="monotone" 
@@ -368,7 +368,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                   name="Fat"
                   dot={{ fill: '#86BBD8', r: 3 }}
                   activeDot={{ r: 5 }}
-                  connectNulls={false}
+                  connectNulls={true}
                 />
                 <Line 
                   type="monotone" 
@@ -378,7 +378,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                   name="Carbohydrates"
                   dot={{ fill: '#F2CC8F', r: 3 }}
                   activeDot={{ r: 5 }}
-                  connectNulls={false}
+                  connectNulls={true}
                 />
                 <Line 
                   type="monotone" 
@@ -388,7 +388,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                   name="Fiber"
                   dot={{ fill: '#81B29A', r: 3 }}
                   activeDot={{ r: 5 }}
-                  connectNulls={false}
+                  connectNulls={true}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -538,7 +538,7 @@ export function NutrientTrendGraphs({ clientId, days = 14 }: NutrientTrendGraphs
                 name="Actual Hydration"
                 dot={{ fill: '#06B6D4', r: 3 }}
                 activeDot={{ r: 5 }}
-                connectNulls={false}
+                connectNulls={true}
               />
               </LineChart>
             </ResponsiveContainer>
