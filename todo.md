@@ -866,3 +866,10 @@
 - [x] Fixed backend to handle empty itemDescriptions (beverage-only entries)
 - [x] Added fallback in display to show minimum score of 1 if undefined
 - [x] Backend calculateNutritionScore already enforces 1-5 range
+
+## Fix Score Not Updating After Re-analysis (Jan 22, 2026)
+- [x] Investigate why score remains unchanged after re-analysis with beverage changes
+- [x] Found mismatch: backend returns `finalScore` at top level, frontend was reading `mealAnalysis.score`
+- [x] Fixed frontend to read score from `data.finalScore` instead of `data.mealAnalysis.score`
+- [x] Score now properly updates when beverage is changed and re-analyzed
+- [x] Star display automatically updates based on score value

@@ -66,7 +66,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
         fibre: data.mealAnalysis.fibre,
         confidence: (data.mealAnalysis as any).confidence,
         components: data.mealAnalysis.components,
-        score: (data.mealAnalysis as any).score,
+        score: (data as any).finalScore, // Read from top-level finalScore
         referenceCardDetected: (data.mealAnalysis as any).referenceCardDetected,
         validationWarnings: (data.mealAnalysis as any).validationWarnings,
       });
