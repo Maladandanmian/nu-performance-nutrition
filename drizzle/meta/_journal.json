@@ -43,6 +43,13 @@
       "when": 1768175320662,
       "tag": "0005_slippery_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1769056221722,
+      "tag": "0006_boring_shaman",
+      "breakpoints": true
     }
   ]
 }

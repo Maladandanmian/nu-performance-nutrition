@@ -176,9 +176,7 @@ export default function ClientDashboard() {
       setOverallDescription("");
       setMealType("lunch");
       setMealNotes("");
-      setDrinkType("");
-      setVolumeMl("");
-      setBeverageNutrition(null);
+      // Note: drinkType, volumeMl, and beverageNutrition are NOT cleared here - they're needed for saveMeal
       // Note: imageUrl and imageKey are NOT cleared here - they're needed for saveMeal
       // Note: No success toast here - meal is not saved yet, only analyzed
     },
@@ -235,9 +233,12 @@ export default function ClientDashboard() {
       setIsEditMode(false);
       setShowAdvice(false);
       setImprovementAdvice("");
-      // Clear image data after successful save
+      // Clear image and beverage data after successful save
       setImageUrl("");
       setImageKey("");
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
       // Invalidate queries to refresh meal history and daily totals
       utils.meals.list.invalidate();
       utils.meals.dailyTotals.invalidate();
@@ -1621,6 +1622,7 @@ export default function ClientDashboard() {
                     beverageFat: beverageNutrition?.fat,
                     beverageCarbs: beverageNutrition?.carbs,
                     beverageFibre: beverageNutrition?.fibre,
+                    components: analysisResult?.components,
                   });
                 } else {
                   // Create new meal
@@ -1643,6 +1645,7 @@ export default function ClientDashboard() {
                     beverageFat: beverageNutrition?.fat,
                     beverageCarbs: beverageNutrition?.carbs,
                     beverageFibre: beverageNutrition?.fibre,
+                    components: analysisResult?.components,
                   });
                 }
                 setEditingMealId(null);

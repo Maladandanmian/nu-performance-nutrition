@@ -1,0 +1,1 @@
+ALTER TABLE `meals` ADD `components` json;

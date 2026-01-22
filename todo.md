@@ -574,3 +574,14 @@
 - [x] Installed sharp npm package for image conversion
 - [x] Added HEIF → JPEG conversion in identifyItems procedure
 - [x] Tests pass (45/46) - ready for user testing
+
+## Meal Logging Inconsistencies (Jan 22, 2026)
+- [x] Drink not being saved with meal (fixed: preserve beverageNutrition through analysis)
+- [x] Nutrition values only show meal, not meal + drink combined (backend already calculates combined)
+- [x] Meal description doesn't mention accompanying drink (fixed: use finalDescription with drink mention)
+- [x] Itemized food components list not stored in meal record (fixed: added components JSON field to schema)
+- [x] Fix saveMeal procedure to save drink data properly (beverage fields preserved, cleared after save)
+- [x] Calculate combined nutrition (meal + drink) for score and display (already implemented in backend)
+- [x] Update description generation to include drink mention (return finalDescription in analyzeMealWithDrink)
+- [x] Store detected food items list in database for meal editing (components field added and passed through)
+- [x] Test all fixes with new meal + drink logging (tests pass 45/46)

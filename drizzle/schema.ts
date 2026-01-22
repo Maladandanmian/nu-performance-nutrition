@@ -1,4 +1,4 @@
-import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -95,6 +95,8 @@ export const meals = mysqlTable("meals", {
   beverageFat: int("beverageFat"),
   beverageCarbs: int("beverageCarbs"),
   beverageFibre: int("beverageFibre"),
+  // Itemized food components (JSON array)
+  components: json("components"),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

@@ -441,6 +441,8 @@ export const appRouter = router({
             beverageFat: input.beverageFat,
             beverageCarbs: input.beverageCarbs,
             beverageFibre: input.beverageFibre,
+            // Itemized food components
+            components: input.components,
             loggedAt: new Date(),
           });
 
@@ -1114,7 +1116,7 @@ export const appRouter = router({
             success: true,
             finalScore,
             mealAnalysis: {
-              description: mealAnalysis.description,
+              description: finalDescription, // Use finalDescription which includes drink mention
               calories: mealAnalysis.calories,
               protein: mealAnalysis.protein,
               fat: mealAnalysis.fat,
