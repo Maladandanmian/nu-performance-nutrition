@@ -53,7 +53,7 @@ describe("meals.reEstimateComponent", () => {
       // We expect either success or an AI-related error, not a validation error
       expect(error.code).not.toBe("BAD_REQUEST");
     }
-  });
+  }, 15000); // 15 second timeout for AI call
 
   it("should require authentication", async () => {
     const ctx: TrpcContext = {

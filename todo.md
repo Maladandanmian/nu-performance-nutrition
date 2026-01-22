@@ -642,3 +642,7 @@
 - [x] Update protein, fat, carbs, fiber displays to show combined totals as well (lines 344-365)
 - [x] Ensure daily totals calculation includes beverage nutrition (already implemented in routers.ts lines 658-663)
 - [x] Test that meals with beverages show correct combined nutrition values (tests pass 44/46 - same pre-existing failures)
+
+## Fix Flaky componentReEstimation Test Timeout (Jan 22, 2026)
+- [x] Increase timeout for componentReEstimation test that makes actual AI calls (increased from 5s to 15s)
+- [x] Run full test suite to verify all tests pass consistently (45/46 passing, only pre-existing auth.logout failure)
