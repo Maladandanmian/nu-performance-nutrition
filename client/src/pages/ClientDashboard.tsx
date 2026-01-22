@@ -163,6 +163,8 @@ export default function ClientDashboard() {
   // NEW FLOW: Step 4-6 - Analyze meal with drink and save
   const analyzeMealWithDrinkMutation = trpc.meals.analyzeMealWithDrink.useMutation({
     onSuccess: (data) => {
+      console.log('[analyzeMealWithDrink] Response:', data);
+      console.log('[analyzeMealWithDrink] Components:', data.mealAnalysis?.components);
       setShowItemEditor(false);
       setAnalysisResult({
         ...data.mealAnalysis,
@@ -551,6 +553,11 @@ export default function ClientDashboard() {
   const handleEditMeal = (meal: any) => {
     // Populate the analysis modal with the meal data including components
     const mealComponents = meal.components || [];
+    
+    // Convert components to identifiedItems format (array of strings)
+    const itemDescriptions = mealComponents.map((c: any) => c.name);
+    setIdentifiedItems(itemDescriptions);
+    
     setAnalysisResult({
       description: meal.aiDescription,
       calories: meal.calories,
@@ -1647,6 +1654,8 @@ export default function ClientDashboard() {
                   });
                 } else {
                   // Create new meal
+                  console.log('[Log Meal] analysisResult:', analysisResult);
+                  console.log('[Log Meal] components:', analysisResult?.components);
                   saveMealMutation.mutate({
                     clientId: currentClientId,
                     imageUrl,

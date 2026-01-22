@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, mealType, components, beverageType FROM meals WHERE aiDescription LIKE '%smoothie%' ORDER BY loggedAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, mealType, components, beverageType FROM meals WHERE aiDescription LIKE '%smoothie%' ORDER BY loggedAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "2220014",
+      "mealType": "lunch",
+      "components": "[{\"calories\": 250, \"carbs\": 30, \"fat\": 5, \"fibre\": 3, \"name\": \"1.5 cups of pink smoothie or yogurt base (berry flavored, estimated 2% Greek Yogurt base)\", \"protein\": 20}, {\"calories\": 30, \"carbs\": 7, \"fat\": 0, \"fibre\": 1, \"name\": \"1/4 cup of oat or wheat cereal rings (O-shaped cereal, e.g., Cheerios)\", \"protein\": 1}, {\"calories\": 165, \"carbs\": 6, \"fat\": 14, \"fibre\": 3, \"name\": \"1/4 cup of sliced almonds (approx 28g)\", \"protein\": 6}, {\"calories\": 55, \"carbs\": 1, \"fat\": 4, \"fibre\": 0, \"name\": \"1 tablespoon of shelled hemp seeds (hemp hearts)\", \"protein\": 3}, {\"calories\": 3, \"carbs\": 1, \"fat\": 0, \"fibre\": 0, \"name\": \"1/2 of a fresh strawberry, sliced\", \"protein\": 0}, {\"calories\": 10, \"carbs\": 2, \"fat\": 0, \"fibre\": 1, \"name\": \"5-7 fresh blackberries (small handful)\", \"protein\": 0}, {\"calories\": 5, \"carbs\": 1, \"fat\": 0, \"fibre\": 1, \"name\": \"3-4 fresh raspberries\", \"protein\": 0}]",
+      "beverageType": "milk"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmealType\tcomponents\tbeverageType\n2220014\tlunch\t[{\"calories\": 250, \"carbs\": 30, \"fat\": 5, \"fibre\": 3, \"name\": \"1.5 cups of pink smoothie or yogurt base (berry flavored, estimated 2% Greek Yogurt base)\", \"protein\": 20}, {\"calories\": 30, \"carbs\": 7, \"fat\": 0, \"fibre\": 1, \"name\": \"1/4 cup of oat or wheat cereal rings (O-shaped cereal, e.g., Cheerios)\", \"protein\": 1}, {\"calories\": 165, \"carbs\": 6, \"fat\": 14, \"fibre\": 3, \"name\": \"1/4 cup of sliced almonds (approx 28g)\", \"protein\": 6}, {\"calories\": 55, \"carbs\": 1, \"fat\": 4, \"fibre\": 0, \"name\": \"1 tablespoon of shelled hemp seeds (hemp hearts)\", \"protein\": 3}, {\"calories\": 3, \"carbs\": 1, \"fat\": 0, \"fibre\": 0, \"name\": \"1/2 of a fresh strawberry, sliced\", \"protein\": 0}, {\"calories\": 10, \"carbs\": 2, \"fat\": 0, \"fibre\": 1, \"name\": \"5-7 fresh blackberries (small handful)\", \"protein\": 0}, {\"calories\": 5, \"carbs\": 1, \"fat\": 0, \"fibre\": 1, \"name\": \"3-4 fresh raspberries\", \"protein\": 0}]\tmilk\n",
+  "stderr": "",
+  "execution_time_ms": 1541
+}

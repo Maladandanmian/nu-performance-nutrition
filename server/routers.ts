@@ -419,6 +419,7 @@ export const appRouter = router({
           );
 
           // Save meal to database
+          console.log('[saveMeal] Components being saved:', JSON.stringify(input.components));
           const result = await db.createMeal({
             clientId: input.clientId,
             imageUrl: input.imageUrl || "",

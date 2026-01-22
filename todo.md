@@ -594,3 +594,13 @@
 - [x] Trigger re-analysis after user completes edits (Analyse Meal button already exists)
 - [x] Update meal in database with edited components and new nutrition values (saveMeal already handles this)
 - [x] Test edit functionality with actual meal editing (tests pass 45/46)
+
+## Meal Components Not Displaying in Edit Modal (Jan 22, 2026)
+- [x] Edit modal shows only beverage, no food components visible (confirmed with smoothie bowl)
+- [x] Components ARE being saved to database correctly (verified with banana meal)
+- [x] Components are being passed from frontend to saveMeal mutation (logged in console)
+- [x] saveMeal procedure is receiving components parameter (logged on server)
+- [x] createMeal is inserting components into database (verified with SQL query)
+- [x] Issue is in edit modal display logic - components not rendering in UI (fixed: setIdentifiedItems from meal.components)
+- [x] Check how editedComponents state is used to render component list (found: item editor uses identifiedItems, not editedComponents)
+- [x] Fix component rendering in item editor modal (fixed: convert components to identifiedItems format in handleEditMeal)
