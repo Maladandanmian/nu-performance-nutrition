@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
 import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
+import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -449,28 +450,18 @@ export default function ClientDetail() {
             </TabsContent>
 
             <TabsContent value="body" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Weight Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bodyMetricsChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={bodyMetricsChartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="weight" stroke="#CE4C27" strokeWidth={2} name="Weight (kg)" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No body metrics data yet</p>
-                  )}
-                </CardContent>
-              </Card>
+              <BodyweightTrendChart 
+                clientId={clientId!} 
+                goals={{
+                  calories: goals.caloriesTarget,
+                  protein: goals.proteinTarget,
+                  fat: goals.fatTarget,
+                  carbs: goals.carbsTarget,
+                  fibre: goals.fibreTarget,
+                  hydration: goals.hydrationTarget,
+                  weightTarget: goals.weightTarget
+                }} 
+              />
             </TabsContent>
           </Tabs>
         </div>

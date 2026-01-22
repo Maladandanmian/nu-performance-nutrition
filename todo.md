@@ -897,3 +897,9 @@
 ## Remove Duplicate Hydration Trend from Body Metrics (Jan 22, 2026)
 - [x] Remove Hydration Trend graph from Body Metrics tab (already in Daily Trends)
 - [x] Keep only bodyweight tracking in Body Metrics tab
+
+## Add Line Smoothing to Trainer-Side Graphs (Jan 22, 2026)
+- [x] Replace inline Weight Trend chart with BodyweightTrendChart component
+- [x] BodyweightTrendChart includes smoothing toggle, date range selector, and table view
+- [x] Nutrition Trends already use NutrientTrendGraphs component (no smoothing needed)
+- [x] Ensure consistent UI with client-side graphs
