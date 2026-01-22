@@ -709,3 +709,11 @@
 - [x] Identify if both "Drink logged successfully!" and "Beverage logged successfully!" are from the same mutation (yes, logDrinkMutation.mutateAsync triggers onSuccess callback, then code manually shows another toast)
 - [x] Remove duplicate toast notifications (removed manual toasts on lines 448 and 913)
 - [x] Now only shows "Drink logged successfully!" from mutation's onSuccess callback
+
+## Fix Bodyweight 7-Day Chart to Carry Forward Weight from Outside Window (Jan 22, 2026)
+- [x] Investigate bodyweight trend component data fetching and forward-fill logic (found in BodyweightTrendChart.tsx lines 54-87)
+- [x] Identify why 7-day chart doesn't show data before Jan 20 when 30-day chart shows data from Jan 8 (lastKnownWeight initialized to null, only looks within dateRange)
+- [x] Implement logic to look back beyond 7-day window for most recent bodyweight entry (added lines 73-85: filter bodyMetricsData for entries before firstDateInRange, sort by date desc, take most recent)
+- [x] Carry forward that weight to fill gaps at the start of the 7-day period (initialize lastKnownWeight with most recent weight from outside window)
+- [x] Now 7-day chart will show weight from Jan 16 carried forward through Jan 17-19, connecting to Jan 20-22 data
+- [ ] Test with various scenarios and verify accuracy

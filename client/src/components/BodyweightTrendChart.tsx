@@ -70,8 +70,21 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
       }
     });
 
-    // Fill in the date range with carried-forward weights
+    // Find the most recent weight BEFORE the date range starts (to carry forward)
+    const firstDateInRange = new Date(dateRange[0]);
     let lastKnownWeight: number | null = null;
+    
+    // Look through all body metrics to find the most recent weight before the range
+    bodyMetricsData
+      .filter(metric => metric.weight && new Date(metric.recordedAt) < firstDateInRange)
+      .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime())
+      .forEach((metric, index) => {
+        if (index === 0 && metric.weight) {
+          lastKnownWeight = metric.weight / 10; // Convert from stored integer to decimal
+        }
+      });
+    
+    // Fill in the date range with carried-forward weights
     return dateRange.map(date => {
       const recordedWeight = weightMap.get(date);
       if (recordedWeight !== undefined) {
