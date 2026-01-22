@@ -538,3 +538,7 @@
 - [x] Fixed createBodyMetric function to explicitly set null for optional fields
 - [x] Verified beverage logging works end-to-end (estimate nutrition + create drink + log hydration)
 - [x] Tested with "English breakfast tea with milk" - successful
+
+## Body Metrics Table Keeps Disappearing (Jan 22, 2026)
+- [x] Recreated body_metrics table after it disappeared again
+- [ ] Investigate why the table keeps disappearing (possible migration or database reset issue)
