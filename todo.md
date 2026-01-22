@@ -903,3 +903,10 @@
 - [x] BodyweightTrendChart includes smoothing toggle, date range selector, and table view
 - [x] Nutrition Trends already use NutrientTrendGraphs component (no smoothing needed)
 - [x] Ensure consistent UI with client-side graphs
+
+## Merge feature/trainer-dashboard to main (Jan 22, 2026)
+- [ ] Switch to main branch
+- [ ] Merge feature/trainer-dashboard into main
+- [ ] Verify no merge conflicts
+- [ ] Save checkpoint on main branch
+- [ ] Confirm all trainer features deployed
