@@ -171,7 +171,7 @@ export default function ClientDashboard() {
         drinkNutrition: data.drinkNutrition,
       });
       setShowAnalysisModal(true);
-      // Reset all form fields
+      // Reset form fields (but keep imageUrl/imageKey for saving later)
       setIdentifiedItems([]);
       setOverallDescription("");
       setMealType("lunch");
@@ -179,8 +179,7 @@ export default function ClientDashboard() {
       setDrinkType("");
       setVolumeMl("");
       setBeverageNutrition(null);
-      setImageUrl("");
-      setImageKey("");
+      // Note: imageUrl and imageKey are NOT cleared here - they're needed for saveMeal
       // Note: No success toast here - meal is not saved yet, only analyzed
     },
     onError: (error) => {
@@ -236,6 +235,9 @@ export default function ClientDashboard() {
       setIsEditMode(false);
       setShowAdvice(false);
       setImprovementAdvice("");
+      // Clear image data after successful save
+      setImageUrl("");
+      setImageKey("");
       // Invalidate queries to refresh meal history and daily totals
       utils.meals.list.invalidate();
       utils.meals.dailyTotals.invalidate();

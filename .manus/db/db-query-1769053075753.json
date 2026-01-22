@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, mealType, imageUrl, imageKey, loggedAt FROM meals ORDER BY loggedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, mealType, imageUrl, imageKey, loggedAt FROM meals ORDER BY loggedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2160016",
+      "mealType": "lunch",
+      "imageUrl": "",
+      "imageKey": "",
+      "loggedAt": "2026-01-22 03:36:31"
+    },
+    {
+      "id": "2160015",
+      "mealType": "dinner",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/480004/1769052789766-jcuba.jpg",
+      "imageKey": "meals/480004/1769052789766-jcuba.jpg",
+      "loggedAt": "2026-01-22 03:33:25"
+    },
+    {
+      "id": "2160003",
+      "mealType": "dinner",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/480001/1769052728485-nm1k7.jpg",
+      "imageKey": "meals/480001/1769052728485-nm1k7.jpg",
+      "loggedAt": "2026-01-22 03:32:23"
+    },
+    {
+      "id": "2130019",
+      "mealType": "snack",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/330001/1768962802490-c8jhl.jpg",
+      "imageKey": "meals/330001/1768962802490-c8jhl.jpg",
+      "loggedAt": "2026-01-21 02:33:40"
+    },
+    {
+      "id": "2130017",
+      "mealType": "snack",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/330001/1768962727523-cglsk.jpg",
+      "imageKey": "meals/330001/1768962727523-cglsk.jpg",
+      "loggedAt": "2026-01-21 02:32:31"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmealType\timageUrl\timageKey\tloggedAt\n2160016\tlunch\t\t\t2026-01-22 03:36:31\n2160015\tdinner\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/480004/1769052789766-jcuba.jpg\tmeals/480004/1769052789766-jcuba.jpg\t2026-01-22 03:33:25\n2160003\tdinner\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/480001/1769052728485-nm1k7.jpg\tmeals/480001/1769052728485-nm1k7.jpg\t2026-01-22 03:32:23\n2130019\tsnack\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/330001/1768962802490-c8jhl.jpg\tmeals/330001/1768962802490-c8jhl.jpg\t2026-01-21 02:33:40\n2130017\tsnack\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663051163310/CVoYWTwV8QMMBSnZsHHM3q/meals/330001/1768962727523-cglsk.jpg\tmeals/330001/1768962727523-cglsk.jpg\t2026-01-21 02:32:31\n",
+  "stderr": "",
+  "execution_time_ms": 1564
+}

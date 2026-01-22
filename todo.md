@@ -554,8 +554,16 @@
 - [x] Verified API returns all historical weight entries correctly (Jan 8, 13, 15, 20)
 
 ## Duplicate Meal Logging Issue (Jan 22, 2026)
-- [ ] Investigate why logging 1 meal with beverage creates multiple entries (2 meals, 2 cokes, 1 water)
-- [ ] Check saveMeal procedure for duplicate creation logic
-- [ ] Verify beverage logging is not being called multiple times
-- [ ] Fix the root cause of duplicate entries
-- [ ] Test single meal + beverage logging to ensure only correct entries are created
+- [x] Investigate why logging 1 meal with beverage creates multiple entries (2 meals, 2 cokes, 1 water)
+- [x] Check saveMeal procedure for duplicate creation logic
+- [x] Verify beverage logging is not being called multiple times
+- [x] Fix the root cause of duplicate entries (analyzeMealWithDrink was saving to DB, then saveMeal saved again)
+- [x] Test single meal + beverage logging to ensure only correct entries are created
+
+## Missing Meal Images in Nutrition History (Jan 22, 2026)
+- [x] Investigate why meal images are not displaying in nutrition history after duplicate entry fix
+- [x] Check if imageUrl is being saved to database correctly (found imageUrl was empty in DB)
+- [x] Verify NutritionHistoryFeed is rendering meal images (component code was correct)
+- [x] Fix the image display issue (removed imageUrl/imageKey clearing from analyzeMealWithDrink onSuccess)
+- [x] Moved image clearing to saveMealMutation onSuccess instead
+- [ ] Test that meal images appear in nutrition history after fix
