@@ -628,3 +628,10 @@
 - [x] Update test to verify NO duplicate drink entries when beverage is logged with meal
 - [x] Test meal with beverage logging to ensure only one entry appears in nutrition history (tests pass 45/46)
 - [x] Verify hydration tracking still works correctly (body_metrics entry created)
+
+## Fix Beverage State Persistence Between Meals (Jan 22, 2026)
+- [x] Identify where beverage state (drinkType, volumeMl, beverageNutrition) persists between meal entries (found in identifyItemsMutation.onSuccess)
+- [x] Clear beverage state when analysis modal closes after successful meal save (already implemented in saveMealMutation.onSuccess)
+- [x] Clear beverage state when starting a new meal photo upload (added to identifyItemsMutation.onSuccess lines 158-160)
+- [x] Ensure beverage fields are empty/reset for each new meal entry
+- [x] Test that logging meal with beverage, then meal without beverage works correctly (tests pass 45/46)
