@@ -219,21 +219,13 @@ export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
 export async function createBodyMetric(metric: InsertBodyMetric) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Build insert object with only provided fields
+  // Build insert object with explicit null for missing fields
   const convertedMetric: any = {
     clientId: metric.clientId,
+    weight: metric.weight ? Math.round(metric.weight * 10) : null,
+    hydration: metric.hydration || null,
+    notes: metric.notes || null,
     recordedAt: metric.recordedAt || new Date(),
-  };
-  
-  // Only include optional fields if they have values
-  if (metric.weight) {
-    convertedMetric.weight = Math.round(metric.weight * 10);
-  }
-  if (metric.hydration) {
-    convertedMetric.hydration = metric.hydration;
-  }
-  if (metric.notes) {
-    convertedMetric.notes = metric.notes;
   }
   
   return db.insert(bodyMetrics).values(convertedMetric);

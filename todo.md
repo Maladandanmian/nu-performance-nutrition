@@ -530,3 +530,11 @@
 - [x] Verify weight logging API works correctly
 - [x] Verify weight retrieval API works correctly
 - [x] Test weight tracking functionality end-to-end
+
+## Beverage Logging Failure Fix (Jan 22, 2026)
+- [x] Investigate "Failed to log beverage" error
+- [x] Identified root cause: body_metrics table missing after rollback
+- [x] Recreated body_metrics table with proper schema and defaults
+- [x] Fixed createBodyMetric function to explicitly set null for optional fields
+- [x] Verified beverage logging works end-to-end (estimate nutrition + create drink + log hydration)
+- [x] Tested with "English breakfast tea with milk" - successful

@@ -1,0 +1,28 @@
+{
+  "query": "SELECT * FROM drinks WHERE id = 1620003;\nSELECT * FROM body_metrics ORDER BY id DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM drinks WHERE id = 1620003;\nSELECT * FROM body_metrics ORDER BY id DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "1620003",
+      "clientId": "1",
+      "drinkType": "English breakfast tea with milk",
+      "volumeMl": "250",
+      "notes": "NULL",
+      "loggedAt": "2026-01-22 02:51:08",
+      "createdAt": "2026-01-22 02:51:07",
+      "calories": "21",
+      "protein": "1",
+      "fat": "1",
+      "carbs": "2",
+      "fibre": "0",
+      "mealId": "NULL"
+    }
+  ],
+  "messages": [
+    "id\tclientId\tweight\thydration\tnotes\trecordedAt\tcreatedAt",
+    "1\t1\tNULL\t250\tNULL\t2026-01-22 02:51:08\t2026-01-22 02:51:07"
+  ],
+  "stdout": "id\tclientId\tdrinkType\tvolumeMl\tnotes\tloggedAt\tcreatedAt\tcalories\tprotein\tfat\tcarbs\tfibre\tmealId\n1620003\t1\tEnglish breakfast tea with milk\t250\tNULL\t2026-01-22 02:51:08\t2026-01-22 02:51:07\t21\t1\t1\t2\t0\tNULL\nid\tclientId\tweight\thydration\tnotes\trecordedAt\tcreatedAt\n1\t1\tNULL\t250\tNULL\t2026-01-22 02:51:08\t2026-01-22 02:51:07\n",
+  "stderr": "",
+  "execution_time_ms": 1738
+}
