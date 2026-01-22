@@ -103,29 +103,13 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
   }, [bodyMetricsData, dateRange, goals.weightTarget]);
 
   // Apply smoothing if enabled (3-day moving average)
+  // When smoothing is ON: show only actual user-input weights (no forward-filled points)
+  // Recharts will draw smooth curves between these points using type="monotone"
   const smoothedBodyweightData = useMemo(() => {
     if (!smoothing || bodyweightData.length === 0) return bodyweightData;
     
-    return bodyweightData.map((point, index) => {
-      if (point.weight === null) return point;
-      
-      // Calculate 7-day moving average (current + previous 6 days)
-      const window = [];
-      for (let i = Math.max(0, index - 6); i <= index; i++) {
-        if (bodyweightData[i].weight !== null) {
-          window.push(bodyweightData[i].weight!);
-        }
-      }
-      
-      const smoothedWeight = window.length > 0
-        ? window.reduce((sum, w) => sum + w, 0) / window.length
-        : point.weight;
-      
-      return {
-        ...point,
-        weight: smoothedWeight,
-      };
-    });
+    // Filter to show only actual user-input weights
+    return bodyweightData.filter(point => point.isActualInput && point.weight !== null);
   }, [bodyweightData, smoothing]);
   
   const displayData = smoothing ? smoothedBodyweightData : bodyweightData;

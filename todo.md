@@ -733,3 +733,12 @@
 - [x] Test smoothing with steep climb scenario (Jan 8-13: 68.7 kg → 70.4 kg) (ready for user testing)
 - [x] 7-day window creates smoother arc over longer periods
 - [x] Algorithm now averages current day + previous 6 days for better trend visualization
+
+## Implement Spline Interpolation Smoothing for Bodyweight Chart (Jan 22, 2026)
+- [x] Replace moving average approach with spline interpolation
+- [x] When smoothing ON: filter data to show only actual user-input weights (remove forward-filled points)
+- [x] When smoothing OFF: show all data with forward-fill (current behavior)
+- [x] Use Recharts type="monotone" or type="natural" for smooth curves between actual data points
+- [x] Keep actual user-input weights fixed at their exact values
+- [x] Test: Jan 8 (68.7) → Jan 9 (68.7) → Jan 13 (69.8) → Jan 15 (69.4) should show smooth arcs
+- [x] Verify dots only appear on actual user-input dates
