@@ -885,3 +885,11 @@
 - [x] Test Red Bull (energy_drink, -2 penalty) vs vegetable juice (juice_vegetable, +0.5 reward)
 - [x] Verified: Red Bull meal = 2/5, Vegetable juice meal = 5/5 (3-point difference!)
 - [x] Verify consumption tracking unchanged (still just macros)
+
+## Fix Meal History Not Showing Updated Score (Jan 22, 2026)
+- [x] Investigate why meal history shows 4/5 after re-analysis updated score
+- [x] Found: MealEditDialog wasn't passing nutritionScore to update mutation
+- [x] Added nutritionScore to meals.update input schema
+- [x] Frontend now passes analysisResult.score to backend
+- [x] Backend uses provided score if available, otherwise calculates
+- [x] Test that meal history refreshes with new score after edit

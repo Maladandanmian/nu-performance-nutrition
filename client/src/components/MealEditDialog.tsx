@@ -259,6 +259,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
       fibre: calculatedTotals.fibre,
       aiDescription: analysisResult?.description || meal.aiDescription,
       aiConfidence: analysisResult?.confidence,
+      nutritionScore: analysisResult?.score || meal.nutritionScore,
       notes: mealNotes || undefined,
       loggedAt,
       beverageType: drinkType || undefined,

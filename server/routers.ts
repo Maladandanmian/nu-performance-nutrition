@@ -873,6 +873,7 @@ export const appRouter = router({
         fibre: z.number(),
         aiDescription: z.string(),
         aiConfidence: z.number().optional(),
+        nutritionScore: z.number().optional(),
         notes: z.string().optional(),
         loggedAt: z.date().optional(),
         beverageType: z.string().optional(),
@@ -951,6 +952,9 @@ export const appRouter = router({
             input.loggedAt // Use actual logged time
           );
 
+          // Use provided score from re-analysis if available, otherwise use calculated score
+          const finalScore = input.nutritionScore !== undefined ? input.nutritionScore : score;
+
           // Update meal in database
           await db.updateMeal(input.mealId, {
             imageUrl: input.imageUrl,
@@ -963,7 +967,7 @@ export const appRouter = router({
             fibre: input.fibre,
             aiDescription: input.aiDescription,
             aiConfidence: input.aiConfidence,
-            nutritionScore: score,
+            nutritionScore: finalScore,
             notes: input.notes,
             loggedAt: input.loggedAt,
             beverageType: input.beverageType,
@@ -978,7 +982,7 @@ export const appRouter = router({
 
           return {
             success: true,
-            score,
+            score: finalScore,
           };
         } catch (error) {
           console.error('Error in updateMeal:', error);
