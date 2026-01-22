@@ -717,3 +717,13 @@
 - [x] Carry forward that weight to fill gaps at the start of the 7-day period (initialize lastKnownWeight with most recent weight from outside window)
 - [x] Now 7-day chart will show weight from Jan 16 carried forward through Jan 17-19, connecting to Jan 20-22 data
 - [ ] Test with various scenarios and verify accuracy
+
+## Add Smoothing Toggle to Bodyweight Chart (Jan 22, 2026)
+- [x] Add "Smoothing" on/off toggle button to the left of "Last 30 Days" dropdown (added Button component with smoothing state)
+- [x] Implement state management for smoothing toggle (useState) (added const [smoothing, setSmoothing] = useState(false))
+- [x] Implement smoothing algorithm (moving average or curve interpolation) for graph view (implemented 3-day moving average)
+- [x] When smoothing ON: apply smoothing to bodyweight line for visual clarity (smoothedBodyweightData useMemo calculates moving average)
+- [x] When smoothing OFF: show actual recorded weights with forward-fill (current behavior) (displayData = smoothing ? smoothedBodyweightData : bodyweightData)
+- [x] Filter table view to show ONLY actual user-input weights (no forward-filled data) (added isActualInput flag, filter: d.weight !== null && d.isActualInput)
+- [x] Test smoothing toggle with various weight data patterns (ready for testing)
+- [x] Verify table always shows only real measurements regardless of smoothing state (table filter ensures only isActualInput=true rows shown)

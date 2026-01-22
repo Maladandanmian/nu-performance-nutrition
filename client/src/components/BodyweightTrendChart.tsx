@@ -25,6 +25,7 @@ type DateRange = 'today' | '7days' | '30days' | 'all';
 export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>('7days');
   const [viewMode, setViewMode] = useState<'graph' | 'table'>('graph');
+  const [smoothing, setSmoothing] = useState(false);
 
   // Calculate days based on selected range
   const calculatedDays = useMemo(() => {
@@ -87,7 +88,8 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
     // Fill in the date range with carried-forward weights
     return dateRange.map(date => {
       const recordedWeight = weightMap.get(date);
-      if (recordedWeight !== undefined) {
+      const isActualInput = recordedWeight !== undefined;
+      if (isActualInput) {
         lastKnownWeight = recordedWeight;
       }
       return {
@@ -95,10 +97,38 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
         fullDate: date,
         weight: lastKnownWeight,
         weightTarget: goals.weightTarget ? parseFloat(goals.weightTarget) : null,
+        isActualInput, // Track whether this is a real user input or forward-filled
       };
     });
   }, [bodyMetricsData, dateRange, goals.weightTarget]);
 
+  // Apply smoothing if enabled (3-day moving average)
+  const smoothedBodyweightData = useMemo(() => {
+    if (!smoothing || bodyweightData.length === 0) return bodyweightData;
+    
+    return bodyweightData.map((point, index) => {
+      if (point.weight === null) return point;
+      
+      // Calculate 3-day moving average (current + previous 2 days)
+      const window = [];
+      for (let i = Math.max(0, index - 2); i <= index; i++) {
+        if (bodyweightData[i].weight !== null) {
+          window.push(bodyweightData[i].weight!);
+        }
+      }
+      
+      const smoothedWeight = window.length > 0
+        ? window.reduce((sum, w) => sum + w, 0) / window.length
+        : point.weight;
+      
+      return {
+        ...point,
+        weight: smoothedWeight,
+      };
+    });
+  }, [bodyweightData, smoothing]);
+  
+  const displayData = smoothing ? smoothedBodyweightData : bodyweightData;
   const hasWeightData = bodyweightData.some(d => d.weight !== null);
 
   return (
@@ -119,6 +149,14 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant={smoothing ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSmoothing(!smoothing)}
+              className="text-sm"
+            >
+              Smoothing {smoothing ? 'On' : 'Off'}
+            </Button>
             <Select value={selectedDateRange} onValueChange={(value) => setSelectedDateRange(value as DateRange)}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
@@ -146,7 +184,7 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
             {viewMode === 'graph' ? (
               <>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={bodyweightData}>
+                  <LineChart data={displayData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
                       dataKey="date" 
@@ -241,7 +279,7 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
                     </tr>
                   </thead>
                   <tbody>
-                    {bodyweightData.filter(d => d.weight !== null).map((day, idx) => {
+                    {bodyweightData.filter(d => d.weight !== null && d.isActualInput).map((day, idx) => {
                       const diff = goals.weightTarget && day.weight 
                         ? day.weight - parseFloat(goals.weightTarget)
                         : null;
