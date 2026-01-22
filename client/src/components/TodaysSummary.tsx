@@ -61,7 +61,7 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             strokeWidth="8"
             fill="none"
           />
-          {/* Progress circle (green base) */}
+          {/* Progress circle (always solid green when over target, normal progress when not) */}
           <circle
             cx="48"
             cy="48"
@@ -69,12 +69,12 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             stroke={statusColor}
             strokeWidth="8"
             fill="none"
-            strokeDasharray={dashPattern ? `${dashPattern} ${circumference}` : circumference}
-            strokeDashoffset={strokeDashoffset}
+            strokeDasharray={circumference}
+            strokeDashoffset={useDashedStroke ? 0 : strokeDashoffset}
             strokeLinecap="butt"
             className="transition-all duration-500"
           />
-          {/* Warning color segments (alternating with green) */}
+          {/* Warning color dashed overlay (only when over target) */}
           {useDashedStroke && warningColor && (
             <circle
               cx="48"
@@ -83,8 +83,8 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
               stroke={warningColor}
               strokeWidth="8"
               fill="none"
-              strokeDasharray={`0 ${dashLength} ${dashLength} ${dashLength}`}
-              strokeDashoffset={strokeDashoffset - dashLength}
+              strokeDasharray={`${dashLength} ${dashLength}`}
+              strokeDashoffset={0}
               strokeLinecap="butt"
               className="transition-all duration-500"
             />

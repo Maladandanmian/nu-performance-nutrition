@@ -828,3 +828,9 @@
 - [x] Ensure dash pattern covers full 100% of circle circumference
 - [x] Adjust strokeDasharray pattern to eliminate gaps (calculated dashLength = circumference / 24)
 - [x] Test with various over-target percentages (117%, 140%, 220%)
+
+## Eliminate Grey Gap with Single-Circle Approach (Jan 22, 2026)
+- [ ] Grey gap still appears (moved position but not eliminated)
+- [ ] Redesign to use solid green base circle + warning color overlay segments
+- [ ] Ensure perfect synchronization between base and overlay
+- [ ] Test at all positions around circle circumference
