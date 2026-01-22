@@ -29,29 +29,26 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
     statusColor = "#f59e0b"; // orange (close to target)
   }
   
-  // Determine overlay warning for over-target
-  let overlayColor: string | null = null;
-  let showOverlay = false;
+  // Determine warning color and dash pattern for over-target
+  let warningColor: string | null = null;
+  let useDashedStroke = false;
   
   if (actualPercentage > 100) {
-    showOverlay = true;
+    useDashedStroke = true;
     if (actualPercentage <= 120) {
-      overlayColor = "#f59e0b"; // yellow/orange (slightly over)
+      warningColor = "#f59e0b"; // orange (slightly over)
     } else {
-      overlayColor = "#ef4444"; // red (significantly over)
+      warningColor = "#ef4444"; // red (significantly over)
     }
   }
+  
+  // Create alternating dash pattern: 10 units dash, 10 units gap
+  const dashPattern = useDashedStroke ? "10 10" : undefined;
 
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative w-24 h-24">
         <svg className="transform -rotate-90 w-24 h-24">
-          <defs>
-            {/* Define dotted pattern for overlay */}
-            <pattern id={`dots-${label}`} x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
-              <circle cx="4" cy="4" r="1.5" fill={overlayColor || "transparent"} />
-            </pattern>
-          </defs>
           {/* Background circle */}
           <circle
             cx="48"
@@ -61,7 +58,7 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             strokeWidth="8"
             fill="none"
           />
-          {/* Progress circle */}
+          {/* Progress circle (green base) */}
           <circle
             cx="48"
             cy="48"
@@ -69,23 +66,23 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             stroke={statusColor}
             strokeWidth="8"
             fill="none"
-            strokeDasharray={circumference}
+            strokeDasharray={dashPattern ? `${dashPattern} ${circumference}` : circumference}
             strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
+            strokeLinecap="butt"
             className="transition-all duration-500"
           />
-          {/* Overlay warning circle (dotted) for over-target */}
-          {showOverlay && (
+          {/* Warning color segments (alternating with green) */}
+          {useDashedStroke && warningColor && (
             <circle
               cx="48"
               cy="48"
               r={radius}
-              stroke={`url(#dots-${label})`}
+              stroke={warningColor}
               strokeWidth="8"
               fill="none"
-              strokeDasharray={circumference}
+              strokeDasharray={`0 10 10 10`}
               strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
+              strokeLinecap="butt"
               className="transition-all duration-500"
             />
           )}

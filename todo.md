@@ -767,3 +767,11 @@
 - [x] Use SVG patterns or CSS to create dotted overlay effect
 - [x] Test with various over-target scenarios (calories 169%, fat 135%, carbs 134%, hydration 128%)
 - [x] Ensure under-target values remain solid green (current behavior)
+
+## Replace Dotted Overlay with Dashed Stroke Segments (Jan 22, 2026)
+- [x] Remove dotted overlay pattern approach (too subtle and hard to see)
+- [x] Implement alternating color dashed stroke segments in the circle itself
+- [x] 100-120% over: Alternating green-orange dashed segments
+- [x] 120%+ over: Alternating green-red dashed segments
+- [x] Use strokeDasharray to create dashed pattern with alternating colors
+- [x] Test visibility and clarity of dashed segments
