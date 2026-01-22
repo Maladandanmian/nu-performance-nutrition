@@ -1096,61 +1096,15 @@ export const appRouter = router({
             todaysTotals
           );
 
-          // 7. Save meal to database
+          // 7. Return analysis data WITHOUT saving to database
+          // Actual saving will happen when user clicks "Log Meal" button
           // Append beverage info to description if drink is present
           const finalDescription = drinkNutrition && input.drinkType
             ? `${mealAnalysis.description} Consumed with ${input.drinkType}.`
             : mealAnalysis.description;
-
-          const mealResult = await db.createMeal({
-            clientId: input.clientId,
-            imageUrl: input.imageUrl,
-            imageKey: input.imageKey,
-            mealType: input.mealType,
-            aiDescription: finalDescription,
-            calories: mealAnalysis.calories,
-            protein: mealAnalysis.protein,
-            fat: mealAnalysis.fat,
-            carbs: mealAnalysis.carbs,
-            fibre: mealAnalysis.fibre,
-            nutritionScore: finalScore,
-            aiConfidence: mealAnalysis.confidence,
-            notes: input.notes,
-            loggedAt: new Date(),
-          });
-
-          const mealId = Number(mealResult[0].insertId);
-
-          // 8. Save drink to database if provided
-          let drinkId = null;
-          if (drinkNutrition && input.drinkType && input.volumeMl) {
-            const drinkResult = await db.createDrink({
-              clientId: input.clientId,
-              mealId: mealId, // Link drink to meal to avoid double-counting
-              drinkType: input.drinkType,
-              volumeMl: input.volumeMl,
-              calories: drinkNutrition.calories,
-              protein: drinkNutrition.protein,
-              fat: drinkNutrition.fat,
-              carbs: drinkNutrition.carbs,
-              fibre: drinkNutrition.fibre,
-              notes: `Logged with meal`,
-              loggedAt: new Date(),
-            });
-            drinkId = Number(drinkResult[0].insertId);
-
-            // Also log hydration
-            await db.createBodyMetric({
-              clientId: input.clientId,
-              hydration: input.volumeMl,
-              recordedAt: new Date(),
-            });
-          }
-
+          // Return analysis results only - no database operations
           return {
             success: true,
-            mealId,
-            drinkId,
             finalScore,
             mealAnalysis: {
               description: mealAnalysis.description,

@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, clientId, mealType, calories, beverageType, beverageVolumeMl, loggedAt, createdAt \nFROM meals \nWHERE clientId = 1 \nORDER BY loggedAt DESC \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, mealType, calories, beverageType, beverageVolumeMl, loggedAt, createdAt \nFROM meals \nWHERE clientId = 1 \nORDER BY loggedAt DESC \nLIMIT 10;",
+  "rows": [
+    {
+      "id": "2160002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "779",
+      "beverageType": "coke",
+      "beverageVolumeMl": "330",
+      "loggedAt": "2026-01-22 03:21:33",
+      "createdAt": "2026-01-22 03:21:33"
+    },
+    {
+      "id": "2160001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "640",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-22 03:19:41",
+      "createdAt": "2026-01-22 03:19:41"
+    },
+    {
+      "id": "2070003",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "105",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-20 00:17:31",
+      "createdAt": "2026-01-20 00:17:31"
+    },
+    {
+      "id": "2070001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "104",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-20 00:15:47",
+      "createdAt": "2026-01-20 00:15:47"
+    },
+    {
+      "id": "2040006",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "185",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:34:46",
+      "createdAt": "2026-01-17 02:34:45"
+    },
+    {
+      "id": "2040005",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "185",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:34:42",
+      "createdAt": "2026-01-17 02:34:42"
+    },
+    {
+      "id": "2040004",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "195",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:27:41",
+      "createdAt": "2026-01-17 02:27:40"
+    },
+    {
+      "id": "2040003",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "195",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:27:37",
+      "createdAt": "2026-01-17 02:27:37"
+    },
+    {
+      "id": "2040002",
+      "clientId": "1",
+      "mealType": "lunch",
+      "calories": "32",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:18:30",
+      "createdAt": "2026-01-17 02:18:30"
+    },
+    {
+      "id": "2040001",
+      "clientId": "1",
+      "mealType": "breakfast",
+      "calories": "32",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt": "2026-01-17 02:18:13",
+      "createdAt": "2026-01-17 02:18:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tmealType\tcalories\tbeverageType\tbeverageVolumeMl\tloggedAt\tcreatedAt\n2160002\t1\tlunch\t779\tcoke\t330\t2026-01-22 03:21:33\t2026-01-22 03:21:33\n2160001\t1\tbreakfast\t640\tNULL\tNULL\t2026-01-22 03:19:41\t2026-01-22 03:19:41\n2070003\t1\tlunch\t105\tNULL\tNULL\t2026-01-20 00:17:31\t2026-01-20 00:17:31\n2070001\t1\tbreakfast\t104\tNULL\tNULL\t2026-01-20 00:15:47\t2026-01-20 00:15:47\n2040006\t1\tlunch\t185\tNULL\tNULL\t2026-01-17 02:34:46\t2026-01-17 02:34:45\n2040005\t1\tbreakfast\t185\tNULL\tNULL\t2026-01-17 02:34:42\t2026-01-17 02:34:42\n2040004\t1\tlunch\t195\tNULL\tNULL\t2026-01-17 02:27:41\t2026-01-17 02:27:40\n2040003\t1\tbreakfast\t195\tNULL\tNULL\t2026-01-17 02:27:37\t2026-01-17 02:27:37\n2040002\t1\tlunch\t32\tNULL\tNULL\t2026-01-17 02:18:30\t2026-01-17 02:18:30\n2040001\t1\tbreakfast\t32\tNULL\tNULL\t2026-01-17 02:18:13\t2026-01-17 02:18:13\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}

@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, mealType, calories, beverageType, beverageVolumeMl, DATE_FORMAT(loggedAt, '%Y-%m-%d %H:%i:%s') as loggedAt_formatted\nFROM meals \nWHERE clientId = 1 \nAND DATE(loggedAt) = '2026-01-22'\nORDER BY loggedAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, mealType, calories, beverageType, beverageVolumeMl, DATE_FORMAT(loggedAt, '%Y-%m-%d %H:%i:%s') as loggedAt_formatted\nFROM meals \nWHERE clientId = 1 \nAND DATE(loggedAt) = '2026-01-22'\nORDER BY loggedAt DESC;",
+  "rows": [
+    {
+      "id": "2160002",
+      "mealType": "lunch",
+      "calories": "779",
+      "beverageType": "coke",
+      "beverageVolumeMl": "330",
+      "loggedAt_formatted": "2026-01-22 03:21:33"
+    },
+    {
+      "id": "2160001",
+      "mealType": "breakfast",
+      "calories": "640",
+      "beverageType": "NULL",
+      "beverageVolumeMl": "NULL",
+      "loggedAt_formatted": "2026-01-22 03:19:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmealType\tcalories\tbeverageType\tbeverageVolumeMl\tloggedAt_formatted\n2160002\tlunch\t779\tcoke\t330\t2026-01-22 03:21:33\n2160001\tbreakfast\t640\tNULL\tNULL\t2026-01-22 03:19:41\n",
+  "stderr": "",
+  "execution_time_ms": 1593
+}

@@ -64,7 +64,7 @@ describe('New Meal Logging Flow', () => {
     expect(Array.isArray(result.items)).toBe(true);
   });
 
-  it('should analyze meal with drink and save to database', { timeout: testTimeout }, async () => {
+  it('should analyze meal with drink (without saving)', { timeout: testTimeout }, async () => {
     const caller = appRouter.createCaller({
       user: { id: testTrainerId, role: 'admin', name: 'Test Trainer', email: 'trainer@test.com', openId: 'test' },
       req: {} as any,
@@ -91,8 +91,6 @@ describe('New Meal Logging Flow', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.mealId).toBeDefined();
-    expect(result.drinkId).toBeDefined();
     expect(result.finalScore).toBeGreaterThan(0);
     expect(result.finalScore).toBeLessThanOrEqual(5);
     expect(result.mealAnalysis).toBeDefined();
@@ -102,7 +100,7 @@ describe('New Meal Logging Flow', () => {
     expect(result.combinedNutrition.calories).toBeGreaterThan(result.mealAnalysis.calories);
   });
 
-  it('should analyze meal without drink', { timeout: testTimeout }, async () => {
+  it('should analyze meal without drink (analysis only)', { timeout: testTimeout }, async () => {
     const caller = appRouter.createCaller({
       user: { id: testTrainerId, role: 'admin', name: 'Test Trainer', email: 'trainer@test.com', openId: 'test' },
       req: {} as any,
@@ -125,15 +123,13 @@ describe('New Meal Logging Flow', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.mealId).toBeDefined();
-    expect(result.drinkId).toBeNull();
     expect(result.finalScore).toBeGreaterThan(0);
     expect(result.mealAnalysis).toBeDefined();
     expect(result.drinkNutrition).toBeNull();
     expect(result.combinedNutrition.calories).toBe(result.mealAnalysis.calories);
   });
 
-  it('should save meal and drink to separate tables', { timeout: testTimeout }, async () => {
+  it('should save meal via saveMeal after analysis', { timeout: testTimeout }, async () => {
     const caller = appRouter.createCaller({
       user: { id: testTrainerId, role: 'admin', name: 'Test Trainer', email: 'trainer@test.com', openId: 'test' },
       req: {} as any,
@@ -146,7 +142,8 @@ describe('New Meal Logging Flow', () => {
       imageBase64: testImage,
     });
 
-    const result = await caller.meals.analyzeMealWithDrink({
+    // Step 1: Analyze meal (no saving)
+    const analysisResult = await caller.meals.analyzeMealWithDrink({
       clientId: testClientId,
       imageUrl: identifyResult.imageUrl,
       imageKey: identifyResult.imageKey,
@@ -156,19 +153,38 @@ describe('New Meal Logging Flow', () => {
       volumeMl: 500,
     });
 
+    expect(analysisResult.success).toBe(true);
+    expect(analysisResult.mealAnalysis.calories).toBeGreaterThan(0);
+
+    // Step 2: Save meal using saveMeal
+    const saveResult = await caller.meals.saveMeal({
+      clientId: testClientId,
+      imageUrl: identifyResult.imageUrl,
+      imageKey: identifyResult.imageKey,
+      mealType: 'dinner',
+      calories: analysisResult.mealAnalysis.calories,
+      protein: analysisResult.mealAnalysis.protein,
+      fat: analysisResult.mealAnalysis.fat,
+      carbs: analysisResult.mealAnalysis.carbs,
+      fibre: analysisResult.mealAnalysis.fibre,
+      aiDescription: analysisResult.mealAnalysis.description,
+      aiConfidence: 0.8,
+      beverageType: 'Water',
+      beverageVolumeMl: 500,
+      beverageCalories: analysisResult.drinkNutrition?.calories || 0,
+      beverageProtein: analysisResult.drinkNutrition?.protein || 0,
+      beverageFat: analysisResult.drinkNutrition?.fat || 0,
+      beverageCarbs: analysisResult.drinkNutrition?.carbs || 0,
+      beverageFibre: analysisResult.drinkNutrition?.fibre || 0,
+    });
+
     // Verify meal was saved
-    const meal = await db.getMealById(result.mealId);
+    expect(saveResult.success).toBe(true);
+    expect(saveResult.mealId).toBeDefined();
+    const meal = await db.getMealById(saveResult.mealId);
     expect(meal).toBeDefined();
     expect(meal?.clientId).toBe(testClientId);
     expect(meal?.mealType).toBe('dinner');
     expect(meal?.calories).toBeGreaterThan(0);
-
-    // Verify drink was saved
-    const drinks = await db.getDrinksByClientId(testClientId, 10);
-    const drink = drinks.find(d => d.id === result.drinkId);
-    expect(drink).toBeDefined();
-    expect(drink?.clientId).toBe(testClientId);
-    expect(drink?.drinkType).toBe('Water');
-    expect(drink?.volumeMl).toBe(500);
   });
 });

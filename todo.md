@@ -552,3 +552,10 @@
 - [x] Root cause found: Timezone mismatch between UTC timestamps from database and local date range generation
 - [x] Fixed date parsing to use local timezone consistently for both data and date range
 - [x] Verified API returns all historical weight entries correctly (Jan 8, 13, 15, 20)
+
+## Duplicate Meal Logging Issue (Jan 22, 2026)
+- [ ] Investigate why logging 1 meal with beverage creates multiple entries (2 meals, 2 cokes, 1 water)
+- [ ] Check saveMeal procedure for duplicate creation logic
+- [ ] Verify beverage logging is not being called multiple times
+- [ ] Fix the root cause of duplicate entries
+- [ ] Test single meal + beverage logging to ensure only correct entries are created
