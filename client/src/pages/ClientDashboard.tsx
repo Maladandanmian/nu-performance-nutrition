@@ -644,22 +644,35 @@ export default function ClientDashboard() {
       carbs: drink.carbs,
       fibre: drink.fibre,
     });
-    // Set analysis result for the modal
-    // Score drinks 1-5: low-cal drinks score higher (5 is best)
-    const drinkScore = drink.calories < 50 ? 5 : drink.calories < 100 ? 4 : drink.calories < 150 ? 3 : drink.calories < 200 ? 2 : 1;
-    setAnalysisResult({
-      description: drink.drinkType,
-      calories: drink.calories,
-      protein: drink.protein,
-      fat: drink.fat,
-      carbs: drink.carbs,
-      fibre: drink.fibre,
-      score: drinkScore,
-      isDrink: true,
-    });
-    // Mark as editing drink
+    
+    // Clear food items (drinks don't have food components)
+    setIdentifiedItems([]);
+    setEditedComponents([]);
+    
+    // Set description for the modal
+    setOverallDescription(`Editing beverage: ${drink.drinkType}`);
+    
+    // Set drink date/time from loggedAt
+    if (drink.loggedAt) {
+      const drinkDate = new Date(drink.loggedAt);
+      const hongKongTime = new Date(drinkDate.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+      const year = hongKongTime.getFullYear();
+      const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+      const day = String(hongKongTime.getDate()).padStart(2, '0');
+      const hours = String(hongKongTime.getHours()).padStart(2, '0');
+      const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+      setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+    }
+    
+    // Set meal type to snack for drinks (required field)
+    setMealType('snack');
+    
+    // Mark as editing drink (negative ID)
     setEditingMealId(-drink.id);
-    setShowAnalysisModal(true);
+    setIsEditMode(true);
+    
+    // Open item editor modal (unified interface)
+    setShowItemEditor(true);
   };
 
   const handleDeleteDrink = async (drinkId: number) => {
@@ -1024,42 +1037,71 @@ export default function ClientDashboard() {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Meal Items List */}
-            <div>
-              <Label>Detected Food Items (Approx.)</Label>
-              <div className="space-y-2 mt-2">
-                {identifiedItems.map((item, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={item}
-                      onChange={(e) => {
-                        const newItems = [...identifiedItems];
-                        newItems[index] = e.target.value;
-                        setIdentifiedItems(newItems);
-                      }}
-                      placeholder="e.g., 2 fried eggs"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const newItems = identifiedItems.filter((_, i) => i !== index);
-                        setIdentifiedItems(newItems);
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
+            {/* Date and Time Section */}
+            <div className="grid grid-cols-2 gap-4 border-b pb-4">
+              <div>
+                <Label htmlFor="edit-meal-date">Date</Label>
+                <Input
+                  id="edit-meal-date"
+                  type="datetime-local"
+                  value={mealDateTime}
+                  onChange={(e) => setMealDateTime(e.target.value)}
+                />
               </div>
-              <Button
-                variant="outline"
-                className="mt-2"
-                onClick={() => setIdentifiedItems([...identifiedItems, ""])}
-              >
-                + Add Item
-              </Button>
+              <div>
+                <Label htmlFor="edit-meal-type">Meal Type</Label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                  <SelectTrigger id="edit-meal-type">
+                    <SelectValue placeholder="Select meal type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">Breakfast</SelectItem>
+                    <SelectItem value="lunch">Lunch</SelectItem>
+                    <SelectItem value="dinner">Dinner</SelectItem>
+                    <SelectItem value="snack">Snack</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
+            {/* Meal Items List - Only show if editing a meal (not drink-only) */}
+            {(identifiedItems.length > 0 || editingMealId === null || (editingMealId && editingMealId > 0)) && (
+              <div>
+                <Label>Detected Food Items (Approx.)</Label>
+                <div className="space-y-2 mt-2">
+                  {identifiedItems.map((item, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={item}
+                        onChange={(e) => {
+                          const newItems = [...identifiedItems];
+                          newItems[index] = e.target.value;
+                          setIdentifiedItems(newItems);
+                        }}
+                        placeholder="e.g., 2 fried eggs"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newItems = identifiedItems.filter((_, i) => i !== index);
+                          setIdentifiedItems(newItems);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  className="mt-2"
+                  onClick={() => setIdentifiedItems([...identifiedItems, ""])}
+                >
+                  + Add Item
+                </Button>
+              </div>
+            )}
 
             {/* Beverage Section */}
             <div className="border-t pt-4">
@@ -1099,17 +1141,18 @@ export default function ClientDashboard() {
               />
             </div>
 
-            {/* Analyse Meal Button */}
-            <Button
-              className="w-full"
-              onClick={async () => {
-                // Filter out empty items
-                const filteredItems = identifiedItems.filter(item => item.trim() !== "");
-                
-                if (filteredItems.length === 0) {
-                  toast.error("Please add at least one food item");
-                  return;
-                }
+            {/* Analyse Meal Button - Only show if there are food items */}
+            {identifiedItems.length > 0 && (
+              <Button
+                className="w-full"
+                onClick={async () => {
+                  // Filter out empty items
+                  const filteredItems = identifiedItems.filter(item => item.trim() !== "");
+                  
+                  if (filteredItems.length === 0) {
+                    toast.error("Please add at least one food item");
+                    return;
+                  }
 
                 // Estimate beverage nutrition if provided
                 let drinkNutrition = null;
@@ -1160,6 +1203,43 @@ export default function ClientDashboard() {
                 "Analyse Meal"
               )}
             </Button>
+            )}
+
+            {/* Save/Update Button for drink-only edits */}
+            {identifiedItems.length === 0 && editingMealId && editingMealId < 0 && (
+              <Button
+                className="w-full"
+                style={{backgroundColor: '#578DB3'}}
+                onClick={async () => {
+                  if (!drinkType || !volumeMl) {
+                    toast.error("Please provide drink type and volume");
+                    return;
+                  }
+                  
+                  // Update drink directly without analysis
+                  updateDrinkMutation.mutate({
+                    drinkId: -editingMealId,
+                    drinkType,
+                    volumeMl: parseInt(volumeMl),
+                    loggedAt: fromHongKongDateTimeLocal(mealDateTime),
+                  });
+                  
+                  setShowItemEditor(false);
+                  setEditingMealId(null);
+                  setIsEditMode(false);
+                }}
+                disabled={updateDrinkMutation.isPending}
+              >
+                {updateDrinkMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Drink"
+                )}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

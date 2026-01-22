@@ -604,3 +604,11 @@
 - [x] Issue is in edit modal display logic - components not rendering in UI (fixed: setIdentifiedItems from meal.components)
 - [x] Check how editedComponents state is used to render component list (found: item editor uses identifiedItems, not editedComponents)
 - [x] Fix component rendering in item editor modal (fixed: convert components to identifiedItems format in handleEditMeal)
+
+## Unified Edit Interface Consistency (Jan 22, 2026)
+- [x] Remove nutrition score display from initial edit modal (should only show after re-analysis)
+- [x] Add date/time fields to item editor modal for all edit scenarios
+- [x] Update handleEditDrink to use item editor modal instead of analysis modal
+- [x] Ensure all three scenarios (meal only, meal+beverage, beverage only) use same edit interface
+- [x] Analysis modal should only appear AFTER clicking "Analyse Meal" button, not on initial edit
+- [x] Test unified interface with all three editing scenarios (tests pass 45/46)
