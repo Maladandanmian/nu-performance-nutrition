@@ -164,7 +164,10 @@ export default function ClientDashboard() {
   // NEW FLOW: Step 4-6 - Analyze meal with drink and save
   const analyzeMealWithDrinkMutation = trpc.meals.analyzeMealWithDrink.useMutation({
     onSuccess: (data) => {
-      console.log('[analyzeMealWithDrink] Response:', data);
+      console.log('[analyzeMealWithDrink] Full Response:', JSON.stringify(data, null, 2));
+      console.log('[analyzeMealWithDrink] Meal Analysis:', data.mealAnalysis);
+      console.log('[analyzeMealWithDrink] Calories:', data.mealAnalysis?.calories);
+      console.log('[analyzeMealWithDrink] Protein:', data.mealAnalysis?.protein);
       console.log('[analyzeMealWithDrink] Components:', data.mealAnalysis?.components);
       setShowItemEditor(false);
       setAnalysisResult({
@@ -173,6 +176,9 @@ export default function ClientDashboard() {
         combinedNutrition: data.combinedNutrition,
         drinkNutrition: data.drinkNutrition,
       });
+      // Update editedComponents with the new components from AI analysis
+      // This ensures calculatedTotals reflects the updated nutrition values
+      setEditedComponents(data.mealAnalysis.components || []);
       setShowAnalysisModal(true);
       // Reset form fields (but keep imageUrl/imageKey for saving later)
       setIdentifiedItems([]);

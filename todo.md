@@ -659,3 +659,11 @@
 - [x] Pre-fill beverage fields in item editor modal with data from upload screen (automatic - state preserved)
 - [x] Change "Add Beverage (Optional)" label to "Accompanying Beverage" when beverage data is already present (already implemented on line 1110)
 - [x] Test complete flow: enter beverage on upload screen → click "Analyze Meal + Beverage" → item editor opens with beverage pre-filled → save meal (tests pass 45/46 - only pre-existing auth.logout failure)
+
+## Fix Meal Edit Re-Analysis Nutrition Calculation (Jan 22, 2026)
+- [x] Investigate why nutrition data (calories, protein, fat, carbs, fiber) is not recalculated when editing meals (found root cause: calculatedTotals uses editedComponents, but analyzeMealWithDrink.onSuccess wasn't updating editedComponents)
+- [x] Check if analyzeMeal mutation is being called with updated components during edit flow (verified: analyzeMealWithDrinkMutation is called with correct itemDescriptions)
+- [x] Verify that AI re-analysis is triggered when user clicks "Analyse Meal" after editing components (verified: backend AI correctly returns updated nutrition values)
+- [x] Ensure updated nutrition values replace old values in the analysis modal (fixed: added setEditedComponents call in analyzeMealWithDrinkMutation.onSuccess line 181)
+- [x] Test meal edit flow: edit meal → add "2 fried eggs" → click "Analyse Meal" → verify nutrition includes eggs (~180 kcal, ~12g protein) (test passes: mealEditReanalysis.test.ts)
+- [x] Ensure meal description, nutrition values, and score are all updated based on edited components (all working correctly after fix, tests pass 46/47)
