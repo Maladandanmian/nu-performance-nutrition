@@ -847,3 +847,9 @@
 - [x] Implement nutrition score recalculation
 - [ ] Test editing workflow with AI re-analysis (end-to-end user testing)
 - [ ] Verify trainer can only edit their own clients' meals
+
+## React Hooks Order Violation in ClientDetail (Jan 22, 2026)
+- [x] Fix "Rendered more hooks than during the previous render" error
+- [x] Move deleteMealMutation hook to top of component (before any conditional logic)
+- [x] Ensure all hooks are called in consistent order
+- [x] Test that ClientDetail page loads without errors

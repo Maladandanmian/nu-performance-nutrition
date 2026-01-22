@@ -63,6 +63,16 @@ export default function ClientDetail() {
     },
   });
 
+  const deleteMealMutation = trpc.meals.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meal deleted successfully!");
+      utils.meals.list.invalidate({ clientId: clientId! });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
   // Redirect non-authenticated users
   if (!loading && !isAuthenticated) {
     window.location.href = getLoginUrl();
@@ -109,16 +119,6 @@ export default function ClientDetail() {
       weightTarget: weightTarget ? parseFloat(weightTarget) : undefined,
     });
   };
-
-  const deleteMealMutation = trpc.meals.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Meal deleted successfully!");
-      utils.meals.list.invalidate({ clientId: clientId! });
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete meal: ${error.message}`);
-    },
-  });
 
   const handleEditMeal = (meal: any) => {
     setEditingMeal(meal);
