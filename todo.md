@@ -942,3 +942,10 @@
 - [x] Fix daily trends button overlap (Today/7 Days/30 Days buttons overlapping)
 - [x] Add proper responsive breakpoints and spacing for mobile screens
 - [ ] Test on mobile viewport to verify all elements are visible and properly spaced
+
+## Fix Amount Consumed Input Clearing Issue (Jan 23, 2026)
+- [x] Allow user to clear entire value in Amount Consumed field
+- [x] Support empty/temporary states during editing without forcing minimum value
+- [x] Maintain synchronization with Servings Consumed after user finishes typing
+- [x] Display empty string when value is 0 for better UX
+- [ ] Test clearing field and typing new value (e.g., 3.5) from scratch

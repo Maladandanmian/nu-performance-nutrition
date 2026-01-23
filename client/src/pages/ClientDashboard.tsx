@@ -1218,15 +1218,27 @@ export default function ClientDashboard() {
                       <Input
                         type="number"
                         step="0.1"
-                        value={extractedNutrition.servingsConsumed || 1}
+                        value={extractedNutrition.servingsConsumed === 0 ? '' : (extractedNutrition.servingsConsumed ?? 1)}
                         onChange={(e) => {
-                          const servings = parseFloat(e.target.value) || 0;
-                          const amount = servings * extractedNutrition.servingSize;
-                          setExtractedNutrition({
-                            ...extractedNutrition,
-                            servingsConsumed: servings,
-                            amountConsumed: amount
-                          });
+                          const val = e.target.value;
+                          // Allow empty string during editing
+                          if (val === '') {
+                            setExtractedNutrition({
+                              ...extractedNutrition,
+                              servingsConsumed: 0,
+                              amountConsumed: 0
+                            });
+                            return;
+                          }
+                          const servings = parseFloat(val);
+                          if (!isNaN(servings)) {
+                            const amount = servings * extractedNutrition.servingSize;
+                            setExtractedNutrition({
+                              ...extractedNutrition,
+                              servingsConsumed: servings,
+                              amountConsumed: amount
+                            });
+                          }
                         }}
                       />
                     </div>
@@ -1236,15 +1248,27 @@ export default function ClientDashboard() {
                       <Input
                         type="number"
                         step="0.1"
-                        value={extractedNutrition.amountConsumed || extractedNutrition.servingSize}
+                        value={extractedNutrition.amountConsumed === 0 ? '' : (extractedNutrition.amountConsumed ?? extractedNutrition.servingSize)}
                         onChange={(e) => {
-                          const amount = parseFloat(e.target.value) || 0;
-                          const servings = amount / extractedNutrition.servingSize;
-                          setExtractedNutrition({
-                            ...extractedNutrition,
-                            amountConsumed: amount,
-                            servingsConsumed: servings
-                          });
+                          const val = e.target.value;
+                          // Allow empty string during editing
+                          if (val === '') {
+                            setExtractedNutrition({
+                              ...extractedNutrition,
+                              amountConsumed: 0,
+                              servingsConsumed: 0
+                            });
+                            return;
+                          }
+                          const amount = parseFloat(val);
+                          if (!isNaN(amount)) {
+                            const servings = amount / extractedNutrition.servingSize;
+                            setExtractedNutrition({
+                              ...extractedNutrition,
+                              amountConsumed: amount,
+                              servingsConsumed: servings
+                            });
+                          }
                         }}
                       />
                     </div>
