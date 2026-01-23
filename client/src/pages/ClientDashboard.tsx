@@ -1429,31 +1429,20 @@ export default function ClientDashboard() {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Date and Time Section */}
-            <div className="grid grid-cols-2 gap-4 border-b pb-4">
-              <div>
-                <Label htmlFor="edit-meal-date">Date</Label>
-                <Input
-                  id="edit-meal-date"
-                  type="datetime-local"
-                  value={mealDateTime}
-                  onChange={(e) => setMealDateTime(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-meal-type">Meal Type</Label>
-                <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
-                  <SelectTrigger id="edit-meal-type">
-                    <SelectValue placeholder="Select meal type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="breakfast">Breakfast</SelectItem>
-                    <SelectItem value="lunch">Lunch</SelectItem>
-                    <SelectItem value="dinner">Dinner</SelectItem>
-                    <SelectItem value="snack">Snack</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Meal Type Section */}
+            <div className="border-b pb-4">
+              <Label htmlFor="edit-meal-type">Meal Type</Label>
+              <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                <SelectTrigger id="edit-meal-type">
+                  <SelectValue placeholder="Select meal type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="snack">Snack</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Meal Items List - Only show if editing a meal (not drink-only) */}
@@ -1520,6 +1509,18 @@ export default function ClientDashboard() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Date and Time Section */}
+            <div className="border-t pt-4">
+              <Label htmlFor="edit-meal-date">Date & Time</Label>
+              <Input
+                id="edit-meal-date"
+                type="datetime-local"
+                value={mealDateTime}
+                onChange={(e) => setMealDateTime(e.target.value)}
+                className="mt-2"
+              />
             </div>
 
             {/* Meal Notes */}
