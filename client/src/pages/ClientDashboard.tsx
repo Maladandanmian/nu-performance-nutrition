@@ -1511,15 +1511,38 @@ export default function ClientDashboard() {
               </div>
             </div>
 
-            {/* Date and Time Section */}
+            {/* Date and Time Section - Collapsed by default */}
             <div className="border-t pt-4">
-              <Label htmlFor="edit-meal-date">Date & Time</Label>
+              <div className="flex items-center justify-between">
+                <Label>Date & Time</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const input = document.getElementById('edit-meal-date') as HTMLInputElement;
+                    if (input) {
+                      input.readOnly = false;
+                      input.showPicker?.();
+                    }
+                  }}
+                  className="text-xs"
+                >
+                  Edit
+                </Button>
+              </div>
               <Input
                 id="edit-meal-date"
                 type="datetime-local"
                 value={mealDateTime}
                 onChange={(e) => setMealDateTime(e.target.value)}
-                className="mt-2"
+                readOnly
+                className="mt-2 cursor-pointer"
+                onClick={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.readOnly = false;
+                  input.showPicker?.();
+                }}
               />
             </div>
 

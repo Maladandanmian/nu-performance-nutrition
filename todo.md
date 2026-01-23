@@ -958,10 +958,9 @@
 - [x] Meal history display already has beverage indicator (no changes needed)
 - [ ] Test complete flow: scan label → add water → save → verify water shows in history
 
-## Move Date/Time Controls Inline in Meal Edit Dialog (Jan 23, 2026)
-- [x] Find where calendar popup appears when editing meal from history
-- [x] Date/time field was already inline but positioned at top (auto-focused on mobile)
-- [x] Moved date/time field to bottom of dialog (after beverage, before notes)
-- [x] Removed from top position to prevent auto-focus on mobile
-- [x] Calendar now only appears when user explicitly clicks date/time field
-- [ ] Test editing meal items without date changes (no popup interruption)
+## Remove Date Filter Popup Before Meal Edit Dialog (Jan 23, 2026)
+- [x] Found that datetime-local input triggers native mobile calendar picker
+- [x] Made date/time field read-only by default to prevent auto-opening
+- [x] Added "Edit" button next to Date & Time label
+- [x] Clicking field or Edit button enables editing and opens picker
+- [ ] Test editing meals without automatic calendar popup interruption
