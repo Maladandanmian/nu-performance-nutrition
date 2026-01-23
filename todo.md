@@ -1275,3 +1275,11 @@
 - [x] Add white vertical line at current position
 - [x] Color current value text red when regression occurs (current > start)
 - [x] Color current value text blue when progress occurs (current < start)
+
+
+## VAT Progress Bar Layout Redesign (Jan 23, 2026)
+- [x] Keep blue bar full-width (Start to Target) with rounded ends
+- [x] Add red curved cap extending from left edge when regression occurs
+- [x] Both bars share same rounded pill shape
+- [x] White vertical line at current position
+- [x] Current value text in red when regressed

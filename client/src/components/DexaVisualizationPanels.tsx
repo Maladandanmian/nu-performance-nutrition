@@ -543,35 +543,29 @@ function VATProgressBar({ data }: { data: any[] }) {
       {/* Progress Bar */}
       <div className="relative mb-8">
         {/* Bar container */}
-        <div className="h-12 bg-gray-200 rounded-full overflow-hidden relative">
-          {/* Regression bar (red) - shows when current > start */}
+        <div className="relative h-12">
+          {/* Blue bar (full width from Start to Target) */}
+          <div className="h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full relative">
+            {/* Milestone markers */}
+            <div className="absolute inset-0 flex items-center justify-between px-4">
+              <span className="text-xs font-semibold text-white">Start</span>
+              <span className="text-xs font-semibold text-white">Target</span>
+            </div>
+          </div>
+          
+          {/* Red regression cap (overlays on left when regression occurs) */}
           {hasRegressed && (
             <div
-              className="absolute left-0 top-0 h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500"
-              style={{ width: `${Math.abs(regressionPercent)}%` }}
+              className="absolute left-0 top-0 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all duration-500"
+              style={{ width: `${Math.abs(regressionPercent) + 3}%` }}
             />
           )}
-          
-          {/* Progress fill (blue) - starts after regression if any */}
-          <div
-            className="absolute top-0 h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
-            style={{ 
-              left: hasRegressed ? `${Math.abs(regressionPercent)}%` : '0%',
-              width: `${Math.max(progressPercent, 0)}%` 
-            }}
-          />
           
           {/* Current position indicator - white vertical line */}
           <div
             className="absolute top-0 bottom-0 w-1 bg-white shadow-lg transition-all duration-500 z-10"
             style={{ left: `${currentPosition}%` }}
           />
-          
-          {/* Milestone markers */}
-          <div className="absolute inset-0 flex items-center justify-between px-2">
-            <span className="text-xs font-semibold text-white">Start</span>
-            <span className="text-xs font-semibold text-white">Target</span>
-          </div>
         </div>
         
         {/* Value labels */}
