@@ -592,8 +592,8 @@ function VATProgressBar({ data }: { data: any[] }) {
       
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-green-50 p-4 rounded-lg text-center">
-          <div className="text-3xl font-bold text-green-600">
+        <div className={`p-4 rounded-lg text-center ${achievedReduction < 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+          <div className={`text-3xl font-bold ${achievedReduction < 0 ? 'text-red-600' : 'text-green-600'}`}>
             {achievedReduction.toFixed(1)}
           </div>
           <div className="text-sm text-gray-600 mt-1">cm² Reduced</div>

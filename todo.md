@@ -1283,3 +1283,9 @@
 - [x] Both bars share same rounded pill shape
 - [x] White vertical line at current position
 - [x] Current value text in red when regressed
+
+
+## VAT Stats Card Color Updates (Jan 23, 2026)
+- [x] Change "cm² Reduced" card to red background when achievedReduction is negative
+- [x] Change "cm² Reduced" text to red when regression occurs
+- [x] Keep green styling when achievedReduction is positive
