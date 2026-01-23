@@ -1118,3 +1118,18 @@
 - [ ] Final testing and bug fixes
 - [ ] Save checkpoint
 - [ ] Push to GitHub Dexa branch
+
+
+### Phase 3: UI Implementation (Current)
+- [x] Add DEXA upload section to TrainerClientDetail page
+- [x] Created DexaUploadSection component in Body Metrics tab
+- [x] Create file input for PDF upload
+- [x] PDF file picker with base64 conversion
+- [x] Show upload progress and AI extraction status
+- [x] Loading spinner during analysis
+- [x] Display extracted data preview
+- [x] Shows scan date, type, and ID from extraction
+- [x] Add approve/reject buttons
+- [x] Approve/Reject buttons for pending scans
+- [x] Show DEXA data in client Metrics tab
+- [x] Lists all uploaded scans with status indicators

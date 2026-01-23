@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
 import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
+import { DexaUploadSection } from "@/components/DexaUploadSection";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -453,6 +454,17 @@ export default function ClientDetail() {
             </TabsContent>
 
             <TabsContent value="body" className="space-y-4">
+              {/* DEXA Upload Section (Trainer Only) */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>DEXA Scan Upload</CardTitle>
+                  <CardDescription>Upload and analyze DEXA scan reports</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DexaUploadSection clientId={clientId!} />
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle>Weight Trend</CardTitle>
