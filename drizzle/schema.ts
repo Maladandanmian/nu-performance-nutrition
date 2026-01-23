@@ -99,7 +99,7 @@ export const meals = mysqlTable("meals", {
   // Itemized food components (JSON array)
   components: json("components"),
   // Source of meal entry
-  source: mysqlEnum("source", ["meal_photo", "nutrition_label"]).default("meal_photo").notNull(),
+  source: mysqlEnum("source", ["meal_photo", "nutrition_label", "text_description"]).default("meal_photo").notNull(),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

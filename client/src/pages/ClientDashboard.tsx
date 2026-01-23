@@ -103,8 +103,9 @@ export default function ClientDashboard() {
   const [beverageNutrition, setBeverageNutrition] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Nutrition label mode state
-  const [inputMode, setInputMode] = useState<"meal" | "label">("meal");
+  // Input mode state (meal photo, nutrition label, or text description)
+  const [inputMode, setInputMode] = useState<"meal" | "label" | "text">("meal");
+  const [mealTextDescription, setMealTextDescription] = useState("");
   const [extractedNutrition, setExtractedNutrition] = useState<any>(null);
   const [showNutritionEditor, setShowNutritionEditor] = useState(false);
 
@@ -178,6 +179,33 @@ export default function ClientDashboard() {
     },
     onError: (error) => {
       toast.error(`Failed to identify meal items: ${error.message}`);
+    },
+  });
+
+  // NEW FLOW: Analyze meal from text description
+  const analyzeTextMealMutation = trpc.meals.analyzeTextMeal.useMutation({
+    onSuccess: (data) => {
+      setIdentifiedItems(data.items);
+      setOverallDescription(data.overallDescription);
+      setImageUrl(""); // No image for text-based entry
+      setImageKey(""); // No image for text-based entry
+      
+      // Refresh meal date/time to current time for new meal
+      const now = new Date();
+      const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+      const year = hongKongTime.getFullYear();
+      const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+      const day = String(hongKongTime.getDate()).padStart(2, '0');
+      const hours = String(hongKongTime.getHours()).padStart(2, '0');
+      const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+      setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      
+      setShowItemEditor(true);
+      // Clear text input after successful analysis
+      setMealTextDescription("");
+    },
+    onError: (error) => {
+      toast.error(`Failed to analyze meal description: ${error.message}`);
     },
   });
 
@@ -872,39 +900,74 @@ export default function ClientDashboard() {
                   >
                     🏷️ Nutrition Label
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("text");
+                      setIdentifiedItems([]);
+                      setShowItemEditor(false);
+                    }}
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                      inputMode === "text"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    ✍️ Text Description
+                  </button>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="meal-image">{inputMode === "meal" ? "Meal Photo" : "Nutrition Label Photo"}</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowPhotoGuide(true)}
-                      className="text-xs"
-                    >
-                      <Camera className="h-3 w-3 mr-1" />
-                      Photo Tips
-                    </Button>
+                {/* Photo input for meal photo and nutrition label modes */}
+                {inputMode !== "text" && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="meal-image">{inputMode === "meal" ? "Meal Photo" : "Nutrition Label Photo"}</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowPhotoGuide(true)}
+                        className="text-xs"
+                      >
+                        <Camera className="h-3 w-3 mr-1" />
+                        Photo Tips
+                      </Button>
+                    </div>
+                    <div className="mt-2 flex items-center gap-4">
+                      <Input
+                        id="meal-image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="flex-1"
+                        ref={fileInputRef}
+                      />
+                      {selectedFile && (
+                        <span className="text-sm text-gray-600">{selectedFile.name}</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 Include a credit card, business card, or Octopus card for accurate portion sizing
+                    </p>
                   </div>
-                  <div className="mt-2 flex items-center gap-4">
-                    <Input
-                      id="meal-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="flex-1"
-                      ref={fileInputRef}
+                )}
+
+                {/* Text input for text description mode */}
+                {inputMode === "text" && (
+                  <div>
+                    <Label htmlFor="meal-description">Meal Description</Label>
+                    <Textarea
+                      id="meal-description"
+                      placeholder="Describe your meal from memory (e.g., 'hamachi poke bowl with sesame sauce' or 'french toast with maple syrup')"
+                      value={mealTextDescription}
+                      onChange={(e) => setMealTextDescription(e.target.value)}
+                      rows={3}
                     />
-                    {selectedFile && (
-                      <span className="text-sm text-gray-600">{selectedFile.name}</span>
-                    )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 Be as specific as possible for better nutrition estimates
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    💡 Include a credit card, business card, or Octopus card for accurate portion sizing
-                  </p>
-                </div>
+                )}
 
                 <div>
                   <Label htmlFor="meal-type">Meal Type</Label>
@@ -979,7 +1042,67 @@ export default function ClientDashboard() {
                 </div>
 
                 {/* Conditional buttons based on what's filled */}
-                {selectedFile && !drinkType && !volumeMl && (
+                {/* Text mode: Analyze text description */}
+                {inputMode === "text" && mealTextDescription && !drinkType && !volumeMl && (
+                  <Button 
+                    onClick={() => {
+                      if (!clientSession?.clientId) {
+                        toast.error("Client session not found");
+                        return;
+                      }
+                      analyzeTextMealMutation.mutate({
+                        clientId: clientSession.clientId,
+                        mealDescription: mealTextDescription,
+                      });
+                    }}
+                    className="w-full"
+                    disabled={analyzeTextMealMutation.isPending}
+                  >
+                    {analyzeTextMealMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Analyzing Description...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Analyze Meal
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {inputMode === "text" && mealTextDescription && drinkType && volumeMl && (
+                  <Button 
+                    onClick={() => {
+                      if (!clientSession?.clientId) {
+                        toast.error("Client session not found");
+                        return;
+                      }
+                      analyzeTextMealMutation.mutate({
+                        clientId: clientSession.clientId,
+                        mealDescription: mealTextDescription,
+                      });
+                    }}
+                    className="w-full"
+                    disabled={analyzeTextMealMutation.isPending}
+                  >
+                    {analyzeTextMealMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Analyzing Description...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Analyze Meal + Beverage
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Photo modes: Analyze photo */}
+                {inputMode !== "text" && selectedFile && !drinkType && !volumeMl && (
                   <Button 
                     onClick={handleLogMeal} 
                     className="w-full"
@@ -999,7 +1122,7 @@ export default function ClientDashboard() {
                   </Button>
                 )}
                 
-                {selectedFile && drinkType && volumeMl && (
+                {inputMode !== "text" && selectedFile && drinkType && volumeMl && (
                   <Button 
                     onClick={handleLogMeal} 
                     className="w-full"

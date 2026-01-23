@@ -374,7 +374,7 @@ export const appRouter = router({
           fibre: z.number(),
         })).optional(),
         // Source of meal entry
-        source: z.enum(["meal_photo", "nutrition_label"]).optional(),
+        source: z.enum(["meal_photo", "nutrition_label", "text_description"]).optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -1024,6 +1024,36 @@ export const appRouter = router({
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : 'Failed to identify meal items',
+          });
+        }
+      }),
+
+    // NEW FLOW: Analyze meal from text description (no photo)
+    analyzeTextMeal: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        mealDescription: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const { analyzeTextMeal } = await import("./textMealAnalysis");
+          
+          // Analyze the text description and break it into components
+          const analysis = await analyzeTextMeal(input.mealDescription);
+
+          return {
+            success: true,
+            imageUrl: "", // No image for text-based entry
+            imageKey: "", // No image for text-based entry
+            overallDescription: analysis.overallDescription,
+            items: analysis.items.map(item => item.description),
+            referenceCardDetected: false, // No reference card for text-based entry
+          };
+        } catch (error) {
+          console.error('Error in analyzeTextMeal:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to analyze meal description',
           });
         }
       }),

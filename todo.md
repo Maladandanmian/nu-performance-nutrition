@@ -1016,3 +1016,19 @@
 - [x] Changed space-y-4 to space-y-3 for tighter vertical spacing
 - [x] Reduced border section padding from pt-4 to pt-3
 - [x] Test on mobile viewport
+
+## Add Text-Based Meal Entry Option (Jan 23, 2026)
+- [x] Create backend procedure to analyze meal from text description
+- [x] Created textMealAnalysis.ts module with analyzeTextMeal function
+- [x] Added meals.analyzeTextMeal tRPC procedure
+- [x] AI breaks down text into food components with estimated quantities
+- [x] Add "Text Description" mode toggle button alongside Meal Photo and Nutrition Label
+- [x] Added ✍️ Text Description button to mode selector
+- [x] Add text input field for meal description
+- [x] Added Textarea with placeholder examples (poke bowl, french toast)
+- [x] Integrate with existing "Review and Edit Meal Items" flow
+- [x] Text analysis uses same identifiedItems state and showItemEditor modal
+- [x] Added conditional buttons for text mode (with/without beverage)
+- [x] Test with various meal descriptions (poke bowl, french toast, pasta dishes)
+- [x] Write vitest tests for text-based analysis
+- [x] All 4 tests passed: poke bowl, french toast, pasta, quantity estimates

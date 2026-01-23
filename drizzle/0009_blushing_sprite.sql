@@ -1,0 +1,1 @@
+ALTER TABLE `meals` MODIFY COLUMN `source` enum('meal_photo','nutrition_label','text_description') NOT NULL DEFAULT 'meal_photo';

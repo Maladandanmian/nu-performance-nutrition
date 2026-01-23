@@ -64,6 +64,13 @@
       "when": 1769139289088,
       "tag": "0008_long_justin_hammer",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1769146038031,
+      "tag": "0009_blushing_sprite",
+      "breakpoints": true
     }
   ]
 }
