@@ -314,11 +314,11 @@ export default function ClientDetail() {
 
           {/* Data Visualization */}
           <Tabs defaultValue="nutrition" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="nutrition">Nutrition Trends</TabsTrigger>
-              <TabsTrigger value="history">Meal History</TabsTrigger>
-              <TabsTrigger value="trends">Daily Trends</TabsTrigger>
-              <TabsTrigger value="body">Body Metrics</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-1">
+              <TabsTrigger value="nutrition" className="text-xs md:text-sm">Nutrition Trends</TabsTrigger>
+              <TabsTrigger value="history" className="text-xs md:text-sm">Meal History</TabsTrigger>
+              <TabsTrigger value="trends" className="text-xs md:text-sm">Daily Trends</TabsTrigger>
+              <TabsTrigger value="body" className="text-xs md:text-sm">Body Metrics</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -406,12 +406,13 @@ export default function ClientDetail() {
                         {client.name}'s daily consumption vs targets
                       </CardDescription>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         variant={timeRange === "today" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setTimeRange("today")}
                         style={timeRange === "today" ? {backgroundColor: '#578DB3'} : {}}
+                        className="text-xs md:text-sm"
                       >
                         Today
                       </Button>
@@ -420,6 +421,7 @@ export default function ClientDetail() {
                         size="sm"
                         onClick={() => setTimeRange("7days")}
                         style={timeRange === "7days" ? {backgroundColor: '#578DB3'} : {}}
+                        className="text-xs md:text-sm"
                       >
                         7 Days
                       </Button>
@@ -428,6 +430,7 @@ export default function ClientDetail() {
                         size="sm"
                         onClick={() => setTimeRange("30days")}
                         style={timeRange === "30days" ? {backgroundColor: '#578DB3'} : {}}
+                        className="text-xs md:text-sm"
                       >
                         30 Days
                       </Button>
@@ -436,6 +439,7 @@ export default function ClientDetail() {
                         size="sm"
                         onClick={() => setTimeRange("all")}
                         style={timeRange === "all" ? {backgroundColor: '#578DB3'} : {}}
+                        className="text-xs md:text-sm"
                       >
                         All Time
                       </Button>

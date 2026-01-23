@@ -164,17 +164,17 @@ export function BodyweightTrendChart({ clientId, goals }: BodyweightTrendChartPr
               {' | Weight is carried forward when not recorded'}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant={smoothing ? "default" : "outline"}
               size="sm"
               onClick={() => setSmoothing(!smoothing)}
-              className="text-sm"
+              className="text-xs md:text-sm whitespace-nowrap"
             >
               Smoothing {smoothing ? 'On' : 'Off'}
             </Button>
             <Select value={selectedDateRange} onValueChange={(value) => setSelectedDateRange(value as DateRange)}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[120px] md:w-[140px] text-xs md:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
