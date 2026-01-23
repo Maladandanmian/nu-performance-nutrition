@@ -544,22 +544,25 @@ function VATProgressBar({ data }: { data: any[] }) {
       <div className="relative mb-8">
         {/* Bar container */}
         <div className="relative h-12">
-          {/* Blue bar (full width from Start to Target) */}
-          <div className="h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full relative">
+          {/* Red base bar (full width, only visible when regression occurs) */}
+          {hasRegressed && (
+            <div className="absolute left-0 top-0 w-full h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full" />
+          )}
+          
+          {/* Blue bar (overlays red, shrunk on left when regression occurs) */}
+          <div 
+            className="absolute top-0 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-500"
+            style={{
+              left: hasRegressed ? `${Math.abs(regressionPercent)}%` : '0%',
+              right: '0%'
+            }}
+          >
             {/* Milestone markers */}
             <div className="absolute inset-0 flex items-center justify-between px-4">
               <span className="text-xs font-semibold text-white">Start</span>
               <span className="text-xs font-semibold text-white">Target</span>
             </div>
           </div>
-          
-          {/* Red regression cap (overlays on left when regression occurs) */}
-          {hasRegressed && (
-            <div
-              className="absolute left-0 top-0 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all duration-500"
-              style={{ width: `${Math.abs(regressionPercent) + 3}%` }}
-            />
-          )}
           
           {/* Current position indicator - white vertical line */}
           <div
