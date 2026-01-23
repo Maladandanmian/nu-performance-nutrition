@@ -1196,3 +1196,10 @@
 - [x] Add change indicators showing delta between latest and previous scan (Panel 1)
 - [x] Update panel titles to clarify data source (Latest Scan / Trend / All Scans)
 - [x] Show date range for trend-based panels (Panel 2, 3, 6)
+
+
+## DEXA Visualization Data Display Issues (Jan 23, 2026)
+- [x] Fix gram-to-kg conversion for fat mass and lean mass (divide by 1000)
+- [x] Fix timeline direction in Body Recomposition chart (removed unnecessary reverse())
+- [x] Verify all other panels display correct units (Panel 5, 6, raw data drawer)
+- [x] Fixed timeline in VAT Progress and Monthly Progress panels

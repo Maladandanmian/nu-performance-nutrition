@@ -317,14 +317,14 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Reverse to show oldest to newest
-  const scans = [...data].reverse();
+  // Data already comes from DB ordered oldest to newest
+  const scans = data;
   
-  // Extract fat mass and lean mass
+  // Extract fat mass and lean mass (convert grams to kg)
   const chartData = scans.map(scan => ({
     date: new Date(scan.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-    fatMass: parseFloat(scan.totalFatMass || "0"),
-    leanMass: parseFloat(scan.totalLeanMass || "0"),
+    fatMass: parseFloat(scan.totalFatMass || "0") / 1000, // Convert grams to kg
+    leanMass: parseFloat(scan.totalLeanMass || "0") / 1000, // Convert grams to kg
   }));
   
   // Find max total for scaling
@@ -465,8 +465,8 @@ function VATProgressBar({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Get first and latest scans
-  const scans = [...data].reverse(); // oldest to newest
+  // Get first and latest scans (data already ordered oldest to newest)
+  const scans = data;
   const firstScan = scans[0];
   const latestScan = scans[scans.length - 1];
   
@@ -758,8 +758,8 @@ function MetabolicHealthScore({ data }: { data: any }) {
 
   const vatArea = parseFloat(data.vatArea || "0");
   const bodyFatPercent = parseFloat(data.totalBodyFatPercent || "0");
-  const leanMass = parseFloat(data.totalLeanMass || "0");
-  const fatMass = parseFloat(data.totalFatMass || "0");
+  const leanMass = parseFloat(data.totalLeanMass || "0") / 1000; // Convert grams to kg
+  const fatMass = parseFloat(data.totalFatMass || "0") / 1000; // Convert grams to kg
   const leanToFatRatio = fatMass > 0 ? leanMass / fatMass : 0;
   
   // Calculate score (0-100)
@@ -908,8 +908,8 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Reverse to show oldest to newest
-  const scans = [...bodyComp].reverse();
+  // Data already ordered oldest to newest from DB
+  const scans = bodyComp;
   
   // Calculate month-over-month changes
   const timeline = scans.map((scan, idx) => {
@@ -921,8 +921,8 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
       vatChange: prevScan ? parseFloat(scan.vatArea || "0") - parseFloat(prevScan.vatArea || "0") : 0,
       bodyFat: parseFloat(scan.totalBodyFatPercent || "0"),
       bodyFatChange: prevScan ? parseFloat(scan.totalBodyFatPercent || "0") - parseFloat(prevScan.totalBodyFatPercent || "0") : 0,
-      leanMass: parseFloat(scan.totalLeanMass || "0"),
-      leanMassChange: prevScan ? parseFloat(scan.totalLeanMass || "0") - parseFloat(prevScan.totalLeanMass || "0") : 0,
+      leanMass: parseFloat(scan.totalLeanMass || "0") / 1000, // Convert grams to kg
+      leanMassChange: prevScan ? (parseFloat(scan.totalLeanMass || "0") - parseFloat(prevScan.totalLeanMass || "0")) / 1000 : 0, // Convert grams to kg
       isFirst: idx === 0,
     };
   });
@@ -1126,11 +1126,11 @@ function ScanDataSection({ scanId, scanDate }: { scanId: number; scanDate: Date 
               <div className="bg-gray-50 p-3 rounded text-sm space-y-1">
                 <div className="flex justify-between">
                   <span>Total Fat Mass:</span>
-                  <span className="font-medium">{scanDetails.bodyComp.totalFatMass} kg</span>
+                  <span className="font-medium">{(parseFloat(String(scanDetails.bodyComp.totalFatMass || 0)) / 1000).toFixed(1)} kg</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total Lean Mass:</span>
-                  <span className="font-medium">{scanDetails.bodyComp.totalLeanMass} kg</span>
+                  <span className="font-medium">{(parseFloat(String(scanDetails.bodyComp.totalLeanMass || 0)) / 1000).toFixed(1)} kg</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Body Fat %:</span>
