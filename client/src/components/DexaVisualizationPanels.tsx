@@ -101,6 +101,55 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
 
   return (
     <div className="relative">
+      {/* Navigation Controls at Top */}
+      <div className="mb-4">
+        {/* Navigation Dots */}
+        <div className="flex justify-center gap-2 mb-4">
+          {panels.map((panel) => (
+            <button
+              key={panel.id}
+              onClick={() => setCurrentPanel(panel.id)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                currentPanel === panel.id ? "bg-blue-600 w-8" : "bg-gray-300"
+              }`}
+              aria-label={`Go to ${panel.title}`}
+            />
+          ))}
+        </div>
+
+        {/* Navigation Arrows */}
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPanel((prev) => Math.max(0, prev - 1))}
+            disabled={currentPanel === 0}
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Previous
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDataDrawer(true)}
+          >
+            <Database className="w-4 h-4 mr-1" />
+            View Data
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPanel((prev) => Math.min(5, prev + 1))}
+            disabled={currentPanel === 5}
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+
       {/* Panel Container */}
       <div
         className="overflow-hidden"
@@ -121,52 +170,6 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Navigation Dots */}
-      <div className="flex justify-center gap-2 mt-6">
-        {panels.map((panel) => (
-          <button
-            key={panel.id}
-            onClick={() => setCurrentPanel(panel.id)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              currentPanel === panel.id ? "bg-blue-600 w-8" : "bg-gray-300"
-            }`}
-            aria-label={`Go to ${panel.title}`}
-          />
-        ))}
-      </div>
-
-      {/* Navigation Arrows */}
-      <div className="flex justify-between items-center mt-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPanel((prev) => Math.max(0, prev - 1))}
-          disabled={currentPanel === 0}
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Previous
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowDataDrawer(true)}
-        >
-          <Database className="w-4 h-4 mr-1" />
-          View Data
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPanel((prev) => Math.min(5, prev + 1))}
-          disabled={currentPanel === 5}
-        >
-          Next
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
       </div>
 
       {/* Raw Data Drawer */}

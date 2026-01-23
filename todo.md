@@ -1179,3 +1179,12 @@
 - [x] Fix the procedure to return properly formatted JSON (flattened structure)
 - [ ] Test DEXA visualization panels with real client data
 - [ ] Verify all 6 panels load without errors
+
+
+## DEXA Visualization Navigation Controls Missing (Jan 23, 2026)
+- [x] Add left/right arrow buttons to navigate between panels
+- [x] Add dot indicators showing current panel (1 of 6)
+- [x] Move navigation controls to top of component for visibility
+- [x] Ensure arrows are visible and clickable on both desktop and mobile
+- [ ] Test keyboard navigation (left/right arrow keys) - ready for user testing
+- [ ] Test touch swipe gestures on mobile - ready for user testing
