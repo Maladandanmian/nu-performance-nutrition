@@ -1331,3 +1331,11 @@
 - [x] Verify VAT thresholds are appropriate for scoring (updated: Optimal <50, Good 50-75, Moderate 75-100, Elevated 100-150, High Risk >150)
 - [x] Update body fat thresholds (Optimal <15%, Good 15-20%, Moderate 20-25%, Elevated 25-30%, High >30%)
 - [x] Test with actual client data (VAT=87.5, body fat=21.6%) - Score now shows 80 "Good" instead of 100 "Optimal"
+
+
+## Review VAT Thresholds Across All Visualization Panels (Jan 23, 2026)
+- [x] Search for all VAT threshold usage in DexaVisualizationPanels.tsx
+- [x] Check Visceral Fat Status panel circular gauge thresholds (updated to 5-tier system)
+- [x] Update reference text to show all 5 zones
+- [x] Update VAT target calculation to aim for next better zone based on starting value
+- [x] Ensure all panels use consistent thresholds: Optimal <50, Good 50-75, Moderate 75-100, Elevated 100-150, High Risk >150

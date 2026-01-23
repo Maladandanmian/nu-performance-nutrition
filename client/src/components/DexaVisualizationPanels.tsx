@@ -201,7 +201,7 @@ function VisceralFatGauge({ data }: { data: any[] }) {
   let zone = "healthy";
   let zoneColor = "text-green-600";
   let zoneBg = "bg-green-100";
-  let zoneLabel = "Healthy";
+  let zoneLabel = "Optimal";
   
   if (vatArea > 150) {
     zone = "high";
@@ -210,9 +210,19 @@ function VisceralFatGauge({ data }: { data: any[] }) {
     zoneLabel = "High Risk";
   } else if (vatArea > 100) {
     zone = "elevated";
+    zoneColor = "text-orange-600";
+    zoneBg = "bg-orange-100";
+    zoneLabel = "Elevated";
+  } else if (vatArea > 75) {
+    zone = "moderate";
     zoneColor = "text-yellow-600";
     zoneBg = "bg-yellow-100";
-    zoneLabel = "Elevated";
+    zoneLabel = "Moderate";
+  } else if (vatArea > 50) {
+    zone = "good";
+    zoneColor = "text-blue-600";
+    zoneBg = "bg-blue-100";
+    zoneLabel = "Good";
   }
   
   // Calculate gauge percentage (0-200 cm² scale)
@@ -332,7 +342,7 @@ function VisceralFatGauge({ data }: { data: any[] }) {
       {/* Reference Info */}
       <div className="mt-6 text-sm text-gray-500 text-center max-w-md">
         <p className="font-medium mb-1">Visceral Adipose Tissue (VAT)</p>
-        <p>Healthy: &lt;100 cm² • Elevated: 100-150 cm² • High Risk: &gt;150 cm²</p>
+        <p>Optimal: &lt;50 • Good: 50-75 • Moderate: 75-100 • Elevated: 100-150 • High Risk: &gt;150 cm²</p>
       </div>
     </div>
   );
@@ -500,8 +510,24 @@ function VATProgressBar({ data }: { data: any[] }) {
   const startVAT = parseFloat(firstScan.vatArea || "0");
   const currentVAT = parseFloat(latestScan.vatArea || "0");
   
-  // Set target based on starting value (aim for healthy range < 100 cm²)
-  const targetVAT = startVAT > 100 ? 90 : Math.max(startVAT * 0.8, 50);
+  // Set target based on starting value (aim for next better zone)
+  // High Risk (>150) → target 90 (Moderate)
+  // Elevated (100-150) → target 70 (Good)
+  // Moderate (75-100) → target 60 (Good)
+  // Good (50-75) → target 45 (Optimal)
+  // Optimal (<50) → maintain or reduce 20%
+  let targetVAT;
+  if (startVAT > 150) {
+    targetVAT = 90; // Aim for Moderate zone
+  } else if (startVAT > 100) {
+    targetVAT = 70; // Aim for Good zone
+  } else if (startVAT > 75) {
+    targetVAT = 60; // Aim for Good zone
+  } else if (startVAT > 50) {
+    targetVAT = 45; // Aim for Optimal zone
+  } else {
+    targetVAT = Math.max(startVAT * 0.8, 30); // Maintain or reduce 20%
+  }
   
   // Calculate progress
   const totalReduction = startVAT - targetVAT;
