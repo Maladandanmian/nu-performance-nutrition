@@ -98,6 +98,8 @@ export const meals = mysqlTable("meals", {
   beverageCategory: varchar("beverageCategory", { length: 50 }), // Category for scoring (energy_drink, soda, juice_vegetable, etc.)
   // Itemized food components (JSON array)
   components: json("components"),
+  // Source of meal entry
+  source: mysqlEnum("source", ["meal_photo", "nutrition_label"]).default("meal_photo").notNull(),
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

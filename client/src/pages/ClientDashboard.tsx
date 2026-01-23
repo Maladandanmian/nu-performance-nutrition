@@ -94,6 +94,7 @@ export default function ClientDashboard() {
   const [improvementAdvice, setImprovementAdvice] = useState<string>("");
   const [showAdvice, setShowAdvice] = useState(false);
   const [editingMealId, setEditingMealId] = useState<number | null>(null);
+  const [mealSource, setMealSource] = useState<"meal_photo" | "nutrition_label">("meal_photo");
   
   // NEW FLOW: State for item identification and editing
   const [identifiedItems, setIdentifiedItems] = useState<string[]>([]);
@@ -222,24 +223,18 @@ export default function ClientDashboard() {
   const analyzeNutritionLabelMealMutation = trpc.meals.analyzeNutritionLabelMeal.useMutation({
     onSuccess: (data) => {
       setShowNutritionEditor(false);
+      setMealSource("nutrition_label"); // Mark this as a nutrition label meal
       setAnalysisResult({
         ...data.mealAnalysis,
         score: data.finalScore,
-        combinedNutrition: data.combinedNutrition,
-        drinkNutrition: data.drinkNutrition,
       });
       
-      // Preserve beverage data if drink was included
-      if (data.drinkNutrition && drinkType && volumeMl) {
+      // Set beverage nutrition if present
+      if (data.drinkNutrition) {
         setBeverageNutrition({
-          drinkType,
-          volumeMl: parseInt(volumeMl),
-          calories: data.drinkNutrition.calories,
-          protein: data.drinkNutrition.protein,
-          fat: data.drinkNutrition.fat,
-          carbs: data.drinkNutrition.carbs,
-          fibre: data.drinkNutrition.fibre,
-          category: 'beverage', // Default category
+          drinkType: drinkType,
+          volumeMl: parseFloat(volumeMl),
+          ...data.drinkNutrition,
         });
       } else {
         setBeverageNutrition(null);
@@ -345,6 +340,7 @@ export default function ClientDashboard() {
       setImageKey("");
       setDrinkType("");
       setVolumeMl("");
+      setMealSource("meal_photo"); // Reset to default
       setBeverageNutrition(null);
       // Invalidate queries to refresh meal history and daily totals
       utils.meals.list.invalidate();
@@ -2226,6 +2222,7 @@ export default function ClientDashboard() {
                     beverageFibre: beverageNutrition?.fibre,
                     beverageCategory: beverageNutrition?.category,
                     components: analysisResult?.components,
+                    source: mealSource, // Pass the meal source (meal_photo or nutrition_label)
                   });
                 }
                 setEditingMealId(null);

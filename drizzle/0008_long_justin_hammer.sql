@@ -1,0 +1,1 @@
+ALTER TABLE `meals` ADD `source` enum('meal_photo','nutrition_label') DEFAULT 'meal_photo' NOT NULL;

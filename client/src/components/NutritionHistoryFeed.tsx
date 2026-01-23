@@ -292,7 +292,10 @@ function MealEntry({
           <div className="flex items-center gap-2">
             <Utensils className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <div>
-              <div className="font-medium capitalize">{meal.mealType}</div>
+              <div className="font-medium capitalize flex items-center gap-1.5">
+                {meal.mealType}
+                {meal.source === 'nutrition_label' && <span className="text-sm" title="Nutrition label scan">🏷️</span>}
+              </div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {new Date(meal.loggedAt).toLocaleTimeString('en-US', { 

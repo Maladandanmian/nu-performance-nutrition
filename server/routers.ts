@@ -373,6 +373,8 @@ export const appRouter = router({
           carbs: z.number(),
           fibre: z.number(),
         })).optional(),
+        // Source of meal entry
+        source: z.enum(["meal_photo", "nutrition_label"]).optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -450,6 +452,8 @@ export const appRouter = router({
             beverageCategory: input.beverageCategory,
             // Itemized food components
             components: input.components,
+            // Source of meal entry
+            source: input.source || "meal_photo",
             loggedAt: new Date(),
           });
 

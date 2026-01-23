@@ -964,3 +964,19 @@
 - [x] Added "Edit" button next to Date & Time label
 - [x] Clicking field or Edit button enables editing and opens picker
 - [ ] Test editing meals without automatic calendar popup interruption
+
+## Add Nutrition Label Badge in Meal History (Jan 23, 2026)
+- [x] Add `source` field to meals table schema ('meal_photo' | 'nutrition_label')
+- [x] Push database schema changes with pnpm db:push
+- [x] Add source parameter to saveMeal input schema (optional, defaults to 'meal_photo')
+- [x] Update backend to use input.source in createMeal call
+- [x] Update frontend to pass source='nutrition_label' when saving nutrition label meals
+- [x] Add mealSource state variable to track meal type
+- [x] Set mealSource to 'nutrition_label' after nutrition label analysis
+- [x] Pass mealSource in saveMealMutation call
+- [x] Reset mealSource to 'meal_photo' after successful save
+- [x] Display 🏷️ badge in MealHistoryFeed for nutrition label meals
+- [x] Display 🏷️ badge in NutritionHistoryFeed for nutrition label meals
+- [x] Test both meal types display correct badges
+- [x] Write vitest tests for nutrition label badge feature
+- [x] All tests passing for source field tracking
