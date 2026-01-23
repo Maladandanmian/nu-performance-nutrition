@@ -1289,3 +1289,20 @@
 - [x] Change "cm² Reduced" card to red background when achievedReduction is negative
 - [x] Change "cm² Reduced" text to red when regression occurs
 - [x] Keep green styling when achievedReduction is positive
+
+
+## Bone Density Heatmap Color Coding Fix (Jan 23, 2026)
+- [x] Debug why T-score colors are not showing on body diagram
+- [x] Fix region name mapping (L1-L4 → L Spine, Femoral Neck/Total Hip → Pelvis, Total Body → Total)
+- [x] Update SVG regions to use correct database region names
+- [x] Update region cards to display correct data
+
+
+## Bone Density Heatmap T-Score Coloring Fix (Jan 23, 2026)
+- [x] Debug why T-score colors were not showing on body diagram
+- [x] Fixed data filtering to use scanId instead of scanDate (date comparison issue)
+- [x] Fixed region name mapping (L1-L4 → L Spine, Femoral Neck/Total Hip → Pelvis, Total Body → Total)
+- [x] Updated SVG regions to use correct database region names
+- [x] Updated region cards to display correct data
+- [x] Removed debug console logs
+- [x] Bone density heatmap now shows green/yellow/red colors based on T-scores

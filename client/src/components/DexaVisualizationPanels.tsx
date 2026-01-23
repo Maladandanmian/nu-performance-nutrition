@@ -650,13 +650,14 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No BMD data available</div>;
   }
 
-  // Get latest scan BMD data by region
-  const latestData = data.filter(d => d.scanDate === data[0].scanDate);
+  // Get latest scan BMD data by region (filter by scanId to get all regions from same scan)
+  const latestScanId = data[0].scanId;
+  const latestData = data.filter(d => d.scanId === latestScanId);
   
   // Group by region
   const regions: Record<string, any> = {};
   latestData.forEach(item => {
-    if (item.region && item.tScore) {
+    if (item.region && item.tScore !== null && item.tScore !== undefined) {
       regions[item.region] = {
         bmd: parseFloat(item.bmd || "0"),
         tScore: parseFloat(item.tScore || "0"),
@@ -664,6 +665,12 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
       };
     }
   });
+  
+  // Map database region names to display keys
+  const getRegionData = (dbName: string) => regions[dbName];
+  const lSpineData = getRegionData('L Spine');
+  const pelvisData = getRegionData('Pelvis');
+  const totalData = getRegionData('Total');
   
   // Determine color based on T-score
   const getColor = (tScore: number) => {
@@ -674,10 +681,9 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
   
   // Key regions to display
   const keyRegions = [
-    { key: 'L1-L4', label: 'Lumbar Spine', icon: '🦴' },
-    { key: 'Femoral Neck', label: 'Femoral Neck', icon: '🦵' },
-    { key: 'Total Hip', label: 'Total Hip', icon: '🦵' },
-    { key: 'Total Body', label: 'Total Body', icon: '🧑' },
+    { key: 'L Spine', label: 'Lumbar Spine', icon: '🦴' },
+    { key: 'Pelvis', label: 'Pelvis/Hips', icon: '🦵' },
+    { key: 'Total', label: 'Total Body', icon: '🧑' },
   ];
   
   return (
@@ -715,17 +721,17 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
             strokeWidth="2"
           />
           
-          {/* Lumbar Spine (L1-L4) - Color-coded */}
+          {/* Lumbar Spine (L Spine) - Color-coded */}
           <g className="cursor-pointer group">
             <title>
-              {regions['L1-L4'] ? `Lumbar Spine (L1-L4)\nT-Score: ${regions['L1-L4'].tScore.toFixed(2)}\nBMD: ${regions['L1-L4'].bmd.toFixed(3)} g/cm²` : 'Lumbar Spine - No data'}
+              {lSpineData ? `Lumbar Spine\nT-Score: ${lSpineData.tScore.toFixed(2)}\nBMD: ${lSpineData.bmd.toFixed(3)} g/cm²` : 'Lumbar Spine - No data'}
             </title>
             <rect
               x="125"
               y="140"
               width="30"
               height="70"
-              fill={regions['L1-L4'] ? getColor(regions['L1-L4'].tScore).bg : '#d1d5db'}
+              fill={lSpineData ? getColor(lSpineData.tScore).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               rx="6"
@@ -738,16 +744,16 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
           {/* Pelvis */}
           <ellipse cx="140" cy="260" rx="55" ry="28" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
           
-          {/* Left Hip - Color-coded */}
+          {/* Left Hip (Pelvis) - Color-coded */}
           <g className="cursor-pointer group">
             <title>
-              {regions['Total Hip'] || regions['Femoral Neck'] ? `Hip\nT-Score: ${(regions['Total Hip'] || regions['Femoral Neck']).tScore.toFixed(2)}\nBMD: ${(regions['Total Hip'] || regions['Femoral Neck']).bmd.toFixed(3)} g/cm²` : 'Hip - No data'}
+              {pelvisData ? `Pelvis\nT-Score: ${pelvisData.tScore.toFixed(2)}\nBMD: ${pelvisData.bmd.toFixed(3)} g/cm²` : 'Pelvis - No data'}
             </title>
             <circle
               cx="110"
               cy="270"
               r="24"
-              fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#d1d5db'}
+              fill={pelvisData ? getColor(pelvisData.tScore).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               opacity="0.9"
@@ -756,16 +762,16 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
             <text x="110" y="275" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">HIP</text>
           </g>
           
-          {/* Right Hip - Color-coded */}
+          {/* Right Hip (Pelvis) - Color-coded */}
           <g className="cursor-pointer group">
             <title>
-              {regions['Total Hip'] || regions['Femoral Neck'] ? `Hip\nT-Score: ${(regions['Total Hip'] || regions['Femoral Neck']).tScore.toFixed(2)}\nBMD: ${(regions['Total Hip'] || regions['Femoral Neck']).bmd.toFixed(3)} g/cm²` : 'Hip - No data'}
+              {pelvisData ? `Pelvis\nT-Score: ${pelvisData.tScore.toFixed(2)}\nBMD: ${pelvisData.bmd.toFixed(3)} g/cm²` : 'Pelvis - No data'}
             </title>
             <circle
               cx="170"
               cy="270"
               r="24"
-              fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#d1d5db'}
+              fill={pelvisData ? getColor(pelvisData.tScore).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               opacity="0.9"
