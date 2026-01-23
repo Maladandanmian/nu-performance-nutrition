@@ -1266,3 +1266,12 @@
 - [x] Add white vertical line indicator at current position on progress bar
 - [x] Change "Target" label color to white to match "Start" label
 - [x] Remove conditional "Current" text that only appeared when progress > 50%
+
+
+## VAT Progress Bar Regression Visualization (Jan 23, 2026)
+- [x] Calculate current position as percentage along start→target range
+- [x] Show red bar extending from left when client has regressed (current > start)
+- [x] Show blue bar for progress portion (start → target)
+- [x] Add white vertical line at current position
+- [x] Color current value text red when regression occurs (current > start)
+- [x] Color current value text blue when progress occurs (current < start)

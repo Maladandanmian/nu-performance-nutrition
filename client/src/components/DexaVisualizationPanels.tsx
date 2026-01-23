@@ -509,6 +509,15 @@ function VATProgressBar({ data }: { data: any[] }) {
   const progressPercent = Math.min((achievedReduction / totalReduction) * 100, 100);
   const remainingReduction = Math.max(currentVAT - targetVAT, 0);
   
+  // Calculate current position on the bar (0% = start, 100% = target)
+  const totalRange = startVAT - targetVAT;
+  const currentPosition = ((startVAT - currentVAT) / totalRange) * 100;
+  
+  // Check if regression occurred (current > start)
+  const hasRegressed = currentVAT > startVAT;
+  const regressionAmount = hasRegressed ? currentVAT - startVAT : 0;
+  const regressionPercent = hasRegressed ? (regressionAmount / totalRange) * 100 : 0;
+  
   // Monthly rate (if more than one scan)
   const monthsElapsed = scans.length > 1 ? scans.length - 1 : 1;
   const monthlyRate = achievedReduction / monthsElapsed;
@@ -535,16 +544,27 @@ function VATProgressBar({ data }: { data: any[] }) {
       <div className="relative mb-8">
         {/* Bar container */}
         <div className="h-12 bg-gray-200 rounded-full overflow-hidden relative">
-          {/* Progress fill */}
+          {/* Regression bar (red) - shows when current > start */}
+          {hasRegressed && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500"
+              style={{ width: `${Math.abs(regressionPercent)}%` }}
+            />
+          )}
+          
+          {/* Progress fill (blue) - starts after regression if any */}
           <div
-            className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
+            className="absolute top-0 h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
+            style={{ 
+              left: hasRegressed ? `${Math.abs(regressionPercent)}%` : '0%',
+              width: `${Math.max(progressPercent, 0)}%` 
+            }}
           />
           
           {/* Current position indicator - white vertical line */}
           <div
-            className="absolute top-0 bottom-0 w-1 bg-white shadow-lg transition-all duration-500"
-            style={{ left: `${progressPercent}%` }}
+            className="absolute top-0 bottom-0 w-1 bg-white shadow-lg transition-all duration-500 z-10"
+            style={{ left: `${currentPosition}%` }}
           />
           
           {/* Milestone markers */}
@@ -561,7 +581,9 @@ function VATProgressBar({ data }: { data: any[] }) {
             <div className="text-gray-500 text-xs">Starting</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold text-blue-600">{currentVAT.toFixed(1)} cm²</div>
+            <div className={`font-semibold ${hasRegressed ? 'text-red-600' : 'text-blue-600'}`}>
+              {currentVAT.toFixed(1)} cm²
+            </div>
             <div className="text-gray-500 text-xs">Current</div>
           </div>
           <div className="text-right">
