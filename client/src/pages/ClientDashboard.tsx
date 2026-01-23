@@ -1932,13 +1932,13 @@ export default function ClientDashboard() {
               </div>
             )}
 
-            {/* Meal Type Selector - hide for drink-only */}
+            {/* Meal Type Selector with Date/Time - hide for drink-only */}
             {!analysisResult?.isDrink && (
-              <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <Label htmlFor="edit-meal-type">Meal Type</Label>
+                  <Label htmlFor="edit-meal-type" className="text-xs">Meal Type</Label>
                   <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
-                    <SelectTrigger id="edit-meal-type">
+                    <SelectTrigger id="edit-meal-type" className="h-9 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1949,119 +1949,36 @@ export default function ClientDashboard() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label htmlFor="meal-date" className="text-xs">Date</Label>
-                    <Input
-                      id="meal-date"
-                      type="date"
-                      value={mealDateTime.split('T')[0]}
-                      onChange={(e) => {
-                        const time = mealDateTime.split('T')[1] || '00:00';
-                        setMealDateTime(`${e.target.value}T${time}`);
-                      }}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="meal-time" className="text-xs">Time</Label>
-                    <Input
-                      id="meal-time"
-                      type="time"
-                      value={mealDateTime.split('T')[1] || '00:00'}
-                      onChange={(e) => {
-                        const date = mealDateTime.split('T')[0];
-                        setMealDateTime(`${date}T${e.target.value}`);
-                      }}
-                      className="text-sm"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="meal-date" className="text-xs">Date</Label>
+                  <Input
+                    id="meal-date"
+                    type="date"
+                    value={mealDateTime.split('T')[0]}
+                    onChange={(e) => {
+                      const time = mealDateTime.split('T')[1] || '00:00';
+                      setMealDateTime(`${e.target.value}T${time}`);
+                    }}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="meal-time" className="text-xs">Time</Label>
+                  <Input
+                    id="meal-time"
+                    type="time"
+                    value={mealDateTime.split('T')[1] || '00:00'}
+                    onChange={(e) => {
+                      const date = mealDateTime.split('T')[0];
+                      setMealDateTime(`${date}T${e.target.value}`);
+                    }}
+                    className="h-9 text-sm"
+                  />
                 </div>
               </div>
             )}
 
-            {/* Beverage Section - hide for drink-only */}
-            {!analysisResult?.isDrink && (
-              <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="font-semibold text-sm" style={{color: '#578DB3'}}>Beverage (Optional)</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="edit-drink-type" className="text-xs">Drink Type</Label>
-                  <Input
-                    id="edit-drink-type"
-                    placeholder="e.g., Water, Tea"
-                    value={drinkType}
-                    onChange={(e) => setDrinkType(e.target.value)}
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit-volume" className="text-xs">Volume (ml)</Label>
-                  <Input
-                    id="edit-volume"
-                    type="number"
-                    placeholder="e.g., 350"
-                    value={volumeMl}
-                    onChange={(e) => setVolumeMl(e.target.value)}
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-              {drinkType && volumeMl && !analysisResult?.isDrink && (
-                <>
-                  {/* Special handling for plain water - auto-estimate */}
-                  {drinkType.toLowerCase().trim() === 'water' ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // Auto-set water nutrition values
-                        setBeverageNutrition({
-                          drinkType: 'Water',
-                          volumeMl: parseInt(volumeMl),
-                          calories: 0,
-                          protein: 0,
-                          fat: 0,
-                          carbs: 0,
-                          fibre: 0,
-                          confidence: 100,
-                          description: 'Plain water has no calories or nutrients'
-                        });
-                      }}
-                      className="w-full text-xs"
-                    >
-                      {beverageNutrition ? '✓ Water Logged' : 'Log Water'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        estimateBeverageMutation.mutate({
-                          drinkType,
-                          volumeMl: parseInt(volumeMl),
-                        });
-                      }}
-                      disabled={estimateBeverageMutation.isPending}
-                      className="w-full text-xs"
-                    >
-                      {estimateBeverageMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
-                          Estimating...
-                        </>
-                      ) : (
-                        beverageNutrition ? '✓ Beverage Estimated' : 'Estimate Beverage Nutrition'
-                      )}
-                    </Button>
-                  )}
-                </>
-              )}
-              {drinkType && volumeMl && analysisResult?.isDrink && (
-                <div className="text-xs text-green-600 font-medium text-center py-2">✓ Beverage Estimated</div>
-              )}
-            </div>
-            )}
+
 
             {/* Nutrition Score */}
             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200">
@@ -2078,204 +1995,7 @@ export default function ClientDashboard() {
               </div>
             </div>
 
-            {/* Food Components Breakdown */}
-            {editedComponents.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-lg" style={{color: '#578DB3'}}>Food Components</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      if (isEditMode) {
-                        // Recalculate score when done editing
-                        await recalculateScoreMutation.mutateAsync({
-                          clientId: currentClientId,
-                          calories: calculatedTotals.calories,
-                          protein: calculatedTotals.protein,
-                          fat: calculatedTotals.fat,
-                          carbs: calculatedTotals.carbs,
-                          fibre: calculatedTotals.fibre,
-                        });
-                        // Clear old improvement advice since meal has changed
-                        setShowAdvice(false);
-                        setImprovementAdvice("");
-                      }
-                      setIsEditMode(!isEditMode);
-                    }}
-                    className="text-xs"
-                    disabled={recalculateScoreMutation.isPending}
-                  >
-                    {recalculateScoreMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
-                        Updating...
-                      </>
-                    ) : (
-                      isEditMode ? 'Done Editing' : 'Edit Meal'
-                    )}
-                  </Button>
-                </div>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {editedComponents.map((component: any, index: number) => (
-                    <ComponentEditor
-                      key={index}
-                      component={component}
-                      index={index}
-                      isEditMode={isEditMode}
-                      imageUrl={imageUrl}
-                      onUpdate={(updated) => {
-                        const newComponents = [...editedComponents];
-                        newComponents[index] = updated;
-                        setEditedComponents(newComponents);
-                      }}
-                      onDelete={() => {
-                        setEditedComponents(editedComponents.filter((_, i) => i !== index));
-                      }}
-                    />
-                  ))}
-                </div>
-                {isEditMode && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAddComponent(true)}
-                    className="w-full"
-                  >
-                    + Add Component
-                  </Button>
-                )}
-              </div>
-            )}
 
-            {/* Validation Warnings */}
-            {analysisResult?.validationWarnings && analysisResult.validationWarnings.length > 0 && (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="font-semibold text-sm text-yellow-800 mb-1">⚠️ Validation Notes</div>
-                <ul className="text-xs text-yellow-700 space-y-1">
-                  {analysisResult.validationWarnings.map((warning: string, index: number) => (
-                    <li key={index}>• {warning}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Nutritional Breakdown */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg" style={{color: '#578DB3'}}>Total Nutrition</h3>
-              
-              {/* Calories */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="text-xl">🔥</span>
-                    Calories
-                  </span>
-                  <span className="text-lg font-bold">{calculatedTotals.calories} kcal</span>
-                </div>
-                <Progress value={Math.min(calculatedTotals.calories / 10, 100)} className="h-2" />
-              </div>
-
-              {/* Protein */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="text-xl">💪</span>
-                    Protein
-                  </span>
-                  <span className="text-lg font-bold">{calculatedTotals.protein}g</span>
-                </div>
-                <Progress value={Math.min(calculatedTotals.protein * 2, 100)} className="h-2" />
-              </div>
-
-              {/* Fats */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="text-xl">🥑</span>
-                    Fats
-                  </span>
-                  <span className="text-lg font-bold">{calculatedTotals.fat}g</span>
-                </div>
-                <Progress value={Math.min(calculatedTotals.fat * 2, 100)} className="h-2" />
-              </div>
-
-              {/* Carbs */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="text-xl">🍞</span>
-                    Carbohydrates
-                  </span>
-                  <span className="text-lg font-bold">{calculatedTotals.carbs}g</span>
-                </div>
-                <Progress value={Math.min(calculatedTotals.carbs * 1.5, 100)} className="h-2" />
-              </div>
-
-              {/* Fiber */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="text-xl">🌾</span>
-                    Fiber
-                  </span>
-                  <span className="text-lg font-bold">{calculatedTotals.fibre}g</span>
-                </div>
-                <Progress value={Math.min(calculatedTotals.fibre * 4, 100)} className="h-2" />
-              </div>
-            </div>
-
-            {/* AI Confidence */}
-            <div className="text-center text-sm text-gray-600 pt-4 border-t">
-              AI Confidence: {analysisResult?.confidence}%
-            </div>
-
-            {/* Improvement Advice Section */}
-            {!showAdvice ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  getAdviceMutation.mutate({
-                    clientId: currentClientId,
-                    mealDescription: analysisResult?.description || '',
-                    components: editedComponents,
-                    calories: calculatedTotals.calories,
-                    protein: calculatedTotals.protein,
-                    fat: calculatedTotals.fat,
-                    carbs: calculatedTotals.carbs,
-                    fibre: calculatedTotals.fibre,
-                  });
-                }}
-                className="w-full"
-                disabled={getAdviceMutation.isPending}
-              >
-                {getAdviceMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                    Generating Advice...
-                  </>
-                ) : (
-                  '💡 Improve My Score'
-                )}
-              </Button>
-            ) : (
-              <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-blue-900">💡 Personalized Advice</h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAdvice(false)}
-                    className="h-6 w-6 p-0"
-                  >
-                    ✕
-                  </Button>
-                </div>
-                <div className="text-sm text-blue-900 whitespace-pre-wrap">
-                  {improvementAdvice}
-                </div>
-              </div>
-            )}
 
             <Button 
               onClick={() => {
