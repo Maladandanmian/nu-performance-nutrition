@@ -275,14 +275,22 @@ function MealEntry({
 }) {
   return (
     <div className="flex gap-4">
-      {/* Meal Image */}
-      {meal.imageUrl && (
+      {/* Meal Image or Icon */}
+      {meal.source === 'nutrition_label' ? (
+        <div className="flex-shrink-0 w-20 h-20 bg-amber-100 rounded-md flex items-center justify-center">
+          <span className="text-4xl" title="Nutrition label scan">🏷️</span>
+        </div>
+      ) : meal.imageUrl ? (
         <div className="flex-shrink-0">
           <img
             src={meal.imageUrl}
             alt="Meal"
             className="w-20 h-20 object-cover rounded-md"
           />
+        </div>
+      ) : (
+        <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-md flex items-center justify-center">
+          <Utensils className="h-8 w-8 text-gray-400" />
         </div>
       )}
       
@@ -292,9 +300,8 @@ function MealEntry({
           <div className="flex items-center gap-2">
             <Utensils className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <div>
-              <div className="font-medium capitalize flex items-center gap-1.5">
+              <div className="font-medium capitalize">
                 {meal.mealType}
-                {meal.source === 'nutrition_label' && <span className="text-sm" title="Nutrition label scan">🏷️</span>}
               </div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />

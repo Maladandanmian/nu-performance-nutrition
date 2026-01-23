@@ -980,3 +980,15 @@
 - [x] Test both meal types display correct badges
 - [x] Write vitest tests for nutrition label badge feature
 - [x] All tests passing for source field tracking
+
+## Move Nutrition Label Badge to Icon Box Position (Jan 23, 2026)
+- [x] Update MealHistoryFeed to show 🏷️ in icon box instead of next to meal type text
+- [x] Remove badge from meal type text in MealHistoryFeed
+- [x] Use amber background color for nutrition label icon box
+- [x] Update NutritionHistoryFeed to show 🏷️ in icon box for nutrition label entries
+- [x] For nutrition label meals: show 🏷️ instead of meal image or Utensils icon
+- [x] Remove badge from meal type text in NutritionHistoryFeed
+- [x] Add fallback icon box for meals without images (gray Utensils icon)
+- [x] Drinks don't need badge (no source field in drinks table)
+- [x] Keep existing icons for photo-analyzed entries
+- [ ] Test visual appearance in both client and trainer views

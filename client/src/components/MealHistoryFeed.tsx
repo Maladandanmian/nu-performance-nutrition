@@ -147,8 +147,12 @@ export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHist
           key={meal.id}
           className="flex gap-3 p-3 border rounded-lg hover:shadow-sm transition-shadow bg-white"
         >
-          {/* Meal Image */}
-          {meal.imageUrl ? (
+          {/* Meal Image or Icon */}
+          {meal.source === 'nutrition_label' ? (
+            <div className="flex-shrink-0 w-16 h-16 bg-amber-100 rounded flex items-center justify-center">
+              <span className="text-3xl" title="Nutrition label scan">🏷️</span>
+            </div>
+          ) : meal.imageUrl ? (
             <div className="flex-shrink-0">
               <img
                 src={meal.imageUrl}
@@ -166,9 +170,8 @@ export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHist
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div>
-                <h3 className="font-semibold text-lg capitalize flex items-center gap-1.5">
+                <h3 className="font-semibold text-lg capitalize">
                   {meal.mealType}
-                  {meal.source === 'nutrition_label' && <span className="text-base" title="Nutrition label scan">🏷️</span>}
                 </h3>
                 <p className="text-sm text-gray-600 line-clamp-2">
                   {meal.aiDescription}
