@@ -101,6 +101,11 @@ export default function ClientDashboard() {
   const [overallDescription, setOverallDescription] = useState("");
   const [beverageNutrition, setBeverageNutrition] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Nutrition label mode state
+  const [inputMode, setInputMode] = useState<"meal" | "label">("meal");
+  const [extractedNutrition, setExtractedNutrition] = useState<any>(null);
+  const [showNutritionEditor, setShowNutritionEditor] = useState(false);
 
   // Calculate totals from edited components + beverage
   const calculatedTotals = useMemo(() => {
@@ -493,12 +498,11 @@ export default function ClientDashboard() {
     const clientId = currentClientId;
 
     try {
-      // Convert file to base64 and send to server
-      // Server will handle HEIF/HEIC conversion
+      // Convert file to base64
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const base64Data = base64.split(',')[1]; // Remove data:image/...;base64, prefix
+        const base64Data = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
 
         // Step 2: Identify items in the image
         await identifyItemsMutation.mutateAsync({
@@ -506,13 +510,9 @@ export default function ClientDashboard() {
           imageBase64: base64Data,
         });
       };
-      reader.onerror = () => {
-        toast.error('Failed to read image file. Please try again.');
-      };
       reader.readAsDataURL(selectedFile);
     } catch (error) {
       console.error('Error uploading meal:', error);
-      toast.error('Failed to upload image. Please try again.');
     }
   };
 
@@ -756,9 +756,43 @@ export default function ClientDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Mode Toggle */}
+                <div className="flex items-center justify-center gap-2 p-1 bg-gray-100 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("meal");
+                      setExtractedNutrition(null);
+                      setShowNutritionEditor(false);
+                    }}
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                      inputMode === "meal"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    📸 Meal Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("label");
+                      setIdentifiedItems([]);
+                      setShowItemEditor(false);
+                    }}
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                      inputMode === "label"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    🏷️ Nutrition Label
+                  </button>
+                </div>
+
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="meal-image">Meal Photo</Label>
+                    <Label htmlFor="meal-image">{inputMode === "meal" ? "Meal Photo" : "Nutrition Label Photo"}</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -1127,12 +1161,11 @@ export default function ClientDashboard() {
 
             {/* Beverage Section */}
             <div className="border-t pt-4">
-              <Label className="mb-2 block">
+              <Label>
                 {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
               </Label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
-                  <Label htmlFor="drink-type" className="text-sm mb-1 block">Drink Type</Label>
                   <Input
                     id="drink-type"
                     placeholder="e.g., English breakfast tea with milk"
@@ -1141,11 +1174,11 @@ export default function ClientDashboard() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="volume" className="text-sm mb-1 block">Volume (ml)</Label>
+                  <Label htmlFor="volume">Volume (ml)</Label>
                   <Input
                     id="volume"
                     type="number"
-                    placeholder="e.g., 250"
+                    placeholder="250"
                     value={volumeMl}
                     onChange={(e) => setVolumeMl(e.target.value)}
                   />

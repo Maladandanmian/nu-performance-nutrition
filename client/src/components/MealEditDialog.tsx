@@ -259,7 +259,6 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
       fibre: calculatedTotals.fibre,
       aiDescription: analysisResult?.description || meal.aiDescription,
       aiConfidence: analysisResult?.confidence,
-      nutritionScore: analysisResult?.score || meal.nutritionScore,
       notes: mealNotes || undefined,
       loggedAt,
       beverageType: drinkType || undefined,
@@ -352,10 +351,9 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
 
           {/* Beverage Section */}
           <div className="border-t pt-4">
-            <Label className="mb-2 block">Accompanying Beverage (Optional)</Label>
-            <div className="grid grid-cols-2 gap-4">
+            <Label>Accompanying Beverage (Optional)</Label>
+            <div className="grid grid-cols-2 gap-4 mt-2">
               <div>
-                <Label className="text-sm mb-1 block">Drink Type</Label>
                 <Input
                   placeholder="e.g., Coffee with milk"
                   value={drinkType}
@@ -363,10 +361,9 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
                 />
               </div>
               <div>
-                <Label className="text-sm mb-1 block">Volume (ml)</Label>
                 <Input
                   type="number"
-                  placeholder="e.g., 250"
+                  placeholder="Volume (ml)"
                   value={volumeMl}
                   onChange={(e) => setVolumeMl(e.target.value)}
                 />

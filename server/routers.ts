@@ -7,7 +7,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { analyzeMealImage, calculateNutritionScore } from "./qwenVision";
-import sharp from 'sharp';
+import sharp from "sharp";
 import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvementAdvice";
 import { estimateBeverageNutrition } from "./beverageNutrition";
 import { reEstimateComponentNutrition } from "./componentReEstimation";
@@ -873,7 +873,6 @@ export const appRouter = router({
         fibre: z.number(),
         aiDescription: z.string(),
         aiConfidence: z.number().optional(),
-        nutritionScore: z.number().optional(),
         notes: z.string().optional(),
         loggedAt: z.date().optional(),
         beverageType: z.string().optional(),
@@ -952,9 +951,6 @@ export const appRouter = router({
             input.loggedAt // Use actual logged time
           );
 
-          // Use provided score from re-analysis if available, otherwise use calculated score
-          const finalScore = input.nutritionScore !== undefined ? input.nutritionScore : score;
-
           // Update meal in database
           await db.updateMeal(input.mealId, {
             imageUrl: input.imageUrl,
@@ -967,7 +963,7 @@ export const appRouter = router({
             fibre: input.fibre,
             aiDescription: input.aiDescription,
             aiConfidence: input.aiConfidence,
-            nutritionScore: finalScore,
+            nutritionScore: score,
             notes: input.notes,
             loggedAt: input.loggedAt,
             beverageType: input.beverageType,
@@ -982,7 +978,7 @@ export const appRouter = router({
 
           return {
             success: true,
-            score: finalScore,
+            score,
           };
         } catch (error) {
           console.error('Error in updateMeal:', error);
@@ -1001,8 +997,14 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Upload image to S3
-          const imageBuffer = Buffer.from(input.imageBase64, 'base64');
+          // 1. Upload image to S3 (convert HEIF to JPEG if needed)
+          const inputBuffer = Buffer.from(input.imageBase64, 'base64');
+          
+          // Convert to JPEG using sharp (handles HEIF, PNG, WebP, etc.)
+          const imageBuffer = await sharp(inputBuffer)
+            .jpeg({ quality: 90 })
+            .toBuffer();
+          
           const randomSuffix = Math.random().toString(36).substring(7);
           const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
           const { url: imageUrl } = await storagePut(imageKey, imageBuffer, "image/jpeg");
@@ -1023,6 +1025,219 @@ export const appRouter = router({
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : 'Failed to identify meal items',
+          });
+        }
+      }),
+
+    // Extract nutrition data from nutrition label image
+    extractNutritionLabel: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        imageBase64: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 1. Upload image to S3
+          const inputBuffer = Buffer.from(input.imageBase64, 'base64');
+          
+          const randomSuffix = Math.random().toString(36).substring(7);
+          const imageKey = `nutrition-labels/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
+          const { url: imageUrl } = await storagePut(imageKey, inputBuffer, "image/jpeg");
+
+          // 2. Extract nutrition data using AI
+          const { invokeLLM } = await import("./_core/llm");
+          const response = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: "You are a nutrition label reader. Extract nutrition information from the label image and return it in JSON format. Be precise with numbers."
+              },
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "image_url",
+                    image_url: { url: imageUrl }
+                  },
+                  {
+                    type: "text",
+                    text: "Extract the following from this nutrition label:\n1. Serving size (number and unit, e.g., '100' and 'g' or '1' and 'serving')\n2. Calories per serving\n3. Protein per serving (g)\n4. Carbohydrates per serving (g)\n5. Fat per serving (g)\n6. Fiber per serving (g, if available)\n\nReturn as JSON with keys: servingSize, servingUnit, calories, protein, carbs, fat, fiber"
+                  }
+                ]
+              }
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "nutrition_label",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    servingSize: { type: "number", description: "The serving size number" },
+                    servingUnit: { type: "string", description: "The unit of the serving size (g, ml, serving, oz, etc.)" },
+                    calories: { type: "number", description: "Calories per serving" },
+                    protein: { type: "number", description: "Protein in grams per serving" },
+                    carbs: { type: "number", description: "Carbohydrates in grams per serving" },
+                    fat: { type: "number", description: "Fat in grams per serving" },
+                    fiber: { type: "number", description: "Fiber in grams per serving, 0 if not available" },
+                  },
+                  required: ["servingSize", "servingUnit", "calories", "protein", "carbs", "fat", "fiber"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+
+          const content = response.choices[0].message.content;
+          const nutritionData = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
+
+          return {
+            success: true,
+            imageUrl,
+            imageKey,
+            ...nutritionData,
+          };
+        } catch (error) {
+          console.error('Error in extractNutritionLabel:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to extract nutrition label data',
+          });
+        }
+      }),
+
+    // Analyze nutrition label meal with optional beverage
+    analyzeNutritionLabelMeal: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        imageUrl: z.string(),
+        imageKey: z.string(),
+        mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+        // Extracted nutrition data (user can edit these)
+        servingSize: z.number(),
+        servingUnit: z.string(),
+        calories: z.number(),
+        protein: z.number(),
+        carbs: z.number(),
+        fat: z.number(),
+        fiber: z.number(),
+        // Amount consumed
+        amountConsumed: z.number(),
+        notes: z.string().optional(),
+        // Optional beverage data
+        drinkType: z.string().optional(),
+        volumeMl: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 1. Calculate adjusted nutrition based on amount consumed
+          const multiplier = input.amountConsumed / input.servingSize;
+          const adjustedNutrition = {
+            calories: Math.round(input.calories * multiplier),
+            protein: Math.round(input.protein * multiplier * 10) / 10,
+            fat: Math.round(input.fat * multiplier * 10) / 10,
+            carbs: Math.round(input.carbs * multiplier * 10) / 10,
+            fibre: Math.round(input.fiber * multiplier * 10) / 10,
+          };
+
+          // 2. If drink is provided, estimate its nutrition
+          let drinkNutrition = null;
+          if (input.drinkType && input.volumeMl) {
+            drinkNutrition = await estimateBeverageNutrition(input.drinkType, input.volumeMl);
+          }
+
+          // 3. Get client's nutrition goals
+          const goals = await db.getNutritionGoalByClientId(input.clientId);
+          if (!goals) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Nutrition goals not found for this client' 
+            });
+          }
+
+          // 4. Calculate today's totals (before this meal)
+          const allMeals = await db.getMealsByClientId(input.clientId);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const todaysMeals = allMeals.filter(meal => {
+            const mealDate = new Date(meal.loggedAt);
+            mealDate.setHours(0, 0, 0, 0);
+            return mealDate.getTime() === today.getTime();
+          });
+          
+          const todaysTotals = todaysMeals.reduce(
+            (totals, meal) => ({
+              calories: totals.calories + (meal.calories || 0) + (meal.beverageCalories || 0),
+              protein: totals.protein + (meal.protein || 0) + (meal.beverageProtein || 0),
+              fat: totals.fat + (meal.fat || 0) + (meal.beverageFat || 0),
+              carbs: totals.carbs + (meal.carbs || 0) + (meal.beverageCarbs || 0),
+              fibre: totals.fibre + (meal.fibre || 0) + (meal.beverageFibre || 0),
+            }),
+            { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
+          );
+
+          // 5. Calculate combined nutrition (label + drink)
+          const combinedCalories = adjustedNutrition.calories + (drinkNutrition?.calories || 0);
+          const combinedProtein = adjustedNutrition.protein + (drinkNutrition?.protein || 0);
+          const combinedFat = adjustedNutrition.fat + (drinkNutrition?.fat || 0);
+          const combinedCarbs = adjustedNutrition.carbs + (drinkNutrition?.carbs || 0);
+          const combinedFibre = adjustedNutrition.fibre + (drinkNutrition?.fibre || 0);
+
+          // 6. Calculate final score based on combined nutrition
+          const finalScore = calculateNutritionScore(
+            {
+              calories: combinedCalories,
+              protein: combinedProtein,
+              fat: combinedFat,
+              carbs: combinedCarbs,
+              fibre: combinedFibre,
+            },
+            goals,
+            todaysTotals,
+            new Date(),
+            drinkNutrition?.category
+          );
+
+          // 7. Create description for nutrition label meal
+          const description = `Nutrition label scan: ${input.amountConsumed}${input.servingUnit} consumed (${input.servingSize}${input.servingUnit} per serving).`;
+          const finalDescription = drinkNutrition && input.drinkType
+            ? `${description} Consumed with ${input.drinkType}.`
+            : description;
+
+          // 8. Return analysis results
+          return {
+            success: true,
+            finalScore,
+            mealAnalysis: {
+              description: finalDescription,
+              calories: adjustedNutrition.calories,
+              protein: adjustedNutrition.protein,
+              fat: adjustedNutrition.fat,
+              carbs: adjustedNutrition.carbs,
+              fibre: adjustedNutrition.fibre,
+            },
+            drinkNutrition: drinkNutrition ? {
+              calories: drinkNutrition.calories,
+              protein: drinkNutrition.protein,
+              fat: drinkNutrition.fat,
+              carbs: drinkNutrition.carbs,
+              fibre: drinkNutrition.fibre,
+            } : null,
+            combinedNutrition: {
+              calories: combinedCalories,
+              protein: combinedProtein,
+              fat: combinedFat,
+              carbs: combinedCarbs,
+              fibre: combinedFibre,
+            },
+          };
+        } catch (error) {
+          console.error('Error in analyzeNutritionLabelMeal:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to analyze nutrition label meal',
           });
         }
       }),

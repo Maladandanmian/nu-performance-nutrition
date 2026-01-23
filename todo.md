@@ -882,70 +882,16 @@
 - [x] Modify scoring algorithm to apply category-based modifiers (-2 to +0.5)
 - [x] Update database schema to store beverage category
 - [x] Update frontend to pass category through entire chain
-- [x] Test Red Bull (energy_drink, -2 penalty) vs vegetable juice (juice_vegetable, +0.5 reward)
-- [x] Verified: Red Bull meal = 2/5, Vegetable juice meal = 5/5 (3-point difference!)
-- [x] Verify consumption tracking unchanged (still just macros)
+- [ ] Test Red Bull (energy_drink, -2 penalty) vs vegetable juice (juice_vegetable, +0.5 reward)
+- [ ] Verify consumption tracking unchanged (still just macros)
 
-## Fix Meal History Not Showing Updated Score (Jan 22, 2026)
-- [x] Investigate why meal history shows 4/5 after re-analysis updated score
-- [x] Found: MealEditDialog wasn't passing nutritionScore to update mutation
-- [x] Added nutritionScore to meals.update input schema
-- [x] Frontend now passes analysisResult.score to backend
-- [x] Backend uses provided score if available, otherwise calculates
-- [x] Test that meal history refreshes with new score after edit
-
-## Remove Duplicate Hydration Trend from Body Metrics (Jan 22, 2026)
-- [x] Remove Hydration Trend graph from Body Metrics tab (already in Daily Trends)
-- [x] Keep only bodyweight tracking in Body Metrics tab
-
-## Add Line Smoothing to Trainer-Side Graphs (Jan 22, 2026)
-- [x] Replace inline Weight Trend chart with BodyweightTrendChart component
-- [x] BodyweightTrendChart includes smoothing toggle, date range selector, and table view
-- [x] Nutrition Trends already use NutrientTrendGraphs component (no smoothing needed)
-- [x] Ensure consistent UI with client-side graphs
-
-## Merge feature/trainer-dashboard to main (Jan 22, 2026)
-- [x] Switch to main branch
-- [x] Merge feature/trainer-dashboard into main
-- [x] Verify no merge conflicts (clean merge: 2,444 additions, 62 deletions)
-- [x] Save checkpoint on main branch
-- [x] Confirm all trainer features deployed
-
-## Update App Icon and Favicon (Jan 22, 2026)
-- [x] Extract logo files from zip
-- [x] Copy appropriate sizes to public directory (27 files)
-- [x] Update index.html with favicon links
-- [x] Add iOS/Android app icon meta tags
-- [x] Add Microsoft Tiles and manifest.json
-- [x] Test favicon display in browser
-
-## Fix Beverage Volume Label Alignment (Jan 22, 2026)
-- [ ] Fix "Volume (ml)" label alignment to match "Accompanying Beverage" heading
-- [ ] Ensure both labels are at same vertical level
-
-## Fix Beverage Volume Label Alignment (Jan 22, 2026)
-- [x] Fix "Volume (ml)" label alignment to match "Accompanying Beverage" heading
-- [x] Ensure both labels are at same vertical level
-- [x] Add "Drink Type" label for first input field
-- [x] Apply fix to both MealEditDialog and ClientDashboard
-
-## Fix HEIF/HEIC Image Processing Error (Jan 22, 2026)
-- [x] Investigate where HEIF images are being processed
-- [x] Add HEIF format detection and conversion to JPEG
-- [x] Implement client-side Canvas conversion (browser handles HEIF natively)
-- [x] Add server-side fallback error handling
-- [ ] Test with actual iPhone photos (HEIC format) - requires user testing
-
-## Critical iPhone Photo Support Fix (Jan 22, 2026)
-- [x] Remove failing client-side HEIF conversion
-- [x] Send original image file to server
-- [x] Change file input accept to force iOS automatic conversion
-- [x] Add clear error message for unsupported formats
-- [ ] Test with actual iPhone HEIC photos (requires user testing)
-
-## Fix HEIC File Selection (Jan 22, 2026)
-- [x] Revert accept attribute to allow HEIC file selection
-- [x] Ensure FileReader properly handles HEIC files
-- [x] Discovered sharp was breaking HEIC files
-- [x] Reverted to original approach: upload raw images without conversion
-- [x] HEIC files now work - AI vision model can read them directly
+## Nutrition Label Analysis Feature (Jan 23, 2026)
+- [x] Add mode toggle UI (Meal Photo / Nutrition Label) on Log Meal tab
+- [x] Create backend procedure to extract nutrition data from label images
+- [ ] Build serving size/amount input UI with unit selector (g/ml/servings)
+- [ ] Allow editing of extracted nutrition values
+- [x] Calculate adjusted nutrition based on amount consumed (backend)
+- [ ] Integrate with existing beverage addition flow
+- [x] Integrate with scoring system (backend)
+- [ ] Save nutrition label meals to database with proper metadata
+- [ ] Test end-to-end flow with real nutrition labels
