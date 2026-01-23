@@ -895,3 +895,8 @@
 - [x] Integrate with scoring system (backend)
 - [ ] Save nutrition label meals to database with proper metadata
 - [ ] Test end-to-end flow with real nutrition labels
+
+## Fix HEIC Error in identifyItems (Jan 23, 2026)
+- [x] Remove sharp conversion from identifyItems procedure
+- [x] Verified extractNutritionLabel already uploads raw images
+- [x] Upload raw images directly to S3 (AI can handle HEIF natively)

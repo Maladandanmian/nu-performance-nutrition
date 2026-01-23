@@ -997,13 +997,8 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Upload image to S3 (convert HEIF to JPEG if needed)
-          const inputBuffer = Buffer.from(input.imageBase64, 'base64');
-          
-          // Convert to JPEG using sharp (handles HEIF, PNG, WebP, etc.)
-          const imageBuffer = await sharp(inputBuffer)
-            .jpeg({ quality: 90 })
-            .toBuffer();
+          // 1. Upload image to S3 (raw format - AI can handle HEIF, JPEG, PNG, etc.)
+          const imageBuffer = Buffer.from(input.imageBase64, 'base64');
           
           const randomSuffix = Math.random().toString(36).substring(7);
           const imageKey = `meals/${input.clientId}/${Date.now()}-${randomSuffix}.jpg`;
