@@ -1223,3 +1223,11 @@
 - [x] Updated card title to "Upload & Manage DEXA Scans"
 - [ ] Test upload/approval workflow still works correctly
 - [ ] Test that newly uploaded scans appear in visualizations after approval
+
+
+## DEXA Visualization Auto-Update (Jan 23, 2026)
+- [x] Check if approveScan mutation invalidates dexa.getBodyCompTrend query (was missing)
+- [x] Check if approveScan mutation invalidates dexa.getBmdTrend query (was missing)
+- [x] Check if rejectScan mutation invalidates queries (was missing)
+- [x] Add cache invalidation to both approve and reject mutations
+- [x] Visualizations will now refresh immediately after approval/rejection

@@ -35,6 +35,8 @@ export function DexaUploadSection({ clientId }: DexaUploadSectionProps) {
     onSuccess: () => {
       toast.success("Scan approved!");
       utils.dexa.getClientScans.invalidate({ clientId });
+      utils.dexa.getBodyCompTrend.invalidate({ clientId });
+      utils.dexa.getBmdTrend.invalidate({ clientId });
     },
     onError: (error) => {
       toast.error(`Failed to approve: ${error.message}`);
@@ -45,6 +47,8 @@ export function DexaUploadSection({ clientId }: DexaUploadSectionProps) {
     onSuccess: () => {
       toast.success("Scan rejected");
       utils.dexa.getClientScans.invalidate({ clientId });
+      utils.dexa.getBodyCompTrend.invalidate({ clientId });
+      utils.dexa.getBmdTrend.invalidate({ clientId });
     },
     onError: (error) => {
       toast.error(`Failed to reject: ${error.message}`);
