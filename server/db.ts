@@ -302,10 +302,10 @@ export async function upsertDexaGoals(clientId: number, goals: Partial<InsertDex
  */
 export async function getDexaGoalsByClientId(clientId: number) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   
   const result = await db.select().from(dexaGoals).where(eq(dexaGoals.clientId, clientId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  return result.length > 0 ? result[0] : null;
 }
 
 /**

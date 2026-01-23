@@ -1379,3 +1379,8 @@
 - [ ] Test that all visualization changes (thresholds, scoring, colors) work on client side
 - [ ] Ensure clients can see their own DEXA scans and insights
 - [ ] Test with client PIN login to verify access
+
+## Fix dexa.getGoals returning undefined (Jan 23, 2026)
+- [x] Update getDexaGoalsByClientId to return null instead of undefined when no goals exist
+- [x] Create comprehensive vitest tests for DEXA goals functionality
+- [x] Test that DEXA Insights tab loads without errors when no goals are set
