@@ -1315,3 +1315,11 @@
 - [x] Implement BMD-based coloring for regions without T-scores (T-score = 0)
 - [x] Update getColor function to handle both T-score and BMD-based coloring
 - [x] Test that all body parts show proper colors (head=green, arms=yellow, torso=red, legs=green, hips=green)
+
+
+## Fix Body Fat % Displaying as 0.0% (Jan 23, 2026)
+- [x] Query database to check actual body fat percentage values (found totalBodyFatPct = 21.60%)
+- [x] Identify if issue is in data extraction, calculation, or display logic (field name mismatch)
+- [x] Fix the body fat percentage calculation/display (changed totalBodyFatPercent to totalBodyFatPct)
+- [x] Verify lean/fat ratio is calculated correctly
+- [x] Test with actual DEXA scan data (Metabolic Health panel now shows 21.6%)

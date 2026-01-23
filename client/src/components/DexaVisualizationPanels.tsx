@@ -1036,7 +1036,7 @@ function MetabolicHealthScore({ data }: { data: any }) {
   }
 
   const vatArea = parseFloat(data.vatArea || "0");
-  const bodyFatPercent = parseFloat(data.totalBodyFatPercent || "0");
+  const bodyFatPercent = parseFloat(data.totalBodyFatPct || "0");
   const leanMass = parseFloat(data.totalLeanMass || "0") / 1000; // Convert grams to kg
   const fatMass = parseFloat(data.totalFatMass || "0") / 1000; // Convert grams to kg
   const leanToFatRatio = fatMass > 0 ? leanMass / fatMass : 0;
@@ -1198,8 +1198,8 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
       date: new Date(scan.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       vatArea: parseFloat(scan.vatArea || "0"),
       vatChange: prevScan ? parseFloat(scan.vatArea || "0") - parseFloat(prevScan.vatArea || "0") : 0,
-      bodyFat: parseFloat(scan.totalBodyFatPercent || "0"),
-      bodyFatChange: prevScan ? parseFloat(scan.totalBodyFatPercent || "0") - parseFloat(prevScan.totalBodyFatPercent || "0") : 0,
+      bodyFat: parseFloat(scan.totalBodyFatPct || "0"),
+      bodyFatChange: prevScan ? parseFloat(scan.totalBodyFatPct || "0") - parseFloat(prevScan.totalBodyFatPct || "0") : 0,
       leanMass: parseFloat(scan.totalLeanMass || "0") / 1000, // Convert grams to kg
       leanMassChange: prevScan ? (parseFloat(scan.totalLeanMass || "0") - parseFloat(prevScan.totalLeanMass || "0")) / 1000 : 0, // Convert grams to kg
       isFirst: idx === 0,

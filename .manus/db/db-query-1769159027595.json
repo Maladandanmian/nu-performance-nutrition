@@ -1,0 +1,28 @@
+{
+  "query": "SELECT bc.totalBodyFatPct, bc.totalFatMass, bc.totalLeanMass, bc.totalMass, bc.vatArea, ds.scanDate \nFROM dexa_body_comp bc \nJOIN dexa_scans ds ON bc.scanId = ds.id \nWHERE ds.clientId = 630001 AND ds.status = 'approved' \nORDER BY ds.scanDate DESC LIMIT 1\\G",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT bc.totalBodyFatPct, bc.totalFatMass, bc.totalLeanMass, bc.totalMass, bc.vatArea, ds.scanDate \nFROM dexa_body_comp bc \nJOIN dexa_scans ds ON bc.scanId = ds.id \nWHERE ds.clientId = 630001 AND ds.status = 'approved' \nORDER BY ds.scanDate DESC LIMIT 1\\G",
+  "rows": [
+    {
+      "*************************** 1. row ***************************": "totalBodyFatPct: 21.60"
+    },
+    {
+      "*************************** 1. row ***************************": "   totalFatMass: 19745"
+    },
+    {
+      "*************************** 1. row ***************************": "  totalLeanMass: 71866"
+    },
+    {
+      "*************************** 1. row ***************************": "      totalMass: 91612"
+    },
+    {
+      "*************************** 1. row ***************************": "        vatArea: 87.50"
+    },
+    {
+      "*************************** 1. row ***************************": "       scanDate: 2025-06-16"
+    }
+  ],
+  "messages": [],
+  "stdout": "*************************** 1. row ***************************\ntotalBodyFatPct: 21.60\n   totalFatMass: 19745\n  totalLeanMass: 71866\n      totalMass: 91612\n        vatArea: 87.50\n       scanDate: 2025-06-16\n",
+  "stderr": "",
+  "execution_time_ms": 1523
+}
