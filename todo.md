@@ -1133,3 +1133,19 @@
 - [x] Approve/Reject buttons for pending scans
 - [x] Show DEXA data in client Metrics tab
 - [x] Lists all uploaded scans with status indicators
+
+
+### Phase 4: PDF Image Extraction (Completed)
+- [x] Install pdf-to-image conversion library (using poppler-utils pdftoppm)
+- [x] Create image extraction module to convert PDF pages to PNG
+- [x] Use AI vision to identify and crop specific image sections:
+  - Body scan images (colorized + grayscale)
+  - Fracture Risk chart (BMD zones)
+  - Total Body % Fat chart
+- [x] Upload extracted images to S3
+- [x] Store image references in dexa_images table
+- [x] Update uploadScan procedure to call image extraction
+- [x] Add image gallery to DexaUploadSection (trainer view)
+- [x] Add expandable scan details with images in trainer UI
+- [x] Test full workflow with provided PDF samples
+- [x] Write vitest tests for image extraction (4 tests, all passing)

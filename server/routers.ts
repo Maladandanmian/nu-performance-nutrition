@@ -1518,14 +1518,33 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { analyzeDexaPdf } = await import("./dexaPdfAnalysis");
+        const { extractDexaImages } = await import("./dexaImageExtraction");
+        const { writeFile, unlink } = await import('fs/promises');
+        const { randomBytes } = await import('crypto');
         
         // Upload PDF to S3
         const pdfBuffer = Buffer.from(input.pdfFile.data, 'base64');
         const pdfKey = `dexa-scans/${input.clientId}/${Date.now()}-${input.pdfFile.filename}`;
         const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, 'application/pdf');
         
+        // Save PDF temporarily for image extraction
+        const tempPdfPath = `/tmp/dexa-${randomBytes(8).toString('hex')}.pdf`;
+        await writeFile(tempPdfPath, pdfBuffer);
+        
         // Extract data using AI
         const extractedData = await analyzeDexaPdf(pdfUrl);
+        
+        // Extract images from PDF
+        let extractedImages: any[] = [];
+        try {
+          extractedImages = await extractDexaImages(tempPdfPath);
+        } catch (error) {
+          console.error('Image extraction failed:', error);
+          // Continue without images if extraction fails
+        } finally {
+          // Clean up temp PDF
+          await unlink(tempPdfPath).catch(() => {});
+        }
         
         // Create scan record
         const scanId = await db.createDexaScan({
@@ -1587,9 +1606,22 @@ export const appRouter = router({
           });
         }
         
+        // Store extracted images
+        if (extractedImages.length > 0) {
+          const imageRecords = extractedImages.map((img: any) => ({
+            scanId,
+            imageType: img.type,
+            imageUrl: img.imageUrl,
+            imageKey: img.imageKey,
+            pageNumber: img.pageNumber,
+          }));
+          await db.createDexaImages(imageRecords);
+        }
+        
         return {
           scanId,
           extractedData,
+          extractedImages: extractedImages.length,
         };
       }),
 
@@ -1630,18 +1662,20 @@ export const appRouter = router({
         return allScans.filter(scan => scan.status === 'approved');
       }),
 
-    // Get detailed scan data (BMD + Body Comp)
+    // Get detailed scan data (BMD + Body Comp + Images)
     getScanDetails: protectedProcedure
       .input(z.object({ scanId: z.number() }))
       .query(async ({ input }) => {
         const scan = await db.getDexaScanById(input.scanId);
         const bmdData = await db.getDexaBmdData(input.scanId);
         const bodyComp = await db.getDexaBodyComp(input.scanId);
+        const images = await db.getDexaImages(input.scanId);
         
         return {
           scan,
           bmdData,
           bodyComp,
+          images,
         };
       }),
 
