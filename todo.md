@@ -1246,3 +1246,9 @@
 - [x] Add left padding (pl-10) to chart container for Y-axis labels
 - [x] Y-axis labels now fully visible within the chart area
 - [x] Labels positioned with -ml-8, container has pl-10 to accommodate
+
+
+## Body Recomposition Y-Axis Label Alignment (Jan 23, 2026)
+- [x] Remove negative margin (-ml-8) from Y-axis labels
+- [x] Position labels at left-0 to align with padded container
+- [x] Labels now properly aligned with chart

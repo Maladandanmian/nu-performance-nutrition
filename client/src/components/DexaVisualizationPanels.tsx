@@ -443,7 +443,7 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
         </svg>
         
         {/* Y-axis labels */}
-        <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 -ml-8">
+        <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500">
           <span>{maxTotal.toFixed(0)} kg</span>
           <span>{(maxTotal * 0.5).toFixed(0)} kg</span>
           <span>0 kg</span>
