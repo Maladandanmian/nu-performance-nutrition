@@ -1188,3 +1188,11 @@
 - [x] Ensure arrows are visible and clickable on both desktop and mobile
 - [ ] Test keyboard navigation (left/right arrow keys) - ready for user testing
 - [ ] Test touch swipe gestures on mobile - ready for user testing
+
+
+## DEXA Visualization Date Context Missing (Jan 23, 2026)
+- [x] Add scan date labels to each panel showing which data is displayed
+- [x] Add "Latest Scan" vs "Trend Over Time" indicators in panel titles
+- [x] Add change indicators showing delta between latest and previous scan (Panel 1)
+- [x] Update panel titles to clarify data source (Latest Scan / Trend / All Scans)
+- [x] Show date range for trend-based panels (Panel 2, 3, 6)

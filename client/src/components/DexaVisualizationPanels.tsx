@@ -69,32 +69,32 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
   const panels = [
     {
       id: 0,
-      title: "Visceral Fat Status",
+      title: "Visceral Fat Status (Latest Scan)",
       component: <VisceralFatGauge data={bodyCompHistory} />,
     },
     {
       id: 1,
-      title: "Body Recomposition",
+      title: "Body Recomposition (Trend)",
       component: <BodyRecompositionChart data={bodyCompHistory} />,
     },
     {
       id: 2,
-      title: "VAT Reduction Progress",
+      title: "VAT Reduction Progress (All Scans)",
       component: <VATProgressBar data={bodyCompHistory} />,
     },
     {
       id: 3,
-      title: "Bone Density Map",
+      title: "Bone Density Map (Latest Scan)",
       component: <BoneDensityHeatmap data={bmdHistory || []} />,
     },
     {
       id: 4,
-      title: "Metabolic Health",
+      title: "Metabolic Health (Latest Scan)",
       component: <MetabolicHealthScore data={latestScan} />,
     },
     {
       id: 5,
-      title: "Monthly Progress",
+      title: "Monthly Progress (All Scans)",
       component: <MonthlyProgressSummary bodyComp={bodyCompHistory} bmd={bmdHistory || []} />,
     },
   ];
@@ -224,6 +224,11 @@ function VisceralFatGauge({ data }: { data: any[] }) {
   
   return (
     <div className="flex flex-col items-center">
+      {/* Scan Date */}
+      <div className="text-sm text-gray-500 mb-4">
+        Latest Scan: {new Date(latest.scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </div>
+      
       {/* Circular Gauge */}
       <div className="relative w-64 h-64 mb-6">
         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
@@ -263,11 +268,16 @@ function VisceralFatGauge({ data }: { data: any[] }) {
       
       {/* Change Indicator */}
       {data.length > 1 && (
-        <div className="flex items-center gap-2 mb-6">
-          <span className={change <= 0 ? "text-green-600" : "text-red-600"}>
-            {change <= 0 ? "↓" : "↑"} {Math.abs(change).toFixed(1)} cm²
-          </span>
-          <span className="text-gray-500 text-sm">since last scan</span>
+        <div className="flex flex-col items-center gap-1 mb-6">
+          <div className="flex items-center gap-2">
+            <span className={change <= 0 ? "text-green-600" : "text-red-600"}>
+              {change <= 0 ? "↓" : "↑"} {Math.abs(change).toFixed(1)} cm²
+            </span>
+            <span className="text-gray-500 text-sm">since last scan</span>
+          </div>
+          <div className="text-xs text-gray-400">
+            Previous: {new Date(data[1].scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </div>
         </div>
       )}
       
@@ -328,6 +338,11 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
   
   return (
     <div className="flex flex-col">
+      {/* Date Range */}
+      <div className="text-sm text-gray-500 mb-4 text-center">
+        Trend: {new Date(scans[0].scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - {new Date(scans[scans.length - 1].scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+      </div>
+      
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-red-50 p-4 rounded-lg">
@@ -476,6 +491,11 @@ function VATProgressBar({ data }: { data: any[] }) {
   
   return (
     <div className="flex flex-col">
+      {/* Date Range */}
+      <div className="text-sm text-gray-500 mb-4 text-center">
+        Journey: {new Date(firstScan.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} → {new Date(latestScan.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+      </div>
+      
       {/* Current Status */}
       <div className="text-center mb-8">
         <div className="text-6xl font-bold text-blue-600 mb-2">
@@ -613,6 +633,11 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
   
   return (
     <div className="flex flex-col">
+      {/* Scan Date */}
+      <div className="text-sm text-gray-500 mb-4 text-center">
+        Latest Scan: {new Date(data[0].scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </div>
+      
       {/* Simplified Body Diagram */}
       <div className="flex justify-center mb-8">
         <svg width="200" height="400" viewBox="0 0 200 400" className="">
@@ -795,6 +820,11 @@ function MetabolicHealthScore({ data }: { data: any }) {
   
   return (
     <div className="flex flex-col items-center">
+      {/* Scan Date */}
+      <div className="text-sm text-gray-500 mb-4">
+        Based on scan: {new Date(data.scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </div>
+      
       {/* Main Score */}
       <div className="text-center mb-8">
         <div className="text-8xl font-bold mb-2" style={{ color: zoneColor }}>
@@ -912,6 +942,9 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
       <div className="text-center mb-6">
         <div className="text-3xl font-bold mb-2">Your DEXA Journey</div>
         <div className="text-gray-600">{scans.length} scans tracked</div>
+        <div className="text-sm text-gray-500 mt-1">
+          {new Date(scans[0].scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - {new Date(scans[scans.length - 1].scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+        </div>
       </div>
       
       {/* Timeline */}
