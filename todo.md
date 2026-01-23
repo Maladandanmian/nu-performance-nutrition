@@ -922,3 +922,9 @@
 - [x] When user edits servings, update amount automatically (servings × serving weight)
 - [x] When user edits amount, update servings automatically (amount ÷ serving weight)
 - [x] Backend calculation already correct (uses amountConsumed ÷ servingSize)
+
+## Replace Helper Text with Sync Symbol (Jan 23, 2026)
+- [x] Remove "Edit either field - they sync automatically" helper text
+- [x] Add bidirectional arrow symbol (⇄) between Servings and Amount fields
+- [x] Position symbol vertically centered between the two inputs
+- [x] Test visual clarity and spacing

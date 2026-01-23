@@ -1212,8 +1212,8 @@ export default function ClientDashboard() {
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1">
                       <Label>Servings Consumed</Label>
                       <Input
                         type="number"
@@ -1230,7 +1230,8 @@ export default function ClientDashboard() {
                         }}
                       />
                     </div>
-                    <div>
+                    <div className="text-2xl text-muted-foreground pb-2">⇄</div>
+                    <div className="flex-1">
                       <Label>Amount Consumed ({extractedNutrition.servingUnit})</Label>
                       <Input
                         type="number"
@@ -1248,9 +1249,6 @@ export default function ClientDashboard() {
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Edit either field - they sync automatically
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
