@@ -189,10 +189,11 @@ function VisceralFatGauge({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
+  // Data is ordered newest→oldest from DB, so latest is at index 0
   const latest = data[0];
   const vatArea = parseFloat(latest.vatArea || "0");
   
-  // Get last 6 scans for sparkline
+  // Get last 6 scans for sparkline (take from start, reverse for oldest→newest display)
   const recentScans = data.slice(0, 6).reverse();
   const vatTrend = recentScans.map(scan => parseFloat(scan.vatArea || "0"));
   
@@ -217,8 +218,9 @@ function VisceralFatGauge({ data }: { data: any[] }) {
   // Calculate gauge percentage (0-200 cm² scale)
   const gaugePercent = Math.min((vatArea / 200) * 100, 100);
   
-  // Calculate trend
-  const previousVat = data.length > 1 ? parseFloat(data[1].vatArea || "0") : vatArea;
+  // Calculate trend (previous is second item since data is newest-first)
+  const previous = data.length > 1 ? data[1] : null;
+  const previousVat = previous ? parseFloat(previous.vatArea || "0") : vatArea;
   const change = vatArea - previousVat;
   const changePercent = previousVat > 0 ? ((change / previousVat) * 100).toFixed(1) : "0";
   
@@ -275,8 +277,8 @@ function VisceralFatGauge({ data }: { data: any[] }) {
             </span>
             <span className="text-gray-500 text-sm">since last scan</span>
           </div>
-          <div className="text-xs text-gray-400">
-            Previous: {new Date(data[1].scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          <div className="text-xs text-gray-500 mt-1">
+            Previous: {previous ? new Date(previous.scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
           </div>
         </div>
       )}
@@ -317,8 +319,8 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Data already comes from DB ordered oldest to newest
-  const scans = data;
+  // Data comes from DB ordered newest→oldest, reverse for chart display (oldest→newest)
+  const scans = [...data].reverse();
   
   // Extract fat mass and lean mass (convert grams to kg)
   const chartData = scans.map(scan => ({
@@ -465,8 +467,8 @@ function VATProgressBar({ data }: { data: any[] }) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Get first and latest scans (data already ordered oldest to newest)
-  const scans = data;
+  // Data comes from DB newest→oldest, reverse for journey display (oldest→newest)
+  const scans = [...data].reverse();
   const firstScan = scans[0];
   const latestScan = scans[scans.length - 1];
   
@@ -908,8 +910,8 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
     return <div className="text-center text-gray-500">No data available</div>;
   }
 
-  // Data already ordered oldest to newest from DB
-  const scans = bodyComp;
+  // Data comes from DB newest→oldest, reverse for timeline (oldest→newest)
+  const scans = [...bodyComp].reverse();
   
   // Calculate month-over-month changes
   const timeline = scans.map((scan, idx) => {

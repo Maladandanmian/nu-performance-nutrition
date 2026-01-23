@@ -1203,3 +1203,15 @@
 - [x] Fix timeline direction in Body Recomposition chart (removed unnecessary reverse())
 - [x] Verify all other panels display correct units (Panel 5, 6, raw data drawer)
 - [x] Fixed timeline in VAT Progress and Monthly Progress panels
+
+
+## Scan Date Sorting and Visualization Logic (Jan 23, 2026)
+- [x] Change database queries to sort by scanDate DESC (newest first) instead of ASC
+- [x] Update getDexaBodyCompHistory to use DESC order
+- [x] Update getDexaBmdHistory to use DESC order  
+- [x] Update all visualization components to expect newest-first data
+- [x] Update VisceralFatGauge: latest = data[0], previous = data[1]
+- [x] Update Body Recomposition: reverse data for oldest→newest chart display
+- [x] Update VAT Progress: reverse data for oldest→newest
+- [x] Update Monthly Progress: reverse data for oldest→newest timeline
+- [x] BoneDensityHeatmap and MetabolicHealthScore already correct

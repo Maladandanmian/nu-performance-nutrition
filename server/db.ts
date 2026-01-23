@@ -431,7 +431,7 @@ export async function getDexaBodyCompHistory(clientId: number) {
     .from(dexaBodyComp)
     .innerJoin(dexaScans, eq(dexaBodyComp.scanId, dexaScans.id))
     .where(eq(dexaScans.clientId, clientId))
-    .orderBy(dexaScans.scanDate);
+    .orderBy(desc(dexaScans.scanDate)); // DESC: newest first
   
   // Transform to flat structure with scan status
   return results.map((row: any) => ({
@@ -461,5 +461,5 @@ export async function getDexaBmdHistory(clientId: number) {
     .from(dexaBmdData)
     .innerJoin(dexaScans, eq(dexaBmdData.scanId, dexaScans.id))
     .where(eq(dexaScans.clientId, clientId))
-    .orderBy(dexaScans.scanDate);
+    .orderBy(desc(dexaScans.scanDate)); // DESC: newest first
 }
