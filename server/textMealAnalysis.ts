@@ -44,6 +44,8 @@ Provide:
 1. A brief overall description of the meal (cleaned up version of user's input)
 2. A list of individual food components with estimated quantities
 
+IMPORTANT: Do NOT include meal type labels (breakfast/lunch/dinner/snack) in the description. Just describe the food itself.
+
 Example for "hamachi poke bowl with sesame sauce":
 - Overall: "Hamachi (yellowtail) poke bowl with sesame sauce"
 - Components:
@@ -55,12 +57,21 @@ Example for "hamachi poke bowl with sesame sauce":
   * "1 tsp sesame seeds"
 
 Example for "french toast":
-- Overall: "French toast breakfast"
+- Overall: "French toast with toppings"
 - Components:
   * "2 slices french toast"
   * "2 tbsp maple syrup"
   * "1 tbsp butter"
-  * "1/4 cup berries"`,
+  * "1/4 cup berries"
+
+Example for "boiled eggs with hash browns":
+- Overall: "Boiled eggs, hash browns, spinach, ketchup, and pain au chocolat"
+- Components:
+  * "2 boiled eggs"
+  * "1 cup hash browns"
+  * "1/2 cup spinach"
+  * "1 tbsp ketchup"
+  * "1 pain au chocolat pastry"`,
         },
       ],
       response_format: {

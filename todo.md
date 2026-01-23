@@ -1032,3 +1032,11 @@
 - [x] Test with various meal descriptions (poke bowl, french toast, pasta dishes)
 - [x] Write vitest tests for text-based analysis
 - [x] All 4 tests passed: poke bowl, french toast, pasta, quantity estimates
+
+## Fix AI Description Meal Type Assumption (Jan 23, 2026)
+- [x] Update textMealAnalysis prompt to avoid assuming meal type (breakfast/lunch/dinner)
+- [x] Added explicit instruction: "Do NOT include meal type labels in the description"
+- [x] Added example showing neutral description for typical breakfast foods
+- [x] AI should describe food neutrally without meal type labels
+- [x] Test that description no longer includes "Breakfast featuring..." when meal type is Lunch
+- [x] All 4 tests still pass after prompt update
