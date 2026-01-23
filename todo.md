@@ -991,4 +991,12 @@
 - [x] Add fallback icon box for meals without images (gray Utensils icon)
 - [x] Drinks don't need badge (no source field in drinks table)
 - [x] Keep existing icons for photo-analyzed entries
-- [ ] Test visual appearance in both client and trainer views
+- [x] Test visual appearance in both client and trainer views
+
+## Add Ability to Delete Beverage from Meals (Jan 23, 2026)
+- [x] Add "Remove Drink" button to meal edit dialog when beverage is present
+- [x] Clear all beverage-related fields when button is clicked (drinkType, volumeMl, beverageNutrition)
+- [x] Add X icon import from lucide-react
+- [x] Verify backend updateMeal procedure handles null beverage fields correctly
+- [x] Backend already supports optional beverage fields (all marked as .optional())
+- [x] Test removing drink from meal in edit dialog and saving

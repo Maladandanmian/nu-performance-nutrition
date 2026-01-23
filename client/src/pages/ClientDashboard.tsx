@@ -16,7 +16,7 @@ import TodaysSummary from "@/components/TodaysSummary";
 import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
 import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
-import { Camera, Droplets, History, LogOut, Scale, Upload } from "lucide-react";
+import { Camera, Droplets, History, LogOut, Scale, Upload, X } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -1482,9 +1482,28 @@ export default function ClientDashboard() {
 
             {/* Beverage Section */}
             <div className="border-t pt-4">
-              <Label>
-                {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
-              </Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>
+                  {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
+                </Label>
+                {(drinkType || volumeMl) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDrinkType("");
+                      setVolumeMl("");
+                      setBeverageNutrition(null);
+                      toast.success("Beverage removed");
+                    }}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2 text-xs"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Remove Drink
+                  </Button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
                   <Input
