@@ -949,3 +949,11 @@
 - [x] Maintain synchronization with Servings Consumed after user finishes typing
 - [x] Display empty string when value is 0 for better UX
 - [ ] Test clearing field and typing new value (e.g., 3.5) from scratch
+
+## Fix Water Consumption Not Saving/Displaying for Nutrition Label Entries (Jan 23, 2026)
+- [x] Investigate why water from nutrition label entries isn't being saved to database
+- [x] Backend analyzeNutritionLabelMeal procedure returns beverage data correctly
+- [x] Frontend was clearing beverageNutrition state after analysis (bug identified)
+- [x] Fixed frontend to preserve beverage data from analysis results
+- [x] Meal history display already has beverage indicator (no changes needed)
+- [ ] Test complete flow: scan label → add water → save → verify water shows in history

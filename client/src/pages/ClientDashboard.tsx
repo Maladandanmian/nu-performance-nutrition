@@ -228,12 +228,28 @@ export default function ClientDashboard() {
         combinedNutrition: data.combinedNutrition,
         drinkNutrition: data.drinkNutrition,
       });
+      
+      // Preserve beverage data if drink was included
+      if (data.drinkNutrition && drinkType && volumeMl) {
+        setBeverageNutrition({
+          drinkType,
+          volumeMl: parseInt(volumeMl),
+          calories: data.drinkNutrition.calories,
+          protein: data.drinkNutrition.protein,
+          fat: data.drinkNutrition.fat,
+          carbs: data.drinkNutrition.carbs,
+          fibre: data.drinkNutrition.fibre,
+          category: 'beverage', // Default category
+        });
+      } else {
+        setBeverageNutrition(null);
+      }
+      
       setShowAnalysisModal(true);
       // Reset form
       setExtractedNutrition(null);
       setDrinkType("");
       setVolumeMl("");
-      setBeverageNutrition(null);
       setMealNotes("");
       // Reset input mode to meal
       setInputMode("meal");
