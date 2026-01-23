@@ -1240,3 +1240,9 @@
 - [x] Leave empty space for months without scans
 - [x] Show visual indication of temporal spacing between scans
 - [x] Bars now positioned at correct dates with 8px width
+
+
+## Body Recomposition Chart Margin Fix (Jan 23, 2026)
+- [x] Add left padding (pl-10) to chart container for Y-axis labels
+- [x] Y-axis labels now fully visible within the chart area
+- [x] Labels positioned with -ml-8, container has pl-10 to accommodate

@@ -390,7 +390,7 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
       </div>
       
       {/* Stacked Area Chart */}
-      <div className="relative h-64 mb-4">
+      <div className="relative h-64 mb-4 pl-10">
         <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
           {/* Grid lines */}
           {[0, 25, 50, 75, 100].map(percent => (
