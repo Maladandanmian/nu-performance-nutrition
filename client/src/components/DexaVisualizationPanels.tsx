@@ -284,25 +284,50 @@ function VisceralFatGauge({ data }: { data: any[] }) {
       )}
       
       {/* Sparkline Trend */}
-      {vatTrend.length > 1 && (
-        <div className="w-full max-w-md">
-          <div className="text-sm text-gray-500 mb-2 text-center">6-Month Trend</div>
-          <div className="h-16 flex items-end justify-between gap-1">
-            {vatTrend.map((val, idx) => {
-              const maxVal = Math.max(...vatTrend);
-              const height = (val / maxVal) * 100;
-              return (
-                <div
-                  key={idx}
-                  className="flex-1 bg-blue-500 rounded-t transition-all"
-                  style={{ height: `${height}%` }}
-                  title={`${val.toFixed(1)} cm²`}
-                />
-              );
-            })}
+      {data.length > 1 && (() => {
+        // Create 6-month timeline from 6 months ago to today
+        const today = new Date();
+        const sixMonthsAgo = new Date(today);
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        
+        // Find max VAT for scaling
+        const maxVat = Math.max(...data.map(d => d.vatArea || 0));
+        
+        return (
+          <div className="w-full max-w-md">
+            <div className="text-sm text-gray-500 mb-2 text-center">6-Month Trend</div>
+            <div className="h-16 relative">
+              {/* Timeline bars */}
+              {data.map((scan, idx) => {
+                const scanDate = new Date(scan.scanDate);
+                // Calculate position as percentage from left (0% = 6 months ago, 100% = today)
+                const totalMs = today.getTime() - sixMonthsAgo.getTime();
+                const scanMs = scanDate.getTime() - sixMonthsAgo.getTime();
+                const position = (scanMs / totalMs) * 100;
+                
+                // Only show if within 6-month window
+                if (position < 0 || position > 100) return null;
+                
+                const height = ((scan.vatArea || 0) / maxVat) * 100;
+                
+                return (
+                  <div
+                    key={idx}
+                    className="absolute bottom-0 bg-blue-500 rounded-t transition-all"
+                    style={{
+                      left: `${position}%`,
+                      width: '8px',
+                      height: `${height}%`,
+                      transform: 'translateX(-50%)'
+                    }}
+                    title={`${new Date(scan.scanDate).toLocaleDateString()}: ${(scan.vatArea || 0).toFixed(1)} cm²`}
+                  />
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       
       {/* Reference Info */}
       <div className="mt-6 text-sm text-gray-500 text-center max-w-md">

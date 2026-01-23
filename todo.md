@@ -1231,3 +1231,12 @@
 - [x] Check if rejectScan mutation invalidates queries (was missing)
 - [x] Add cache invalidation to both approve and reject mutations
 - [x] Visualizations will now refresh immediately after approval/rejection
+
+
+## Visceral Fat Sparkline Timeline Fix (Jan 23, 2026)
+- [x] Change sparkline from stretching bars to fill width
+- [x] Create fixed 6-month timeline (today minus 6 months to today)
+- [x] Position bars based on actual scan dates within the timeline
+- [x] Leave empty space for months without scans
+- [x] Show visual indication of temporal spacing between scans
+- [x] Bars now positioned at correct dates with 8px width
