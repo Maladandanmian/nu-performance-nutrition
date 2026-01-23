@@ -183,8 +183,12 @@ export default function ClientDashboard() {
   // Nutrition label extraction mutation
   const extractNutritionLabelMutation = trpc.meals.extractNutritionLabel.useMutation({
     onSuccess: (data) => {
-      // Store extracted nutrition data
-      setExtractedNutrition(data);
+      // Store extracted nutrition data with default values
+      setExtractedNutrition({
+        ...data,
+        servingsConsumed: 1, // Default to 1 serving
+        amountConsumed: data.servingSize, // Default to 100% of serving size
+      });
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
       
@@ -1208,17 +1212,45 @@ export default function ClientDashboard() {
                       />
                     </div>
                   </div>
-                  <div>
-                    <Label>Amount You Consumed ({extractedNutrition.servingUnit})</Label>
-                    <Input
-                      type="number"
-                      placeholder={`e.g., 76 (if you consumed 76${extractedNutrition.servingUnit})`}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, amountConsumed: parseFloat(e.target.value)})}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Enter the actual amount you consumed in {extractedNutrition.servingUnit}
-                    </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Servings Consumed</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={extractedNutrition.servingsConsumed || 1}
+                        onChange={(e) => {
+                          const servings = parseFloat(e.target.value) || 0;
+                          const amount = servings * extractedNutrition.servingSize;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            servingsConsumed: servings,
+                            amountConsumed: amount
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Amount Consumed ({extractedNutrition.servingUnit})</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={extractedNutrition.amountConsumed || extractedNutrition.servingSize}
+                        onChange={(e) => {
+                          const amount = parseFloat(e.target.value) || 0;
+                          const servings = amount / extractedNutrition.servingSize;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            amountConsumed: amount,
+                            servingsConsumed: servings
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Edit either field - they sync automatically
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">

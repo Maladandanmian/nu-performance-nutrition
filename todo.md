@@ -914,3 +914,11 @@
 - [x] Add unit display next to the input field (same as serving size unit)
 - [x] Update placeholder to show example with unit (e.g., "76" when serving size is "25g")
 - [x] Add helper text explaining the field
+
+## Synchronized Serving/Weight Inputs (Jan 23, 2026)
+- [x] Extract both serving count and serving weight from nutrition labels
+- [x] Add two synchronized input fields: "Servings Consumed" and "Amount Consumed"
+- [x] Auto-fill both to default values (1 serving = serving weight)
+- [x] When user edits servings, update amount automatically (servings × serving weight)
+- [x] When user edits amount, update servings automatically (amount ÷ serving weight)
+- [x] Backend calculation already correct (uses amountConsumed ÷ servingSize)
