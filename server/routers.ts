@@ -1685,7 +1685,7 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const history = await db.getDexaBodyCompHistory(input.clientId);
         // Filter to approved scans only
-        return history.filter((record: any) => record.dexa_scans.status === 'approved');
+        return history.filter((record: any) => record.status === 'approved');
       }),
 
     // Get BMD history for trend charts

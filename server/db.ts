@@ -426,12 +426,19 @@ export async function getDexaBodyCompHistory(clientId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
+  const results = await db
     .select()
     .from(dexaBodyComp)
     .innerJoin(dexaScans, eq(dexaBodyComp.scanId, dexaScans.id))
     .where(eq(dexaScans.clientId, clientId))
     .orderBy(dexaScans.scanDate);
+  
+  // Transform to flat structure with scan status
+  return results.map((row: any) => ({
+    ...row.dexa_body_comp,
+    scanDate: row.dexa_scans.scanDate,
+    status: row.dexa_scans.status,
+  }));
 }
 
 /**

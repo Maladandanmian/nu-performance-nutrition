@@ -1172,3 +1172,10 @@
 - [x] Integrate into client dashboard (new DEXA Scans tab)
 - [x] Add trainer preview mode (DEXA Insights tab in ClientDetail)
 - [ ] Test with real DEXA scan data upload
+
+
+## DEXA Visualization JSON Parse Error (Jan 23, 2026)
+- [x] Investigate which tRPC procedure is returning invalid JSON (getDexaBodyCompHistory)
+- [x] Fix the procedure to return properly formatted JSON (flattened structure)
+- [ ] Test DEXA visualization panels with real client data
+- [ ] Verify all 6 panels load without errors
