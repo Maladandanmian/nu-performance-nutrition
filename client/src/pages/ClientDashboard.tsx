@@ -1336,7 +1336,7 @@ export default function ClientDashboard() {
             )}
 
             {/* Beverage Section */}
-            <div className="border-t pt-4">
+            <div className="border-t pt-3">
               <Label>
                 {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
               </Label>
@@ -1424,9 +1424,9 @@ export default function ClientDashboard() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Meal Type Section */}
-            <div className="border-b pb-4">
+            <div className="border-b pb-3">
               <Label htmlFor="edit-meal-type">Meal Type</Label>
               <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
                 <SelectTrigger id="edit-meal-type">
@@ -1481,7 +1481,7 @@ export default function ClientDashboard() {
             )}
 
             {/* Beverage Section */}
-            <div className="border-t pt-4">
+            <div className="border-t pt-3">
               <div className="flex items-center justify-between mb-2">
                 <Label>
                   {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
@@ -1528,7 +1528,7 @@ export default function ClientDashboard() {
             </div>
 
             {/* Date and Time Section - Collapsed by default */}
-            <div className="border-t pt-4">
+            <div className="border-t pt-3">
               <div className="flex items-center justify-between">
                 <Label>Date & Time</Label>
                 <Button

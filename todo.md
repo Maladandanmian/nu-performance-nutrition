@@ -1006,3 +1006,13 @@
 - [x] Added "Drink Type" label to first input to match "Volume (ml)" label
 - [x] Both inputs now have consistent label spacing for proper alignment
 - [x] Test alignment in edit dialog
+
+## Fix Mobile Spacing Issues (Jan 23, 2026)
+- [x] Fix icon overlap with meal type text in meal history cards
+- [x] Reorganized layout: meal type + time on same line, description below, score inline
+- [x] Removed redundant timestamp section (date shown in group header, time next to meal type)
+- [x] Reduced font sizes for better mobile fit
+- [x] Reduce excessive spacing in edit dialog on mobile
+- [x] Changed space-y-4 to space-y-3 for tighter vertical spacing
+- [x] Reduced border section padding from pt-4 to pt-3
+- [x] Test on mobile viewport

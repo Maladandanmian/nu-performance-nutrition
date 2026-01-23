@@ -168,27 +168,31 @@ export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHist
 
           {/* Meal Details */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <div>
-                <h3 className="font-semibold text-lg capitalize">
-                  {meal.mealType}
-                </h3>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {meal.aiDescription}
-                </p>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="flex items-center gap-1 text-yellow-500">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star} className="text-lg">
-                    {star <= (meal.nutritionScore || 0) ? '⭐' : '☆'}
-                  </span>
-                  ))}
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  Score: {meal.nutritionScore}/5
-                </div>
-              </div>
+            {/* Meal Type and Time */}
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-base capitalize">
+                {meal.mealType}
+              </h3>
+              <span className="text-xs text-gray-500">
+                {format(new Date(meal.loggedAt), 'h:mm a')}
+              </span>
+            </div>
+            
+            {/* Description */}
+            <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+              {meal.aiDescription}
+            </p>
+            
+            {/* Score */}
+            <div className="flex items-center gap-1 text-yellow-500 mb-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span key={star} className="text-base">
+                  {star <= (meal.nutritionScore || 0) ? '⭐' : '☆'}
+                </span>
+              ))}
+              <span className="text-xs text-gray-500 ml-1">
+                {meal.nutritionScore}/5
+              </span>
             </div>
 
             {/* Nutrition Info */}
@@ -215,22 +219,12 @@ export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHist
               </div>
             </div>
 
-            {/* Timestamp */}
-            <div className="flex items-center gap-4 text-xs text-gray-500">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {format(new Date(meal.loggedAt), 'MMM d, yyyy')}
+            {/* Additional Info */}
+            {meal.aiConfidence && (
+              <div className="text-xs text-gray-500">
+                AI Confidence: {meal.aiConfidence}%
               </div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {format(new Date(meal.loggedAt), 'h:mm a')}
-              </div>
-              {meal.aiConfidence && (
-                <div className="ml-auto">
-                  AI Confidence: {meal.aiConfidence}%
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Beverage Info */}
             {meal.beverageType && (
