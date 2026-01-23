@@ -11,6 +11,7 @@ import { MealHistoryFeed } from "@/components/MealHistoryFeed";
 import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import { DexaUploadSection } from "@/components/DexaUploadSection";
+import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -315,11 +316,12 @@ export default function ClientDetail() {
 
           {/* Data Visualization */}
           <Tabs defaultValue="nutrition" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-1">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto gap-1">
               <TabsTrigger value="nutrition" className="text-xs md:text-sm">Nutrition Trends</TabsTrigger>
               <TabsTrigger value="history" className="text-xs md:text-sm">Meal History</TabsTrigger>
               <TabsTrigger value="trends" className="text-xs md:text-sm">Daily Trends</TabsTrigger>
               <TabsTrigger value="body" className="text-xs md:text-sm">Body Metrics</TabsTrigger>
+              <TabsTrigger value="dexa-viz" className="text-xs md:text-sm">DEXA Insights</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -508,6 +510,20 @@ export default function ClientDetail() {
                   ) : (
                     <p className="text-center text-gray-500 py-8">No hydration data yet</p>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="dexa-viz">
+              <Card>
+                <CardHeader>
+                  <CardTitle>DEXA Scan Insights</CardTitle>
+                  <CardDescription>
+                    Interactive visualizations showing client's body composition, visceral fat, and bone density progress
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DexaVisualizationPanels clientId={clientId!} />
                 </CardContent>
               </Card>
             </TabsContent>

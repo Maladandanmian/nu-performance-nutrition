@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
+import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -848,11 +849,12 @@ export default function ClientDashboard() {
           <TodaysSummary clientId={clientSession?.clientId || 0} />
           
           <Tabs defaultValue="log-meal">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="dexa">DEXA Scans</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -1284,6 +1286,21 @@ export default function ClientDashboard() {
                 goals={goalsData.goals}
               />
             )}
+          </TabsContent>
+
+          {/* DEXA Scans Tab */}
+          <TabsContent value="dexa">
+            <Card>
+              <CardHeader>
+                <CardTitle>Your DEXA Scan Results</CardTitle>
+                <CardDescription>
+                  Track your body composition, visceral fat, and bone density progress over time
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DexaVisualizationPanels clientId={clientSession?.clientId || 0} />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
         </div>

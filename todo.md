@@ -1158,3 +1158,17 @@
 - [x] All 4 vitest tests passing
 - [ ] Test PDF upload with real file through UI
 - [ ] Verify images are stored correctly in database
+
+
+## DEXA Visualization Panels (Jan 23, 2026)
+- [x] Create swipeable panel container with touch/keyboard navigation
+- [x] Panel 1: Visceral Fat Gauge (circular gauge + sparkline trend)
+- [x] Panel 2: Body Recomposition Chart (stacked area: fat vs lean mass over time)
+- [x] Panel 3: VAT Reduction Progress Bar (start → current → target)
+- [x] Panel 4: Bone Density Heatmap (color-coded body silhouette)
+- [x] Panel 5: Metabolic Health Score (0-100 with zone classification)
+- [x] Panel 6: Monthly Progress Summary (multi-metric timeline)
+- [x] Add raw data drawer component (slide-up with tables, images, PDF link)
+- [x] Integrate into client dashboard (new DEXA Scans tab)
+- [x] Add trainer preview mode (DEXA Insights tab in ClientDetail)
+- [ ] Test with real DEXA scan data upload
