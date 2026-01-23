@@ -516,24 +516,9 @@ function VATProgressBar({ data }: { data: any[] }) {
   const startVAT = parseFloat(firstScan.vatArea || "0");
   const currentVAT = parseFloat(latestScan.vatArea || "0");
   
-  // Set target based on starting value (aim for next better zone)
-  // High Risk (>150) → target 90 (Moderate)
-  // Elevated (100-150) → target 70 (Good)
-  // Moderate (75-100) → target 60 (Good)
-  // Good (50-75) → target 45 (Optimal)
-  // Optimal (<50) → maintain or reduce 20%
-  let targetVAT;
-  if (startVAT > 150) {
-    targetVAT = 90; // Aim for Moderate zone
-  } else if (startVAT > 100) {
-    targetVAT = 70; // Aim for Good zone
-  } else if (startVAT > 75) {
-    targetVAT = 60; // Aim for Good zone
-  } else if (startVAT > 50) {
-    targetVAT = 45; // Aim for Optimal zone
-  } else {
-    targetVAT = Math.max(startVAT * 0.8, 30); // Maintain or reduce 20%
-  }
+  // Set target: 20% reduction from starting value
+  // This provides a realistic, achievable goal
+  const targetVAT = startVAT * 0.8;
   
   // Calculate progress
   const totalReduction = startVAT - targetVAT;
@@ -566,8 +551,8 @@ function VATProgressBar({ data }: { data: any[] }) {
       
       {/* Current Status */}
       <div className="text-center mb-8">
-        <div className="text-6xl font-bold text-blue-600 mb-2">
-          {progressPercent.toFixed(0)}%
+        <div className={`text-6xl font-bold mb-2 ${hasRegressed ? 'text-red-600' : 'text-blue-600'}`}>
+          {hasRegressed ? '-' : ''}{Math.abs(progressPercent).toFixed(0)}%
         </div>
         <div className="text-lg text-gray-600">Progress to Goal</div>
       </div>
@@ -585,7 +570,7 @@ function VATProgressBar({ data }: { data: any[] }) {
           <div 
             className="absolute top-0 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-500"
             style={{
-              left: hasRegressed ? `${Math.abs(regressionPercent)}%` : '0%',
+              left: hasRegressed ? `${Math.abs(regressionPercent) + 1.5}%` : '0%',
               right: '0%'
             }}
           >

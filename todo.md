@@ -1348,3 +1348,10 @@
 - [x] Moderate zone (75-100): Yellow ring (#eab308)
 - [x] Elevated zone (100-150): Orange ring (#f97316)
 - [x] High Risk zone (>150): Red ring (#ef4444)
+
+
+## Fix VAT Progress Bar Visual Issues (Jan 23, 2026)
+- [x] Adjust blue bar positioning to reveal more red regression indicator on left side (added 1.5% offset)
+- [x] Fix progress percentage showing "-0%" - now shows actual regression percentage with red color
+- [x] Restore original target calculation logic (back to 20% reduction: 87.4 * 0.8 = 69.9)
+- [x] Target now correctly shows 69.9 cm² instead of 60.0 cm²
