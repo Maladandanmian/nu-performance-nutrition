@@ -1260,3 +1260,9 @@
 - [x] Implement T-score color coding: green (>-1.0), yellow (-1.0 to -2.5), red (<-2.5)
 - [x] Add hover tooltips showing region name, T-score, and BMD values
 - [x] Body diagram now looks professional with proper head, neck, shoulders, torso, limbs
+
+
+## VAT Reduction Progress Bar UI Improvements (Jan 23, 2026)
+- [x] Add white vertical line indicator at current position on progress bar
+- [x] Change "Target" label color to white to match "Start" label
+- [x] Remove conditional "Current" text that only appeared when progress > 50%

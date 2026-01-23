@@ -541,13 +541,16 @@ function VATProgressBar({ data }: { data: any[] }) {
             style={{ width: `${progressPercent}%` }}
           />
           
+          {/* Current position indicator - white vertical line */}
+          <div
+            className="absolute top-0 bottom-0 w-1 bg-white shadow-lg transition-all duration-500"
+            style={{ left: `${progressPercent}%` }}
+          />
+          
           {/* Milestone markers */}
           <div className="absolute inset-0 flex items-center justify-between px-2">
             <span className="text-xs font-semibold text-white">Start</span>
-            {progressPercent > 50 && (
-              <span className="text-xs font-semibold text-white">Current</span>
-            )}
-            <span className="text-xs font-semibold text-gray-600">Target</span>
+            <span className="text-xs font-semibold text-white">Target</span>
           </div>
         </div>
         
