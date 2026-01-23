@@ -17,7 +17,7 @@ import { invokeLLM } from './_core/llm';
 const execAsync = promisify(exec);
 
 interface ExtractedImage {
-  type: 'body_scan_color' | 'body_scan_gray' | 'fracture_risk_chart' | 'body_fat_chart';
+  type: 'body_scan_colorized' | 'body_scan_grayscale' | 'fracture_risk_chart' | 'body_fat_chart';
   imageUrl: string;
   imageKey: string;
   pageNumber: number;
@@ -57,15 +57,15 @@ async function identifyImageSections(imagePath: string, pageNum: number): Promis
       {
         role: 'system',
         content: `You are analyzing a DEXA scan report page. Identify which of these image types are present:
-- body_scan_color: Colorized body scan showing fat distribution (usually red/blue/pink colors)
-- body_scan_gray: Grayscale skeletal body scan
+- body_scan_colorized: Colorized body scan showing fat distribution (usually red/blue/pink colors)
+- body_scan_grayscale: Grayscale skeletal body scan
 - fracture_risk_chart: Chart showing BMD/bone density zones with age (usually has green/yellow/red zones labeled "Fracture Risk")
 - body_fat_chart: Chart showing body fat percentage zones with age (usually labeled "Total Body % Fat")
 
 Return ONLY a JSON array of objects with this structure:
 [
-  { "type": "body_scan_color", "present": true },
-  { "type": "body_scan_gray", "present": false },
+  { "type": "body_scan_colorized", "present": true },
+  { "type": "body_scan_grayscale", "present": false },
   { "type": "fracture_risk_chart", "present": true },
   { "type": "body_fat_chart", "present": false }
 ]
@@ -95,7 +95,7 @@ Do not include any other text or explanation.`
                 properties: {
                   type: {
                     type: 'string',
-                    enum: ['body_scan_color', 'body_scan_gray', 'fracture_risk_chart', 'body_fat_chart']
+                    enum: ['body_scan_colorized', 'body_scan_grayscale', 'fracture_risk_chart', 'body_fat_chart']
                   },
                   present: { type: 'boolean' }
                 },

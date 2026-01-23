@@ -1149,3 +1149,12 @@
 - [x] Add expandable scan details with images in trainer UI
 - [x] Test full workflow with provided PDF samples
 - [x] Write vitest tests for image extraction (4 tests, all passing)
+
+
+## DEXA Image Upload Database Error (Jan 23, 2026)
+- [x] Diagnose dexa_images table schema mismatch
+- [x] Fix database schema or insertion logic (changed body_scan_color/gray to body_scan_colorized/grayscale)
+- [x] Updated AI prompts, frontend labels, and tests
+- [x] All 4 vitest tests passing
+- [ ] Test PDF upload with real file through UI
+- [ ] Verify images are stored correctly in database

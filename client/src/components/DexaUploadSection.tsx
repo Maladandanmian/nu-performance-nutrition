@@ -379,8 +379,8 @@ function MetricCard({ label, value }: { label: string; value: string }) {
 
 function formatImageType(type: string): string {
   const labels: Record<string, string> = {
-    body_scan_color: "Body Scan (Color)",
-    body_scan_gray: "Body Scan (Skeletal)",
+    body_scan_colorized: "Body Scan (Color)",
+    body_scan_grayscale: "Body Scan (Skeletal)",
     fracture_risk_chart: "Fracture Risk Chart",
     body_fat_chart: "Body Fat % Chart",
   };

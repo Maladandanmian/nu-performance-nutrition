@@ -18,7 +18,7 @@ describe('DEXA Image Extraction', () => {
       expect(img.pageNumber).toBeGreaterThan(0);
       
       // Type should be one of the expected values
-      expect(['body_scan_color', 'body_scan_gray', 'fracture_risk_chart', 'body_fat_chart']).toContain(img.type);
+      expect(['body_scan_colorized', 'body_scan_grayscale', 'fracture_risk_chart', 'body_fat_chart']).toContain(img.type);
       
       // URL should be a valid S3 URL
       expect(img.imageUrl).toMatch(/^https:\/\//);
@@ -37,7 +37,7 @@ describe('DEXA Image Extraction', () => {
     const types = images.map(img => img.type);
     
     // Check that we extracted body scan images
-    const hasBodyScan = types.some(t => t === 'body_scan_color' || t === 'body_scan_gray');
+    const hasBodyScan = types.some(t => t === 'body_scan_colorized' || t === 'body_scan_grayscale');
     expect(hasBodyScan).toBe(true);
     
     // Check that we extracted at least one chart
