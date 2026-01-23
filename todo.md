@@ -928,3 +928,10 @@
 - [x] Add bidirectional arrow symbol (⇄) between Servings and Amount fields
 - [x] Position symbol vertically centered between the two inputs
 - [x] Test visual clarity and spacing
+
+## Fix Meal Type Persistence in Nutrition Label Mode (Jan 23, 2026)
+- [x] Investigate why meal type reverts to default when nutrition label is extracted
+- [x] Preserve user-selected meal type through extraction flow
+- [x] Apply time-based meal type defaults for nutrition label mode (same as meal photo mode)
+- [x] Fixed both nutrition label flow and meal photo flow to preserve user selection
+- [ ] Test meal type persistence when user selects Breakfast before scanning label

@@ -164,8 +164,8 @@ export default function ClientDashboard() {
       const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
       setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
       
-      // Refresh meal type based on current time
-      setMealType(getMealTypeFromTime());
+      // Note: Meal type is NOT reset here - user's selection is preserved
+      // Time-based default is only applied on initial component load (line 60)
       
       setShowItemEditor(true);
       // Reset file input only (keep beverage data from upload screen)
@@ -202,8 +202,8 @@ export default function ClientDashboard() {
       const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
       setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
       
-      // Refresh meal type based on current time
-      setMealType(getMealTypeFromTime());
+      // Note: Meal type is NOT reset here - user's selection is preserved
+      // Time-based default is only applied on initial component load (line 60)
       
       // Show nutrition editor instead of item editor
       setShowNutritionEditor(true);
