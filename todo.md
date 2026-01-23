@@ -1306,3 +1306,12 @@
 - [x] Updated region cards to display correct data
 - [x] Removed debug console logs
 - [x] Bone density heatmap now shows green/yellow/red colors based on T-scores
+
+
+## Map All BMD Regions to Heatmap Body Parts (Jan 23, 2026)
+- [x] Query database to see all available BMD region names (12 regions: Head, L/R Arm, L/R Leg, L/R Ribs, L/T Spine, Pelvis, Subtotal, Total)
+- [x] Map each database region to corresponding SVG body part (arms, legs, torso, head)
+- [x] Update BoneDensityHeatmap component to color all available regions
+- [x] Implement BMD-based coloring for regions without T-scores (T-score = 0)
+- [x] Update getColor function to handle both T-score and BMD-based coloring
+- [x] Test that all body parts show proper colors (head=green, arms=yellow, torso=red, legs=green, hips=green)

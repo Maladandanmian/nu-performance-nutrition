@@ -1,0 +1,82 @@
+{
+  "query": "SELECT region, bmd, tScore, zScore FROM dexa_bmd_data WHERE scanId = (SELECT id FROM dexa_scans ORDER BY scanDate DESC LIMIT 1) ORDER BY region;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT region, bmd, tScore, zScore FROM dexa_bmd_data WHERE scanId = (SELECT id FROM dexa_scans ORDER BY scanDate DESC LIMIT 1) ORDER BY region;",
+  "rows": [
+    {
+      "region": "Head",
+      "bmd": "1.709",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "L Arm",
+      "bmd": "0.861",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "L Leg",
+      "bmd": "1.260",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "L Ribs",
+      "bmd": "0.617",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "L Spine",
+      "bmd": "0.973",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "Pelvis",
+      "bmd": "1.248",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "R Arm",
+      "bmd": "0.885",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "R Leg",
+      "bmd": "1.240",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "R Ribs",
+      "bmd": "0.603",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "Subtotal",
+      "bmd": "1.041",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "T Spine",
+      "bmd": "0.735",
+      "tScore": "0.00",
+      "zScore": "0.00"
+    },
+    {
+      "region": "Total",
+      "bmd": "1.105",
+      "tScore": "-0.90",
+      "zScore": "-0.90"
+    }
+  ],
+  "messages": [],
+  "stdout": "region\tbmd\ttScore\tzScore\nHead\t1.709\t0.00\t0.00\nL Arm\t0.861\t0.00\t0.00\nL Leg\t1.260\t0.00\t0.00\nL Ribs\t0.617\t0.00\t0.00\nL Spine\t0.973\t0.00\t0.00\nPelvis\t1.248\t0.00\t0.00\nR Arm\t0.885\t0.00\t0.00\nR Leg\t1.240\t0.00\t0.00\nR Ribs\t0.603\t0.00\t0.00\nSubtotal\t1.041\t0.00\t0.00\nT Spine\t0.735\t0.00\t0.00\nTotal\t1.105\t-0.90\t-0.90\n",
+  "stderr": "",
+  "execution_time_ms": 1546
+}

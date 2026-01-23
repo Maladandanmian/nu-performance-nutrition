@@ -654,10 +654,10 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
   const latestScanId = data[0].scanId;
   const latestData = data.filter(d => d.scanId === latestScanId);
   
-  // Group by region
+  // Group by region (include all regions, even with tScore = 0)
   const regions: Record<string, any> = {};
   latestData.forEach(item => {
-    if (item.region && item.tScore !== null && item.tScore !== undefined) {
+    if (item.region) {
       regions[item.region] = {
         bmd: parseFloat(item.bmd || "0"),
         tScore: parseFloat(item.tScore || "0"),
@@ -669,14 +669,33 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
   // Map database region names to display keys
   const getRegionData = (dbName: string) => regions[dbName];
   const lSpineData = getRegionData('L Spine');
+  const tSpineData = getRegionData('T Spine');
   const pelvisData = getRegionData('Pelvis');
+  const lArmData = getRegionData('L Arm');
+  const rArmData = getRegionData('R Arm');
+  const lLegData = getRegionData('L Leg');
+  const rLegData = getRegionData('R Leg');
+  const lRibsData = getRegionData('L Ribs');
+  const rRibsData = getRegionData('R Ribs');
+  const headData = getRegionData('Head');
   const totalData = getRegionData('Total');
   
-  // Determine color based on T-score
-  const getColor = (tScore: number) => {
-    if (tScore >= -1.0) return { bg: '#10b981', label: 'Strong', text: 'text-green-700' };
-    if (tScore >= -2.5) return { bg: '#fbbf24', label: 'Normal', text: 'text-yellow-700' };
-    return { bg: '#ef4444', label: 'Low', text: 'text-red-700' };
+  // Determine color based on T-score or BMD (for regions without T-score)
+  const getColor = (tScore: number, bmd?: number) => {
+    // If T-score is available and non-zero, use it
+    if (tScore !== 0) {
+      if (tScore >= -1.0) return { bg: '#10b981', label: 'Strong', text: 'text-green-700' };
+      if (tScore >= -2.5) return { bg: '#fbbf24', label: 'Normal', text: 'text-yellow-700' };
+      return { bg: '#ef4444', label: 'Low', text: 'text-red-700' };
+    }
+    // For regions with only BMD data (T-score = 0), use BMD-based coloring
+    // Typical BMD ranges: >1.0 = good, 0.8-1.0 = moderate, <0.8 = low
+    if (bmd) {
+      if (bmd >= 1.0) return { bg: '#10b981', label: 'Good BMD', text: 'text-green-700' };
+      if (bmd >= 0.8) return { bg: '#fbbf24', label: 'Moderate BMD', text: 'text-yellow-700' };
+      return { bg: '#ef4444', label: 'Low BMD', text: 'text-red-700' };
+    }
+    return { bg: '#d1d5db', label: 'No data', text: 'text-gray-700' };
   };
   
   // Key regions to display
@@ -696,8 +715,23 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
       {/* Anatomical Body Diagram */}
       <div className="flex justify-center mb-8">
         <svg width="280" height="480" viewBox="0 0 280 480" className="">
-          {/* Head */}
-          <ellipse cx="140" cy="40" rx="32" ry="38" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
+          {/* Head - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {headData ? `Head\nBMD: ${headData.bmd.toFixed(3)} g/cm²` : 'Head - No data'}
+            </title>
+            <ellipse 
+              cx="140" 
+              cy="40" 
+              rx="32" 
+              ry="38" 
+              fill={headData ? getColor(headData.tScore, headData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="2"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
           
           {/* Neck */}
           <rect x="130" y="75" width="20" height="25" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="3" />
@@ -705,21 +739,96 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
           {/* Shoulders */}
           <ellipse cx="140" cy="115" rx="65" ry="20" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
           
-          {/* Upper Arms */}
-          <rect x="70" y="115" width="22" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="11" />
-          <rect x="188" y="115" width="22" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="11" />
+          {/* Left Arm - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {lArmData ? `Left Arm\nBMD: ${lArmData.bmd.toFixed(3)} g/cm²` : 'Left Arm - No data'}
+            </title>
+            <rect 
+              x="70" 
+              y="115" 
+              width="22" 
+              height="80" 
+              fill={lArmData ? getColor(lArmData.tScore, lArmData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="11"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
           
-          {/* Forearms */}
-          <rect x="68" y="195" width="20" height="75" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="10" />
-          <rect x="192" y="195" width="20" height="75" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="10" />
+          {/* Right Arm - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {rArmData ? `Right Arm\nBMD: ${rArmData.bmd.toFixed(3)} g/cm²` : 'Right Arm - No data'}
+            </title>
+            <rect 
+              x="188" 
+              y="115" 
+              width="22" 
+              height="80" 
+              fill={rArmData ? getColor(rArmData.tScore, rArmData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="11"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
           
-          {/* Torso */}
-          <path
-            d="M 100 120 Q 95 180, 100 240 L 180 240 Q 185 180, 180 120 Z"
-            fill="#f3f4f6"
-            stroke="#6b7280"
-            strokeWidth="2"
-          />
+          {/* Left Forearm - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {lArmData ? `Left Forearm\nBMD: ${lArmData.bmd.toFixed(3)} g/cm²` : 'Left Forearm - No data'}
+            </title>
+            <rect 
+              x="68" 
+              y="195" 
+              width="20" 
+              height="75" 
+              fill={lArmData ? getColor(lArmData.tScore, lArmData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="10"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
+          
+          {/* Right Forearm - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {rArmData ? `Right Forearm\nBMD: ${rArmData.bmd.toFixed(3)} g/cm²` : 'Right Forearm - No data'}
+            </title>
+            <rect 
+              x="192" 
+              y="195" 
+              width="20" 
+              height="75" 
+              fill={rArmData ? getColor(rArmData.tScore, rArmData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="10"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
+          
+          {/* Torso (Ribs + T Spine) - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {tSpineData ? `Thoracic Spine & Ribs\nT Spine BMD: ${tSpineData.bmd.toFixed(3)} g/cm²\nL Ribs BMD: ${lRibsData?.bmd.toFixed(3)} g/cm²\nR Ribs BMD: ${rRibsData?.bmd.toFixed(3)} g/cm²` : 'Torso - No data'}
+            </title>
+            <path
+              d="M 100 120 Q 95 180, 100 240 L 180 240 Q 185 180, 180 120 Z"
+              fill={tSpineData ? getColor(tSpineData.tScore, tSpineData.bmd).bg : '#f3f4f6'}
+              stroke="#6b7280"
+              strokeWidth="2"
+              opacity="0.7"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
           
           {/* Lumbar Spine (L Spine) - Color-coded */}
           <g className="cursor-pointer group">
@@ -731,7 +840,7 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
               y="140"
               width="30"
               height="70"
-              fill={lSpineData ? getColor(lSpineData.tScore).bg : '#d1d5db'}
+              fill={lSpineData ? getColor(lSpineData.tScore, lSpineData.bmd).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               rx="6"
@@ -753,7 +862,7 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
               cx="110"
               cy="270"
               r="24"
-              fill={pelvisData ? getColor(pelvisData.tScore).bg : '#d1d5db'}
+              fill={pelvisData ? getColor(pelvisData.tScore, pelvisData.bmd).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               opacity="0.9"
@@ -771,7 +880,7 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
               cx="170"
               cy="270"
               r="24"
-              fill={pelvisData ? getColor(pelvisData.tScore).bg : '#d1d5db'}
+              fill={pelvisData ? getColor(pelvisData.tScore, pelvisData.bmd).bg : '#d1d5db'}
               stroke="#6b7280"
               strokeWidth="2"
               opacity="0.9"
@@ -780,13 +889,81 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
             <text x="170" y="275" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">HIP</text>
           </g>
           
-          {/* Upper Legs (Thighs) */}
-          <rect x="105" y="295" width="28" height="95" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="14" />
-          <rect x="147" y="295" width="28" height="95" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="14" />
+          {/* Left Leg (Thigh) - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {lLegData ? `Left Leg\nBMD: ${lLegData.bmd.toFixed(3)} g/cm²` : 'Left Leg - No data'}
+            </title>
+            <rect 
+              x="105" 
+              y="295" 
+              width="28" 
+              height="95" 
+              fill={lLegData ? getColor(lLegData.tScore, lLegData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="14"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
           
-          {/* Lower Legs */}
-          <rect x="107" y="390" width="24" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="12" />
-          <rect x="149" y="390" width="24" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="12" />
+          {/* Right Leg (Thigh) - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {rLegData ? `Right Leg\nBMD: ${rLegData.bmd.toFixed(3)} g/cm²` : 'Right Leg - No data'}
+            </title>
+            <rect 
+              x="147" 
+              y="295" 
+              width="28" 
+              height="95" 
+              fill={rLegData ? getColor(rLegData.tScore, rLegData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="14"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
+          
+          {/* Left Lower Leg - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {lLegData ? `Left Lower Leg\nBMD: ${lLegData.bmd.toFixed(3)} g/cm²` : 'Left Lower Leg - No data'}
+            </title>
+            <rect 
+              x="107" 
+              y="390" 
+              width="24" 
+              height="80" 
+              fill={lLegData ? getColor(lLegData.tScore, lLegData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="12"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
+          
+          {/* Right Lower Leg - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {rLegData ? `Right Lower Leg\nBMD: ${rLegData.bmd.toFixed(3)} g/cm²` : 'Right Lower Leg - No data'}
+            </title>
+            <rect 
+              x="149" 
+              y="390" 
+              width="24" 
+              height="80" 
+              fill={rLegData ? getColor(rLegData.tScore, rLegData.bmd).bg : '#f3f4f6'} 
+              stroke="#6b7280" 
+              strokeWidth="1.5" 
+              rx="12"
+              opacity="0.8"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+          </g>
         </svg>
       </div>
       
@@ -796,7 +973,7 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
           const data = regions[region.key];
           if (!data) return null;
           
-          const colorInfo = getColor(data.tScore);
+          const colorInfo = getColor(data.tScore, data.bmd);
           
           return (
             <div key={region.key} className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
