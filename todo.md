@@ -1215,3 +1215,11 @@
 - [x] Update VAT Progress: reverse data for oldest→newest
 - [x] Update Monthly Progress: reverse data for oldest→newest timeline
 - [x] BoneDensityHeatmap and MetabolicHealthScore already correct
+
+
+## DEXA Section Reorganization (Jan 23, 2026)
+- [x] Remove DexaUploadSection from Body Metrics tab in ClientDetail.tsx
+- [x] Add DexaUploadSection below visualization panels in DEXA Insights tab
+- [x] Updated card title to "Upload & Manage DEXA Scans"
+- [ ] Test upload/approval workflow still works correctly
+- [ ] Test that newly uploaded scans appear in visualizations after approval

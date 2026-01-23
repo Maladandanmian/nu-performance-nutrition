@@ -456,17 +456,6 @@ export default function ClientDetail() {
             </TabsContent>
 
             <TabsContent value="body" className="space-y-4">
-              {/* DEXA Upload Section (Trainer Only) */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>DEXA Scan Upload</CardTitle>
-                  <CardDescription>Upload and analyze DEXA scan reports</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DexaUploadSection clientId={clientId!} />
-                </CardContent>
-              </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Weight Trend</CardTitle>
@@ -514,7 +503,7 @@ export default function ClientDetail() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="dexa-viz">
+            <TabsContent value="dexa-viz" className="space-y-4">
               <Card>
                 <CardHeader>
                   <CardTitle>DEXA Scan Insights</CardTitle>
@@ -524,6 +513,17 @@ export default function ClientDetail() {
                 </CardHeader>
                 <CardContent>
                   <DexaVisualizationPanels clientId={clientId!} />
+                </CardContent>
+              </Card>
+
+              {/* Upload & Manage Scans */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upload & Manage DEXA Scans</CardTitle>
+                  <CardDescription>Upload new DEXA scan PDFs and review pending scans for approval</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DexaUploadSection clientId={clientId!} />
                 </CardContent>
               </Card>
             </TabsContent>
