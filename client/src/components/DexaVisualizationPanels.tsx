@@ -259,7 +259,13 @@ function VisceralFatGauge({ data }: { data: any[] }) {
             cy="50"
             r="40"
             fill="none"
-            stroke={zone === "healthy" ? "#10b981" : zone === "elevated" ? "#f59e0b" : "#ef4444"}
+            stroke={
+              zone === "high" ? "#ef4444" : 
+              zone === "elevated" ? "#f97316" : 
+              zone === "moderate" ? "#eab308" : 
+              zone === "good" ? "#3b82f6" : 
+              "#10b981"
+            }
             strokeWidth="8"
             strokeDasharray={`${gaugePercent * 2.51} 251`}
             strokeLinecap="round"
