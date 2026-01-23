@@ -14,6 +14,7 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
   // Fetch approved DEXA scans for this client
   const { data: bodyCompHistory } = trpc.dexa.getBodyCompTrend.useQuery({ clientId });
   const { data: bmdHistory } = trpc.dexa.getBmdTrend.useQuery({ clientId });
+  const { data: dexaGoals } = trpc.dexa.getGoals.useQuery({ clientId });
 
   // Get the most recent scan for current values
   const latestScan = bodyCompHistory?.[0];
@@ -80,7 +81,7 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
     {
       id: 2,
       title: "VAT Reduction Progress (All Scans)",
-      component: <VATProgressBar data={bodyCompHistory} />,
+      component: <VATProgressBar data={bodyCompHistory} customTarget={dexaGoals?.vatTarget ? parseFloat(dexaGoals.vatTarget) : undefined} />,
     },
     {
       id: 3,
@@ -503,7 +504,7 @@ function BodyRecompositionChart({ data }: { data: any[] }) {
 }
 
 // Panel 3: VAT Reduction Progress Bar
-function VATProgressBar({ data }: { data: any[] }) {
+function VATProgressBar({ data, customTarget }: { data: any[]; customTarget?: number }) {
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
@@ -516,9 +517,8 @@ function VATProgressBar({ data }: { data: any[] }) {
   const startVAT = parseFloat(firstScan.vatArea || "0");
   const currentVAT = parseFloat(latestScan.vatArea || "0");
   
-  // Set target: 20% reduction from starting value
-  // This provides a realistic, achievable goal
-  const targetVAT = startVAT * 0.8;
+  // Use custom target if set by trainer, otherwise default to 20% reduction
+  const targetVAT = customTarget !== undefined ? customTarget : startVAT * 0.8;
   
   // Calculate progress
   const totalReduction = startVAT - targetVAT;

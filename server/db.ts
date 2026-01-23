@@ -275,8 +275,38 @@ import {
   InsertDexaScan, dexaScans,
   InsertDexaBmdData, dexaBmdData,
   InsertDexaBodyComp, dexaBodyComp,
-  InsertDexaImage, dexaImages
+  InsertDexaImage, dexaImages,
+  InsertDexaGoal, dexaGoals
 } from "../drizzle/schema";
+
+/**
+ * Create or update DEXA goals for a client
+ */
+export async function upsertDexaGoals(clientId: number, goals: Partial<InsertDexaGoal>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getDexaGoalsByClientId(clientId);
+  
+  if (existing) {
+    // Update existing goals
+    return db.update(dexaGoals).set(goals).where(eq(dexaGoals.clientId, clientId));
+  } else {
+    // Create new goals
+    return db.insert(dexaGoals).values({ clientId, ...goals });
+  }
+}
+
+/**
+ * Get DEXA goals for a client
+ */
+export async function getDexaGoalsByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(dexaGoals).where(eq(dexaGoals.clientId, clientId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
 
 /**
  * Create a new DEXA scan record

@@ -1696,6 +1696,35 @@ export const appRouter = router({
         // Filter to approved scans only
         return history.filter((record: any) => record.status === 'approved');
       }),
+
+    // Get DEXA goals for a client (accessible to both trainers and clients)
+    getGoals: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getDexaGoalsByClientId(input.clientId);
+      }),
+
+    // Update DEXA goals (trainer only)
+    updateGoals: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        vatTarget: z.number().optional(),
+        bodyFatPctTarget: z.number().optional(),
+        leanMassTarget: z.number().optional(),
+        boneDensityTarget: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { clientId, ...goals } = input;
+        // Convert numbers to strings for decimal fields
+        const convertedGoals: any = {};
+        if (goals.vatTarget !== undefined) convertedGoals.vatTarget = goals.vatTarget.toString();
+        if (goals.bodyFatPctTarget !== undefined) convertedGoals.bodyFatPctTarget = goals.bodyFatPctTarget.toString();
+        if (goals.leanMassTarget !== undefined) convertedGoals.leanMassTarget = goals.leanMassTarget.toString();
+        if (goals.boneDensityTarget !== undefined) convertedGoals.boneDensityTarget = goals.boneDensityTarget.toString();
+        
+        await db.upsertDexaGoals(clientId, convertedGoals);
+        return { success: true };
+      }),
   }),
 });
 

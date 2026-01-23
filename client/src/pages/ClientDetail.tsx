@@ -32,6 +32,13 @@ export default function ClientDetail() {
   const [fibreTarget, setFibreTarget] = useState("");
   const [hydrationTarget, setHydrationTarget] = useState("");
   const [weightTarget, setWeightTarget] = useState("");
+  
+  // DEXA goals state
+  const [isEditDexaGoalsOpen, setIsEditDexaGoalsOpen] = useState(false);
+  const [vatTarget, setVatTarget] = useState("");
+  const [bodyFatPctTarget, setBodyFatPctTarget] = useState("");
+  const [leanMassTarget, setLeanMassTarget] = useState("");
+  const [boneDensityTarget, setBoneDensityTarget] = useState("");
   const [timeRange, setTimeRange] = useState<"today" | "7days" | "30days" | "all">("30days");
   const [editingMeal, setEditingMeal] = useState<any | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -50,6 +57,10 @@ export default function ClientDetail() {
     { enabled: !!clientId }
   );
   const { data: bodyMetrics } = trpc.bodyMetrics.list.useQuery(
+    { clientId: clientId! },
+    { enabled: !!clientId }
+  );
+  const { data: dexaGoals } = trpc.dexa.getGoals.useQuery(
     { clientId: clientId! },
     { enabled: !!clientId }
   );
@@ -72,6 +83,17 @@ export default function ClientDetail() {
     },
     onError: (error) => {
       toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
+  const updateDexaGoalsMutation = trpc.dexa.updateGoals.useMutation({
+    onSuccess: () => {
+      toast.success("DEXA goals updated");
+      utils.dexa.getGoals.invalidate({ clientId: clientId! });
+      setIsEditDexaGoalsOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update DEXA goals: ${error.message}`);
     },
   });
 
@@ -119,6 +141,24 @@ export default function ClientDetail() {
       fibreTarget: parseInt(fibreTarget),
       hydrationTarget: parseInt(hydrationTarget),
       weightTarget: weightTarget ? parseFloat(weightTarget) : undefined,
+    });
+  };
+
+  const handleEditDexaGoals = () => {
+    setVatTarget(dexaGoals?.vatTarget || "");
+    setBodyFatPctTarget(dexaGoals?.bodyFatPctTarget || "");
+    setLeanMassTarget(dexaGoals?.leanMassTarget || "");
+    setBoneDensityTarget(dexaGoals?.boneDensityTarget || "");
+    setIsEditDexaGoalsOpen(true);
+  };
+
+  const handleSaveDexaGoals = async () => {
+    await updateDexaGoalsMutation.mutateAsync({
+      clientId: clientId!,
+      vatTarget: vatTarget ? parseFloat(vatTarget) : undefined,
+      bodyFatPctTarget: bodyFatPctTarget ? parseFloat(bodyFatPctTarget) : undefined,
+      leanMassTarget: leanMassTarget ? parseFloat(leanMassTarget) : undefined,
+      boneDensityTarget: boneDensityTarget ? parseFloat(boneDensityTarget) : undefined,
     });
   };
 
@@ -504,6 +544,122 @@ export default function ClientDetail() {
             </TabsContent>
 
             <TabsContent value="dexa-viz" className="space-y-4">
+              {/* DEXA Goals Card */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>DEXA Goals</CardTitle>
+                      <CardDescription>Target values for body composition metrics</CardDescription>
+                    </div>
+                    <Dialog open={isEditDexaGoalsOpen} onOpenChange={setIsEditDexaGoalsOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleEditDexaGoals}
+                          style={{borderColor: '#578DB3', color: '#578DB3'}}
+                          className="hover:bg-blue-50"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit DEXA Goals
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit DEXA Goals</DialogTitle>
+                          <DialogDescription>
+                            Set custom target values for {client.name}'s body composition metrics
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="vatTarget">VAT Target (cm²)</Label>
+                            <Input
+                              id="vatTarget"
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g., 69.9"
+                              value={vatTarget}
+                              onChange={(e) => setVatTarget(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Visceral adipose tissue area target</p>
+                          </div>
+                          <div>
+                            <Label htmlFor="bodyFatPctTarget">Body Fat % Target</Label>
+                            <Input
+                              id="bodyFatPctTarget"
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g., 18.5"
+                              value={bodyFatPctTarget}
+                              onChange={(e) => setBodyFatPctTarget(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Total body fat percentage target</p>
+                          </div>
+                          <div>
+                            <Label htmlFor="leanMassTarget">Lean Mass Target (kg)</Label>
+                            <Input
+                              id="leanMassTarget"
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g., 75.0"
+                              value={leanMassTarget}
+                              onChange={(e) => setLeanMassTarget(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Total lean mass target</p>
+                          </div>
+                          <div>
+                            <Label htmlFor="boneDensityTarget">Bone Density Target (g/cm²)</Label>
+                            <Input
+                              id="boneDensityTarget"
+                              type="number"
+                              step="0.01"
+                              placeholder="e.g., 1.20"
+                              value={boneDensityTarget}
+                              onChange={(e) => setBoneDensityTarget(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Average BMD target for key regions</p>
+                          </div>
+                          <Button 
+                            onClick={handleSaveDexaGoals} 
+                            className="w-full hover:opacity-90"
+                            style={{backgroundColor: '#578DB3'}}
+                            disabled={updateDexaGoalsMutation.isPending}
+                          >
+                            {updateDexaGoalsMutation.isPending ? "Saving..." : "Save DEXA Goals"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {dexaGoals ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">VAT Target</p>
+                        <p className="text-2xl font-bold">{dexaGoals.vatTarget ? `${dexaGoals.vatTarget} cm²` : 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Body Fat %</p>
+                        <p className="text-2xl font-bold">{dexaGoals.bodyFatPctTarget ? `${dexaGoals.bodyFatPctTarget}%` : 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Lean Mass</p>
+                        <p className="text-2xl font-bold">{dexaGoals.leanMassTarget ? `${dexaGoals.leanMassTarget} kg` : 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Bone Density</p>
+                        <p className="text-2xl font-bold">{dexaGoals.boneDensityTarget ? `${dexaGoals.boneDensityTarget} g/cm²` : 'Not set'}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No DEXA goals set yet. Click "Edit DEXA Goals" to set targets.</p>
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle>DEXA Scan Insights</CardTitle>

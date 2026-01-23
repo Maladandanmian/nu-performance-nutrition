@@ -1355,3 +1355,27 @@
 - [x] Fix progress percentage showing "-0%" - now shows actual regression percentage with red color
 - [x] Restore original target calculation logic (back to 20% reduction: 87.4 * 0.8 = 69.9)
 - [x] Target now correctly shows 69.9 cm² instead of 60.0 cm²
+
+
+## Implement DEXA Target-Setting System (Jan 23, 2026)
+- [x] Design database schema for storing custom DEXA targets (VAT, body fat %, lean mass, bone density)
+- [x] Create dexaGoals table with clientId, vatTarget, bodyFatPctTarget, leanMassTarget, boneDensityTarget
+- [x] Push schema migration to database
+- [x] Add tRPC procedures: getDexaGoals, setDexaGoals (dexa.getGoals, dexa.updateGoals)
+- [x] Add database helpers: upsertDexaGoals, getDexaGoalsByClientId
+- [x] Create "Edit DEXA Goals" UI similar to nutrition goals interface
+- [x] Add "Edit DEXA Goals" button and card to DEXA Insights tab
+- [x] Display current DEXA goals with VAT, body fat %, lean mass, and bone density targets
+- [x] Update VAT Reduction Progress to use custom vatTarget when available (falls back to 20% reduction)
+- [ ] Update Metabolic Health scoring to use custom targets
+- [ ] Update Body Recomposition panel to use custom lean mass target
+- [ ] Add target history tracking to show when goals are adjusted
+- [ ] Test with multiple clients and various target combinations
+
+
+## Verify Client-Side DEXA Visualization Access (Jan 23, 2026)
+- [ ] Check if ClientDashboard has DEXA Insights tab
+- [ ] Verify DexaVisualizationPanels component is accessible to clients
+- [ ] Test that all visualization changes (thresholds, scoring, colors) work on client side
+- [ ] Ensure clients can see their own DEXA scans and insights
+- [ ] Test with client PIN login to verify access

@@ -66,6 +66,24 @@ export type NutritionGoal = typeof nutritionGoals.$inferSelect;
 export type InsertNutritionGoal = typeof nutritionGoals.$inferInsert;
 
 /**
+ * DEXA goals table - stores target values for DEXA metrics per client
+ * Editable by trainers only
+ */
+export const dexaGoals = mysqlTable("dexa_goals", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }).unique(),
+  vatTarget: decimal("vatTarget", { precision: 5, scale: 1 }), // cm² (visceral adipose tissue target)
+  bodyFatPctTarget: decimal("bodyFatPctTarget", { precision: 4, scale: 1 }), // % (body fat percentage target)
+  leanMassTarget: decimal("leanMassTarget", { precision: 5, scale: 1 }), // kg (lean mass target)
+  boneDensityTarget: decimal("boneDensityTarget", { precision: 4, scale: 2 }), // g/cm² (BMD target for key regions)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DexaGoal = typeof dexaGoals.$inferSelect;
+export type InsertDexaGoal = typeof dexaGoals.$inferInsert;
+
+/**
  * Meals table - stores food entries with AI-analyzed nutritional data
  */
 export const meals = mysqlTable("meals", {
