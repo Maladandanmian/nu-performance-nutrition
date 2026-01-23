@@ -1323,3 +1323,11 @@
 - [x] Fix the body fat percentage calculation/display (changed totalBodyFatPercent to totalBodyFatPct)
 - [x] Verify lean/fat ratio is calculated correctly
 - [x] Test with actual DEXA scan data (Metabolic Health panel now shows 21.6%)
+
+
+## Fix Metabolic Health Score Calculation (Jan 23, 2026)
+- [x] Review scoring logic in VisceralFatStatus component
+- [x] Check if body fat percentage is being used correctly in score calculation (now using totalBodyFatPct)
+- [x] Verify VAT thresholds are appropriate for scoring (updated: Optimal <50, Good 50-75, Moderate 75-100, Elevated 100-150, High Risk >150)
+- [x] Update body fat thresholds (Optimal <15%, Good 15-20%, Moderate 20-25%, Elevated 25-30%, High >30%)
+- [x] Test with actual client data (VAT=87.5, body fat=21.6%) - Score now shows 80 "Good" instead of 100 "Optimal"

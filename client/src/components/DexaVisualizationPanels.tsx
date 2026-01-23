@@ -1046,25 +1046,40 @@ function MetabolicHealthScore({ data }: { data: any }) {
   let factors: { name: string; impact: string; points: number }[] = [];
   
   // VAT Area (max -40 points)
+  // Optimal: <50, Good: 50-75, Healthy: 75-100, Elevated: 100-150, High Risk: >150
   if (vatArea > 150) {
     score -= 40;
     factors.push({ name: 'Visceral Fat', impact: 'High risk level', points: -40 });
   } else if (vatArea > 100) {
-    score -= 20;
-    factors.push({ name: 'Visceral Fat', impact: 'Elevated level', points: -20 });
+    score -= 25;
+    factors.push({ name: 'Visceral Fat', impact: 'Elevated level', points: -25 });
+  } else if (vatArea > 75) {
+    score -= 10;
+    factors.push({ name: 'Visceral Fat', impact: 'Moderate level', points: -10 });
+  } else if (vatArea > 50) {
+    score -= 5;
+    factors.push({ name: 'Visceral Fat', impact: 'Good range', points: -5 });
   } else {
-    factors.push({ name: 'Visceral Fat', impact: 'Healthy range', points: 0 });
+    factors.push({ name: 'Visceral Fat', impact: 'Optimal range', points: 0 });
   }
   
-  // Body Fat % (max -30 points, gender-adjusted)
+  // Body Fat % (max -30 points)
+  // Optimal: <15% (M) <22% (F), Good: 15-20% (M) 22-25% (F), Elevated: 20-25% (M) 25-30% (F), High: >25% (M) >30% (F)
+  // Using general thresholds (not gender-specific for now)
   if (bodyFatPercent > 30) {
     score -= 30;
     factors.push({ name: 'Body Fat %', impact: 'Above healthy range', points: -30 });
   } else if (bodyFatPercent > 25) {
-    score -= 15;
-    factors.push({ name: 'Body Fat %', impact: 'Slightly elevated', points: -15 });
+    score -= 20;
+    factors.push({ name: 'Body Fat %', impact: 'Elevated', points: -20 });
+  } else if (bodyFatPercent > 20) {
+    score -= 10;
+    factors.push({ name: 'Body Fat %', impact: 'Moderate', points: -10 });
+  } else if (bodyFatPercent > 15) {
+    score -= 5;
+    factors.push({ name: 'Body Fat %', impact: 'Good range', points: -5 });
   } else {
-    factors.push({ name: 'Body Fat %', impact: 'Healthy range', points: 0 });
+    factors.push({ name: 'Body Fat %', impact: 'Optimal range', points: 0 });
   }
   
   // Lean to Fat Ratio (max -30 points)
