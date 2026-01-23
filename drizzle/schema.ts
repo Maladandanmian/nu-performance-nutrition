@@ -1,4 +1,4 @@
-import { decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { date, decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -145,3 +145,119 @@ export const bodyMetrics = mysqlTable("body_metrics", {
 
 export type BodyMetric = typeof bodyMetrics.$inferSelect;
 export type InsertBodyMetric = typeof bodyMetrics.$inferInsert;
+
+/**
+ * DEXA scans table - stores uploaded DEXA scan reports
+ * Trainer uploads PDF, AI extracts data, trainer reviews/approves before client can view
+ */
+export const dexaScans = mysqlTable("dexa_scans", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  // PDF storage
+  pdfUrl: text("pdfUrl").notNull(),
+  pdfKey: text("pdfKey").notNull(),
+  // Scan metadata
+  scanDate: date("scanDate").notNull(),
+  scanId: varchar("scanId", { length: 100 }), // e.g., A0818220D from PDF
+  scanType: varchar("scanType", { length: 100 }), // e.g., "a Whole Body"
+  scanVersion: varchar("scanVersion", { length: 100 }), // e.g., "13.6.0.5"
+  operator: varchar("operator", { length: 100 }),
+  model: varchar("model", { length: 100 }), // e.g., "Horizon A"
+  // Patient info from scan
+  patientHeight: int("patientHeight"), // cm
+  patientWeight: int("patientWeight"), // kg (stored as integer, e.g., 59.8kg = 598)
+  patientAge: int("patientAge"),
+  // Status workflow
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  rejectionReason: text("rejectionReason"),
+  approvedAt: timestamp("approvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DexaScan = typeof dexaScans.$inferSelect;
+export type InsertDexaScan = typeof dexaScans.$inferInsert;
+
+/**
+ * DEXA bone mineral density data - regional BMD breakdown
+ * One row per body region per scan
+ */
+export const dexaBmdData = mysqlTable("dexa_bmd_data", {
+  id: int("id").autoincrement().primaryKey(),
+  scanId: int("scanId").notNull().references(() => dexaScans.id, { onDelete: "cascade" }),
+  region: varchar("region", { length: 50 }).notNull(), // L Arm, R Arm, L Ribs, R Ribs, T Spine, L Spine, Pelvis, L Leg, R Leg, Subtotal, Head, Total
+  area: decimal("area", { precision: 10, scale: 2 }), // cm²
+  bmc: decimal("bmc", { precision: 10, scale: 2 }), // g (Bone Mineral Content)
+  bmd: decimal("bmd", { precision: 10, scale: 3 }), // g/cm² (Bone Mineral Density)
+  tScore: decimal("tScore", { precision: 5, scale: 2 }), // T-score
+  zScore: decimal("zScore", { precision: 5, scale: 2 }), // Z-score
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DexaBmdData = typeof dexaBmdData.$inferSelect;
+export type InsertDexaBmdData = typeof dexaBmdData.$inferInsert;
+
+/**
+ * DEXA body composition data - fat/lean mass and adipose indices
+ * One row per scan with aggregated body composition metrics
+ */
+export const dexaBodyComp = mysqlTable("dexa_body_comp", {
+  id: int("id").autoincrement().primaryKey(),
+  scanId: int("scanId").notNull().references(() => dexaScans.id, { onDelete: "cascade" }),
+  // Total body metrics
+  totalFatMass: int("totalFatMass"), // grams
+  totalLeanMass: int("totalLeanMass"), // grams
+  totalMass: int("totalMass"), // grams
+  totalBodyFatPct: decimal("totalBodyFatPct", { precision: 5, scale: 2 }), // %
+  totalBodyFatPctTScore: decimal("totalBodyFatPctTScore", { precision: 5, scale: 2 }),
+  totalBodyFatPctZScore: decimal("totalBodyFatPctZScore", { precision: 5, scale: 2 }),
+  // Regional fat distribution
+  trunkFatMass: int("trunkFatMass"), // grams
+  trunkFatPct: decimal("trunkFatPct", { precision: 5, scale: 2 }), // %
+  androidFatMass: int("androidFatMass"), // grams
+  androidFatPct: decimal("androidFatPct", { precision: 5, scale: 2 }), // %
+  gynoidFatMass: int("gynoidFatMass"), // grams
+  gynoidFatPct: decimal("gynoidFatPct", { precision: 5, scale: 2 }), // %
+  // Adipose indices (KEY METRICS)
+  fatMassHeightRatio: decimal("fatMassHeightRatio", { precision: 5, scale: 2 }), // kg/m²
+  androidGynoidRatio: decimal("androidGynoidRatio", { precision: 5, scale: 3 }), // A/G ratio
+  trunkLegsFatRatio: decimal("trunkLegsFatRatio", { precision: 5, scale: 2 }), // % Fat Trunk / % Fat Legs
+  trunkLimbFatMassRatio: decimal("trunkLimbFatMassRatio", { precision: 5, scale: 2 }), // Trunk/Limb Fat Mass Ratio
+  // Visceral Adipose Tissue (VAT) - TOP PRIORITY METRICS
+  vatMass: int("vatMass"), // grams
+  vatVolume: int("vatVolume"), // cm³
+  vatArea: decimal("vatArea", { precision: 10, scale: 2 }), // cm² - PRIMARY METRIC
+  // Lean indices
+  leanMassHeightRatio: decimal("leanMassHeightRatio", { precision: 5, scale: 2 }), // kg/m²
+  appendicularLeanMassHeightRatio: decimal("appendicularLeanMassHeightRatio", { precision: 5, scale: 2 }), // kg/m²
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DexaBodyComp = typeof dexaBodyComp.$inferSelect;
+export type InsertDexaBodyComp = typeof dexaBodyComp.$inferInsert;
+
+/**
+ * DEXA images - extracted images from PDF (body scans, charts, tables)
+ * Stored as PNG files in S3 for display in the app
+ */
+export const dexaImages = mysqlTable("dexa_images", {
+  id: int("id").autoincrement().primaryKey(),
+  scanId: int("scanId").notNull().references(() => dexaScans.id, { onDelete: "cascade" }),
+  imageType: mysqlEnum("imageType", [
+    "body_scan_grayscale",
+    "body_scan_colorized",
+    "fracture_risk_chart",
+    "body_fat_chart",
+    "bmd_table",
+    "body_comp_table",
+    "adipose_indices_table",
+  ]).notNull(),
+  imageUrl: text("imageUrl").notNull(),
+  imageKey: text("imageKey").notNull(),
+  pageNumber: int("pageNumber"), // PDF page number where image was extracted
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DexaImage = typeof dexaImages.$inferSelect;
+export type InsertDexaImage = typeof dexaImages.$inferInsert;

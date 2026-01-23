@@ -1502,6 +1502,167 @@ export const appRouter = router({
         return db.getBodyMetricsByClientId(input.clientId);
       }),
   }),
+
+  // ============================================================================
+  // DEXA Scan Router (Trainer & Client)
+  // ============================================================================
+  dexa: router({
+    // Trainer: Upload DEXA PDF and trigger AI extraction
+    uploadScan: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        pdfFile: z.object({
+          data: z.string(), // base64 encoded PDF
+          filename: z.string(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { analyzeDexaPdf } = await import("./dexaPdfAnalysis");
+        
+        // Upload PDF to S3
+        const pdfBuffer = Buffer.from(input.pdfFile.data, 'base64');
+        const pdfKey = `dexa-scans/${input.clientId}/${Date.now()}-${input.pdfFile.filename}`;
+        const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, 'application/pdf');
+        
+        // Extract data using AI
+        const extractedData = await analyzeDexaPdf(pdfUrl);
+        
+        // Create scan record
+        const scanId = await db.createDexaScan({
+          clientId: input.clientId,
+          trainerId: 1, // TODO: Get from ctx.user.id
+          pdfUrl,
+          pdfKey,
+          scanDate: extractedData.scanMetadata.scanDate,
+          scanId: extractedData.scanMetadata.scanId || null,
+          scanType: extractedData.scanMetadata.scanType || null,
+          scanVersion: extractedData.scanMetadata.analysisVersion || null,
+          operator: extractedData.scanMetadata.operator || null,
+          model: extractedData.scanMetadata.model || null,
+          patientHeight: extractedData.scanMetadata.patientHeight || null,
+          patientWeight: extractedData.scanMetadata.patientWeight ? Math.round(extractedData.scanMetadata.patientWeight * 10) : null,
+          patientAge: extractedData.scanMetadata.patientAge || null,
+          status: 'pending',
+        });
+        
+        // Store BMD data
+        if (extractedData.bmdData && extractedData.bmdData.length > 0) {
+          const bmdRecords = extractedData.bmdData.map((bmd: any) => ({
+            scanId,
+            region: bmd.region,
+            area: bmd.area?.toString() || null,
+            bmc: bmd.bmc?.toString() || null,
+            bmd: bmd.bmd?.toString() || null,
+            tScore: bmd.tScore?.toString() || null,
+            zScore: bmd.zScore?.toString() || null,
+          }));
+          await db.createDexaBmdData(bmdRecords);
+        }
+        
+        // Store body composition data
+        if (extractedData.bodyComposition || extractedData.adiposeIndices) {
+          await db.createDexaBodyComp({
+            scanId,
+            totalFatMass: extractedData.bodyComposition?.totalFatMass || null,
+            totalLeanMass: extractedData.bodyComposition?.totalLeanMass || null,
+            totalMass: extractedData.bodyComposition?.totalMass || null,
+            totalBodyFatPct: extractedData.bodyComposition?.totalBodyFatPct?.toString() || null,
+            totalBodyFatPctTScore: extractedData.bodyComposition?.totalBodyFatPctTScore?.toString() || null,
+            totalBodyFatPctZScore: extractedData.bodyComposition?.totalBodyFatPctZScore?.toString() || null,
+            trunkFatMass: extractedData.bodyComposition?.trunkFatMass || null,
+            trunkFatPct: extractedData.bodyComposition?.trunkFatPct?.toString() || null,
+            androidFatMass: extractedData.bodyComposition?.androidFatMass || null,
+            androidFatPct: extractedData.bodyComposition?.androidFatPct?.toString() || null,
+            gynoidFatMass: extractedData.bodyComposition?.gynoidFatMass || null,
+            gynoidFatPct: extractedData.bodyComposition?.gynoidFatPct?.toString() || null,
+            fatMassHeightRatio: extractedData.adiposeIndices?.fatMassHeightRatio?.toString() || null,
+            androidGynoidRatio: extractedData.adiposeIndices?.androidGynoidRatio?.toString() || null,
+            trunkLegsFatRatio: extractedData.adiposeIndices?.trunkLegsFatRatio?.toString() || null,
+            trunkLimbFatMassRatio: extractedData.adiposeIndices?.trunkLimbFatMassRatio?.toString() || null,
+            vatMass: extractedData.adiposeIndices?.vatMass || null,
+            vatVolume: extractedData.adiposeIndices?.vatVolume || null,
+            vatArea: extractedData.adiposeIndices?.vatArea?.toString() || null,
+            leanMassHeightRatio: extractedData.leanIndices?.leanMassHeightRatio?.toString() || null,
+            appendicularLeanMassHeightRatio: extractedData.leanIndices?.appendicularLeanMassHeightRatio?.toString() || null,
+          });
+        }
+        
+        return {
+          scanId,
+          extractedData,
+        };
+      }),
+
+    // Trainer: Approve or reject a scan
+    updateScanStatus: adminProcedure
+      .input(z.object({
+        scanId: z.number(),
+        status: z.enum(['approved', 'rejected']),
+        rejectionReason: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateDexaScanStatus(input.scanId, input.status, input.rejectionReason);
+        return { success: true };
+      }),
+
+    // Trainer: Get all scans for a client (including pending)
+    getClientScans: adminProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const scans = await db.getDexaScansByClient(input.clientId);
+        return scans;
+      }),
+
+    // Client: Get approved scans only
+    getMyScans: authenticatedProcedure
+      .query(async ({ ctx }) => {
+        // Get client session
+        const clientCookie = ctx.req.cookies?.['client_session'];
+        if (!clientCookie) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'No client session found' });
+        }
+        
+        const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
+        const clientId = decoded.clientId;
+        
+        const allScans = await db.getDexaScansByClient(clientId);
+        // Filter to approved scans only
+        return allScans.filter(scan => scan.status === 'approved');
+      }),
+
+    // Get detailed scan data (BMD + Body Comp)
+    getScanDetails: protectedProcedure
+      .input(z.object({ scanId: z.number() }))
+      .query(async ({ input }) => {
+        const scan = await db.getDexaScanById(input.scanId);
+        const bmdData = await db.getDexaBmdData(input.scanId);
+        const bodyComp = await db.getDexaBodyComp(input.scanId);
+        
+        return {
+          scan,
+          bmdData,
+          bodyComp,
+        };
+      }),
+
+    // Get body composition history for trend charts
+    getBodyCompTrend: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const history = await db.getDexaBodyCompHistory(input.clientId);
+        // Filter to approved scans only
+        return history.filter((record: any) => record.dexa_scans.status === 'approved');
+      }),
+
+    // Get BMD history for trend charts
+    getBmdTrend: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const history = await db.getDexaBmdHistory(input.clientId);
+        // Filter to approved scans only
+        return history.filter((record: any) => record.status === 'approved');
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -266,3 +266,193 @@ export async function deleteClientAndData(clientId: number) {
     throw error;
   }
 }
+
+// ============================================================================
+// DEXA Scan Database Helpers
+// ============================================================================
+
+import {
+  InsertDexaScan, dexaScans,
+  InsertDexaBmdData, dexaBmdData,
+  InsertDexaBodyComp, dexaBodyComp,
+  InsertDexaImage, dexaImages
+} from "../drizzle/schema";
+
+/**
+ * Create a new DEXA scan record
+ */
+export async function createDexaScan(scan: InsertDexaScan) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(dexaScans).values(scan);
+  return result[0].insertId;
+}
+
+/**
+ * Get all DEXA scans for a client
+ */
+export async function getDexaScansByClient(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaScans)
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(desc(dexaScans.scanDate));
+}
+
+/**
+ * Get a single DEXA scan by ID
+ */
+export async function getDexaScanById(scanId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(dexaScans)
+    .where(eq(dexaScans.id, scanId))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Update DEXA scan status (approve/reject)
+ */
+export async function updateDexaScanStatus(
+  scanId: number,
+  status: "approved" | "rejected",
+  rejectionReason?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: any = { status };
+  if (status === "approved") {
+    updateData.approvedAt = new Date();
+  }
+  if (rejectionReason) {
+    updateData.rejectionReason = rejectionReason;
+  }
+
+  await db
+    .update(dexaScans)
+    .set(updateData)
+    .where(eq(dexaScans.id, scanId));
+}
+
+/**
+ * Create BMD data records for a scan
+ */
+export async function createDexaBmdData(bmdRecords: InsertDexaBmdData[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (bmdRecords.length === 0) return;
+  await db.insert(dexaBmdData).values(bmdRecords);
+}
+
+/**
+ * Get BMD data for a scan
+ */
+export async function getDexaBmdData(scanId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaBmdData)
+    .where(eq(dexaBmdData.scanId, scanId));
+}
+
+/**
+ * Create body composition record for a scan
+ */
+export async function createDexaBodyComp(bodyComp: InsertDexaBodyComp) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(dexaBodyComp).values(bodyComp);
+}
+
+/**
+ * Get body composition data for a scan
+ */
+export async function getDexaBodyComp(scanId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(dexaBodyComp)
+    .where(eq(dexaBodyComp.scanId, scanId))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Create image records for a scan
+ */
+export async function createDexaImages(images: InsertDexaImage[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (images.length === 0) return;
+  await db.insert(dexaImages).values(images);
+}
+
+/**
+ * Get images for a scan
+ */
+export async function getDexaImages(scanId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaImages)
+    .where(eq(dexaImages.scanId, scanId))
+    .orderBy(dexaImages.pageNumber);
+}
+
+/**
+ * Get all body composition data for a client (for trend analysis)
+ */
+export async function getDexaBodyCompHistory(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaBodyComp)
+    .innerJoin(dexaScans, eq(dexaBodyComp.scanId, dexaScans.id))
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(dexaScans.scanDate);
+}
+
+/**
+ * Get all BMD data for a client (for trend analysis)
+ */
+export async function getDexaBmdHistory(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      scanDate: dexaScans.scanDate,
+      scanId: dexaScans.id,
+      status: dexaScans.status,
+      region: dexaBmdData.region,
+      bmd: dexaBmdData.bmd,
+      tScore: dexaBmdData.tScore,
+      zScore: dexaBmdData.zScore,
+    })
+    .from(dexaBmdData)
+    .innerJoin(dexaScans, eq(dexaBmdData.scanId, dexaScans.id))
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(dexaScans.scanDate);
+}

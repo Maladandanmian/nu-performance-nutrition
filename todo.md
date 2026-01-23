@@ -1053,3 +1053,68 @@
 - [x] Keep essential fields: meal type, date/time, nutrition score (5-star), and Log Meal button
 - [x] Test streamlined modal in all flows
 - [x] No TypeScript errors, UI simplification complete
+
+
+## DEXA Scan Tracking MVP (Jan 23, 2026 - Dexa Branch)
+
+**MVP Scope:** PDF upload, AI extraction, basic trainer/client views, simple trends
+**Deferred:** Advanced visualizations (Gauge, Progress Bar, Heatmap, Dashboard), image extraction
+
+### Phase 1: Database Schema Design
+- [x] Create dexa_scans table (scan_date, client_id, pdf_url, status, metadata)
+- [x] Create dexa_bmd_data table (regional BMD, BMC, T-score, Z-score)
+- [x] Create dexa_body_comp table (fat_mass, lean_mass, VAT metrics, ratios)
+- [x] Create dexa_images table (body scans, charts, tables as PNG)
+- [x] Push schema changes with pnpm db:push
+
+### Phase 2: Backend Procedures
+- [x] Create PDF upload procedure (trainer only, stores to S3)
+- [x] Created dexa.uploadScan tRPC procedure
+- [x] Create AI extraction procedure (analyzes PDF, extracts tables and metrics)
+- [x] Created dexaPdfAnalysis.ts module with analyzeDexaPdf function
+- [ ] Create image extraction procedure (converts PDF sections to PNG) - DEFERRED to future iteration
+- [x] Create data storage procedures (save BMD, body comp, images)
+- [x] Added db helpers: createDexaScan, createDexaBmdData, createDexaBodyComp, etc.
+- [x] Create approval/rejection procedures (trainer workflow)
+- [x] Created dexa.updateScanStatus, dexa.getClientScans, dexa.getScanDetails
+
+### Phase 3: Trainer Upload Interface
+- [ ] Add DEXA upload section to trainer dashboard
+- [ ] PDF file upload with client selection
+- [ ] Trigger AI extraction on upload
+- [ ] Show loading state during extraction
+- [ ] Display extraction preview with editable fields
+
+### Phase 4: Trainer Review/Approval Interface
+- [ ] Show extracted data in editable form
+- [ ] Display extracted images for verification
+- [ ] Allow manual corrections to AI-extracted values
+- [ ] Add approve/reject buttons
+- [ ] Show comparison with previous scan if available
+
+### Phase 5: Client View
+- [ ] Add DEXA section to client metrics page (below bodyweight trend)
+- [ ] Display approved scans in chronological order
+- [ ] Show "Progress since last scan" summary card
+- [ ] Display body composition scan images timeline
+- [ ] Show key metrics tables (BMD, Adipose Indices)
+
+### Phase 6: Five Key Visualizations
+- [ ] Visceral Fat Gauge (0.5-5.0 scale with color gradient and emoji)
+- [ ] VAT Reduction Progress Bar (start → current → target with % achieved)
+- [ ] Lean Mass vs Fat Mass Ratio Trend (dual-axis line graph)
+- [ ] Regional BMD Heatmap (color-coded body diagram)
+- [ ] Metabolic Health Dashboard (health zone classification)
+
+### Phase 7: Testing
+- [ ] Test PDF upload and AI extraction with sample DEXA reports
+- [ ] Test trainer review/approval workflow
+- [ ] Test client view with multiple scans
+- [ ] Test all 5 visualizations with real data
+- [ ] Write vitest tests for backend procedures
+- [ ] Test edge cases (no previous scan, missing data)
+
+### Phase 8: Delivery
+- [ ] Final testing and bug fixes
+- [ ] Save checkpoint
+- [ ] Push to GitHub Dexa branch
