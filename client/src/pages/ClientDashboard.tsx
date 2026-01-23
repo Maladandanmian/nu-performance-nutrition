@@ -180,6 +180,65 @@ export default function ClientDashboard() {
     },
   });
 
+  // Nutrition label extraction mutation
+  const extractNutritionLabelMutation = trpc.meals.extractNutritionLabel.useMutation({
+    onSuccess: (data) => {
+      // Store extracted nutrition data
+      setExtractedNutrition(data);
+      setImageUrl(data.imageUrl);
+      setImageKey(data.imageKey);
+      
+      // Refresh meal date/time to current time
+      const now = new Date();
+      const hongKongTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }));
+      const year = hongKongTime.getFullYear();
+      const month = String(hongKongTime.getMonth() + 1).padStart(2, '0');
+      const day = String(hongKongTime.getDate()).padStart(2, '0');
+      const hours = String(hongKongTime.getHours()).padStart(2, '0');
+      const minutes = String(hongKongTime.getMinutes()).padStart(2, '0');
+      setMealDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      
+      // Refresh meal type based on current time
+      setMealType(getMealTypeFromTime());
+      
+      // Show nutrition editor instead of item editor
+      setShowNutritionEditor(true);
+      // Reset file input
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+    onError: (error) => {
+      toast.error(`Failed to extract nutrition label: ${error.message}`);
+    },
+  });
+
+  // Analyze nutrition label meal mutation
+  const analyzeNutritionLabelMealMutation = trpc.meals.analyzeNutritionLabelMeal.useMutation({
+    onSuccess: (data) => {
+      setShowNutritionEditor(false);
+      setAnalysisResult({
+        ...data.mealAnalysis,
+        score: data.finalScore,
+        combinedNutrition: data.combinedNutrition,
+        drinkNutrition: data.drinkNutrition,
+      });
+      setShowAnalysisModal(true);
+      // Reset form
+      setExtractedNutrition(null);
+      setDrinkType("");
+      setVolumeMl("");
+      setBeverageNutrition(null);
+      setMealNotes("");
+      // Reset input mode to meal
+      setInputMode("meal");
+    },
+    onError: (error) => {
+      toast.error(`Failed to analyze nutrition label meal: ${error.message}`);
+    },
+  });
+
   // NEW FLOW: Step 4-6 - Analyze meal with drink and save
   const analyzeMealWithDrinkMutation = trpc.meals.analyzeMealWithDrink.useMutation({
     onSuccess: (data) => {
@@ -504,11 +563,20 @@ export default function ClientDashboard() {
         const base64 = reader.result as string;
         const base64Data = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
 
-        // Step 2: Identify items in the image
-        await identifyItemsMutation.mutateAsync({
-          clientId,
-          imageBase64: base64Data,
-        });
+        // Step 2: Check mode and call appropriate procedure
+        if (inputMode === "label") {
+          // Nutrition label mode: extract nutrition data
+          await extractNutritionLabelMutation.mutateAsync({
+            clientId,
+            imageBase64: base64Data,
+          });
+        } else {
+          // Meal photo mode: identify items
+          await identifyItemsMutation.mutateAsync({
+            clientId,
+            imageBase64: base64Data,
+          });
+        }
       };
       reader.readAsDataURL(selectedFile);
     } catch (error) {
@@ -1081,6 +1149,204 @@ export default function ClientDashboard() {
         </Tabs>
         </div>
       </main>
+
+      {/* Nutrition Label Editor Modal */}
+      <Dialog open={showNutritionEditor} onOpenChange={setShowNutritionEditor}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Review Nutrition Label Data</DialogTitle>
+            <DialogDescription>
+              Extracted nutrition information from the label. Edit if needed.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Date and Time Section */}
+            <div className="grid grid-cols-2 gap-4 border-b pb-4">
+              <div>
+                <Label htmlFor="label-meal-date">Date</Label>
+                <Input
+                  id="label-meal-date"
+                  type="datetime-local"
+                  value={mealDateTime}
+                  onChange={(e) => setMealDateTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="label-meal-type">Meal Type</Label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as "breakfast" | "lunch" | "dinner" | "snack")}>
+                  <SelectTrigger id="label-meal-type">
+                    <SelectValue placeholder="Select meal type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">Breakfast</SelectItem>
+                    <SelectItem value="lunch">Lunch</SelectItem>
+                    <SelectItem value="dinner">Dinner</SelectItem>
+                    <SelectItem value="snack">Snack</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Extracted Nutrition Data */}
+            {extractedNutrition && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Serving Size</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        value={extractedNutrition.servingSize}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingSize: parseFloat(e.target.value)})}
+                      />
+                      <Input
+                        value={extractedNutrition.servingUnit}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingUnit: e.target.value})}
+                        placeholder="g/ml/serving"
+                        className="w-32"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Amount You Consumed ({extractedNutrition.servingUnit})</Label>
+                    <Input
+                      type="number"
+                      placeholder={`e.g., 76 (if you consumed 76${extractedNutrition.servingUnit})`}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, amountConsumed: parseFloat(e.target.value)})}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enter the actual amount you consumed in {extractedNutrition.servingUnit}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>Calories</Label>
+                    <Input
+                      type="number"
+                      value={extractedNutrition.calories}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, calories: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Protein (g)</Label>
+                    <Input
+                      type="number"
+                      value={extractedNutrition.protein}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, protein: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Carbs (g)</Label>
+                    <Input
+                      type="number"
+                      value={extractedNutrition.carbs}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, carbs: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Fat (g)</Label>
+                    <Input
+                      type="number"
+                      value={extractedNutrition.fat}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fat: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Fiber (g)</Label>
+                    <Input
+                      type="number"
+                      value={extractedNutrition.fiber}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fiber: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Beverage Section */}
+            <div className="border-t pt-4">
+              <Label>
+                {drinkType || volumeMl ? "Accompanying Beverage" : "Add Beverage (Optional)"}
+              </Label>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div>
+                  <Label htmlFor="label-drink-type">Drink Type</Label>
+                  <Input
+                    id="label-drink-type"
+                    placeholder="e.g., Water"
+                    value={drinkType}
+                    onChange={(e) => setDrinkType(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="label-volume">Volume (ml)</Label>
+                  <Input
+                    id="label-volume"
+                    type="number"
+                    placeholder="500"
+                    value={volumeMl}
+                    onChange={(e) => setVolumeMl(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Meal Notes */}
+            <div>
+              <Label htmlFor="label-meal-notes">Notes (Optional)</Label>
+              <Textarea
+                id="label-meal-notes"
+                placeholder="Any additional notes..."
+                value={mealNotes}
+                onChange={(e) => setMealNotes(e.target.value)}
+              />
+            </div>
+
+            {/* Analyze Button */}
+            <Button
+              className="w-full"
+              onClick={async () => {
+                if (!extractedNutrition?.amountConsumed) {
+                  toast.error("Please enter amount consumed");
+                  return;
+                }
+                
+                if (!clientSession?.clientId) {
+                  toast.error("Client session not found");
+                  return;
+                }
+                
+                analyzeNutritionLabelMealMutation.mutate({
+                  clientId: clientSession.clientId,
+                  imageUrl,
+                  imageKey,
+                  mealType,
+                  servingSize: extractedNutrition.servingSize,
+                  servingUnit: extractedNutrition.servingUnit,
+                  calories: extractedNutrition.calories,
+                  protein: extractedNutrition.protein,
+                  carbs: extractedNutrition.carbs,
+                  fat: extractedNutrition.fat,
+                  fiber: extractedNutrition.fiber,
+                  amountConsumed: extractedNutrition.amountConsumed,
+                  notes: mealNotes,
+                  drinkType: drinkType || undefined,
+                  volumeMl: volumeMl ? parseFloat(volumeMl) : undefined,
+                });
+              }}
+              disabled={analyzeNutritionLabelMealMutation.isPending}
+            >
+              {analyzeNutritionLabelMealMutation.isPending ? "Analyzing..." : "Analyze Meal"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* NEW FLOW: Item Editor Modal (Step 3) */}
       <Dialog open={showItemEditor} onOpenChange={setShowItemEditor}>

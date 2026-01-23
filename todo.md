@@ -900,3 +900,17 @@
 - [x] Remove sharp conversion from identifyItems procedure
 - [x] Verified extractNutritionLabel already uploads raw images
 - [x] Upload raw images directly to S3 (AI can handle HEIF natively)
+
+## Wire Up Nutrition Label Extraction Flow (Jan 23, 2026)
+- [x] Add extractNutritionLabel mutation to ClientDashboard
+- [x] Modify handleLogMeal to check inputMode and call appropriate procedure
+- [x] Create nutrition editor component to display extracted values
+- [x] Add serving size input UI
+- [x] Wire up analyzeNutritionLabelMeal mutation
+- [ ] Test nutrition label upload and extraction end-to-end (requires user testing)
+
+## Improve Amount Consumed UI (Jan 23, 2026)
+- [x] Change label from "Amount Consumed" to "Amount You Consumed"
+- [x] Add unit display next to the input field (same as serving size unit)
+- [x] Update placeholder to show example with unit (e.g., "76" when serving size is "25g")
+- [x] Add helper text explaining the field
