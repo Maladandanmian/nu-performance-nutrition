@@ -665,53 +665,100 @@ function BoneDensityHeatmap({ data }: { data: any[] }) {
         Latest Scan: {new Date(data[0].scanDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
       </div>
       
-      {/* Simplified Body Diagram */}
+      {/* Anatomical Body Diagram */}
       <div className="flex justify-center mb-8">
-        <svg width="200" height="400" viewBox="0 0 200 400" className="">
+        <svg width="280" height="480" viewBox="0 0 280 480" className="">
           {/* Head */}
-          <circle cx="100" cy="30" r="25" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" />
+          <ellipse cx="140" cy="40" rx="32" ry="38" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
           
-          {/* Spine (L1-L4 region) */}
-          <rect
-            x="90"
-            y="70"
-            width="20"
-            height="80"
-            fill={regions['L1-L4'] ? getColor(regions['L1-L4'].tScore).bg : '#e5e7eb'}
-            stroke="#9ca3af"
+          {/* Neck */}
+          <rect x="130" y="75" width="20" height="25" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="3" />
+          
+          {/* Shoulders */}
+          <ellipse cx="140" cy="115" rx="65" ry="20" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
+          
+          {/* Upper Arms */}
+          <rect x="70" y="115" width="22" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="11" />
+          <rect x="188" y="115" width="22" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="11" />
+          
+          {/* Forearms */}
+          <rect x="68" y="195" width="20" height="75" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="10" />
+          <rect x="192" y="195" width="20" height="75" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="10" />
+          
+          {/* Torso */}
+          <path
+            d="M 100 120 Q 95 180, 100 240 L 180 240 Q 185 180, 180 120 Z"
+            fill="#f3f4f6"
+            stroke="#6b7280"
             strokeWidth="2"
-            rx="4"
           />
-          <text x="100" y="115" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">L1-L4</text>
+          
+          {/* Lumbar Spine (L1-L4) - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {regions['L1-L4'] ? `Lumbar Spine (L1-L4)\nT-Score: ${regions['L1-L4'].tScore.toFixed(2)}\nBMD: ${regions['L1-L4'].bmd.toFixed(3)} g/cm²` : 'Lumbar Spine - No data'}
+            </title>
+            <rect
+              x="125"
+              y="140"
+              width="30"
+              height="70"
+              fill={regions['L1-L4'] ? getColor(regions['L1-L4'].tScore).bg : '#d1d5db'}
+              stroke="#6b7280"
+              strokeWidth="2"
+              rx="6"
+              opacity="0.9"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+            <text x="140" y="180" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">SPINE</text>
+          </g>
           
           {/* Pelvis */}
-          <ellipse cx="100" cy="180" rx="50" ry="30" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" />
+          <ellipse cx="140" cy="260" rx="55" ry="28" fill="#f3f4f6" stroke="#6b7280" strokeWidth="2" />
           
-          {/* Left Hip */}
-          <circle
-            cx="70"
-            cy="200"
-            r="20"
-            fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#e5e7eb'}
-            stroke="#9ca3af"
-            strokeWidth="2"
-          />
-          <text x="70" y="205" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">Hip</text>
+          {/* Left Hip - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {regions['Total Hip'] || regions['Femoral Neck'] ? `Hip\nT-Score: ${(regions['Total Hip'] || regions['Femoral Neck']).tScore.toFixed(2)}\nBMD: ${(regions['Total Hip'] || regions['Femoral Neck']).bmd.toFixed(3)} g/cm²` : 'Hip - No data'}
+            </title>
+            <circle
+              cx="110"
+              cy="270"
+              r="24"
+              fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#d1d5db'}
+              stroke="#6b7280"
+              strokeWidth="2"
+              opacity="0.9"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+            <text x="110" y="275" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">HIP</text>
+          </g>
           
-          {/* Right Hip */}
-          <circle
-            cx="130"
-            cy="200"
-            r="20"
-            fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#e5e7eb'}
-            stroke="#9ca3af"
-            strokeWidth="2"
-          />
-          <text x="130" y="205" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">Hip</text>
+          {/* Right Hip - Color-coded */}
+          <g className="cursor-pointer group">
+            <title>
+              {regions['Total Hip'] || regions['Femoral Neck'] ? `Hip\nT-Score: ${(regions['Total Hip'] || regions['Femoral Neck']).tScore.toFixed(2)}\nBMD: ${(regions['Total Hip'] || regions['Femoral Neck']).bmd.toFixed(3)} g/cm²` : 'Hip - No data'}
+            </title>
+            <circle
+              cx="170"
+              cy="270"
+              r="24"
+              fill={regions['Total Hip'] || regions['Femoral Neck'] ? getColor((regions['Total Hip'] || regions['Femoral Neck']).tScore).bg : '#d1d5db'}
+              stroke="#6b7280"
+              strokeWidth="2"
+              opacity="0.9"
+              className="group-hover:opacity-100 transition-opacity"
+            />
+            <text x="170" y="275" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">HIP</text>
+          </g>
           
-          {/* Legs */}
-          <rect x="75" y="220" width="15" height="150" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" rx="4" />
-          <rect x="110" y="220" width="15" height="150" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" rx="4" />
+          {/* Upper Legs (Thighs) */}
+          <rect x="105" y="295" width="28" height="95" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="14" />
+          <rect x="147" y="295" width="28" height="95" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="14" />
+          
+          {/* Lower Legs */}
+          <rect x="107" y="390" width="24" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="12" />
+          <rect x="149" y="390" width="24" height="80" fill="#f3f4f6" stroke="#6b7280" strokeWidth="1.5" rx="12" />
         </svg>
       </div>
       

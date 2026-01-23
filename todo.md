@@ -1252,3 +1252,11 @@
 - [x] Remove negative margin (-ml-8) from Y-axis labels
 - [x] Position labels at left-0 to align with padded container
 - [x] Labels now properly aligned with chart
+
+
+## Bone Density Heatmap Redesign (Jan 23, 2026)
+- [x] Replace stick figure SVG with proper anatomical body diagram
+- [x] Create distinct regions for: L1-L4 spine, hips, arms, legs with realistic proportions
+- [x] Implement T-score color coding: green (>-1.0), yellow (-1.0 to -2.5), red (<-2.5)
+- [x] Add hover tooltips showing region name, T-score, and BMD values
+- [x] Body diagram now looks professional with proper head, neck, shoulders, torso, limbs
