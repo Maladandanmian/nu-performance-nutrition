@@ -1000,3 +1000,9 @@
 - [x] Verify backend updateMeal procedure handles null beverage fields correctly
 - [x] Backend already supports optional beverage fields (all marked as .optional())
 - [x] Test removing drink from meal in edit dialog and saving
+
+## Fix Beverage Input Alignment in Edit Dialog (Jan 23, 2026)
+- [x] Fix vertical alignment of drink type and volume inputs to be on same level
+- [x] Added "Drink Type" label to first input to match "Volume (ml)" label
+- [x] Both inputs now have consistent label spacing for proper alignment
+- [x] Test alignment in edit dialog
