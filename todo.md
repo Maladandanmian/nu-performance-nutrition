@@ -1423,3 +1423,8 @@
 - [x] Verified Limb Asymmetry visualization now shows actual data:
   * Upper Limbs: 0.0% asymmetry (perfectly balanced)
   * Lower Limbs: 2.7% asymmetry (Right leg more developed)
+
+## Bug: Meal Editing Modal Issues (Jan 24, 2026)
+- [x] Add missing "Clear Drink" button to beverage section (appears when drink type or volume is entered)
+- [x] Fix mobile date/time picker - added onBlur handler to force state update when native picker closes
+- [ ] Test both fixes on mobile to ensure drinks can be cleared and date/time changes persist
