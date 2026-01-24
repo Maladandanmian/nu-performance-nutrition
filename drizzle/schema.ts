@@ -249,6 +249,12 @@ export const dexaBodyComp = mysqlTable("dexa_body_comp", {
   // Lean indices
   leanMassHeightRatio: decimal("leanMassHeightRatio", { precision: 5, scale: 2 }), // kg/m²
   appendicularLeanMassHeightRatio: decimal("appendicularLeanMassHeightRatio", { precision: 5, scale: 2 }), // kg/m²
+  // Limb-specific lean mass (for asymmetry analysis)
+  lArmLeanMass: int("lArmLeanMass"), // grams
+  rArmLeanMass: int("rArmLeanMass"), // grams
+  lLegLeanMass: int("lLegLeanMass"), // grams
+  rLegLeanMass: int("rLegLeanMass"), // grams
+  trunkLeanMass: int("trunkLeanMass"), // grams
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

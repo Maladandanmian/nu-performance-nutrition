@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
+import { LimbAsymmetryChart } from "./LimbAsymmetryChart";
 
 interface DexaVisualizationPanelsProps {
   clientId: number;
@@ -25,7 +26,7 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
       if (e.key === "ArrowLeft") {
         setCurrentPanel((prev) => Math.max(0, prev - 1));
       } else if (e.key === "ArrowRight") {
-        setCurrentPanel((prev) => Math.min(5, prev + 1));
+        setCurrentPanel((prev) => Math.min(6, prev + 1));
       }
     };
 
@@ -48,7 +49,7 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
   const handleTouchEnd = () => {
     if (touchStart - touchEnd > 75) {
       // Swiped left
-      setCurrentPanel((prev) => Math.min(5, prev + 1));
+      setCurrentPanel((prev) => Math.min(6, prev + 1));
     }
 
     if (touchStart - touchEnd < -75) {
@@ -97,6 +98,11 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
       id: 5,
       title: "Monthly Progress (All Scans)",
       component: <MonthlyProgressSummary bodyComp={bodyCompHistory} bmd={bmdHistory || []} />,
+    },
+    {
+      id: 6,
+      title: "Limb Asymmetry (Latest Scan)",
+      component: <LimbAsymmetryChart data={bodyCompHistory} />,
     },
   ];
 
