@@ -1399,3 +1399,8 @@
 - [x] Ensure component is properly integrated in DexaVisualizationPanels - Confirmed: Panel 6 integrated and accessible
 - [x] Update DEXA PDF extraction to populate limb-specific lean mass fields (lArmLeanMass, rArmLeanMass, lLegLeanMass, rLegLeanMass)
 - [ ] Test with actual DEXA PDF to verify limb mass data is now being extracted and displayed
+
+## Bug: Cannot Navigate to Limb Asymmetry Panel (Jan 24, 2026)
+- [x] Fix Next button disabled logic - changed Math.min(5) to Math.min(6) and disabled condition from panel 5 to panel 6
+- [x] Update max panel index from 5 to 6 in navigation controls
+- [x] Verified fix compiles without errors and hot-reloaded successfully

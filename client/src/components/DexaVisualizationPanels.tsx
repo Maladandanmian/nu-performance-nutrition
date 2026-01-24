@@ -148,8 +148,8 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCurrentPanel((prev) => Math.min(5, prev + 1))}
-            disabled={currentPanel === 5}
+            onClick={() => setCurrentPanel((prev) => Math.min(6, prev + 1))}
+            disabled={currentPanel === 6}
           >
             Next
             <ChevronRight className="w-4 h-4 ml-1" />
