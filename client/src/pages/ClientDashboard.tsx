@@ -358,7 +358,7 @@ export default function ClientDashboard() {
   });
 
   const saveMealMutation = trpc.meals.saveMeal.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast.success('Meal logged successfully!');
       setShowAnalysisModal(false);
       setIsEditMode(false);
@@ -371,8 +371,48 @@ export default function ClientDashboard() {
       setVolumeMl("");
       setMealSource("meal_photo"); // Reset to default
       setBeverageNutrition(null);
-      // Invalidate queries to refresh meal history and daily totals
-      utils.meals.list.invalidate();
+      
+      // Explicitly update the cache with the new meal to prevent it from disappearing
+      utils.meals.list.setData(
+        { clientId: variables.clientId },
+        (oldData) => {
+          if (!oldData) return oldData;
+          // Create a new meal object with the returned ID
+          const newMeal = {
+            id: data.mealId,
+            clientId: variables.clientId,
+            imageUrl: variables.imageUrl || "",
+            imageKey: variables.imageKey || "",
+            mealType: variables.mealType,
+            calories: variables.calories,
+            protein: variables.protein,
+            fat: variables.fat,
+            carbs: variables.carbs,
+            fibre: variables.fibre,
+            aiDescription: variables.aiDescription,
+            aiConfidence: variables.aiConfidence,
+            nutritionScore: data.score,
+            notes: variables.notes || "",
+            beverageType: variables.beverageType || null,
+            beverageVolumeMl: variables.beverageVolumeMl || null,
+            beverageCalories: variables.beverageCalories || null,
+            beverageProtein: variables.beverageProtein || null,
+            beverageFat: variables.beverageFat || null,
+            beverageCarbs: variables.beverageCarbs || null,
+            beverageFibre: variables.beverageFibre || null,
+            beverageCategory: variables.beverageCategory || null,
+            components: variables.components || null,
+            loggedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            source: variables.source || "meal_photo",
+          } as any; // Type assertion to match the expected type
+          // Add new meal to the beginning of the array
+          return [newMeal, ...oldData];
+        }
+      );
+      
+      // Also invalidate to ensure consistency with server
       utils.meals.dailyTotals.invalidate();
     },
     onError: (error) => {

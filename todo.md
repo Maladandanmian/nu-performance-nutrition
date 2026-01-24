@@ -1428,3 +1428,10 @@
 - [x] Add missing "Clear Drink" button to beverage section (appears when drink type or volume is entered)
 - [x] Fix mobile date/time picker - added onBlur handler to force state update when native picker closes
 - [ ] Test both fixes on mobile to ensure drinks can be cleared and date/time changes persist
+
+## Bug: Cannot Log Duplicate Meals (Jan 24, 2026)
+- [x] Locate meal logging logic - no duplicate prevention code found
+- [x] Root cause identified: tRPC query cache issue - second meal scan causes first meal to disappear from history feed
+- [x] Fix: Update saveMealMutation onSuccess to explicitly add new meal to cache using setData
+- [x] Added components field and type assertion to match expected meal type
+- [ ] Test logging same nutrition label twice to verify both entries appear in history feed
