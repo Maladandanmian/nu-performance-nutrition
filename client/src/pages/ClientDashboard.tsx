@@ -109,8 +109,9 @@ export default function ClientDashboard() {
   const [mealTextDescription, setMealTextDescription] = useState("");
   const [extractedNutrition, setExtractedNutrition] = useState<any>(null);
   const [showNutritionEditor, setShowNutritionEditor] = useState(false);
+  const [portionPercentage, setPortionPercentage] = useState(100);
 
-  // Calculate totals from edited components + beverage
+  // Calculate totals from edited components + beverage, applying portion percentage
   const calculatedTotals = useMemo(() => {
     let mealTotals;
     if (editedComponents.length === 0) {
@@ -122,13 +123,14 @@ export default function ClientDashboard() {
         fibre: analysisResult?.fibre || 0,
       };
     } else {
+      // Sum up all components
       mealTotals = editedComponents.reduce(
-        (totals, component) => ({
-          calories: totals.calories + (component.calories || 0),
-          protein: totals.protein + (component.protein || 0),
-          fat: totals.fat + (component.fat || 0),
-          carbs: totals.carbs + (component.carbs || 0),
-          fibre: totals.fibre + (component.fibre || 0),
+        (acc, comp) => ({
+          calories: acc.calories + (comp.calories || 0),
+          protein: acc.protein + (comp.protein || 0),
+          fat: acc.fat + (comp.fat || 0),
+          carbs: acc.carbs + (comp.carbs || 0),
+          fibre: acc.fibre + (comp.fibre || 0),
         }),
         { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
       );
@@ -136,7 +138,7 @@ export default function ClientDashboard() {
 
     // Add beverage nutrition if available
     if (beverageNutrition) {
-      return {
+      mealTotals = {
         calories: mealTotals.calories + (beverageNutrition.calories || 0),
         protein: mealTotals.protein + (beverageNutrition.protein || 0),
         fat: mealTotals.fat + (beverageNutrition.fat || 0),
@@ -145,8 +147,16 @@ export default function ClientDashboard() {
       };
     }
 
-    return mealTotals;
-  }, [editedComponents, analysisResult, beverageNutrition]);
+    // Apply portion percentage scaling to all values
+    const portionMultiplier = portionPercentage / 100;
+    return {
+      calories: Math.round(mealTotals.calories * portionMultiplier),
+      protein: Math.round(mealTotals.protein * portionMultiplier * 10) / 10,
+      fat: Math.round(mealTotals.fat * portionMultiplier * 10) / 10,
+      carbs: Math.round(mealTotals.carbs * portionMultiplier * 10) / 10,
+      fibre: Math.round(mealTotals.fibre * portionMultiplier * 10) / 10,
+    };
+  }, [editedComponents, analysisResult, beverageNutrition, portionPercentage]);
 
   // ALL TRPC HOOKS MUST BE CALLED UNCONDITIONALLY
   // NEW FLOW: Step 2 - Identify items in meal image
@@ -173,6 +183,7 @@ export default function ClientDashboard() {
       setShowItemEditor(true);
       // Reset file input only (keep beverage data from upload screen)
       setSelectedFile(null);
+      setPortionPercentage(100); // Reset portion to 100% for new meal
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -204,6 +215,7 @@ export default function ClientDashboard() {
       setShowItemEditor(true);
       // Clear text input after successful analysis
       setMealTextDescription("");
+      setPortionPercentage(100); // Reset portion to 100% for new meal
     },
     onError: (error) => {
       toast.error(`Failed to analyze meal description: ${error.message}`);
@@ -371,6 +383,7 @@ export default function ClientDashboard() {
       setVolumeMl("");
       setMealSource("meal_photo"); // Reset to default
       setBeverageNutrition(null);
+      setPortionPercentage(100); // Reset portion to 100%
       
       // Explicitly update the cache with the new meal to prevent it from disappearing
       utils.meals.list.setData(
@@ -773,6 +786,7 @@ export default function ClientDashboard() {
     setShowItemEditor(true); // Show item editor instead of analysis modal
     setEditingMealId(meal.id);
     setMealType(meal.mealType);
+    setPortionPercentage(100); // Reset portion to 100% when editing meal
     
     // Set meal date/time from loggedAt
     if (meal.loggedAt) {
@@ -1704,6 +1718,31 @@ export default function ClientDashboard() {
                     onChange={(e) => setVolumeMl(e.target.value)}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Portion Section */}
+            <div className="border-t pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="portion-percentage">Portion Consumed</Label>
+                <span className="text-sm text-gray-500">{portionPercentage}%</span>
+              </div>
+              <div className="space-y-2">
+                <Input
+                  id="portion-percentage"
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={portionPercentage}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 100;
+                    setPortionPercentage(Math.min(100, Math.max(1, value)));
+                  }}
+                  className="text-center font-semibold"
+                />
+                <p className="text-xs text-gray-500">
+                  💡 Adjust if you only ate part of the meal (e.g., 50% for half a pizza)
+                </p>
               </div>
             </div>
 

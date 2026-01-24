@@ -1435,3 +1435,14 @@
 - [x] Fix: Update saveMealMutation onSuccess to explicitly add new meal to cache using setData
 - [x] Added components field and type assertion to match expected meal type
 - [ ] Test logging same nutrition label twice to verify both entries appear in history feed
+
+## Add Portion Adjustment Feature (Jan 24, 2026)
+- [x] Add "Portion" field to meal analysis screen (below beverage section) pre-filled to 100%
+- [x] Allow user to edit portion percentage (e.g., 50% for shared meals)
+- [x] Implement proportional scaling of all nutritional values (calories, protein, fat, carbs, fiber) based on portion percentage
+- [x] Scale both meal components and beverage nutrition proportionally
+- [x] Created comprehensive test suite with 6 passing tests covering various portion scenarios
+- [x] Portion percentage resets to 100% when opening new meal or closing modal
+- [ ] Save portion percentage to database with meal record (optional - currently scales before save)
+- [ ] Display portion percentage in meal history (e.g., "50% of meal") (optional enhancement)
+- [x] Test with various portion percentages (25%, 50%, 75%, 100%) - all tests passing
