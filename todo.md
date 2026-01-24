@@ -1391,3 +1391,11 @@
 - [x] Update reference info text to show: Normal <100, Increased Risk 100-160, High Risk >160 cm³
 - [x] Update Metabolic Health Score to use new VAT risk categories
 - [x] Verify all VAT calculations use cm³ (volume) not grams or lbs
+
+## Bug: LimbAsymmetryChart Not Visible (Jan 24, 2026)
+- [x] Check if LimbAsymmetryChart component is rendering in DEXA Insights - FOUND: Component is rendering correctly
+- [x] Verify limb lean mass data is being populated in database - ROOT CAUSE: PDF extraction wasn't extracting limb mass values
+- [x] Check browser console for errors - No errors found
+- [x] Ensure component is properly integrated in DexaVisualizationPanels - Confirmed: Panel 6 integrated and accessible
+- [x] Update DEXA PDF extraction to populate limb-specific lean mass fields (lArmLeanMass, rArmLeanMass, lLegLeanMass, rLegLeanMass)
+- [ ] Test with actual DEXA PDF to verify limb mass data is now being extracted and displayed

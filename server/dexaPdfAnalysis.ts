@@ -46,6 +46,12 @@ Extract the following information from the PDF:
    - Android % Fat
    - Gynoid Fat Mass (g)
    - Gynoid % Fat
+   - LIMB-SPECIFIC LEAN MASS (from Body Composition Results table):
+     * L Arm Lean Mass (g)
+     * R Arm Lean Mass (g)
+     * L Leg Lean Mass (g)
+     * R Leg Lean Mass (g)
+     * Trunk Lean Mass (g)
 
 4. ADIPOSE INDICES (from Adipose Indices table):
    - Fat Mass/Height² (kg/m²)
@@ -134,6 +140,11 @@ Return ONLY valid JSON. Do NOT include markdown code blocks or explanations.`,
                 androidFatPct: { type: "number", description: "percentage" },
                 gynoidFatMass: { type: "number", description: "grams" },
                 gynoidFatPct: { type: "number", description: "percentage" },
+                lArmLeanMass: { type: "number", description: "grams" },
+                rArmLeanMass: { type: "number", description: "grams" },
+                lLegLeanMass: { type: "number", description: "grams" },
+                rLegLeanMass: { type: "number", description: "grams" },
+                trunkLeanMass: { type: "number", description: "grams" },
               },
               required: [],
               additionalProperties: false,
