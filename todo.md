@@ -1404,3 +1404,10 @@
 - [x] Fix Next button disabled logic - changed Math.min(5) to Math.min(6) and disabled condition from panel 5 to panel 6
 - [x] Update max panel index from 5 to 6 in navigation controls
 - [x] Verified fix compiles without errors and hot-reloaded successfully
+
+## Fix Limb Mass Data Extraction and Panel Order (Jan 24, 2026)
+- [x] Verify PDF extraction is correctly pulling limb-specific lean mass from Body Composition table - CONFIRMED: dexaPdfAnalysis.ts extracts these fields
+- [x] Check if database is receiving and storing limb mass values correctly - FIXED: Added lArmLeanMass, rArmLeanMass, lLegLeanMass, rLegLeanMass, trunkLeanMass to database save logic
+- [x] Swap panel 5 (Limb Asymmetry) and panel 6 (Monthly Progress) so Monthly Progress is last
+- [x] Panel order now: 0-Visceral Fat, 1-Body Recomp, 2-VAT Progress, 3-Metabolic Health, 4-Bone Density, 5-Limb Asymmetry, 6-Monthly Progress
+- [ ] Test with actual DEXA PDF to verify limb data populates correctly

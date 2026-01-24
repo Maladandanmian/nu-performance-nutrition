@@ -96,13 +96,13 @@ export function DexaVisualizationPanels({ clientId }: DexaVisualizationPanelsPro
     },
     {
       id: 5,
-      title: "Monthly Progress (All Scans)",
-      component: <MonthlyProgressSummary bodyComp={bodyCompHistory} bmd={bmdHistory || []} />,
+      title: "Limb Asymmetry (Latest Scan)",
+      component: <LimbAsymmetryChart data={bodyCompHistory} />,
     },
     {
       id: 6,
-      title: "Limb Asymmetry (Latest Scan)",
-      component: <LimbAsymmetryChart data={bodyCompHistory} />,
+      title: "Monthly Progress (All Scans)",
+      component: <MonthlyProgressSummary bodyComp={bodyCompHistory} bmd={bmdHistory || []} />,
     },
   ];
 
