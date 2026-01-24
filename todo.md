@@ -1384,3 +1384,10 @@
 - [x] Update getDexaGoalsByClientId to return null instead of undefined when no goals exist
 - [x] Create comprehensive vitest tests for DEXA goals functionality
 - [x] Test that DEXA Insights tab loads without errors when no goals are set
+
+## Update VAT Risk Categories (Jan 23, 2026)
+- [x] Update VAT risk thresholds: <100 (normal), 100-160 (increased risk), >160 (high risk)
+- [x] Update VisceralFatGauge component with new risk categories and color coding
+- [x] Update reference info text to show: Normal <100, Increased Risk 100-160, High Risk >160 cm³
+- [x] Update Metabolic Health Score to use new VAT risk categories
+- [x] Verify all VAT calculations use cm³ (volume) not grams or lbs

@@ -198,35 +198,26 @@ function VisceralFatGauge({ data }: { data: any[] }) {
   const recentScans = data.slice(0, 6).reverse();
   const vatTrend = recentScans.map(scan => parseFloat(scan.vatArea || "0"));
   
-  // Determine health zone
-  let zone = "healthy";
+  // Determine health zone based on new VAT thresholds
+  // <100 (normal), 100-160 (increased risk), >160 (high risk)
+  let zone = "normal";
   let zoneColor = "text-green-600";
   let zoneBg = "bg-green-100";
-  let zoneLabel = "Optimal";
+  let zoneLabel = "Normal";
   
-  if (vatArea > 150) {
+  if (vatArea > 160) {
     zone = "high";
     zoneColor = "text-red-600";
     zoneBg = "bg-red-100";
     zoneLabel = "High Risk";
-  } else if (vatArea > 100) {
-    zone = "elevated";
+  } else if (vatArea >= 100) {
+    zone = "increased";
     zoneColor = "text-orange-600";
     zoneBg = "bg-orange-100";
-    zoneLabel = "Elevated";
-  } else if (vatArea > 75) {
-    zone = "moderate";
-    zoneColor = "text-yellow-600";
-    zoneBg = "bg-yellow-100";
-    zoneLabel = "Moderate";
-  } else if (vatArea > 50) {
-    zone = "good";
-    zoneColor = "text-blue-600";
-    zoneBg = "bg-blue-100";
-    zoneLabel = "Good";
+    zoneLabel = "Increased Risk";
   }
   
-  // Calculate gauge percentage (0-200 cm² scale)
+  // Calculate gauge percentage (0-200 cm² scale for visualization)
   const gaugePercent = Math.min((vatArea / 200) * 100, 100);
   
   // Calculate trend (previous is second item since data is newest-first)
@@ -262,9 +253,7 @@ function VisceralFatGauge({ data }: { data: any[] }) {
             fill="none"
             stroke={
               zone === "high" ? "#ef4444" : 
-              zone === "elevated" ? "#f97316" : 
-              zone === "moderate" ? "#eab308" : 
-              zone === "good" ? "#3b82f6" : 
+              zone === "increased" ? "#f97316" : 
               "#10b981"
             }
             strokeWidth="8"
@@ -349,7 +338,7 @@ function VisceralFatGauge({ data }: { data: any[] }) {
       {/* Reference Info */}
       <div className="mt-6 text-sm text-gray-500 text-center max-w-md">
         <p className="font-medium mb-1">Visceral Adipose Tissue (VAT)</p>
-        <p>Optimal: &lt;50 • Good: 50-75 • Moderate: 75-100 • Elevated: 100-150 • High Risk: &gt;150 cm²</p>
+        <p>Normal: &lt;100 • Increased Risk: 100-160 • High Risk: &gt;160 cm³</p>
       </div>
     </div>
   );
@@ -1063,21 +1052,15 @@ function MetabolicHealthScore({ data }: { data: any }) {
   let factors: { name: string; impact: string; points: number }[] = [];
   
   // VAT Area (max -40 points)
-  // Optimal: <50, Good: 50-75, Healthy: 75-100, Elevated: 100-150, High Risk: >150
-  if (vatArea > 150) {
+  // New thresholds: <100 (normal), 100-160 (increased risk), >160 (high risk)
+  if (vatArea > 160) {
     score -= 40;
     factors.push({ name: 'Visceral Fat', impact: 'High risk level', points: -40 });
-  } else if (vatArea > 100) {
-    score -= 25;
-    factors.push({ name: 'Visceral Fat', impact: 'Elevated level', points: -25 });
-  } else if (vatArea > 75) {
-    score -= 10;
-    factors.push({ name: 'Visceral Fat', impact: 'Moderate level', points: -10 });
-  } else if (vatArea > 50) {
-    score -= 5;
-    factors.push({ name: 'Visceral Fat', impact: 'Good range', points: -5 });
+  } else if (vatArea >= 100) {
+    score -= 20;
+    factors.push({ name: 'Visceral Fat', impact: 'Increased risk level', points: -20 });
   } else {
-    factors.push({ name: 'Visceral Fat', impact: 'Optimal range', points: 0 });
+    factors.push({ name: 'Visceral Fat', impact: 'Normal range', points: 0 });
   }
   
   // Body Fat % (max -30 points)
