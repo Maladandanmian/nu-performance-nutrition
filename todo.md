@@ -1411,3 +1411,15 @@
 - [x] Swap panel 5 (Limb Asymmetry) and panel 6 (Monthly Progress) so Monthly Progress is last
 - [x] Panel order now: 0-Visceral Fat, 1-Body Recomp, 2-VAT Progress, 3-Metabolic Health, 4-Bone Density, 5-Limb Asymmetry, 6-Monthly Progress
 - [ ] Test with actual DEXA PDF to verify limb data populates correctly
+
+## One-Time DEXA PDF Re-Analysis (Jan 24, 2026)
+- [x] Create script to fetch all existing DEXA scans from database
+- [x] Re-run extraction with updated logic (pass URL directly to analyzeDexaPdf)
+- [x] Update database with limb mass values for all existing scans
+- [x] Successfully updated 3 scans with limb mass data:
+  * Scan 1: L Arm 5083.8g, R Arm 5066.2g, L Leg 11755.5g, R Leg 12268.4g
+  * Scan 2: L Arm 5083.8g, R Arm 5066.2g, L Leg 11755.5g, R Leg 12268.4g
+  * Scan 3: L Arm 5059.1g, R Arm 5056.5g, L Leg 11515.1g, R Leg 11828g
+- [x] Verified Limb Asymmetry visualization now shows actual data:
+  * Upper Limbs: 0.0% asymmetry (perfectly balanced)
+  * Lower Limbs: 2.7% asymmetry (Right leg more developed)
