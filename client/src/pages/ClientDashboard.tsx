@@ -1854,7 +1854,11 @@ export default function ClientDashboard() {
                     const input = document.getElementById('edit-meal-date') as HTMLInputElement;
                     if (input) {
                       input.readOnly = false;
-                      input.showPicker?.();
+                      try {
+                        input.showPicker?.();
+                      } catch (e) {
+                        // Ignore SecurityError in iframe context - native picker will still work
+                      }
                     }
                   }}
                   className="text-xs"
@@ -1872,7 +1876,11 @@ export default function ClientDashboard() {
                 onClick={(e) => {
                   const input = e.target as HTMLInputElement;
                   input.readOnly = false;
-                  input.showPicker?.();
+                  try {
+                    input.showPicker?.();
+                  } catch (e) {
+                    // Ignore SecurityError in iframe context - native picker will still work
+                  }
                 }}
               />
             </div>

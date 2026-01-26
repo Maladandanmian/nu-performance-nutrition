@@ -1471,3 +1471,8 @@
 - [x] Updated comprehensive test suite with 8 passing tests covering reactive display logic
 - [x] Test with Qing Yuansu: 1 serving = 9 kcal, 2 servings = 18 kcal (auto-update)
 - [x] Verify bidirectional sync: editing servings updates nutrition, editing nutrition updates per-serving base
+
+## Fix showPicker() SecurityError in iframe (Jan 26, 2026)
+- [x] Locate showPicker() calls (lines 1857 and 1875) in ClientDashboard.tsx
+- [x] Wrap showPicker() in try-catch to handle SecurityError in iframe context
+- [x] Test that date/time picker still works (falls back to native behavior on error)
