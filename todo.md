@@ -1476,3 +1476,17 @@
 - [x] Locate showPicker() calls (lines 1857 and 1875) in ClientDashboard.tsx
 - [x] Wrap showPicker() in try-catch to handle SecurityError in iframe context
 - [x] Test that date/time picker still works (falls back to native behavior on error)
+
+## Configure Tests to Use Dedicated Test Account (Jan 26, 2026)
+- [x] Create test authentication helper that logs in with PIN 098765 (test-helpers.ts)
+- [x] Add getTestClientId() function to get test client ID
+- [x] Add createTestContext() function for authenticated tRPC context
+- [x] Add verifyTestAccount() function to prevent production account usage
+- [x] Add cleanupTestData() function to delete test records after tests
+- [x] Create example test demonstrating test account usage (test-account-example.test.ts)
+- [x] Verify tests run against test account (Client ID: 630001, PIN: 098765)
+- [x] Document test account setup in TEST_ACCOUNT_README.md
+- [ ] Migrate existing tests to use test account helpers (optional - can be done incrementally)
+- [ ] Update auth.logout.test.ts to use test account (optional)
+- [ ] Update meals.portion.test.ts to use test account (optional - currently unit test only)
+- [ ] Update nutrition-label.test.ts to use test account (optional - currently unit test only)
