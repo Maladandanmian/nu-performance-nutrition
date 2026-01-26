@@ -1067,13 +1067,13 @@ export default function ClientDashboard() {
                   </Select>
                 </div>
 
-                {/* Quick Log Drinks */}
+                {/* Quick Log Meals */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    <Label className="text-sm font-semibold">Quick Log Drinks</Label>
+                    <Label className="text-sm font-semibold">Quick Log Meals</Label>
                   </div>
-                  <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
+                  <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
                 </div>
 
                 <div>
@@ -1131,23 +1131,14 @@ export default function ClientDashboard() {
                     </div>
                   </div>
 
-                  {/* Repeat Last Drink Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (!clientSession?.clientId) {
-                        toast.error("Client session not found");
-                        return;
-                      }
-                      repeatLastDrinkMutation.mutate({ clientId: clientSession.clientId });
-                    }}
-                    disabled={repeatLastDrinkMutation.isPending}
-                    className="w-full"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Repeat Last Drink
-                  </Button>
+                  {/* Quick Log Drinks */}
+                  <div className="space-y-2 mt-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <Label className="text-sm font-semibold">Quick Log Drinks</Label>
+                    </div>
+                    <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
+                  </div>
                 </div>
 
                 {/* Conditional buttons based on what's filled */}

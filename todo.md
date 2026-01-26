@@ -1541,3 +1541,12 @@
 - [x] Ensure "Repeat Last Meal" only repeats meals (not drinks)
 - [x] Ensure "Repeat Last Drink" only repeats drinks (not meals)
 - [ ] Test both repeat functions independently (manual testing recommended)
+
+## Fix Quick Log Sections Layout (Jan 26, 2026)
+- [x] Change "Quick Log Drinks" to "Quick Log Meals" in Log Meal section
+- [x] Replace FavoriteDrinksButtons with FavoriteMealsButtons in Log Meal section
+- [x] Move FavoriteDrinksButtons back to Add Beverage section
+- [x] Update Add Beverage section title to "Quick Log Drinks"
+- [x] Ensure Quick Log Meals shows 3 favorite meals + Repeat Last Meal button
+- [x] Ensure Quick Log Drinks shows 3 favorite drinks + Repeat Last Drink button
+- [x] Test both sections display correctly
