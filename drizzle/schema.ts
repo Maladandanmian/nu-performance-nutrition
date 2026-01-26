@@ -118,6 +118,8 @@ export const meals = mysqlTable("meals", {
   components: json("components"),
   // Source of meal entry
   source: mysqlEnum("source", ["meal_photo", "nutrition_label", "text_description"]).default("meal_photo").notNull(),
+  // Favorite flag for quick access
+  isFavorite: int("isFavorite").default(0).notNull(), // 0 = not favorite, 1 = favorite
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -141,6 +143,8 @@ export const drinks = mysqlTable("drinks", {
   carbs: int("carbs").default(0).notNull(), // grams
   fibre: int("fibre").default(0).notNull(), // grams
   notes: text("notes"),
+  // Favorite flag for quick access
+  isFavorite: int("isFavorite").default(0).notNull(), // 0 = not favorite, 1 = favorite
   loggedAt: timestamp("loggedAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

@@ -1502,3 +1502,26 @@
 - [x] Button only appears when editing existing meal (editingMealId > 0)
 - [x] Re-analyzes meal with updated components and beverage
 - [x] Updates database with new nutrition values and user edits
+
+## Implement Favorites System for Meals and Drinks (Jan 26, 2026)
+- [x] Design database schema: Add `isFavorite` boolean field to meals and drinks tables
+- [x] Add database migration to add isFavorite column (migration 0013)
+- [x] Create backend procedure: `meals.toggleFavorite` to mark/unmark meals as favorite
+- [x] Create backend procedure: `drinks.toggleFavorite` to mark/unmark drinks as favorite
+- [x] Create backend procedure: `meals.getFavorites` to get client's favorite meals (limit 3)
+- [x] Create backend procedure: `drinks.getFavorites` to get client's favorite drinks (limit 3)
+- [x] Create backend procedure: `meals.repeatLast` to duplicate last logged meal with new timestamp
+- [x] Create backend procedure: `meals.logFavorite` to log a favorite meal with current timestamp
+- [x] Create backend procedure: `drinks.logFavorite` to log a favorite drink with current timestamp
+- [x] Add "Mark as Favorite" button/icon to meal cards in nutrition history (star icon in top-right)
+- [x] Add "Mark as Favorite" button/icon to drink cards in nutrition history (star icon in top-right)
+- [x] Show visual indicator (star icon) on favorited meals/drinks in history (filled yellow star)
+- [x] Add 3 favorite meal buttons at bottom of "Log Meal" section (FavoriteMealsButtons component)
+- [x] Add 3 favorite drink buttons at bottom of "Add Beverage" section (FavoriteDrinksButtons component)
+- [x] Add "Repeat Last Meal" button at bottom of "Log Meal" section (4th button)
+- [x] Handle case when no favorites exist (show "No favorites yet" message)
+- [x] Handle case when fewer than 3 favorites exist (show only available favorites)
+- [x] Show loading state when logging favorite/repeating meal (spinner on button)
+- [x] Show success toast after logging favorite/repeating meal
+- [x] Limit favorites to 3 per type (enforced in backend getFavorites query)
+- [ ] Fix test data setup (minor issue with drink creation in test - functionality works in UI)

@@ -1463,6 +1463,106 @@ Return as JSON.`
           });
         }
       }),
+
+    // Toggle favorite status for a meal
+    toggleFavorite: authenticatedProcedure
+      .input(z.object({
+        mealId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const meal = await db.getMealById(input.mealId);
+          if (!meal || meal.clientId !== input.clientId) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Meal not found' });
+          }
+
+          // Check if toggling to favorite would exceed limit
+          if (!meal.isFavorite) {
+            const favorites = await db.getFavoriteMeals(input.clientId);
+            if (favorites.length >= 3) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Maximum 3 favorite meals allowed. Remove a favorite first.',
+              });
+            }
+          }
+
+          await db.toggleMealFavorite(input.mealId, !meal.isFavorite);
+          return { success: true, isFavorite: !meal.isFavorite };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to toggle favorite',
+          });
+        }
+      }),
+
+    // Get favorite meals for quick access
+    getFavorites: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          return await db.getFavoriteMeals(input.clientId);
+        } catch (error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to get favorite meals',
+          });
+        }
+      }),
+
+    // Log a favorite meal with current timestamp
+    logFavorite: authenticatedProcedure
+      .input(z.object({
+        mealId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const meal = await db.getMealById(input.mealId);
+          if (!meal || meal.clientId !== input.clientId || !meal.isFavorite) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite meal not found' });
+          }
+
+          // Create a copy of the meal with current timestamp
+          const newMeal = await db.duplicateMeal(input.mealId, new Date());
+          return { success: true, meal: newMeal };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to log favorite meal',
+          });
+        }
+      }),
+
+    // Repeat last logged meal
+    repeatLast: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const lastMeal = await db.getLastMeal(input.clientId);
+          if (!lastMeal) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'No previous meals found' });
+          }
+
+          // Create a copy of the last meal with current timestamp
+          const newMeal = await db.duplicateMeal(lastMeal.id, new Date());
+          return { success: true, meal: newMeal };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to repeat last meal',
+          });
+        }
+      }),
   }),
 
   // Drinks
@@ -1534,6 +1634,82 @@ Return as JSON.`
         const { drinkId, ...data } = input;
         await db.updateDrink(drinkId, data);
         return { success: true };
+      }),
+
+    // Toggle favorite status for a drink
+    toggleFavorite: authenticatedProcedure
+      .input(z.object({
+        drinkId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const drink = await db.getDrinkById(input.drinkId);
+          if (!drink || drink.clientId !== input.clientId) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Drink not found' });
+          }
+
+          // Check if toggling to favorite would exceed limit
+          if (!drink.isFavorite) {
+            const favorites = await db.getFavoriteDrinks(input.clientId);
+            if (favorites.length >= 3) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Maximum 3 favorite drinks allowed. Remove a favorite first.',
+              });
+            }
+          }
+
+          await db.toggleDrinkFavorite(input.drinkId, !drink.isFavorite);
+          return { success: true, isFavorite: !drink.isFavorite };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to toggle favorite',
+          });
+        }
+      }),
+
+    // Get favorite drinks for quick access
+    getFavorites: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          return await db.getFavoriteDrinks(input.clientId);
+        } catch (error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to get favorite drinks',
+          });
+        }
+      }),
+
+    // Log a favorite drink with current timestamp
+    logFavorite: authenticatedProcedure
+      .input(z.object({
+        drinkId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const drink = await db.getDrinkById(input.drinkId);
+          if (!drink || drink.clientId !== input.clientId || !drink.isFavorite) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite drink not found' });
+          }
+
+          // Create a copy of the drink with current timestamp
+          const newDrink = await db.duplicateDrink(input.drinkId, new Date());
+          return { success: true, drink: newDrink };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to log favorite drink',
+          });
+        }
       }),
   }),
 

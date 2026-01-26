@@ -16,7 +16,9 @@ import TodaysSummary from "@/components/TodaysSummary";
 import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
 import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
-import { Camera, Droplets, History, LogOut, Scale, Upload, X } from "lucide-react";
+import { FavoriteMealsButtons } from "@/components/FavoriteMealsButtons";
+import { FavoriteDrinksButtons } from "@/components/FavoriteDrinksButtons";
+import { Camera, Droplets, History, LogOut, Scale, Upload, X, Star } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -1109,6 +1111,14 @@ export default function ClientDashboard() {
                     </div>
                   </div>
 
+                  {/* Favorite Drinks */}
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <Label className="text-sm font-semibold">Quick Log Drinks</Label>
+                    </div>
+                    <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
+                  </div>
                 </div>
 
                 {/* Conditional buttons based on what's filled */}
@@ -1270,6 +1280,15 @@ export default function ClientDashboard() {
                     Add Photo or Beverage
                   </Button>
                 )}
+
+                {/* Favorite Meals & Repeat Last Meal */}
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    <Label className="text-base font-semibold">Quick Log</Label>
+                  </div>
+                  <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

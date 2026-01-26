@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users,
@@ -189,6 +189,57 @@ export async function updateMeal(mealId: number, data: Partial<InsertMeal>) {
   return db.update(meals).set(data).where(eq(meals.id, mealId));
 }
 
+export async function toggleMealFavorite(mealId: number, isFavorite: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(meals).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(meals.id, mealId));
+}
+
+export async function getFavoriteMeals(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(meals)
+    .where(and(eq(meals.clientId, clientId), eq(meals.isFavorite, 1)))
+    .orderBy(desc(meals.loggedAt))
+    .limit(3);
+}
+
+export async function getLastMeal(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(meals)
+    .where(eq(meals.clientId, clientId))
+    .orderBy(desc(meals.loggedAt))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function duplicateMeal(mealId: number, newLoggedAt: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const originalMeal = await getMealById(mealId);
+  if (!originalMeal) throw new Error("Meal not found");
+  
+  // Create a copy without id, createdAt, and with new loggedAt
+  const { id, createdAt, isFavorite, ...mealData } = originalMeal;
+  const newMeal: InsertMeal = {
+    ...mealData,
+    loggedAt: newLoggedAt,
+    isFavorite: 0, // Don't copy favorite status
+  };
+  
+  await db.insert(meals).values(newMeal);
+  
+  // Query the newly created meal by clientId and loggedAt
+  const result = await db.select().from(meals)
+    .where(and(eq(meals.clientId, originalMeal.clientId), eq(meals.loggedAt, newLoggedAt)))
+    .orderBy(desc(meals.id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
 // Drink queries
 export async function createDrink(drink: InsertDrink) {
   const db = await getDb();
@@ -213,6 +264,54 @@ export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.update(drinks).set(data).where(eq(drinks.id, drinkId));
+}
+
+export async function getDrinkById(drinkId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(drinks).where(eq(drinks.id, drinkId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function toggleDrinkFavorite(drinkId: number, isFavorite: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(drinks).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(drinks.id, drinkId));
+}
+
+export async function getFavoriteDrinks(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drinks)
+    .where(and(eq(drinks.clientId, clientId), eq(drinks.isFavorite, 1)))
+    .orderBy(desc(drinks.loggedAt))
+    .limit(3);
+}
+
+export async function duplicateDrink(drinkId: number, newLoggedAt: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const originalDrink = await getDrinkById(drinkId);
+  if (!originalDrink) throw new Error("Drink not found");
+  
+  // Create a copy without id, createdAt, and with new loggedAt
+  const { id, createdAt, isFavorite, ...drinkData} = originalDrink;
+  const newDrink: InsertDrink = {
+    ...drinkData,
+    loggedAt: newLoggedAt,
+    isFavorite: 0, // Don't copy favorite status
+  };
+  
+  await db.insert(drinks).values(newDrink);
+  
+  // Query the newly created drink by clientId and loggedAt
+  const result = await db.select().from(drinks)
+    .where(and(eq(drinks.clientId, originalDrink.clientId), eq(drinks.loggedAt, newLoggedAt)))
+    .orderBy(desc(drinks.id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
 }
 
 // Body metrics queries
