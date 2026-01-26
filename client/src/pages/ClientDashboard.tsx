@@ -228,8 +228,8 @@ export default function ClientDashboard() {
       // Store extracted nutrition data with default values
       setExtractedNutrition({
         ...data,
-        servingsConsumed: 1, // Default to 1 serving
-        amountConsumed: data.servingSize, // Default to 100% of serving size
+        servingsConsumed: 1, // Default to 1 actual serving
+        amountConsumed: data.actualServingSize, // Default to 1 actual serving size
       });
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
@@ -1401,129 +1401,138 @@ export default function ClientDashboard() {
             {/* Extracted Nutrition Data */}
             {extractedNutrition && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Serving Size</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        value={extractedNutrition.servingSize}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingSize: parseFloat(e.target.value)})}
-                      />
-                      <Input
-                        value={extractedNutrition.servingUnit}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingUnit: e.target.value})}
-                        placeholder="g/ml/serving"
-                        className="w-32"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-end gap-3">
-                    <div className="flex-1">
-                      <Label>Servings Consumed</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={extractedNutrition.servingsConsumed === 0 ? '' : (extractedNutrition.servingsConsumed ?? 1)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          // Allow empty string during editing
-                          if (val === '') {
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              servingsConsumed: 0,
-                              amountConsumed: 0
-                            });
-                            return;
-                          }
-                          const servings = parseFloat(val);
-                          if (!isNaN(servings)) {
-                            const amount = servings * extractedNutrition.servingSize;
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              servingsConsumed: servings,
-                              amountConsumed: amount
-                            });
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="text-2xl text-muted-foreground pb-2">⇄</div>
-                    <div className="flex-1">
-                      <Label>Amount Consumed ({extractedNutrition.servingUnit})</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={extractedNutrition.amountConsumed === 0 ? '' : (extractedNutrition.amountConsumed ?? extractedNutrition.servingSize)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          // Allow empty string during editing
-                          if (val === '') {
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              amountConsumed: 0,
-                              servingsConsumed: 0
-                            });
-                            return;
-                          }
-                          const amount = parseFloat(val);
-                          if (!isNaN(amount)) {
-                            const servings = amount / extractedNutrition.servingSize;
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              amountConsumed: amount,
-                              servingsConsumed: servings
-                            });
-                          }
-                        }}
-                      />
-                    </div>
+                {/* Product Name */}
+                <div>
+                  <Label>Product Name</Label>
+                  <Input
+                    value={extractedNutrition.productName}
+                    onChange={(e) => setExtractedNutrition({...extractedNutrition, productName: e.target.value})}
+                    placeholder="Product name"
+                  />
+                </div>
+
+                {/* Reference Serving Info */}
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <Label className="text-sm font-semibold text-blue-900">Label Reference (Nutrition per...)</Label>
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      type="number"
+                      value={extractedNutrition.referenceSize}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, referenceSize: parseFloat(e.target.value)})}
+                      className="w-24"
+                    />
+                    <Input
+                      value={extractedNutrition.referenceUnit}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, referenceUnit: e.target.value})}
+                      placeholder="g/ml"
+                      className="w-20"
+                    />
+                    <span className="text-sm text-gray-500 self-center">(e.g., "per 100g")</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label>Calories</Label>
+                {/* Actual Serving Size */}
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <Label className="text-sm font-semibold text-green-900">Actual Serving Size</Label>
+                  <div className="flex gap-2 mt-2">
                     <Input
                       type="number"
-                      value={extractedNutrition.calories}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, calories: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingSize}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingSize: parseFloat(e.target.value)})}
+                      className="w-24"
                     />
-                  </div>
-                  <div>
-                    <Label>Protein (g)</Label>
                     <Input
-                      type="number"
-                      value={extractedNutrition.protein}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, protein: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingUnit}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingUnit: e.target.value})}
+                      placeholder="g/ml"
+                      className="w-20"
                     />
-                  </div>
-                  <div>
-                    <Label>Carbs (g)</Label>
                     <Input
-                      type="number"
-                      value={extractedNutrition.carbs}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, carbs: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingDescription}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingDescription: e.target.value})}
+                      placeholder="per sachet/scoop"
+                      className="flex-1"
                     />
                   </div>
+                  <p className="text-xs text-gray-600 mt-1">e.g., 3.5g per sachet, 35g per scoop</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Fat (g)</Label>
-                    <Input
-                      type="number"
-                      value={extractedNutrition.fat}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fat: parseFloat(e.target.value)})}
-                    />
+                {/* Servings Consumed */}
+                <div>
+                  <Label>How many servings did you consume?</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    value={extractedNutrition.servingsConsumed === 0 ? '' : (extractedNutrition.servingsConsumed ?? 1)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        setExtractedNutrition({...extractedNutrition, servingsConsumed: 0});
+                        return;
+                      }
+                      const servings = parseFloat(val);
+                      if (!isNaN(servings)) {
+                        setExtractedNutrition({...extractedNutrition, servingsConsumed: servings});
+                      }
+                    }}
+                    placeholder="1"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {extractedNutrition.servingsConsumed > 0 && (
+                      `= ${(extractedNutrition.servingsConsumed * extractedNutrition.actualServingSize).toFixed(1)}${extractedNutrition.actualServingUnit} total`
+                    )}
+                  </p>
+                </div>
+
+                {/* Nutrition Values (per reference serving) */}
+                <div className="border-t pt-3">
+                  <Label className="text-sm font-semibold">Nutrition per {extractedNutrition.referenceSize}{extractedNutrition.referenceUnit}</Label>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label>Calories</Label>
+                      <Input
+                        type="number"
+                        value={extractedNutrition.calories}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, calories: parseFloat(e.target.value)})}
+                      />
+                    </div>
+                    <div>
+                      <Label>Protein (g)</Label>
+                      <Input
+                        type="number"
+                        value={extractedNutrition.protein}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, protein: parseFloat(e.target.value)})}
+                      />
+                    </div>
+                    <div>
+                      <Label>Carbs (g)</Label>
+                      <Input
+                        type="number"
+                        value={extractedNutrition.carbs}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, carbs: parseFloat(e.target.value)})}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Fiber (g)</Label>
-                    <Input
-                      type="number"
-                      value={extractedNutrition.fiber}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fiber: parseFloat(e.target.value)})}
-                    />
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label>Fat (g)</Label>
+                      <Input
+                        type="number"
+                        value={extractedNutrition.fat}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, fat: parseFloat(e.target.value)})}
+                      />
+                    </div>
+                    <div>
+                      <Label>Fiber (g)</Label>
+                      <Input
+                        type="number"
+                        value={extractedNutrition.fiber}
+                        onChange={(e) => setExtractedNutrition({...extractedNutrition, fiber: parseFloat(e.target.value)})}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1587,14 +1596,19 @@ export default function ClientDashboard() {
                   imageUrl,
                   imageKey,
                   mealType,
-                  servingSize: extractedNutrition.servingSize,
-                  servingUnit: extractedNutrition.servingUnit,
+                  referenceSize: extractedNutrition.referenceSize,
+                  referenceUnit: extractedNutrition.referenceUnit,
+                  actualServingSize: extractedNutrition.actualServingSize,
+                  actualServingUnit: extractedNutrition.actualServingUnit,
+                  actualServingDescription: extractedNutrition.actualServingDescription,
                   calories: extractedNutrition.calories,
                   protein: extractedNutrition.protein,
                   carbs: extractedNutrition.carbs,
                   fat: extractedNutrition.fat,
                   fiber: extractedNutrition.fiber,
-                  amountConsumed: extractedNutrition.amountConsumed,
+                  productName: extractedNutrition.productName,
+                  ingredients: extractedNutrition.ingredients || [],
+                  amountConsumed: extractedNutrition.servingsConsumed || 1, // Number of actual servings consumed
                   notes: mealNotes,
                   drinkType: drinkType || undefined,
                   volumeMl: volumeMl ? parseFloat(volumeMl) : undefined,

@@ -1079,7 +1079,7 @@ export const appRouter = router({
             messages: [
               {
                 role: "system",
-                content: "You are a nutrition label reader. Extract nutrition information from the label image and return it in JSON format. Be precise with numbers."
+                content: "You are a nutrition label reader. Extract nutrition information from the label image and return it in JSON format. Be precise with numbers. Support Chinese and English labels."
               },
               {
                 role: "user",
@@ -1090,7 +1090,33 @@ export const appRouter = router({
                   },
                   {
                     type: "text",
-                    text: "Extract the following from this nutrition label:\n1. Serving size (number and unit, e.g., '100' and 'g' or '1' and 'serving')\n2. Calories per serving\n3. Protein per serving (g)\n4. Carbohydrates per serving (g)\n5. Fat per serving (g)\n6. Fiber per serving (g, if available)\n\nReturn as JSON with keys: servingSize, servingUnit, calories, protein, carbs, fat, fiber"
+                    text: `Extract the following from this nutrition label:
+
+1. **Reference Serving**: The serving size that nutrition values are based on (e.g., "per 100g", "per serving", "每100g")
+   - referenceSize: number (e.g., 100)
+   - referenceUnit: string (e.g., "g", "ml", "serving")
+
+2. **Actual Serving**: The recommended serving size per consumption (e.g., "3.5g per sachet", "1 scoop = 35g")
+   - actualServingSize: number (e.g., 3.5)
+   - actualServingUnit: string (e.g., "g", "ml")
+   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "每袋")
+   - If not found, set actualServingSize = referenceSize
+
+3. **Nutrition per reference serving**:
+   - calories (kcal/kJ - convert kJ to kcal by dividing by 4.184)
+   - protein (g)
+   - carbs (g - total carbohydrates, or 碳水化合物)
+   - fat (g - total fat, or 脂肪)
+   - fiber (g - dietary fiber, or 膳食纤维, set to 0 if not available)
+
+4. **Product name**: The name of the product (e.g., "Qing Yuansu", "轻元素")
+
+5. **Ingredients**: List the main ingredients/components visible on the label
+   - Extract up to 10 key ingredients
+   - Include percentages if shown (e.g., "Barley Grass Powder (45%)")
+   - For Chinese labels, translate to English
+
+Return as JSON.`
                   }
                 ]
               }
@@ -1103,15 +1129,24 @@ export const appRouter = router({
                 schema: {
                   type: "object",
                   properties: {
-                    servingSize: { type: "number", description: "The serving size number" },
-                    servingUnit: { type: "string", description: "The unit of the serving size (g, ml, serving, oz, etc.)" },
-                    calories: { type: "number", description: "Calories per serving" },
-                    protein: { type: "number", description: "Protein in grams per serving" },
-                    carbs: { type: "number", description: "Carbohydrates in grams per serving" },
-                    fat: { type: "number", description: "Fat in grams per serving" },
-                    fiber: { type: "number", description: "Fiber in grams per serving, 0 if not available" },
+                    referenceSize: { type: "number", description: "The reference serving size number (e.g., 100 for per 100g)" },
+                    referenceUnit: { type: "string", description: "The unit of the reference serving (g, ml, serving, etc.)" },
+                    actualServingSize: { type: "number", description: "The actual serving size per consumption" },
+                    actualServingUnit: { type: "string", description: "The unit of the actual serving (g, ml, etc.)" },
+                    actualServingDescription: { type: "string", description: "Description of actual serving (e.g., 'per sachet', '1 scoop')" },
+                    calories: { type: "number", description: "Calories per reference serving" },
+                    protein: { type: "number", description: "Protein in grams per reference serving" },
+                    carbs: { type: "number", description: "Carbohydrates in grams per reference serving" },
+                    fat: { type: "number", description: "Fat in grams per reference serving" },
+                    fiber: { type: "number", description: "Fiber in grams per reference serving, 0 if not available" },
+                    productName: { type: "string", description: "Name of the product" },
+                    ingredients: {
+                      type: "array",
+                      description: "List of main ingredients",
+                      items: { type: "string" }
+                    },
                   },
-                  required: ["servingSize", "servingUnit", "calories", "protein", "carbs", "fat", "fiber"],
+                  required: ["referenceSize", "referenceUnit", "actualServingSize", "actualServingUnit", "actualServingDescription", "calories", "protein", "carbs", "fat", "fiber", "productName", "ingredients"],
                   additionalProperties: false,
                 },
               },
@@ -1144,15 +1179,20 @@ export const appRouter = router({
         imageKey: z.string(),
         mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
         // Extracted nutrition data (user can edit these)
-        servingSize: z.number(),
-        servingUnit: z.string(),
-        calories: z.number(),
-        protein: z.number(),
-        carbs: z.number(),
-        fat: z.number(),
-        fiber: z.number(),
-        // Amount consumed
-        amountConsumed: z.number(),
+        referenceSize: z.number(), // e.g., 100 for "per 100g"
+        referenceUnit: z.string(), // e.g., "g"
+        actualServingSize: z.number(), // e.g., 3.5 for "3.5g per sachet"
+        actualServingUnit: z.string(), // e.g., "g"
+        actualServingDescription: z.string(), // e.g., "per sachet"
+        calories: z.number(), // per reference serving
+        protein: z.number(), // per reference serving
+        carbs: z.number(), // per reference serving
+        fat: z.number(), // per reference serving
+        fiber: z.number(), // per reference serving
+        productName: z.string(),
+        ingredients: z.array(z.string()), // List of ingredients
+        // Amount consumed (in actual serving units)
+        amountConsumed: z.number(), // e.g., 1 for "1 sachet"
         notes: z.string().optional(),
         // Optional beverage data
         drinkType: z.string().optional(),
@@ -1161,7 +1201,12 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         try {
           // 1. Calculate adjusted nutrition based on amount consumed
-          const multiplier = input.amountConsumed / input.servingSize;
+          // Convert amount consumed to reference serving units
+          // Example: 1 sachet (3.5g) consumed, reference is per 100g
+          // multiplier = (1 * 3.5) / 100 = 0.035
+          const totalGramsConsumed = input.amountConsumed * input.actualServingSize;
+          const multiplier = totalGramsConsumed / input.referenceSize;
+          
           const adjustedNutrition = {
             calories: Math.round(input.calories * multiplier),
             protein: Math.round(input.protein * multiplier * 10) / 10,
@@ -1169,6 +1214,16 @@ export const appRouter = router({
             carbs: Math.round(input.carbs * multiplier * 10) / 10,
             fibre: Math.round(input.fiber * multiplier * 10) / 10,
           };
+          
+          // 1.5. Create components array from ingredients
+          const components = input.ingredients.map(ingredient => ({
+            name: ingredient,
+            calories: 0, // We don't have per-ingredient breakdown
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            fibre: 0,
+          }));
 
           // 2. If drink is provided, estimate its nutrition
           let drinkNutrition = null;
@@ -1230,7 +1285,7 @@ export const appRouter = router({
           );
 
           // 7. Create description for nutrition label meal
-          const description = `Nutrition label scan: ${input.amountConsumed}${input.servingUnit} consumed (${input.servingSize}${input.servingUnit} per serving).`;
+          const description = `${input.productName}: ${input.amountConsumed} ${input.actualServingDescription} consumed (${input.actualServingSize}${input.actualServingUnit} ${input.actualServingDescription}, nutrition per ${input.referenceSize}${input.referenceUnit}).`;
           const finalDescription = drinkNutrition && input.drinkType
             ? `${description} Consumed with ${input.drinkType}.`
             : description;
@@ -1246,6 +1301,7 @@ export const appRouter = router({
               fat: adjustedNutrition.fat,
               carbs: adjustedNutrition.carbs,
               fibre: adjustedNutrition.fibre,
+              components, // Add components array
             },
             drinkNutrition: drinkNutrition ? {
               calories: drinkNutrition.calories,

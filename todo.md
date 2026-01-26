@@ -1446,3 +1446,15 @@
 - [ ] Save portion percentage to database with meal record (optional - currently scales before save)
 - [ ] Display portion percentage in meal history (e.g., "50% of meal") (optional enhancement)
 - [x] Test with various portion percentages (25%, 50%, 75%, 100%) - all tests passing
+
+## Fix Nutrition Label Scanning Issues (Jan 24, 2026)
+- [x] Analyze current nutrition label extraction logic to understand serving size handling
+- [x] Update AI prompt to extract both "per 100g" (reference) and "per serving" (actual) nutrition values
+- [x] Add serving size fields to nutrition label editor (reference size, actual serving size, serving description)
+- [x] Calculate correct nutrition values based on actual serving size consumed (multiplier = totalGrams / referenceSize)
+- [x] Modify nutrition label flow to generate components list (like meal photo scanning)
+- [x] Update analyzeNutritionLabelMeal to return components array with ingredient breakdown
+- [x] Update frontend UI to display reference serving (blue), actual serving (green), and servings consumed
+- [x] Created comprehensive test suite with 8 passing tests covering all scenarios
+- [x] Verify serving size adjustment works correctly (100g label → 3.5g serving = 0.035 multiplier)
+- [ ] User testing: Verify components list appears in item editor after nutrition label scan
