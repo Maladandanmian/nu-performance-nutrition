@@ -1528,8 +1528,8 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite meal not found' });
           }
 
-          // Create a copy of the meal with current timestamp
-          const newMeal = await db.duplicateMeal(input.mealId, new Date());
+          // Create a copy of the meal with current timestamp and preserve favorite status
+          const newMeal = await db.duplicateMeal(input.mealId, new Date(), true);
           return { success: true, meal: newMeal };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
@@ -1700,8 +1700,8 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite drink not found' });
           }
 
-          // Create a copy of the drink with current timestamp
-          const newDrink = await db.duplicateDrink(input.drinkId, new Date());
+          // Create a copy of the drink with current timestamp and preserve favorite status
+          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), true);
           return { success: true, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;

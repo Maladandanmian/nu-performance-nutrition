@@ -214,7 +214,7 @@ export async function getLastMeal(clientId: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function duplicateMeal(mealId: number, newLoggedAt: Date) {
+export async function duplicateMeal(mealId: number, newLoggedAt: Date, preserveFavorite = false) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -226,7 +226,7 @@ export async function duplicateMeal(mealId: number, newLoggedAt: Date) {
   const newMeal: InsertMeal = {
     ...mealData,
     loggedAt: newLoggedAt,
-    isFavorite: 0, // Don't copy favorite status
+    isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
   };
   
   await db.insert(meals).values(newMeal);
@@ -288,7 +288,7 @@ export async function getFavoriteDrinks(clientId: number) {
     .limit(3);
 }
 
-export async function duplicateDrink(drinkId: number, newLoggedAt: Date) {
+export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserveFavorite = false) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -300,7 +300,7 @@ export async function duplicateDrink(drinkId: number, newLoggedAt: Date) {
   const newDrink: InsertDrink = {
     ...drinkData,
     loggedAt: newLoggedAt,
-    isFavorite: 0, // Don't copy favorite status
+    isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
   };
   
   await db.insert(drinks).values(newDrink);
