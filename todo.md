@@ -1458,3 +1458,16 @@
 - [x] Created comprehensive test suite with 8 passing tests covering all scenarios
 - [x] Verify serving size adjustment works correctly (100g label → 3.5g serving = 0.035 multiplier)
 - [ ] User testing: Verify components list appears in item editor after nutrition label scan
+
+## Fix Nutrition Label Display - Show Reactive Nutrition Based on Servings (Jan 26, 2026)
+- [x] Update extractNutritionLabel to calculate and return nutrition per actual serving (not reference serving)
+- [x] Add perServingNutrition field to extraction response (calories, protein, fat, carbs, fiber for 1 actual serving)
+- [x] Add calculatedNutritionLabel useMemo in frontend that multiplies perServingNutrition × servingsConsumed
+- [x] Update nutrition label editor UI to display calculatedNutritionLabel (reactive to servings input)
+- [x] Change label from "Nutrition per 100g" to "Total Nutrition (for X servings)" with gram total display
+- [x] When servings change, nutrition fields automatically update to show total (via useMemo)
+- [x] Allow manual override: if user edits nutrition directly, update perServingNutrition accordingly (bidirectional sync)
+- [x] Simplify analyzeNutritionLabelMeal backend: just pass final nutrition values (no recalculation)
+- [x] Updated comprehensive test suite with 8 passing tests covering reactive display logic
+- [x] Test with Qing Yuansu: 1 serving = 9 kcal, 2 servings = 18 kcal (auto-update)
+- [x] Verify bidirectional sync: editing servings updates nutrition, editing nutrition updates per-serving base

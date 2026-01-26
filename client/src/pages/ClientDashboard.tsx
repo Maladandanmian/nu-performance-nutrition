@@ -111,6 +111,20 @@ export default function ClientDashboard() {
   const [showNutritionEditor, setShowNutritionEditor] = useState(false);
   const [portionPercentage, setPortionPercentage] = useState(100);
 
+  // Calculate nutrition for nutrition label based on servings consumed
+  const calculatedNutritionLabel = useMemo(() => {
+    if (!extractedNutrition?.perServingNutrition) return null;
+    
+    const servings = extractedNutrition.servingsConsumed || 1;
+    return {
+      calories: Math.round(extractedNutrition.perServingNutrition.calories * servings),
+      protein: Math.round(extractedNutrition.perServingNutrition.protein * servings * 10) / 10,
+      fat: Math.round(extractedNutrition.perServingNutrition.fat * servings * 10) / 10,
+      carbs: Math.round(extractedNutrition.perServingNutrition.carbs * servings * 10) / 10,
+      fiber: Math.round(extractedNutrition.perServingNutrition.fiber * servings * 10) / 10,
+    };
+  }, [extractedNutrition?.perServingNutrition, extractedNutrition?.servingsConsumed]);
+
   // Calculate totals from edited components + beverage, applying portion percentage
   const calculatedTotals = useMemo(() => {
     let mealTotals;
@@ -1486,32 +1500,69 @@ export default function ClientDashboard() {
                   </p>
                 </div>
 
-                {/* Nutrition Values (per reference serving) */}
+                {/* Nutrition Values (reactive to servings consumed) */}
                 <div className="border-t pt-3">
-                  <Label className="text-sm font-semibold">Nutrition per {extractedNutrition.referenceSize}{extractedNutrition.referenceUnit}</Label>
+                  <Label className="text-sm font-semibold">
+                    Total Nutrition (for {extractedNutrition.servingsConsumed || 1} serving{(extractedNutrition.servingsConsumed || 1) > 1 ? 's' : ''})
+                  </Label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    = {((extractedNutrition.servingsConsumed || 1) * extractedNutrition.actualServingSize).toFixed(1)}{extractedNutrition.actualServingUnit} total
+                  </p>
                   <div className="grid grid-cols-3 gap-4 mt-2">
                     <div>
                       <Label>Calories</Label>
                       <Input
                         type="number"
-                        value={extractedNutrition.calories}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, calories: parseFloat(e.target.value)})}
+                        value={calculatedNutritionLabel?.calories || 0}
+                        onChange={(e) => {
+                          const newCalories = parseFloat(e.target.value);
+                          const perServing = Math.round(newCalories / (extractedNutrition.servingsConsumed || 1));
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              calories: perServing
+                            }
+                          });
+                        }}
                       />
                     </div>
                     <div>
                       <Label>Protein (g)</Label>
                       <Input
                         type="number"
-                        value={extractedNutrition.protein}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, protein: parseFloat(e.target.value)})}
+                        step="0.1"
+                        value={calculatedNutritionLabel?.protein || 0}
+                        onChange={(e) => {
+                          const newProtein = parseFloat(e.target.value);
+                          const perServing = Math.round((newProtein / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              protein: perServing
+                            }
+                          });
+                        }}
                       />
                     </div>
                     <div>
                       <Label>Carbs (g)</Label>
                       <Input
                         type="number"
-                        value={extractedNutrition.carbs}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, carbs: parseFloat(e.target.value)})}
+                        step="0.1"
+                        value={calculatedNutritionLabel?.carbs || 0}
+                        onChange={(e) => {
+                          const newCarbs = parseFloat(e.target.value);
+                          const perServing = Math.round((newCarbs / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              carbs: perServing
+                            }
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -1521,16 +1572,38 @@ export default function ClientDashboard() {
                       <Label>Fat (g)</Label>
                       <Input
                         type="number"
-                        value={extractedNutrition.fat}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, fat: parseFloat(e.target.value)})}
+                        step="0.1"
+                        value={calculatedNutritionLabel?.fat || 0}
+                        onChange={(e) => {
+                          const newFat = parseFloat(e.target.value);
+                          const perServing = Math.round((newFat / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              fat: perServing
+                            }
+                          });
+                        }}
                       />
                     </div>
                     <div>
                       <Label>Fiber (g)</Label>
                       <Input
                         type="number"
-                        value={extractedNutrition.fiber}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, fiber: parseFloat(e.target.value)})}
+                        step="0.1"
+                        value={calculatedNutritionLabel?.fiber || 0}
+                        onChange={(e) => {
+                          const newFiber = parseFloat(e.target.value);
+                          const perServing = Math.round((newFiber / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              fiber: perServing
+                            }
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -1581,8 +1654,8 @@ export default function ClientDashboard() {
             <Button
               className="w-full"
               onClick={async () => {
-                if (!extractedNutrition?.amountConsumed) {
-                  toast.error("Please enter amount consumed");
+                if (!extractedNutrition?.servingsConsumed || extractedNutrition.servingsConsumed <= 0) {
+                  toast.error("Please enter number of servings consumed");
                   return;
                 }
                 
@@ -1591,24 +1664,33 @@ export default function ClientDashboard() {
                   return;
                 }
                 
+                // Use the calculated nutrition values (already scaled by servings)
+                const finalNutrition = calculatedNutritionLabel || {
+                  calories: 0,
+                  protein: 0,
+                  carbs: 0,
+                  fat: 0,
+                  fiber: 0,
+                };
+                
+                // Create serving description
+                const servings = extractedNutrition.servingsConsumed;
+                const totalGrams = (servings * extractedNutrition.actualServingSize).toFixed(1);
+                const servingDescription = `${servings} ${extractedNutrition.actualServingDescription}${servings > 1 ? 's' : ''} (${totalGrams}${extractedNutrition.actualServingUnit} total)`;
+                
                 analyzeNutritionLabelMealMutation.mutate({
                   clientId: clientSession.clientId,
                   imageUrl,
                   imageKey,
                   mealType,
-                  referenceSize: extractedNutrition.referenceSize,
-                  referenceUnit: extractedNutrition.referenceUnit,
-                  actualServingSize: extractedNutrition.actualServingSize,
-                  actualServingUnit: extractedNutrition.actualServingUnit,
-                  actualServingDescription: extractedNutrition.actualServingDescription,
-                  calories: extractedNutrition.calories,
-                  protein: extractedNutrition.protein,
-                  carbs: extractedNutrition.carbs,
-                  fat: extractedNutrition.fat,
-                  fiber: extractedNutrition.fiber,
                   productName: extractedNutrition.productName,
+                  servingDescription,
                   ingredients: extractedNutrition.ingredients || [],
-                  amountConsumed: extractedNutrition.servingsConsumed || 1, // Number of actual servings consumed
+                  calories: finalNutrition.calories,
+                  protein: finalNutrition.protein,
+                  carbs: finalNutrition.carbs,
+                  fat: finalNutrition.fat,
+                  fiber: finalNutrition.fiber,
                   notes: mealNotes,
                   drinkType: drinkType || undefined,
                   volumeMl: volumeMl ? parseFloat(volumeMl) : undefined,

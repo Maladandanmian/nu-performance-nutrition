@@ -1156,11 +1156,24 @@ Return as JSON.`
           const content = response.choices[0].message.content;
           const nutritionData = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
 
+          // Calculate nutrition per actual serving (not reference serving)
+          // Example: Label shows per 100g, actual serving is 3.5g
+          // User should see nutrition for 3.5g, not 100g
+          const multiplier = nutritionData.actualServingSize / nutritionData.referenceSize;
+          const perServingNutrition = {
+            calories: Math.round(nutritionData.calories * multiplier),
+            protein: Math.round(nutritionData.protein * multiplier * 10) / 10,
+            fat: Math.round(nutritionData.fat * multiplier * 10) / 10,
+            carbs: Math.round(nutritionData.carbs * multiplier * 10) / 10,
+            fiber: Math.round(nutritionData.fiber * multiplier * 10) / 10,
+          };
+
           return {
             success: true,
             imageUrl,
             imageKey,
             ...nutritionData,
+            perServingNutrition, // Nutrition for 1 actual serving
           };
         } catch (error) {
           console.error('Error in extractNutritionLabel:', error);
@@ -1178,21 +1191,16 @@ Return as JSON.`
         imageUrl: z.string(),
         imageKey: z.string(),
         mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-        // Extracted nutrition data (user can edit these)
-        referenceSize: z.number(), // e.g., 100 for "per 100g"
-        referenceUnit: z.string(), // e.g., "g"
-        actualServingSize: z.number(), // e.g., 3.5 for "3.5g per sachet"
-        actualServingUnit: z.string(), // e.g., "g"
-        actualServingDescription: z.string(), // e.g., "per sachet"
-        calories: z.number(), // per reference serving
-        protein: z.number(), // per reference serving
-        carbs: z.number(), // per reference serving
-        fat: z.number(), // per reference serving
-        fiber: z.number(), // per reference serving
+        // Product info
         productName: z.string(),
+        servingDescription: z.string(), // e.g., "2 sachets (7g total)"
         ingredients: z.array(z.string()), // List of ingredients
-        // Amount consumed (in actual serving units)
-        amountConsumed: z.number(), // e.g., 1 for "1 sachet"
+        // Final calculated nutrition (already multiplied by servings consumed)
+        calories: z.number(),
+        protein: z.number(),
+        carbs: z.number(),
+        fat: z.number(),
+        fiber: z.number(),
         notes: z.string().optional(),
         // Optional beverage data
         drinkType: z.string().optional(),
@@ -1200,22 +1208,16 @@ Return as JSON.`
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Calculate adjusted nutrition based on amount consumed
-          // Convert amount consumed to reference serving units
-          // Example: 1 sachet (3.5g) consumed, reference is per 100g
-          // multiplier = (1 * 3.5) / 100 = 0.035
-          const totalGramsConsumed = input.amountConsumed * input.actualServingSize;
-          const multiplier = totalGramsConsumed / input.referenceSize;
-          
+          // 1. Use the final calculated nutrition (already scaled by frontend)
           const adjustedNutrition = {
-            calories: Math.round(input.calories * multiplier),
-            protein: Math.round(input.protein * multiplier * 10) / 10,
-            fat: Math.round(input.fat * multiplier * 10) / 10,
-            carbs: Math.round(input.carbs * multiplier * 10) / 10,
-            fibre: Math.round(input.fiber * multiplier * 10) / 10,
+            calories: input.calories,
+            protein: input.protein,
+            fat: input.fat,
+            carbs: input.carbs,
+            fibre: input.fiber,
           };
           
-          // 1.5. Create components array from ingredients
+          // 2. Create components array from ingredients
           const components = input.ingredients.map(ingredient => ({
             name: ingredient,
             calories: 0, // We don't have per-ingredient breakdown
@@ -1285,7 +1287,7 @@ Return as JSON.`
           );
 
           // 7. Create description for nutrition label meal
-          const description = `${input.productName}: ${input.amountConsumed} ${input.actualServingDescription} consumed (${input.actualServingSize}${input.actualServingUnit} ${input.actualServingDescription}, nutrition per ${input.referenceSize}${input.referenceUnit}).`;
+          const description = `${input.productName}: ${input.servingDescription}`;
           const finalDescription = drinkNutrition && input.drinkType
             ? `${description} Consumed with ${input.drinkType}.`
             : description;
