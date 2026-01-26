@@ -1056,6 +1056,15 @@ export default function ClientDashboard() {
                   </Select>
                 </div>
 
+                {/* Quick Log Drinks */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    <Label className="text-sm font-semibold">Quick Log Drinks</Label>
+                  </div>
+                  <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
+                </div>
+
                 <div>
                   <Label htmlFor="meal-notes">Notes (optional)</Label>
                   <Textarea
@@ -1109,15 +1118,6 @@ export default function ClientDashboard() {
                       <div>• Wine Glass = 150ml</div>
                       <div>• Shot = 30ml</div>
                     </div>
-                  </div>
-
-                  {/* Favorite Drinks */}
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      <Label className="text-sm font-semibold">Quick Log Drinks</Label>
-                    </div>
-                    <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
                   </div>
                 </div>
 

@@ -1525,3 +1525,9 @@
 - [x] Show success toast after logging favorite/repeating meal
 - [x] Limit favorites to 3 per type (enforced in backend getFavorites query)
 - [ ] Fix test data setup (minor issue with drink creation in test - functionality works in UI)
+
+## Move Quick Log Drinks Section to Log Meal Tab (Jan 26, 2026)
+- [x] Remove FavoriteDrinksButtons from "Add Beverage" section
+- [x] Add FavoriteDrinksButtons to "Log Meal" section between Meal Type and Notes
+- [x] Update section title to "Quick Log Drinks"
+- [x] Test layout and positioning
