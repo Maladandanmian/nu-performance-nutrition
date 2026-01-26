@@ -314,6 +314,18 @@ export async function duplicateDrink(drinkId: number, newLoggedAt: Date) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getLastDrink(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(drinks)
+    .where(eq(drinks.clientId, clientId))
+    .orderBy(desc(drinks.loggedAt))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
 // Body metrics queries
 export async function createBodyMetric(metric: InsertBodyMetric) {
   const db = await getDb();

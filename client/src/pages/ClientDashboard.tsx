@@ -18,7 +18,7 @@ import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
 import { FavoriteMealsButtons } from "@/components/FavoriteMealsButtons";
 import { FavoriteDrinksButtons } from "@/components/FavoriteDrinksButtons";
-import { Camera, Droplets, History, LogOut, Scale, Upload, X, Star } from "lucide-react";
+import { Camera, Droplets, History, LogOut, RotateCcw, Scale, Upload, X, Star } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -509,6 +509,17 @@ export default function ClientDashboard() {
     },
     onError: (error) => {
       toast.error(`Failed to update drink: ${error.message}`);
+    },
+  });
+
+  const repeatLastDrinkMutation = trpc.drinks.repeatLast.useMutation({
+    onSuccess: () => {
+      toast.success("Last drink repeated successfully!");
+      utils.drinks.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to repeat last drink");
     },
   });
 
@@ -1119,6 +1130,24 @@ export default function ClientDashboard() {
                       <div>• Shot = 30ml</div>
                     </div>
                   </div>
+
+                  {/* Repeat Last Drink Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!clientSession?.clientId) {
+                        toast.error("Client session not found");
+                        return;
+                      }
+                      repeatLastDrinkMutation.mutate({ clientId: clientSession.clientId });
+                    }}
+                    disabled={repeatLastDrinkMutation.isPending}
+                    className="w-full"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Repeat Last Drink
+                  </Button>
                 </div>
 
                 {/* Conditional buttons based on what's filled */}

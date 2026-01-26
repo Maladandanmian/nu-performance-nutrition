@@ -1531,3 +1531,13 @@
 - [x] Add FavoriteDrinksButtons to "Log Meal" section between Meal Type and Notes
 - [x] Update section title to "Quick Log Drinks"
 - [x] Test layout and positioning
+
+## Add Separate Repeat Last Buttons for Meals and Drinks (Jan 26, 2026)
+- [x] Create backend procedure `drinks.repeatLast` to duplicate last drink with new timestamp
+- [x] Add database helper function `getLastDrink` to fetch most recent drink by clientId
+- [x] Update FavoriteMealsButtons to include "Repeat Last Meal" button (already exists)
+- [x] Add "Repeat Last Drink" button to Add Beverage section (below Volume Reference Guide)
+- [x] Add repeatLastDrinkMutation to ClientDashboard with proper invalidation
+- [x] Ensure "Repeat Last Meal" only repeats meals (not drinks)
+- [x] Ensure "Repeat Last Drink" only repeats drinks (not meals)
+- [ ] Test both repeat functions independently (manual testing recommended)

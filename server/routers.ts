@@ -1711,6 +1711,30 @@ Return as JSON.`
           });
         }
       }),
+
+    // Repeat last drink
+    repeatLast: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const lastDrink = await db.getLastDrink(input.clientId);
+          if (!lastDrink) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'No previous drink found' });
+          }
+
+          // Create a copy of the last drink with current timestamp
+          const newDrink = await db.duplicateDrink(lastDrink.id, new Date());
+          return { success: true, drink: newDrink };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to repeat last drink',
+          });
+        }
+      }),
   }),
 
   // Body metrics
