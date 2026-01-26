@@ -1490,3 +1490,15 @@
 - [ ] Update auth.logout.test.ts to use test account (optional)
 - [ ] Update meals.portion.test.ts to use test account (optional - currently unit test only)
 - [ ] Update nutrition-label.test.ts to use test account (optional - currently unit test only)
+
+## Add Save Button to Meal Edit Modal (Jan 26, 2026)
+- [x] Add "Save Changes" button to bottom of "Review and Edit Meal Items" modal
+- [x] Implement save functionality to update meal type, date/time, notes, and beverage
+- [x] Trigger re-analysis after save (as per mandatory re-analysis requirement)
+- [x] Show loading state while saving ("Saving Changes..." with spinner)
+- [x] Show success/error toast after save
+- [x] Close modal after successful save
+- [x] Refresh meal list to show updated data (via utils.meals.invalidate)
+- [x] Button only appears when editing existing meal (editingMealId > 0)
+- [x] Re-analyzes meal with updated components and beverage
+- [x] Updates database with new nutrition values and user edits

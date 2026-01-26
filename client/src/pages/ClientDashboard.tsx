@@ -1967,6 +1967,106 @@ export default function ClientDashboard() {
             </Button>
             )}
 
+            {/* Save Changes Button - Only show when editing existing meal */}
+            {editingMealId && editingMealId > 0 && (
+              <Button
+                className="w-full"
+                onClick={async () => {
+                  try {
+                    // Re-analyze the meal with updated data
+                    const filteredItems = identifiedItems.filter(item => item.trim() !== "");
+                    
+                    if (filteredItems.length === 0) {
+                      toast.error("Please add at least one food item");
+                      return;
+                    }
+
+                    // Estimate beverage nutrition if provided
+                    let drinkNutrition = null;
+                    if (drinkType && volumeMl) {
+                      if (drinkType.toLowerCase().trim() === 'water') {
+                        drinkNutrition = {
+                          calories: 0,
+                          protein: 0,
+                          fat: 0,
+                          carbs: 0,
+                          fibre: 0,
+                        };
+                      } else {
+                        const result = await estimateBeverageMutation.mutateAsync({
+                          drinkType,
+                          volumeMl: parseInt(volumeMl),
+                        });
+                        drinkNutrition = result.nutrition;
+                      }
+                    }
+
+                    // Re-analyze meal with updated items and beverage
+                    const analysisResult = await analyzeMealWithDrinkMutation.mutateAsync({
+                      clientId: currentClientId,
+                      imageUrl,
+                      imageKey,
+                      mealType,
+                      itemDescriptions: filteredItems,
+                      notes: mealNotes || undefined,
+                      drinkType: drinkType || undefined,
+                      volumeMl: volumeMl ? parseInt(volumeMl) : undefined,
+                    });
+
+                    // Extract meal analysis from response
+                    const mealAnalysis = analysisResult.mealAnalysis;
+                    const combinedNutrition = analysisResult.combinedNutrition;
+
+                    // Update the meal with new analysis results and edited fields
+                    await updateMealMutation.mutateAsync({
+                      mealId: editingMealId,
+                      clientId: currentClientId,
+                      imageUrl,
+                      imageKey,
+                      mealType,
+                      calories: combinedNutrition.calories,
+                      protein: combinedNutrition.protein,
+                      fat: combinedNutrition.fat,
+                      carbs: combinedNutrition.carbs,
+                      fibre: combinedNutrition.fibre,
+                      aiDescription: mealAnalysis.description,
+                      aiConfidence: 0.8,
+                      notes: mealNotes || undefined,
+                      loggedAt: new Date(mealDateTime),
+                      beverageType: drinkType || undefined,
+                      beverageVolumeMl: volumeMl ? parseInt(volumeMl) : undefined,
+                      beverageCalories: drinkNutrition?.calories,
+                      beverageProtein: drinkNutrition?.protein,
+                      beverageFat: drinkNutrition?.fat,
+                      beverageCarbs: drinkNutrition?.carbs,
+                      beverageFibre: drinkNutrition?.fibre,
+                      components: mealAnalysis.components,
+                    });
+
+                    toast.success("Meal updated successfully");
+                    setShowItemEditor(false);
+                    setEditingMealId(null);
+                    
+                    // Refresh meal list
+                    utils.meals.invalidate();
+                  } catch (error) {
+                    toast.error("Failed to update meal");
+                    console.error(error);
+                  }
+                }}
+                disabled={analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending}
+              >
+                {(analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending) ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving Changes...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            )}
+
             {/* Analyse Button for drink-only edits */}
             {identifiedItems.length === 0 && editingMealId && editingMealId < 0 && (
               <Button
