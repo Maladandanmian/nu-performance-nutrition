@@ -1598,3 +1598,14 @@
 - [x] Added text-gray-400 color to unfavorited stars for better contrast
 - [x] Applied fix to both meal and drink entries
 - [x] Test TypeScript compilation
+
+## Immediate Security Improvements (Jan 27, 2026)
+- [x] Install bcrypt dependency
+- [x] Update PIN storage to use bcrypt hashing
+- [x] Create migration script for existing PINs (server/migrate-pins.mjs)
+- [x] Implement rate limiting on login endpoint (5 attempts/15min)
+- [x] Add account lockout tracking in database (login_attempts, rate_limit_locks tables)
+- [x] Implement presigned URLs for DEXA PDFs (5-minute expiry)
+- [x] Update DEXA image URLs to use presigned URLs
+- [x] Write tests for security improvements (17 tests passing)
+- [ ] Push changes to authentication branch

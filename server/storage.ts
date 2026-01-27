@@ -100,3 +100,47 @@ export async function storageGet(relKey: string): Promise<{ key: string; url: st
     url: await buildDownloadUrl(baseUrl, key, apiKey),
   };
 }
+
+/**
+ * Get a presigned URL for secure file access with expiry
+ * Used for sensitive files like DEXA scans
+ * @param relKey - The relative key/path of the file in storage
+ * @param expiresInSeconds - How long the URL should be valid (default: 300 = 5 minutes)
+ * @returns Object with key and presigned URL
+ */
+export async function storageGetPresigned(
+  relKey: string,
+  expiresInSeconds: number = 300
+): Promise<{ key: string; url: string; expiresAt: Date }> {
+  const { baseUrl, apiKey } = getStorageConfig();
+  const key = normalizeKey(relKey);
+  
+  // Build download URL with expiry parameter
+  const downloadApiUrl = new URL(
+    "v1/storage/downloadUrl",
+    ensureTrailingSlash(baseUrl)
+  );
+  downloadApiUrl.searchParams.set("path", key);
+  downloadApiUrl.searchParams.set("expiresIn", expiresInSeconds.toString());
+  
+  const response = await fetch(downloadApiUrl, {
+    method: "GET",
+    headers: buildAuthHeaders(apiKey),
+  });
+  
+  if (!response.ok) {
+    const message = await response.text().catch(() => response.statusText);
+    throw new Error(
+      `Storage presigned URL failed (${response.status} ${response.statusText}): ${message}`
+    );
+  }
+  
+  const data = await response.json();
+  const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+  
+  return {
+    key,
+    url: data.url,
+    expiresAt,
+  };
+}

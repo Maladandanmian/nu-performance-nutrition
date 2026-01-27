@@ -1,4 +1,4 @@
-import { date, decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, date, decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -35,7 +35,7 @@ export const clients = mysqlTable("clients", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),
-  pin: varchar("pin", { length: 6 }).notNull().unique(),
+  pin: varchar("pin", { length: 72 }).notNull().unique(), // 72 chars for bcrypt hash
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -289,3 +289,34 @@ export const dexaImages = mysqlTable("dexa_images", {
 
 export type DexaImage = typeof dexaImages.$inferSelect;
 export type InsertDexaImage = typeof dexaImages.$inferInsert;
+
+
+/**
+ * Login attempts table - tracks failed login attempts for rate limiting
+ * Used to implement account lockout after too many failed attempts
+ */
+export const loginAttempts = mysqlTable("login_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull(), // IPv6 can be up to 45 chars
+  attemptedPin: varchar("attemptedPin", { length: 6 }), // Store last 2 digits only for debugging
+  success: boolean("success").notNull().default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
+
+/**
+ * Rate limit locks table - tracks IP addresses that are currently locked out
+ */
+export const rateLimitLocks = mysqlTable("rate_limit_locks", {
+  id: int("id").autoincrement().primaryKey(),
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull().unique(),
+  lockedUntil: timestamp("lockedUntil").notNull(),
+  failedAttempts: int("failedAttempts").notNull().default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RateLimitLock = typeof rateLimitLocks.$inferSelect;
+export type InsertRateLimitLock = typeof rateLimitLocks.$inferInsert;
