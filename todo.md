@@ -1568,3 +1568,10 @@
 - [x] Configure staleTime to reduce unnecessary refetches
 - [x] Disable refetchOnWindowFocus to reduce load
 - [x] Test TypeScript compilation and server status
+
+## Fix Logout on Home Page (Jan 27, 2026)
+- [x] Investigate why "Switch User / Logout" button doesn't clear session
+- [x] Fix logout to properly clear client session from localStorage
+- [x] Import clearClientSessionFromStorage function
+- [x] Call clearClientSessionFromStorage before page reload
+- [x] Test TypeScript compilation

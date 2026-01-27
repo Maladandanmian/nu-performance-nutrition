@@ -10,7 +10,7 @@ import { useLocation } from "wouter";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { setClientSessionInStorage } from "@/lib/clientSession";
+import { setClientSessionInStorage, clearClientSessionFromStorage } from "@/lib/clientSession";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -123,12 +123,14 @@ export default function Home() {
                     variant="outline"
                     onClick={() => {
                       if (confirm('Are you sure you want to log out and clear your session?')) {
-                        // Clear all cookies and reload
+                        // Clear localStorage session
+                        clearClientSessionFromStorage();
+                        // Clear all cookies
                         document.cookie.split(";").forEach((c) => {
                           document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
                         });
+                        // Reload to clear state
                         window.location.href = '/';
-                        setTimeout(() => window.location.reload(), 100);
                       }
                     }}
                   >
