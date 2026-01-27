@@ -331,7 +331,7 @@ function MealEntry({
               className="h-8 w-8 p-0"
               title={meal.isFavorite ? "Remove from favorites" : "Add to favorites"}
             >
-              <Star className={`h-4 w-4 ${meal.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              <Star className={`h-5 w-5 ${meal.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
             </Button>
             {onEdit && (
               <Button
@@ -456,7 +456,7 @@ function DrinkEntry({
               className="h-8 w-8 p-0"
               title={drink.isFavorite ? "Remove from favorites" : "Add to favorites"}
             >
-              <Star className={`h-4 w-4 ${drink.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              <Star className={`h-5 w-5 ${drink.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
             </Button>
             {onEdit && (
               <Button

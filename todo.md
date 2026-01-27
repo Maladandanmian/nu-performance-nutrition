@@ -1590,3 +1590,11 @@
 - [x] Remove the duplicate section
 - [x] Verify only one Quick Log section remains (inside the dialog)
 - [x] Test TypeScript compilation
+
+## Fix Missing Favorite Stars on Mobile (Jan 27, 2026)
+- [x] Check NutritionHistoryFeed component for favorite star rendering
+- [x] Found stars were too small (h-4 w-4) and had no color when not favorited
+- [x] Increased star size from h-4 w-4 to h-5 w-5 for better visibility
+- [x] Added text-gray-400 color to unfavorited stars for better contrast
+- [x] Applied fix to both meal and drink entries
+- [x] Test TypeScript compilation
