@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
-import { Activity, TrendingUp, Users, Lock } from "lucide-react";
+import { Activity, TrendingUp, Users, Lock, Mail } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useClientAuth } from "@/hooks/useClientAuth";
@@ -17,6 +18,8 @@ export default function Home() {
   const { clientSession, loading: clientLoading } = useClientAuth();
   const [, setLocation] = useLocation();
   const [pin, setPin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const utils = trpc.useUtils();
   const loginWithPINMutation = trpc.auth.loginWithPIN.useMutation({
@@ -34,6 +37,22 @@ export default function Home() {
     },
     onError: (error) => {
       toast.error(error.message || "Invalid PIN");
+    },
+  });
+
+  const loginWithEmailMutation = trpc.emailAuth.loginWithEmail.useMutation({
+    onSuccess: async (data) => {
+      if (data.sessionToken) {
+        setClientSessionInStorage(data.sessionToken);
+        console.log('[Home] Stored session token in localStorage');
+      }
+      toast.success("Login successful! Redirecting...");
+      setTimeout(() => {
+        window.location.href = '/client';
+      }, 500);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Invalid email or password");
     },
   });
 
@@ -56,6 +75,15 @@ export default function Home() {
       return;
     }
     await loginWithPINMutation.mutateAsync({ pin });
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("Please enter email and password");
+      return;
+    }
+    await loginWithEmailMutation.mutateAsync({ email, password });
   };
 
   if (loading) {
@@ -144,7 +172,7 @@ export default function Home() {
         
         {/* Always show login forms for easy access */}
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
-            {/* Client PIN Login - LEFT SIDE (Primary) */}
+            {/* Client Login - LEFT SIDE (Primary) */}
             <Card className="bg-white/95 backdrop-blur border-none shadow-2xl ring-4 ring-white/50">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 p-4 rounded-full" style={{backgroundColor: '#578DB3', width: 'fit-content'}}>
@@ -152,36 +180,90 @@ export default function Home() {
                 </div>
                 <CardTitle className="text-2xl" style={{color: '#2B2A2C'}}>Client Login</CardTitle>
                 <CardDescription className="text-base" style={{color: '#6F6E70'}}>
-                  Enter your 6-digit PIN to access your nutrition dashboard
+                  Access your nutrition dashboard
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handlePINLogin} className="space-y-4">
-                  <div>
-                    <Label htmlFor="pin" className="text-base" style={{color: '#2B2A2C'}}>PIN Code</Label>
-                    <Input
-                      id="pin"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      placeholder="000000"
-                      value={pin}
-                      onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                      className="text-center text-3xl tracking-widest font-bold mt-2"
-                      style={{borderColor: '#86BBD8', borderWidth: '2px'}}
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full hover:opacity-90 text-lg"
-                    style={{backgroundColor: '#578DB3'}}
-                    disabled={loginWithPINMutation.isPending || pin.length !== 6}
-                  >
-                    {loginWithPINMutation.isPending ? "Logging in..." : "Access Dashboard"}
-                  </Button>
-                </form>
+                <Tabs defaultValue="pin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="pin" className="flex items-center gap-2">
+                      <Lock className="h-4 w-4" /> PIN
+                    </TabsTrigger>
+                    <TabsTrigger value="email" className="flex items-center gap-2">
+                      <Mail className="h-4 w-4" /> Email
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="pin">
+                    <form onSubmit={handlePINLogin} className="space-y-4">
+                      <div>
+                        <Label htmlFor="pin" className="text-base" style={{color: '#2B2A2C'}}>PIN Code</Label>
+                        <Input
+                          id="pin"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={6}
+                          placeholder="000000"
+                          value={pin}
+                          onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                          className="text-center text-3xl tracking-widest font-bold mt-2"
+                          style={{borderColor: '#86BBD8', borderWidth: '2px'}}
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full hover:opacity-90 text-lg"
+                        style={{backgroundColor: '#578DB3'}}
+                        disabled={loginWithPINMutation.isPending || pin.length !== 6}
+                      >
+                        {loginWithPINMutation.isPending ? "Logging in..." : "Access Dashboard"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="email">
+                    <form onSubmit={handleEmailLogin} className="space-y-4">
+                      <div>
+                        <Label htmlFor="email" className="text-base" style={{color: '#2B2A2C'}}>Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="mt-2"
+                          style={{borderColor: '#86BBD8', borderWidth: '2px'}}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="password" className="text-base" style={{color: '#2B2A2C'}}>Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="mt-2"
+                          style={{borderColor: '#86BBD8', borderWidth: '2px'}}
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full hover:opacity-90 text-lg"
+                        style={{backgroundColor: '#578DB3'}}
+                        disabled={loginWithEmailMutation.isPending || !email || !password}
+                      >
+                        {loginWithEmailMutation.isPending ? "Logging in..." : "Login with Email"}
+                      </Button>
+                      <p className="text-xs text-center" style={{color: '#6F6E70'}}>
+                        Contact your trainer if you need to set up email login
+                      </p>
+                    </form>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 
