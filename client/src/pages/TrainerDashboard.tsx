@@ -26,7 +26,13 @@ export default function TrainerDashboard() {
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   const createClientMutation = trpc.clients.create.useMutation({
     onSuccess: (data) => {
-      toast.success(`Client added! PIN: ${data.pin}`, { duration: 10000 });
+      const invitationStatus = data.invitationSent 
+        ? "Password setup invitation sent to their email."
+        : "Email not configured. Please manually share the password setup link.";
+      
+      const pinMessage = data.pin ? `\n\nTemporary PIN: ${data.pin}` : "";
+      
+      toast.success(`Client added! ${invitationStatus}`, { duration: 10000 });
       utils.clients.list.invalidate();
       setIsAddClientOpen(false);
       setNewClientName("");
@@ -35,8 +41,8 @@ export default function TrainerDashboard() {
       setNewClientNotes("");
       setNewClientPin("");
       
-      // Show PIN in alert as well
-      alert(`Client created successfully!\n\nClient PIN: ${data.pin}\n\nPlease share this PIN with your client. They will use it to log in.`);
+      // Show success message
+      alert(`Client created successfully!\n\n${invitationStatus}${pinMessage}`);
     },
     onError: (error) => {
       toast.error(`Failed to add client: ${error.message}`);

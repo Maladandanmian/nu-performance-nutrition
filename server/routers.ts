@@ -196,11 +196,20 @@ export const appRouter = router({
         
         // Generate password setup token and send invitation email
         const token = await db.generatePasswordSetupToken(clientId);
-        // TODO: Send invitation email with password setup link
-        console.log(`[ClientInvitation] Password setup token for client ${clientId}: ${token}`);
-        console.log(`[ClientInvitation] Send email to ${clientData.email} with link: /set-password?token=${token}`);
         
-        return { success: true, clientId, pin, invitationSent: true };
+        // Send invitation email
+        const { sendPasswordSetupInvitation } = await import('./emailService');
+        const emailSent = await sendPasswordSetupInvitation(
+          clientData.email,
+          clientData.name,
+          token
+        );
+        
+        if (!emailSent) {
+          console.warn(`[ClientInvitation] Failed to send email to ${clientData.email}. Token: ${token}`);
+        }
+        
+        return { success: true, clientId, pin, invitationSent: emailSent };
       }),
 
     list: adminProcedure.query(async ({ ctx }) => {
