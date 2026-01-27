@@ -1079,7 +1079,7 @@ export const appRouter = router({
             messages: [
               {
                 role: "system",
-                content: "You are a nutrition label reader. Extract nutrition information from the label image and return it in JSON format. Be precise with numbers."
+                content: "You are a nutrition label reader. Extract nutrition information from the label image and return it in JSON format. Be precise with numbers. Support Chinese and English labels."
               },
               {
                 role: "user",
@@ -1090,7 +1090,33 @@ export const appRouter = router({
                   },
                   {
                     type: "text",
-                    text: "Extract the following from this nutrition label:\n1. Serving size (number and unit, e.g., '100' and 'g' or '1' and 'serving')\n2. Calories per serving\n3. Protein per serving (g)\n4. Carbohydrates per serving (g)\n5. Fat per serving (g)\n6. Fiber per serving (g, if available)\n\nReturn as JSON with keys: servingSize, servingUnit, calories, protein, carbs, fat, fiber"
+                    text: `Extract the following from this nutrition label:
+
+1. **Reference Serving**: The serving size that nutrition values are based on (e.g., "per 100g", "per serving", "每100g")
+   - referenceSize: number (e.g., 100)
+   - referenceUnit: string (e.g., "g", "ml", "serving")
+
+2. **Actual Serving**: The recommended serving size per consumption (e.g., "3.5g per sachet", "1 scoop = 35g")
+   - actualServingSize: number (e.g., 3.5)
+   - actualServingUnit: string (e.g., "g", "ml")
+   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "每袋")
+   - If not found, set actualServingSize = referenceSize
+
+3. **Nutrition per reference serving**:
+   - calories (kcal/kJ - convert kJ to kcal by dividing by 4.184)
+   - protein (g)
+   - carbs (g - total carbohydrates, or 碳水化合物)
+   - fat (g - total fat, or 脂肪)
+   - fiber (g - dietary fiber, or 膳食纤维, set to 0 if not available)
+
+4. **Product name**: The name of the product (e.g., "Qing Yuansu", "轻元素")
+
+5. **Ingredients**: List the main ingredients/components visible on the label
+   - Extract up to 10 key ingredients
+   - Include percentages if shown (e.g., "Barley Grass Powder (45%)")
+   - For Chinese labels, translate to English
+
+Return as JSON.`
                   }
                 ]
               }
@@ -1103,15 +1129,24 @@ export const appRouter = router({
                 schema: {
                   type: "object",
                   properties: {
-                    servingSize: { type: "number", description: "The serving size number" },
-                    servingUnit: { type: "string", description: "The unit of the serving size (g, ml, serving, oz, etc.)" },
-                    calories: { type: "number", description: "Calories per serving" },
-                    protein: { type: "number", description: "Protein in grams per serving" },
-                    carbs: { type: "number", description: "Carbohydrates in grams per serving" },
-                    fat: { type: "number", description: "Fat in grams per serving" },
-                    fiber: { type: "number", description: "Fiber in grams per serving, 0 if not available" },
+                    referenceSize: { type: "number", description: "The reference serving size number (e.g., 100 for per 100g)" },
+                    referenceUnit: { type: "string", description: "The unit of the reference serving (g, ml, serving, etc.)" },
+                    actualServingSize: { type: "number", description: "The actual serving size per consumption" },
+                    actualServingUnit: { type: "string", description: "The unit of the actual serving (g, ml, etc.)" },
+                    actualServingDescription: { type: "string", description: "Description of actual serving (e.g., 'per sachet', '1 scoop')" },
+                    calories: { type: "number", description: "Calories per reference serving" },
+                    protein: { type: "number", description: "Protein in grams per reference serving" },
+                    carbs: { type: "number", description: "Carbohydrates in grams per reference serving" },
+                    fat: { type: "number", description: "Fat in grams per reference serving" },
+                    fiber: { type: "number", description: "Fiber in grams per reference serving, 0 if not available" },
+                    productName: { type: "string", description: "Name of the product" },
+                    ingredients: {
+                      type: "array",
+                      description: "List of main ingredients",
+                      items: { type: "string" }
+                    },
                   },
-                  required: ["servingSize", "servingUnit", "calories", "protein", "carbs", "fat", "fiber"],
+                  required: ["referenceSize", "referenceUnit", "actualServingSize", "actualServingUnit", "actualServingDescription", "calories", "protein", "carbs", "fat", "fiber", "productName", "ingredients"],
                   additionalProperties: false,
                 },
               },
@@ -1121,11 +1156,24 @@ export const appRouter = router({
           const content = response.choices[0].message.content;
           const nutritionData = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
 
+          // Calculate nutrition per actual serving (not reference serving)
+          // Example: Label shows per 100g, actual serving is 3.5g
+          // User should see nutrition for 3.5g, not 100g
+          const multiplier = nutritionData.actualServingSize / nutritionData.referenceSize;
+          const perServingNutrition = {
+            calories: Math.round(nutritionData.calories * multiplier),
+            protein: Math.round(nutritionData.protein * multiplier * 10) / 10,
+            fat: Math.round(nutritionData.fat * multiplier * 10) / 10,
+            carbs: Math.round(nutritionData.carbs * multiplier * 10) / 10,
+            fiber: Math.round(nutritionData.fiber * multiplier * 10) / 10,
+          };
+
           return {
             success: true,
             imageUrl,
             imageKey,
             ...nutritionData,
+            perServingNutrition, // Nutrition for 1 actual serving
           };
         } catch (error) {
           console.error('Error in extractNutritionLabel:', error);
@@ -1143,16 +1191,16 @@ export const appRouter = router({
         imageUrl: z.string(),
         imageKey: z.string(),
         mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-        // Extracted nutrition data (user can edit these)
-        servingSize: z.number(),
-        servingUnit: z.string(),
+        // Product info
+        productName: z.string(),
+        servingDescription: z.string(), // e.g., "2 sachets (7g total)"
+        ingredients: z.array(z.string()), // List of ingredients
+        // Final calculated nutrition (already multiplied by servings consumed)
         calories: z.number(),
         protein: z.number(),
         carbs: z.number(),
         fat: z.number(),
         fiber: z.number(),
-        // Amount consumed
-        amountConsumed: z.number(),
         notes: z.string().optional(),
         // Optional beverage data
         drinkType: z.string().optional(),
@@ -1160,15 +1208,24 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         try {
-          // 1. Calculate adjusted nutrition based on amount consumed
-          const multiplier = input.amountConsumed / input.servingSize;
+          // 1. Use the final calculated nutrition (already scaled by frontend)
           const adjustedNutrition = {
-            calories: Math.round(input.calories * multiplier),
-            protein: Math.round(input.protein * multiplier * 10) / 10,
-            fat: Math.round(input.fat * multiplier * 10) / 10,
-            carbs: Math.round(input.carbs * multiplier * 10) / 10,
-            fibre: Math.round(input.fiber * multiplier * 10) / 10,
+            calories: input.calories,
+            protein: input.protein,
+            fat: input.fat,
+            carbs: input.carbs,
+            fibre: input.fiber,
           };
+          
+          // 2. Create components array from ingredients
+          const components = input.ingredients.map(ingredient => ({
+            name: ingredient,
+            calories: 0, // We don't have per-ingredient breakdown
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            fibre: 0,
+          }));
 
           // 2. If drink is provided, estimate its nutrition
           let drinkNutrition = null;
@@ -1230,7 +1287,7 @@ export const appRouter = router({
           );
 
           // 7. Create description for nutrition label meal
-          const description = `Nutrition label scan: ${input.amountConsumed}${input.servingUnit} consumed (${input.servingSize}${input.servingUnit} per serving).`;
+          const description = `${input.productName}: ${input.servingDescription}`;
           const finalDescription = drinkNutrition && input.drinkType
             ? `${description} Consumed with ${input.drinkType}.`
             : description;
@@ -1246,6 +1303,7 @@ export const appRouter = router({
               fat: adjustedNutrition.fat,
               carbs: adjustedNutrition.carbs,
               fibre: adjustedNutrition.fibre,
+              components, // Add components array
             },
             drinkNutrition: drinkNutrition ? {
               calories: drinkNutrition.calories,
@@ -1405,6 +1463,106 @@ export const appRouter = router({
           });
         }
       }),
+
+    // Toggle favorite status for a meal
+    toggleFavorite: authenticatedProcedure
+      .input(z.object({
+        mealId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const meal = await db.getMealById(input.mealId);
+          if (!meal || meal.clientId !== input.clientId) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Meal not found' });
+          }
+
+          // Check if toggling to favorite would exceed limit
+          if (!meal.isFavorite) {
+            const favorites = await db.getFavoriteMeals(input.clientId);
+            if (favorites.length >= 3) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Maximum 3 favorite meals allowed. Remove a favorite first.',
+              });
+            }
+          }
+
+          await db.toggleMealFavorite(input.mealId, !meal.isFavorite);
+          return { success: true, isFavorite: !meal.isFavorite };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to toggle favorite',
+          });
+        }
+      }),
+
+    // Get favorite meals for quick access
+    getFavorites: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          return await db.getFavoriteMeals(input.clientId);
+        } catch (error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to get favorite meals',
+          });
+        }
+      }),
+
+    // Log a favorite meal with current timestamp
+    logFavorite: authenticatedProcedure
+      .input(z.object({
+        mealId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const meal = await db.getMealById(input.mealId);
+          if (!meal || meal.clientId !== input.clientId || !meal.isFavorite) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite meal not found' });
+          }
+
+          // Create a copy of the meal with current timestamp and preserve favorite status
+          const newMeal = await db.duplicateMeal(input.mealId, new Date(), true);
+          return { success: true, meal: newMeal };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to log favorite meal',
+          });
+        }
+      }),
+
+    // Repeat last logged meal
+    repeatLast: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const lastMeal = await db.getLastMeal(input.clientId);
+          if (!lastMeal) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'No previous meals found' });
+          }
+
+          // Create a copy of the last meal with current timestamp
+          const newMeal = await db.duplicateMeal(lastMeal.id, new Date());
+          return { success: true, meal: newMeal };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to repeat last meal',
+          });
+        }
+      }),
   }),
 
   // Drinks
@@ -1477,6 +1635,106 @@ export const appRouter = router({
         await db.updateDrink(drinkId, data);
         return { success: true };
       }),
+
+    // Toggle favorite status for a drink
+    toggleFavorite: authenticatedProcedure
+      .input(z.object({
+        drinkId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const drink = await db.getDrinkById(input.drinkId);
+          if (!drink || drink.clientId !== input.clientId) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Drink not found' });
+          }
+
+          // Check if toggling to favorite would exceed limit
+          if (!drink.isFavorite) {
+            const favorites = await db.getFavoriteDrinks(input.clientId);
+            if (favorites.length >= 3) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Maximum 3 favorite drinks allowed. Remove a favorite first.',
+              });
+            }
+          }
+
+          await db.toggleDrinkFavorite(input.drinkId, !drink.isFavorite);
+          return { success: true, isFavorite: !drink.isFavorite };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to toggle favorite',
+          });
+        }
+      }),
+
+    // Get favorite drinks for quick access
+    getFavorites: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          return await db.getFavoriteDrinks(input.clientId);
+        } catch (error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to get favorite drinks',
+          });
+        }
+      }),
+
+    // Log a favorite drink with current timestamp
+    logFavorite: authenticatedProcedure
+      .input(z.object({
+        drinkId: z.number(),
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const drink = await db.getDrinkById(input.drinkId);
+          if (!drink || drink.clientId !== input.clientId || !drink.isFavorite) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite drink not found' });
+          }
+
+          // Create a copy of the drink with current timestamp and preserve favorite status
+          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), true);
+          return { success: true, drink: newDrink };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to log favorite drink',
+          });
+        }
+      }),
+
+    // Repeat last drink
+    repeatLast: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const lastDrink = await db.getLastDrink(input.clientId);
+          if (!lastDrink) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'No previous drink found' });
+          }
+
+          // Create a copy of the last drink with current timestamp
+          const newDrink = await db.duplicateDrink(lastDrink.id, new Date());
+          return { success: true, drink: newDrink };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to repeat last drink',
+          });
+        }
+      }),
   }),
 
   // Body metrics
@@ -1500,6 +1758,235 @@ export const appRouter = router({
       .input(z.object({ clientId: z.number() }))
       .query(async ({ input }) => {
         return db.getBodyMetricsByClientId(input.clientId);
+      }),
+  }),
+
+  // ============================================================================
+  // DEXA Scan Router (Trainer & Client)
+  // ============================================================================
+  dexa: router({
+    // Trainer: Upload DEXA PDF and trigger AI extraction
+    uploadScan: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        pdfFile: z.object({
+          data: z.string(), // base64 encoded PDF
+          filename: z.string(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        const { analyzeDexaPdf } = await import("./dexaPdfAnalysis");
+        const { extractDexaImages } = await import("./dexaImageExtraction");
+        const { writeFile, unlink } = await import('fs/promises');
+        const { randomBytes } = await import('crypto');
+        
+        // Upload PDF to S3
+        const pdfBuffer = Buffer.from(input.pdfFile.data, 'base64');
+        const pdfKey = `dexa-scans/${input.clientId}/${Date.now()}-${input.pdfFile.filename}`;
+        const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, 'application/pdf');
+        
+        // Save PDF temporarily for image extraction
+        const tempPdfPath = `/tmp/dexa-${randomBytes(8).toString('hex')}.pdf`;
+        await writeFile(tempPdfPath, pdfBuffer);
+        
+        // Extract data using AI
+        const extractedData = await analyzeDexaPdf(pdfUrl);
+        
+        // Extract images from PDF
+        let extractedImages: any[] = [];
+        try {
+          extractedImages = await extractDexaImages(tempPdfPath);
+        } catch (error) {
+          console.error('Image extraction failed:', error);
+          // Continue without images if extraction fails
+        } finally {
+          // Clean up temp PDF
+          await unlink(tempPdfPath).catch(() => {});
+        }
+        
+        // Create scan record
+        const scanId = await db.createDexaScan({
+          clientId: input.clientId,
+          trainerId: 1, // TODO: Get from ctx.user.id
+          pdfUrl,
+          pdfKey,
+          scanDate: extractedData.scanMetadata.scanDate,
+          scanId: extractedData.scanMetadata.scanId || null,
+          scanType: extractedData.scanMetadata.scanType || null,
+          scanVersion: extractedData.scanMetadata.analysisVersion || null,
+          operator: extractedData.scanMetadata.operator || null,
+          model: extractedData.scanMetadata.model || null,
+          patientHeight: extractedData.scanMetadata.patientHeight || null,
+          patientWeight: extractedData.scanMetadata.patientWeight ? Math.round(extractedData.scanMetadata.patientWeight * 10) : null,
+          patientAge: extractedData.scanMetadata.patientAge || null,
+          status: 'pending',
+        });
+        
+        // Store BMD data
+        if (extractedData.bmdData && extractedData.bmdData.length > 0) {
+          const bmdRecords = extractedData.bmdData.map((bmd: any) => ({
+            scanId,
+            region: bmd.region,
+            area: bmd.area?.toString() || null,
+            bmc: bmd.bmc?.toString() || null,
+            bmd: bmd.bmd?.toString() || null,
+            tScore: bmd.tScore?.toString() || null,
+            zScore: bmd.zScore?.toString() || null,
+          }));
+          await db.createDexaBmdData(bmdRecords);
+        }
+        
+        // Store body composition data
+        if (extractedData.bodyComposition || extractedData.adiposeIndices) {
+          await db.createDexaBodyComp({
+            scanId,
+            totalFatMass: extractedData.bodyComposition?.totalFatMass || null,
+            totalLeanMass: extractedData.bodyComposition?.totalLeanMass || null,
+            totalMass: extractedData.bodyComposition?.totalMass || null,
+            totalBodyFatPct: extractedData.bodyComposition?.totalBodyFatPct?.toString() || null,
+            totalBodyFatPctTScore: extractedData.bodyComposition?.totalBodyFatPctTScore?.toString() || null,
+            totalBodyFatPctZScore: extractedData.bodyComposition?.totalBodyFatPctZScore?.toString() || null,
+            trunkFatMass: extractedData.bodyComposition?.trunkFatMass || null,
+            trunkFatPct: extractedData.bodyComposition?.trunkFatPct?.toString() || null,
+            androidFatMass: extractedData.bodyComposition?.androidFatMass || null,
+            androidFatPct: extractedData.bodyComposition?.androidFatPct?.toString() || null,
+            gynoidFatMass: extractedData.bodyComposition?.gynoidFatMass || null,
+            gynoidFatPct: extractedData.bodyComposition?.gynoidFatPct?.toString() || null,
+            lArmLeanMass: extractedData.bodyComposition?.lArmLeanMass || null,
+            rArmLeanMass: extractedData.bodyComposition?.rArmLeanMass || null,
+            lLegLeanMass: extractedData.bodyComposition?.lLegLeanMass || null,
+            rLegLeanMass: extractedData.bodyComposition?.rLegLeanMass || null,
+            trunkLeanMass: extractedData.bodyComposition?.trunkLeanMass || null,
+            fatMassHeightRatio: extractedData.adiposeIndices?.fatMassHeightRatio?.toString() || null,
+            androidGynoidRatio: extractedData.adiposeIndices?.androidGynoidRatio?.toString() || null,
+            trunkLegsFatRatio: extractedData.adiposeIndices?.trunkLegsFatRatio?.toString() || null,
+            trunkLimbFatMassRatio: extractedData.adiposeIndices?.trunkLimbFatMassRatio?.toString() || null,
+            vatMass: extractedData.adiposeIndices?.vatMass || null,
+            vatVolume: extractedData.adiposeIndices?.vatVolume || null,
+            vatArea: extractedData.adiposeIndices?.vatArea?.toString() || null,
+            leanMassHeightRatio: extractedData.leanIndices?.leanMassHeightRatio?.toString() || null,
+            appendicularLeanMassHeightRatio: extractedData.leanIndices?.appendicularLeanMassHeightRatio?.toString() || null,
+          });
+        }
+        
+        // Store extracted images
+        if (extractedImages.length > 0) {
+          const imageRecords = extractedImages.map((img: any) => ({
+            scanId,
+            imageType: img.type,
+            imageUrl: img.imageUrl,
+            imageKey: img.imageKey,
+            pageNumber: img.pageNumber,
+          }));
+          await db.createDexaImages(imageRecords);
+        }
+        
+        return {
+          scanId,
+          extractedData,
+          extractedImages: extractedImages.length,
+        };
+      }),
+
+    // Trainer: Approve or reject a scan
+    updateScanStatus: adminProcedure
+      .input(z.object({
+        scanId: z.number(),
+        status: z.enum(['approved', 'rejected']),
+        rejectionReason: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateDexaScanStatus(input.scanId, input.status, input.rejectionReason);
+        return { success: true };
+      }),
+
+    // Trainer: Get all scans for a client (including pending)
+    getClientScans: adminProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const scans = await db.getDexaScansByClient(input.clientId);
+        return scans;
+      }),
+
+    // Client: Get approved scans only
+    getMyScans: authenticatedProcedure
+      .query(async ({ ctx }) => {
+        // Get client session
+        const clientCookie = ctx.req.cookies?.['client_session'];
+        if (!clientCookie) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'No client session found' });
+        }
+        
+        const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
+        const clientId = decoded.clientId;
+        
+        const allScans = await db.getDexaScansByClient(clientId);
+        // Filter to approved scans only
+        return allScans.filter(scan => scan.status === 'approved');
+      }),
+
+    // Get detailed scan data (BMD + Body Comp + Images)
+    getScanDetails: protectedProcedure
+      .input(z.object({ scanId: z.number() }))
+      .query(async ({ input }) => {
+        const scan = await db.getDexaScanById(input.scanId);
+        const bmdData = await db.getDexaBmdData(input.scanId);
+        const bodyComp = await db.getDexaBodyComp(input.scanId);
+        const images = await db.getDexaImages(input.scanId);
+        
+        return {
+          scan,
+          bmdData,
+          bodyComp,
+          images,
+        };
+      }),
+
+    // Get body composition history for trend charts
+    getBodyCompTrend: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const history = await db.getDexaBodyCompHistory(input.clientId);
+        // Filter to approved scans only
+        return history.filter((record: any) => record.status === 'approved');
+      }),
+
+    // Get BMD history for trend charts
+    getBmdTrend: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const history = await db.getDexaBmdHistory(input.clientId);
+        // Filter to approved scans only
+        return history.filter((record: any) => record.status === 'approved');
+      }),
+
+    // Get DEXA goals for a client (accessible to both trainers and clients)
+    getGoals: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getDexaGoalsByClientId(input.clientId);
+      }),
+
+    // Update DEXA goals (trainer only)
+    updateGoals: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        vatTarget: z.number().optional(),
+        bodyFatPctTarget: z.number().optional(),
+        leanMassTarget: z.number().optional(),
+        boneDensityTarget: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { clientId, ...goals } = input;
+        // Convert numbers to strings for decimal fields
+        const convertedGoals: any = {};
+        if (goals.vatTarget !== undefined) convertedGoals.vatTarget = goals.vatTarget.toString();
+        if (goals.bodyFatPctTarget !== undefined) convertedGoals.bodyFatPctTarget = goals.bodyFatPctTarget.toString();
+        if (goals.leanMassTarget !== undefined) convertedGoals.leanMassTarget = goals.leanMassTarget.toString();
+        if (goals.boneDensityTarget !== undefined) convertedGoals.boneDensityTarget = goals.boneDensityTarget.toString();
+        
+        await db.upsertDexaGoals(clientId, convertedGoals);
+        return { success: true };
       }),
   }),
 });

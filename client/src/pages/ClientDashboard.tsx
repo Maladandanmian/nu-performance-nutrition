@@ -16,13 +16,16 @@ import TodaysSummary from "@/components/TodaysSummary";
 import { PhotoGuidelinesModal } from "@/components/PhotoGuidelinesModal";
 import { ComponentEditor } from "@/components/ComponentEditor";
 import { AddComponentForm } from "@/components/AddComponentForm";
-import { Camera, Droplets, History, LogOut, Scale, Upload, X } from "lucide-react";
+import { FavoriteMealsButtons } from "@/components/FavoriteMealsButtons";
+import { FavoriteDrinksButtons } from "@/components/FavoriteDrinksButtons";
+import { Camera, Droplets, History, LogOut, RotateCcw, Scale, Upload, X, Star } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
+import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -108,8 +111,23 @@ export default function ClientDashboard() {
   const [mealTextDescription, setMealTextDescription] = useState("");
   const [extractedNutrition, setExtractedNutrition] = useState<any>(null);
   const [showNutritionEditor, setShowNutritionEditor] = useState(false);
+  const [portionPercentage, setPortionPercentage] = useState(100);
 
-  // Calculate totals from edited components + beverage
+  // Calculate nutrition for nutrition label based on servings consumed
+  const calculatedNutritionLabel = useMemo(() => {
+    if (!extractedNutrition?.perServingNutrition) return null;
+    
+    const servings = extractedNutrition.servingsConsumed || 1;
+    return {
+      calories: Math.round(extractedNutrition.perServingNutrition.calories * servings),
+      protein: Math.round(extractedNutrition.perServingNutrition.protein * servings * 10) / 10,
+      fat: Math.round(extractedNutrition.perServingNutrition.fat * servings * 10) / 10,
+      carbs: Math.round(extractedNutrition.perServingNutrition.carbs * servings * 10) / 10,
+      fiber: Math.round(extractedNutrition.perServingNutrition.fiber * servings * 10) / 10,
+    };
+  }, [extractedNutrition?.perServingNutrition, extractedNutrition?.servingsConsumed]);
+
+  // Calculate totals from edited components + beverage, applying portion percentage
   const calculatedTotals = useMemo(() => {
     let mealTotals;
     if (editedComponents.length === 0) {
@@ -121,13 +139,14 @@ export default function ClientDashboard() {
         fibre: analysisResult?.fibre || 0,
       };
     } else {
+      // Sum up all components
       mealTotals = editedComponents.reduce(
-        (totals, component) => ({
-          calories: totals.calories + (component.calories || 0),
-          protein: totals.protein + (component.protein || 0),
-          fat: totals.fat + (component.fat || 0),
-          carbs: totals.carbs + (component.carbs || 0),
-          fibre: totals.fibre + (component.fibre || 0),
+        (acc, comp) => ({
+          calories: acc.calories + (comp.calories || 0),
+          protein: acc.protein + (comp.protein || 0),
+          fat: acc.fat + (comp.fat || 0),
+          carbs: acc.carbs + (comp.carbs || 0),
+          fibre: acc.fibre + (comp.fibre || 0),
         }),
         { calories: 0, protein: 0, fat: 0, carbs: 0, fibre: 0 }
       );
@@ -135,7 +154,7 @@ export default function ClientDashboard() {
 
     // Add beverage nutrition if available
     if (beverageNutrition) {
-      return {
+      mealTotals = {
         calories: mealTotals.calories + (beverageNutrition.calories || 0),
         protein: mealTotals.protein + (beverageNutrition.protein || 0),
         fat: mealTotals.fat + (beverageNutrition.fat || 0),
@@ -144,8 +163,16 @@ export default function ClientDashboard() {
       };
     }
 
-    return mealTotals;
-  }, [editedComponents, analysisResult, beverageNutrition]);
+    // Apply portion percentage scaling to all values
+    const portionMultiplier = portionPercentage / 100;
+    return {
+      calories: Math.round(mealTotals.calories * portionMultiplier),
+      protein: Math.round(mealTotals.protein * portionMultiplier * 10) / 10,
+      fat: Math.round(mealTotals.fat * portionMultiplier * 10) / 10,
+      carbs: Math.round(mealTotals.carbs * portionMultiplier * 10) / 10,
+      fibre: Math.round(mealTotals.fibre * portionMultiplier * 10) / 10,
+    };
+  }, [editedComponents, analysisResult, beverageNutrition, portionPercentage]);
 
   // ALL TRPC HOOKS MUST BE CALLED UNCONDITIONALLY
   // NEW FLOW: Step 2 - Identify items in meal image
@@ -172,6 +199,7 @@ export default function ClientDashboard() {
       setShowItemEditor(true);
       // Reset file input only (keep beverage data from upload screen)
       setSelectedFile(null);
+      setPortionPercentage(100); // Reset portion to 100% for new meal
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -203,6 +231,7 @@ export default function ClientDashboard() {
       setShowItemEditor(true);
       // Clear text input after successful analysis
       setMealTextDescription("");
+      setPortionPercentage(100); // Reset portion to 100% for new meal
     },
     onError: (error) => {
       toast.error(`Failed to analyze meal description: ${error.message}`);
@@ -215,8 +244,8 @@ export default function ClientDashboard() {
       // Store extracted nutrition data with default values
       setExtractedNutrition({
         ...data,
-        servingsConsumed: 1, // Default to 1 serving
-        amountConsumed: data.servingSize, // Default to 100% of serving size
+        servingsConsumed: 1, // Default to 1 actual serving
+        amountConsumed: data.actualServingSize, // Default to 1 actual serving size
       });
       setImageUrl(data.imageUrl);
       setImageKey(data.imageKey);
@@ -357,7 +386,7 @@ export default function ClientDashboard() {
   });
 
   const saveMealMutation = trpc.meals.saveMeal.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast.success('Meal logged successfully!');
       setShowAnalysisModal(false);
       setIsEditMode(false);
@@ -370,8 +399,49 @@ export default function ClientDashboard() {
       setVolumeMl("");
       setMealSource("meal_photo"); // Reset to default
       setBeverageNutrition(null);
-      // Invalidate queries to refresh meal history and daily totals
-      utils.meals.list.invalidate();
+      setPortionPercentage(100); // Reset portion to 100%
+      
+      // Explicitly update the cache with the new meal to prevent it from disappearing
+      utils.meals.list.setData(
+        { clientId: variables.clientId },
+        (oldData) => {
+          if (!oldData) return oldData;
+          // Create a new meal object with the returned ID
+          const newMeal = {
+            id: data.mealId,
+            clientId: variables.clientId,
+            imageUrl: variables.imageUrl || "",
+            imageKey: variables.imageKey || "",
+            mealType: variables.mealType,
+            calories: variables.calories,
+            protein: variables.protein,
+            fat: variables.fat,
+            carbs: variables.carbs,
+            fibre: variables.fibre,
+            aiDescription: variables.aiDescription,
+            aiConfidence: variables.aiConfidence,
+            nutritionScore: data.score,
+            notes: variables.notes || "",
+            beverageType: variables.beverageType || null,
+            beverageVolumeMl: variables.beverageVolumeMl || null,
+            beverageCalories: variables.beverageCalories || null,
+            beverageProtein: variables.beverageProtein || null,
+            beverageFat: variables.beverageFat || null,
+            beverageCarbs: variables.beverageCarbs || null,
+            beverageFibre: variables.beverageFibre || null,
+            beverageCategory: variables.beverageCategory || null,
+            components: variables.components || null,
+            loggedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            source: variables.source || "meal_photo",
+          } as any; // Type assertion to match the expected type
+          // Add new meal to the beginning of the array
+          return [newMeal, ...oldData];
+        }
+      );
+      
+      // Also invalidate to ensure consistency with server
       utils.meals.dailyTotals.invalidate();
     },
     onError: (error) => {
@@ -439,6 +509,17 @@ export default function ClientDashboard() {
     },
     onError: (error) => {
       toast.error(`Failed to update drink: ${error.message}`);
+    },
+  });
+
+  const repeatLastDrinkMutation = trpc.drinks.repeatLast.useMutation({
+    onSuccess: () => {
+      toast.success("Last drink repeated successfully!");
+      utils.drinks.list.invalidate();
+      utils.meals.dailyTotals.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to repeat last drink");
     },
   });
 
@@ -732,6 +813,7 @@ export default function ClientDashboard() {
     setShowItemEditor(true); // Show item editor instead of analysis modal
     setEditingMealId(meal.id);
     setMealType(meal.mealType);
+    setPortionPercentage(100); // Reset portion to 100% when editing meal
     
     // Set meal date/time from loggedAt
     if (meal.loggedAt) {
@@ -848,11 +930,12 @@ export default function ClientDashboard() {
           <TodaysSummary clientId={clientSession?.clientId || 0} />
           
           <Tabs defaultValue="log-meal">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="dexa">DEXA Scans</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -984,6 +1067,15 @@ export default function ClientDashboard() {
                   </Select>
                 </div>
 
+                {/* Quick Log Meals */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    <Label className="text-sm font-semibold">Quick Log Meals</Label>
+                  </div>
+                  <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
+                </div>
+
                 <div>
                   <Label htmlFor="meal-notes">Notes (optional)</Label>
                   <Textarea
@@ -1039,6 +1131,14 @@ export default function ClientDashboard() {
                     </div>
                   </div>
 
+                  {/* Quick Log Drinks */}
+                  <div className="space-y-2 mt-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <Label className="text-sm font-semibold">Quick Log Drinks</Label>
+                    </div>
+                    <FavoriteDrinksButtons clientId={clientSession?.clientId || 0} />
+                  </div>
                 </div>
 
                 {/* Conditional buttons based on what's filled */}
@@ -1285,6 +1385,21 @@ export default function ClientDashboard() {
               />
             )}
           </TabsContent>
+
+          {/* DEXA Scans Tab */}
+          <TabsContent value="dexa">
+            <Card>
+              <CardHeader>
+                <CardTitle>Your DEXA Scan Results</CardTitle>
+                <CardDescription>
+                  Track your body composition, visceral fat, and bone density progress over time
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DexaVisualizationPanels clientId={clientSession?.clientId || 0} />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
         </div>
       </main>
@@ -1330,129 +1445,197 @@ export default function ClientDashboard() {
             {/* Extracted Nutrition Data */}
             {extractedNutrition && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Serving Size</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        value={extractedNutrition.servingSize}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingSize: parseFloat(e.target.value)})}
-                      />
-                      <Input
-                        value={extractedNutrition.servingUnit}
-                        onChange={(e) => setExtractedNutrition({...extractedNutrition, servingUnit: e.target.value})}
-                        placeholder="g/ml/serving"
-                        className="w-32"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-end gap-3">
-                    <div className="flex-1">
-                      <Label>Servings Consumed</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={extractedNutrition.servingsConsumed === 0 ? '' : (extractedNutrition.servingsConsumed ?? 1)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          // Allow empty string during editing
-                          if (val === '') {
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              servingsConsumed: 0,
-                              amountConsumed: 0
-                            });
-                            return;
-                          }
-                          const servings = parseFloat(val);
-                          if (!isNaN(servings)) {
-                            const amount = servings * extractedNutrition.servingSize;
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              servingsConsumed: servings,
-                              amountConsumed: amount
-                            });
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="text-2xl text-muted-foreground pb-2">⇄</div>
-                    <div className="flex-1">
-                      <Label>Amount Consumed ({extractedNutrition.servingUnit})</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={extractedNutrition.amountConsumed === 0 ? '' : (extractedNutrition.amountConsumed ?? extractedNutrition.servingSize)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          // Allow empty string during editing
-                          if (val === '') {
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              amountConsumed: 0,
-                              servingsConsumed: 0
-                            });
-                            return;
-                          }
-                          const amount = parseFloat(val);
-                          if (!isNaN(amount)) {
-                            const servings = amount / extractedNutrition.servingSize;
-                            setExtractedNutrition({
-                              ...extractedNutrition,
-                              amountConsumed: amount,
-                              servingsConsumed: servings
-                            });
-                          }
-                        }}
-                      />
-                    </div>
+                {/* Product Name */}
+                <div>
+                  <Label>Product Name</Label>
+                  <Input
+                    value={extractedNutrition.productName}
+                    onChange={(e) => setExtractedNutrition({...extractedNutrition, productName: e.target.value})}
+                    placeholder="Product name"
+                  />
+                </div>
+
+                {/* Reference Serving Info */}
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <Label className="text-sm font-semibold text-blue-900">Label Reference (Nutrition per...)</Label>
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      type="number"
+                      value={extractedNutrition.referenceSize}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, referenceSize: parseFloat(e.target.value)})}
+                      className="w-24"
+                    />
+                    <Input
+                      value={extractedNutrition.referenceUnit}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, referenceUnit: e.target.value})}
+                      placeholder="g/ml"
+                      className="w-20"
+                    />
+                    <span className="text-sm text-gray-500 self-center">(e.g., "per 100g")</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label>Calories</Label>
+                {/* Actual Serving Size */}
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <Label className="text-sm font-semibold text-green-900">Actual Serving Size</Label>
+                  <div className="flex gap-2 mt-2">
                     <Input
                       type="number"
-                      value={extractedNutrition.calories}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, calories: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingSize}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingSize: parseFloat(e.target.value)})}
+                      className="w-24"
                     />
-                  </div>
-                  <div>
-                    <Label>Protein (g)</Label>
                     <Input
-                      type="number"
-                      value={extractedNutrition.protein}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, protein: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingUnit}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingUnit: e.target.value})}
+                      placeholder="g/ml"
+                      className="w-20"
                     />
-                  </div>
-                  <div>
-                    <Label>Carbs (g)</Label>
                     <Input
-                      type="number"
-                      value={extractedNutrition.carbs}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, carbs: parseFloat(e.target.value)})}
+                      value={extractedNutrition.actualServingDescription}
+                      onChange={(e) => setExtractedNutrition({...extractedNutrition, actualServingDescription: e.target.value})}
+                      placeholder="per sachet/scoop"
+                      className="flex-1"
                     />
                   </div>
+                  <p className="text-xs text-gray-600 mt-1">e.g., 3.5g per sachet, 35g per scoop</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Fat (g)</Label>
-                    <Input
-                      type="number"
-                      value={extractedNutrition.fat}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fat: parseFloat(e.target.value)})}
-                    />
+                {/* Servings Consumed */}
+                <div>
+                  <Label>How many servings did you consume?</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    value={extractedNutrition.servingsConsumed === 0 ? '' : (extractedNutrition.servingsConsumed ?? 1)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        setExtractedNutrition({...extractedNutrition, servingsConsumed: 0});
+                        return;
+                      }
+                      const servings = parseFloat(val);
+                      if (!isNaN(servings)) {
+                        setExtractedNutrition({...extractedNutrition, servingsConsumed: servings});
+                      }
+                    }}
+                    placeholder="1"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {extractedNutrition.servingsConsumed > 0 && (
+                      `= ${(extractedNutrition.servingsConsumed * extractedNutrition.actualServingSize).toFixed(1)}${extractedNutrition.actualServingUnit} total`
+                    )}
+                  </p>
+                </div>
+
+                {/* Nutrition Values (reactive to servings consumed) */}
+                <div className="border-t pt-3">
+                  <Label className="text-sm font-semibold">
+                    Total Nutrition (for {extractedNutrition.servingsConsumed || 1} serving{(extractedNutrition.servingsConsumed || 1) > 1 ? 's' : ''})
+                  </Label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    = {((extractedNutrition.servingsConsumed || 1) * extractedNutrition.actualServingSize).toFixed(1)}{extractedNutrition.actualServingUnit} total
+                  </p>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label>Calories</Label>
+                      <Input
+                        type="number"
+                        value={calculatedNutritionLabel?.calories || 0}
+                        onChange={(e) => {
+                          const newCalories = parseFloat(e.target.value);
+                          const perServing = Math.round(newCalories / (extractedNutrition.servingsConsumed || 1));
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              calories: perServing
+                            }
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Protein (g)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={calculatedNutritionLabel?.protein || 0}
+                        onChange={(e) => {
+                          const newProtein = parseFloat(e.target.value);
+                          const perServing = Math.round((newProtein / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              protein: perServing
+                            }
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Carbs (g)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={calculatedNutritionLabel?.carbs || 0}
+                        onChange={(e) => {
+                          const newCarbs = parseFloat(e.target.value);
+                          const perServing = Math.round((newCarbs / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              carbs: perServing
+                            }
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Fiber (g)</Label>
-                    <Input
-                      type="number"
-                      value={extractedNutrition.fiber}
-                      onChange={(e) => setExtractedNutrition({...extractedNutrition, fiber: parseFloat(e.target.value)})}
-                    />
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label>Fat (g)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={calculatedNutritionLabel?.fat || 0}
+                        onChange={(e) => {
+                          const newFat = parseFloat(e.target.value);
+                          const perServing = Math.round((newFat / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              fat: perServing
+                            }
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Fiber (g)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={calculatedNutritionLabel?.fiber || 0}
+                        onChange={(e) => {
+                          const newFiber = parseFloat(e.target.value);
+                          const perServing = Math.round((newFiber / (extractedNutrition.servingsConsumed || 1)) * 10) / 10;
+                          setExtractedNutrition({
+                            ...extractedNutrition,
+                            perServingNutrition: {
+                              ...extractedNutrition.perServingNutrition,
+                              fiber: perServing
+                            }
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1501,8 +1684,8 @@ export default function ClientDashboard() {
             <Button
               className="w-full"
               onClick={async () => {
-                if (!extractedNutrition?.amountConsumed) {
-                  toast.error("Please enter amount consumed");
+                if (!extractedNutrition?.servingsConsumed || extractedNutrition.servingsConsumed <= 0) {
+                  toast.error("Please enter number of servings consumed");
                   return;
                 }
                 
@@ -1511,19 +1694,33 @@ export default function ClientDashboard() {
                   return;
                 }
                 
+                // Use the calculated nutrition values (already scaled by servings)
+                const finalNutrition = calculatedNutritionLabel || {
+                  calories: 0,
+                  protein: 0,
+                  carbs: 0,
+                  fat: 0,
+                  fiber: 0,
+                };
+                
+                // Create serving description
+                const servings = extractedNutrition.servingsConsumed;
+                const totalGrams = (servings * extractedNutrition.actualServingSize).toFixed(1);
+                const servingDescription = `${servings} ${extractedNutrition.actualServingDescription}${servings > 1 ? 's' : ''} (${totalGrams}${extractedNutrition.actualServingUnit} total)`;
+                
                 analyzeNutritionLabelMealMutation.mutate({
                   clientId: clientSession.clientId,
                   imageUrl,
                   imageKey,
                   mealType,
-                  servingSize: extractedNutrition.servingSize,
-                  servingUnit: extractedNutrition.servingUnit,
-                  calories: extractedNutrition.calories,
-                  protein: extractedNutrition.protein,
-                  carbs: extractedNutrition.carbs,
-                  fat: extractedNutrition.fat,
-                  fiber: extractedNutrition.fiber,
-                  amountConsumed: extractedNutrition.amountConsumed,
+                  productName: extractedNutrition.productName,
+                  servingDescription,
+                  ingredients: extractedNutrition.ingredients || [],
+                  calories: finalNutrition.calories,
+                  protein: finalNutrition.protein,
+                  carbs: finalNutrition.carbs,
+                  fat: finalNutrition.fat,
+                  fiber: finalNutrition.fiber,
                   notes: mealNotes,
                   drinkType: drinkType || undefined,
                   volumeMl: volumeMl ? parseFloat(volumeMl) : undefined,
@@ -1650,6 +1847,31 @@ export default function ClientDashboard() {
               </div>
             </div>
 
+            {/* Portion Section */}
+            <div className="border-t pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="portion-percentage">Portion Consumed</Label>
+                <span className="text-sm text-gray-500">{portionPercentage}%</span>
+              </div>
+              <div className="space-y-2">
+                <Input
+                  id="portion-percentage"
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={portionPercentage}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 100;
+                    setPortionPercentage(Math.min(100, Math.max(1, value)));
+                  }}
+                  className="text-center font-semibold"
+                />
+                <p className="text-xs text-gray-500">
+                  💡 Adjust if you only ate part of the meal (e.g., 50% for half a pizza)
+                </p>
+              </div>
+            </div>
+
             {/* Date and Time Section - Collapsed by default */}
             <div className="border-t pt-3">
               <div className="flex items-center justify-between">
@@ -1662,7 +1884,11 @@ export default function ClientDashboard() {
                     const input = document.getElementById('edit-meal-date') as HTMLInputElement;
                     if (input) {
                       input.readOnly = false;
-                      input.showPicker?.();
+                      try {
+                        input.showPicker?.();
+                      } catch (e) {
+                        // Ignore SecurityError in iframe context - native picker will still work
+                      }
                     }
                   }}
                   className="text-xs"
@@ -1680,7 +1906,11 @@ export default function ClientDashboard() {
                 onClick={(e) => {
                   const input = e.target as HTMLInputElement;
                   input.readOnly = false;
-                  input.showPicker?.();
+                  try {
+                    input.showPicker?.();
+                  } catch (e) {
+                    // Ignore SecurityError in iframe context - native picker will still work
+                  }
                 }}
               />
             </div>
@@ -1765,6 +1995,106 @@ export default function ClientDashboard() {
                 "Analyse Meal"
               )}
             </Button>
+            )}
+
+            {/* Save Changes Button - Only show when editing existing meal */}
+            {editingMealId && editingMealId > 0 && (
+              <Button
+                className="w-full"
+                onClick={async () => {
+                  try {
+                    // Re-analyze the meal with updated data
+                    const filteredItems = identifiedItems.filter(item => item.trim() !== "");
+                    
+                    if (filteredItems.length === 0) {
+                      toast.error("Please add at least one food item");
+                      return;
+                    }
+
+                    // Estimate beverage nutrition if provided
+                    let drinkNutrition = null;
+                    if (drinkType && volumeMl) {
+                      if (drinkType.toLowerCase().trim() === 'water') {
+                        drinkNutrition = {
+                          calories: 0,
+                          protein: 0,
+                          fat: 0,
+                          carbs: 0,
+                          fibre: 0,
+                        };
+                      } else {
+                        const result = await estimateBeverageMutation.mutateAsync({
+                          drinkType,
+                          volumeMl: parseInt(volumeMl),
+                        });
+                        drinkNutrition = result.nutrition;
+                      }
+                    }
+
+                    // Re-analyze meal with updated items and beverage
+                    const analysisResult = await analyzeMealWithDrinkMutation.mutateAsync({
+                      clientId: currentClientId,
+                      imageUrl,
+                      imageKey,
+                      mealType,
+                      itemDescriptions: filteredItems,
+                      notes: mealNotes || undefined,
+                      drinkType: drinkType || undefined,
+                      volumeMl: volumeMl ? parseInt(volumeMl) : undefined,
+                    });
+
+                    // Extract meal analysis from response
+                    const mealAnalysis = analysisResult.mealAnalysis;
+                    const combinedNutrition = analysisResult.combinedNutrition;
+
+                    // Update the meal with new analysis results and edited fields
+                    await updateMealMutation.mutateAsync({
+                      mealId: editingMealId,
+                      clientId: currentClientId,
+                      imageUrl,
+                      imageKey,
+                      mealType,
+                      calories: combinedNutrition.calories,
+                      protein: combinedNutrition.protein,
+                      fat: combinedNutrition.fat,
+                      carbs: combinedNutrition.carbs,
+                      fibre: combinedNutrition.fibre,
+                      aiDescription: mealAnalysis.description,
+                      aiConfidence: 0.8,
+                      notes: mealNotes || undefined,
+                      loggedAt: new Date(mealDateTime),
+                      beverageType: drinkType || undefined,
+                      beverageVolumeMl: volumeMl ? parseInt(volumeMl) : undefined,
+                      beverageCalories: drinkNutrition?.calories,
+                      beverageProtein: drinkNutrition?.protein,
+                      beverageFat: drinkNutrition?.fat,
+                      beverageCarbs: drinkNutrition?.carbs,
+                      beverageFibre: drinkNutrition?.fibre,
+                      components: mealAnalysis.components,
+                    });
+
+                    toast.success("Meal updated successfully");
+                    setShowItemEditor(false);
+                    setEditingMealId(null);
+                    
+                    // Refresh meal list
+                    utils.meals.invalidate();
+                  } catch (error) {
+                    toast.error("Failed to update meal");
+                    console.error(error);
+                  }
+                }}
+                disabled={analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending}
+              >
+                {(analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending) ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving Changes...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
             )}
 
             {/* Analyse Button for drink-only edits */}

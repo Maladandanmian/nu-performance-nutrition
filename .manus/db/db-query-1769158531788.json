@@ -1,0 +1,46 @@
+{
+  "query": "SELECT DISTINCT region FROM dexa_bmd_data ORDER BY region;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT DISTINCT region FROM dexa_bmd_data ORDER BY region;",
+  "rows": [
+    {
+      "region": "Head"
+    },
+    {
+      "region": "L Arm"
+    },
+    {
+      "region": "L Leg"
+    },
+    {
+      "region": "L Ribs"
+    },
+    {
+      "region": "L Spine"
+    },
+    {
+      "region": "Pelvis"
+    },
+    {
+      "region": "R Arm"
+    },
+    {
+      "region": "R Leg"
+    },
+    {
+      "region": "R Ribs"
+    },
+    {
+      "region": "Subtotal"
+    },
+    {
+      "region": "T Spine"
+    },
+    {
+      "region": "Total"
+    }
+  ],
+  "messages": [],
+  "stdout": "region\nHead\nL Arm\nL Leg\nL Ribs\nL Spine\nPelvis\nR Arm\nR Leg\nR Ribs\nSubtotal\nT Spine\nTotal\n",
+  "stderr": "",
+  "execution_time_ms": 1645
+}

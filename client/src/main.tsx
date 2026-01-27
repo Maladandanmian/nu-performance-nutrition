@@ -9,7 +9,20 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3, // Retry failed queries up to 3 times
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff: 1s, 2s, 4s
+      staleTime: 5000, // Consider data fresh for 5 seconds
+      refetchOnWindowFocus: false, // Don't refetch on window focus to reduce load
+    },
+    mutations: {
+      retry: 2, // Retry failed mutations up to 2 times
+      retryDelay: 1000, // Wait 1 second between mutation retries
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -53,11 +66,16 @@ const trpcClient = trpc.createClient({
           headers.set('X-Client-Session', clientSession);
         }
         
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
         return globalThis.fetch(input, {
           ...(init ?? {}),
           headers,
           credentials: "include",
-        });
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeoutId));
       },
     }),
   ],

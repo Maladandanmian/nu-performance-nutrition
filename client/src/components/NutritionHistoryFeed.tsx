@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { format, isToday, isYesterday, startOfWeek, startOfMonth, subDays } from "date-fns";
-import { Calendar, Clock, Edit2, Trash2, Droplet, Utensils } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2, Droplet, Utensils, Star } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -273,6 +273,13 @@ function MealEntry({
   onEdit?: (meal: any) => void;
   onDelete?: (mealId: number) => void;
 }) {
+  const utils = trpc.useUtils();
+  const toggleFavoriteMutation = trpc.meals.toggleFavorite.useMutation({
+    onSuccess: () => {
+      utils.meals.list.invalidate();
+      utils.meals.getFavorites.invalidate();
+    },
+  });
   return (
     <div className="flex gap-4">
       {/* Meal Image or Icon */}
@@ -317,6 +324,15 @@ function MealEntry({
           
           {/* Action Buttons */}
           <div className="flex gap-1 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleFavoriteMutation.mutate({ mealId: meal.id, clientId: meal.clientId })}
+              className="h-8 w-8 p-0"
+              title={meal.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Star className={`h-4 w-4 ${meal.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+            </Button>
             {onEdit && (
               <Button
                 variant="ghost"
@@ -401,6 +417,13 @@ function DrinkEntry({
   onEdit?: (drink: any) => void;
   onDelete?: (drinkId: number) => void;
 }) {
+  const utils = trpc.useUtils();
+  const toggleFavoriteMutation = trpc.drinks.toggleFavorite.useMutation({
+    onSuccess: () => {
+      utils.drinks.list.invalidate();
+      utils.drinks.getFavorites.invalidate();
+    },
+  });
   return (
     <div className="flex gap-4">
       {/* Drink Icon */}
@@ -426,6 +449,15 @@ function DrinkEntry({
           
           {/* Action Buttons */}
           <div className="flex gap-1 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleFavoriteMutation.mutate({ drinkId: drink.id, clientId: drink.clientId })}
+              className="h-8 w-8 p-0"
+              title={drink.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Star className={`h-4 w-4 ${drink.isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+            </Button>
             {onEdit && (
               <Button
                 variant="ghost"

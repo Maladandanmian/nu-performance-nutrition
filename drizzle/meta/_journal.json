@@ -71,6 +71,34 @@
       "when": 1769146038031,
       "tag": "0009_blushing_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1769149198896,
+      "tag": "0010_moaning_proemial_gods",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1769160612463,
+      "tag": "0011_mature_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1769228809438,
+      "tag": "0012_vengeful_phil_sheldon",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1769409291459,
+      "tag": "0013_powerful_lilandra",
+      "breakpoints": true
     }
   ]
 }

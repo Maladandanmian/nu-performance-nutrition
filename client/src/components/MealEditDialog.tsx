@@ -287,7 +287,7 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
 
         <div className="space-y-4">
           {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-4 border-b pb-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="meal-date">Date & Time</Label>
               <Input
@@ -295,6 +295,12 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
                 type="datetime-local"
                 value={mealDateTime}
                 onChange={(e) => setMealDateTime(e.target.value)}
+                onBlur={(e) => {
+                  // Force update on blur for mobile compatibility
+                  if (e.target.value !== mealDateTime) {
+                    setMealDateTime(e.target.value);
+                  }
+                }}
               />
             </div>
             <div>
@@ -351,8 +357,25 @@ export function MealEditDialog({ open, onOpenChange, meal, clientId, onSuccess }
 
           {/* Beverage Section */}
           <div className="border-t pt-4">
-            <Label>Accompanying Beverage (Optional)</Label>
-            <div className="grid grid-cols-2 gap-4 mt-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label>Accompanying Beverage (Optional)</Label>
+              {(drinkType || volumeMl) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setDrinkType("");
+                    setVolumeMl("");
+                    setBeverageNutrition(null);
+                    toast.success("Drink cleared");
+                  }}
+                  className="text-xs"
+                >
+                  Clear Drink
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Input
                   placeholder="e.g., Coffee with milk"

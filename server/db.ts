@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users,
@@ -189,6 +189,57 @@ export async function updateMeal(mealId: number, data: Partial<InsertMeal>) {
   return db.update(meals).set(data).where(eq(meals.id, mealId));
 }
 
+export async function toggleMealFavorite(mealId: number, isFavorite: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(meals).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(meals.id, mealId));
+}
+
+export async function getFavoriteMeals(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(meals)
+    .where(and(eq(meals.clientId, clientId), eq(meals.isFavorite, 1)))
+    .orderBy(desc(meals.loggedAt))
+    .limit(3);
+}
+
+export async function getLastMeal(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(meals)
+    .where(eq(meals.clientId, clientId))
+    .orderBy(desc(meals.loggedAt))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function duplicateMeal(mealId: number, newLoggedAt: Date, preserveFavorite = false) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const originalMeal = await getMealById(mealId);
+  if (!originalMeal) throw new Error("Meal not found");
+  
+  // Create a copy without id, createdAt, and with new loggedAt
+  const { id, createdAt, isFavorite, ...mealData } = originalMeal;
+  const newMeal: InsertMeal = {
+    ...mealData,
+    loggedAt: newLoggedAt,
+    isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
+  };
+  
+  await db.insert(meals).values(newMeal);
+  
+  // Query the newly created meal by clientId and loggedAt
+  const result = await db.select().from(meals)
+    .where(and(eq(meals.clientId, originalMeal.clientId), eq(meals.loggedAt, newLoggedAt)))
+    .orderBy(desc(meals.id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
 // Drink queries
 export async function createDrink(drink: InsertDrink) {
   const db = await getDb();
@@ -213,6 +264,66 @@ export async function updateDrink(drinkId: number, data: Partial<InsertDrink>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.update(drinks).set(data).where(eq(drinks.id, drinkId));
+}
+
+export async function getDrinkById(drinkId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(drinks).where(eq(drinks.id, drinkId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function toggleDrinkFavorite(drinkId: number, isFavorite: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(drinks).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(drinks.id, drinkId));
+}
+
+export async function getFavoriteDrinks(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drinks)
+    .where(and(eq(drinks.clientId, clientId), eq(drinks.isFavorite, 1)))
+    .orderBy(desc(drinks.loggedAt))
+    .limit(3);
+}
+
+export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserveFavorite = false) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const originalDrink = await getDrinkById(drinkId);
+  if (!originalDrink) throw new Error("Drink not found");
+  
+  // Create a copy without id, createdAt, and with new loggedAt
+  const { id, createdAt, isFavorite, ...drinkData} = originalDrink;
+  const newDrink: InsertDrink = {
+    ...drinkData,
+    loggedAt: newLoggedAt,
+    isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
+  };
+  
+  await db.insert(drinks).values(newDrink);
+  
+  // Query the newly created drink by clientId and loggedAt
+  const result = await db.select().from(drinks)
+    .where(and(eq(drinks.clientId, originalDrink.clientId), eq(drinks.loggedAt, newLoggedAt)))
+    .orderBy(desc(drinks.id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getLastDrink(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(drinks)
+    .where(eq(drinks.clientId, clientId))
+    .orderBy(desc(drinks.loggedAt))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
 }
 
 // Body metrics queries
@@ -265,4 +376,231 @@ export async function deleteClientAndData(clientId: number) {
     console.error(`[Database] Failed to delete client ${clientId}:`, error);
     throw error;
   }
+}
+
+// ============================================================================
+// DEXA Scan Database Helpers
+// ============================================================================
+
+import {
+  InsertDexaScan, dexaScans,
+  InsertDexaBmdData, dexaBmdData,
+  InsertDexaBodyComp, dexaBodyComp,
+  InsertDexaImage, dexaImages,
+  InsertDexaGoal, dexaGoals
+} from "../drizzle/schema";
+
+/**
+ * Create or update DEXA goals for a client
+ */
+export async function upsertDexaGoals(clientId: number, goals: Partial<InsertDexaGoal>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getDexaGoalsByClientId(clientId);
+  
+  if (existing) {
+    // Update existing goals
+    return db.update(dexaGoals).set(goals).where(eq(dexaGoals.clientId, clientId));
+  } else {
+    // Create new goals
+    return db.insert(dexaGoals).values({ clientId, ...goals });
+  }
+}
+
+/**
+ * Get DEXA goals for a client
+ */
+export async function getDexaGoalsByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(dexaGoals).where(eq(dexaGoals.clientId, clientId)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Create a new DEXA scan record
+ */
+export async function createDexaScan(scan: InsertDexaScan) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(dexaScans).values(scan);
+  return result[0].insertId;
+}
+
+/**
+ * Get all DEXA scans for a client
+ */
+export async function getDexaScansByClient(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaScans)
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(desc(dexaScans.scanDate));
+}
+
+/**
+ * Get a single DEXA scan by ID
+ */
+export async function getDexaScanById(scanId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(dexaScans)
+    .where(eq(dexaScans.id, scanId))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Update DEXA scan status (approve/reject)
+ */
+export async function updateDexaScanStatus(
+  scanId: number,
+  status: "approved" | "rejected",
+  rejectionReason?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: any = { status };
+  if (status === "approved") {
+    updateData.approvedAt = new Date();
+  }
+  if (rejectionReason) {
+    updateData.rejectionReason = rejectionReason;
+  }
+
+  await db
+    .update(dexaScans)
+    .set(updateData)
+    .where(eq(dexaScans.id, scanId));
+}
+
+/**
+ * Create BMD data records for a scan
+ */
+export async function createDexaBmdData(bmdRecords: InsertDexaBmdData[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (bmdRecords.length === 0) return;
+  await db.insert(dexaBmdData).values(bmdRecords);
+}
+
+/**
+ * Get BMD data for a scan
+ */
+export async function getDexaBmdData(scanId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaBmdData)
+    .where(eq(dexaBmdData.scanId, scanId));
+}
+
+/**
+ * Create body composition record for a scan
+ */
+export async function createDexaBodyComp(bodyComp: InsertDexaBodyComp) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(dexaBodyComp).values(bodyComp);
+}
+
+/**
+ * Get body composition data for a scan
+ */
+export async function getDexaBodyComp(scanId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(dexaBodyComp)
+    .where(eq(dexaBodyComp.scanId, scanId))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Create image records for a scan
+ */
+export async function createDexaImages(images: InsertDexaImage[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (images.length === 0) return;
+  await db.insert(dexaImages).values(images);
+}
+
+/**
+ * Get images for a scan
+ */
+export async function getDexaImages(scanId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(dexaImages)
+    .where(eq(dexaImages.scanId, scanId))
+    .orderBy(dexaImages.pageNumber);
+}
+
+/**
+ * Get all body composition data for a client (for trend analysis)
+ */
+export async function getDexaBodyCompHistory(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const results = await db
+    .select()
+    .from(dexaBodyComp)
+    .innerJoin(dexaScans, eq(dexaBodyComp.scanId, dexaScans.id))
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(desc(dexaScans.scanDate)); // DESC: newest first
+  
+  // Transform to flat structure with scan status
+  return results.map((row: any) => ({
+    ...row.dexa_body_comp,
+    scanDate: row.dexa_scans.scanDate,
+    status: row.dexa_scans.status,
+  }));
+}
+
+/**
+ * Get all BMD data for a client (for trend analysis)
+ */
+export async function getDexaBmdHistory(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      scanDate: dexaScans.scanDate,
+      scanId: dexaScans.id,
+      status: dexaScans.status,
+      region: dexaBmdData.region,
+      bmd: dexaBmdData.bmd,
+      tScore: dexaBmdData.tScore,
+      zScore: dexaBmdData.zScore,
+    })
+    .from(dexaBmdData)
+    .innerJoin(dexaScans, eq(dexaBmdData.scanId, dexaScans.id))
+    .where(eq(dexaScans.clientId, clientId))
+    .orderBy(desc(dexaScans.scanDate)); // DESC: newest first
 }
