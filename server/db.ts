@@ -6,7 +6,10 @@ import {
   InsertNutritionGoal, nutritionGoals,
   InsertMeal, meals,
   InsertDrink, drinks,
-  InsertBodyMetric, bodyMetrics
+  InsertBodyMetric, bodyMetrics,
+  emailVerificationTokens,
+  passwordResetTokens,
+  auditLogs,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -635,4 +638,146 @@ export async function getDexaBmdHistory(clientId: number) {
     .innerJoin(dexaScans, eq(dexaBmdData.scanId, dexaScans.id))
     .where(eq(dexaScans.clientId, clientId))
     .orderBy(desc(dexaScans.scanDate)); // DESC: newest first
+}
+
+// Email Authentication Database Functions
+
+/**
+ * Get client by email address
+ */
+export async function getClientByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(clients)
+    .where(eq(clients.email, email))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Update client authentication fields
+ */
+export async function updateClientAuth(
+  clientId: number,
+  data: {
+    email?: string;
+    passwordHash?: string;
+    authMethod?: 'pin' | 'email' | 'both';
+  }
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(clients)
+    .set(data)
+    .where(eq(clients.id, clientId));
+}
+
+/**
+ * Update client password
+ */
+export async function updateClientPassword(clientId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(clients)
+    .set({ passwordHash })
+    .where(eq(clients.id, clientId));
+}
+
+/**
+ * Verify client email
+ */
+export async function verifyClientEmail(clientId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(clients)
+    .set({ emailVerified: true })
+    .where(eq(clients.id, clientId));
+}
+
+/**
+ * Create email verification token
+ */
+export async function createEmailVerificationToken(data: {
+  clientId: number;
+  token: string;
+  expiresAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(emailVerificationTokens).values(data);
+}
+
+/**
+ * Get email verification token
+ */
+export async function getEmailVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(emailVerificationTokens)
+    .where(eq(emailVerificationTokens.token, token))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Mark email verification token as used
+ */
+export async function markEmailVerificationTokenUsed(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(emailVerificationTokens)
+    .set({ used: true })
+    .where(eq(emailVerificationTokens.token, token));
+}
+
+/**
+ * Create password reset token
+ */
+export async function createPasswordResetToken(data: {
+  clientId: number;
+  token: string;
+  expiresAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.insert(passwordResetTokens).values(data);
+}
+
+/**
+ * Get password reset token
+ */
+export async function getPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Mark password reset token as used
+ */
+export async function markPasswordResetTokenUsed(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  return db.update(passwordResetTokens)
+    .set({ used: true })
+    .where(eq(passwordResetTokens.token, token));
 }

@@ -14,6 +14,8 @@ import { reEstimateComponentNutrition } from "./componentReEstimation";
 import { estimateFoodNutrition } from "./foodQuantityEstimation";
 import { identifyMealItems } from "./mealItemIdentification";
 import { analyzeMealNutrition } from "./mealNutritionAnalysis";
+import { emailAuthRouter } from "./emailAuthProcedures";
+import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -25,6 +27,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const appRouter = router({
   system: systemRouter,
+  emailAuth: emailAuthRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     

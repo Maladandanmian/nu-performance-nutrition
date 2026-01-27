@@ -1603,9 +1603,61 @@
 - [x] Install bcrypt dependency
 - [x] Update PIN storage to use bcrypt hashing
 - [x] Create migration script for existing PINs (server/migrate-pins.mjs)
+- [x] Run PIN migration - all 37 clients hashed successfully
+- [x] Verify all PINs are hashed (37/37 ✓)
 - [x] Implement rate limiting on login endpoint (5 attempts/15min)
 - [x] Add account lockout tracking in database (login_attempts, rate_limit_locks tables)
 - [x] Implement presigned URLs for DEXA PDFs (5-minute expiry)
 - [x] Update DEXA image URLs to use presigned URLs
 - [x] Write tests for security improvements (17 tests passing)
-- [ ] Push changes to authentication branch
+- [x] Push changes to authentication branch
+
+## Improve Rate Limit Error Messaging (Jan 27, 2026)
+- [ ] Check current error message returned by rate limiter
+- [ ] Enhance message to include lockout duration (15 minutes)
+- [ ] Add retry time information to error response
+- [ ] Update frontend to display user-friendly lockout message
+- [ ] Test error message display on login page
+
+## Short-Term Security: Email/Password Auth (Jan 27, 2026)
+
+### Phase 1: Database Schema - COMPLETE
+- [x] Add email field to clients table
+- [x] Add passwordHash field to clients table  
+- [x] Add emailVerified field to clients table
+- [x] Add authMethod enum field (pin/email/both)
+- [x] Create audit_logs table for tracking actions
+- [x] Create password_reset_tokens table
+- [x] Run database migrations
+
+### Phase 2: Backend Authentication - COMPLETE
+- [x] Create password hashing utilities (server/emailAuth.ts)
+- [x] Implement client login with email/password (emailAuth router)
+- [x] Implement password validation (min 8 chars, uppercase, lowercase, number, special char)
+- [x] Keep PIN login as fallback during transition
+- [ ] Implement password reset flow (email sending)
+
+### Phase 3: Session Management - COMPLETE
+- [x] Create session manager with JWT utilities (server/sessionManager.ts)
+- [x] Implement secure token generation with proper claims
+- [x] Add token verification and validation
+- [x] Session invalidation on logout (existing)
+
+### Phase 4: Audit Logging - COMPLETE
+- [x] Create audit log helper functions (server/auditLog.ts)
+- [x] Log authentication events (login_pin, login_email, login_failed, logout)
+- [x] Log sensitive data access (view_dexa, upload_dexa, delete_dexa)
+- [x] Log data modifications (create_meal, update_meal, delete_meal, etc.)
+- [x] Track actor type, IP address, user agent, and details
+
+### Phase 5: Frontend Updates - COMPLETE
+- [x] Create email/password login form (tabbed interface)
+- [x] Update login page with both PIN and email options
+- [ ] Add email verification flow (future)
+- [ ] Add password reset request UI (future)
+
+### Phase 6: Testing - COMPLETE
+- [x] Write tests for email/password auth (15 tests passing)
+- [x] Write tests for audit logging
+- [x] Test password hashing and verification
+- [ ] End-to-end authentication flow test (manual)

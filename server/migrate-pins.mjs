@@ -1,10 +1,11 @@
 /**
  * Migration script to hash existing plaintext PINs with bcrypt
- * Run with: node server/migrate-pins.mjs
+ * Run with: npx tsx server/migrate-pins.mjs
  */
 import bcrypt from 'bcrypt';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
+import { clients } from '../drizzle/schema';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -22,9 +23,6 @@ async function migratePins() {
 
   console.log('Connecting to database...');
   const db = drizzle(databaseUrl);
-
-  // Import schema dynamically
-  const { clients } = await import('../drizzle/schema.js');
 
   console.log('Fetching all clients...');
   const allClients = await db.select().from(clients);

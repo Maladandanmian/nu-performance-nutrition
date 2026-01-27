@@ -35,7 +35,10 @@ export const clients = mysqlTable("clients", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),
-  pin: varchar("pin", { length: 72 }).notNull().unique(), // 72 chars for bcrypt hash
+  pin: varchar("pin", { length: 72 }).unique(), // 72 chars for bcrypt hash (optional during transition)
+  passwordHash: varchar("passwordHash", { length: 72 }), // bcrypt hash for email/password auth
+  emailVerified: boolean("emailVerified").default(false).notNull(),
+  authMethod: mysqlEnum("authMethod", ["pin", "email", "both"]).default("pin").notNull(),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -320,3 +323,59 @@ export const rateLimitLocks = mysqlTable("rate_limit_locks", {
 
 export type RateLimitLock = typeof rateLimitLocks.$inferSelect;
 export type InsertRateLimitLock = typeof rateLimitLocks.$inferInsert;
+
+/**
+ * Password reset tokens table - stores tokens for password reset flow
+ */
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  used: boolean("used").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
+/**
+ * Audit logs table - tracks important actions for security and compliance
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  // Actor information
+  actorType: mysqlEnum("actorType", ["client", "trainer", "system"]).notNull(),
+  actorId: int("actorId"), // client or user ID
+  // Action details
+  action: varchar("action", { length: 100 }).notNull(), // e.g., "login", "logout", "view_dexa", "update_meal"
+  resourceType: varchar("resourceType", { length: 50 }), // e.g., "client", "meal", "dexa_scan"
+  resourceId: int("resourceId"),
+  // Context
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  details: text("details"), // JSON string with additional context
+  // Result
+  success: boolean("success").default(true).notNull(),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * Email verification tokens table - stores tokens for email verification
+ */
+export const emailVerificationTokens = mysqlTable("email_verification_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  used: boolean("used").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
+export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;
+
