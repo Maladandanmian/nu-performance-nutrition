@@ -1300,15 +1300,6 @@ export default function ClientDashboard() {
                     Add Photo or Beverage
                   </Button>
                 )}
-
-                {/* Favorite Meals & Repeat Last Meal */}
-                <div className="border-t pt-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    <Label className="text-base font-semibold">Quick Log</Label>
-                  </div>
-                  <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

@@ -1584,3 +1584,9 @@
 - [x] Change grid from 3 columns to 2 columns (4 slots total: 3 favorites + 1 repeat)
 - [x] Verify drinks.repeatLast backend procedure exists (already implemented)
 - [x] Test TypeScript compilation
+
+## Remove Redundant Quick Log Section (Jan 27, 2026)
+- [x] Locate redundant Quick Log section at bottom of ClientDashboard (lines 1304-1311)
+- [x] Remove the duplicate section
+- [x] Verify only one Quick Log section remains (inside the dialog)
+- [x] Test TypeScript compilation
