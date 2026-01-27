@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 interface FavoriteDrinksButtonsProps {
@@ -24,10 +25,20 @@ export function FavoriteDrinksButtons({ clientId }: FavoriteDrinksButtonsProps) 
     },
   });
   
+  const repeatLastDrinkMutation = trpc.drinks.repeatLast.useMutation({
+    onSuccess: () => {
+      toast.success("Last drink repeated successfully!");
+      utils.drinks.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to repeat last drink");
+    },
+  });
+  
   if (favoritesLoading) {
     return (
-      <div className="grid grid-cols-3 gap-2">
-        {[1, 2, 3].map(i => (
+      <div className="grid grid-cols-2 gap-2">
+        {[1, 2, 3, 4].map(i => (
           <div key={i} className="h-10 bg-muted animate-pulse rounded"></div>
         ))}
       </div>
@@ -35,7 +46,7 @@ export function FavoriteDrinksButtons({ clientId }: FavoriteDrinksButtonsProps) 
   }
   
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2">
       {/* Favorite Drinks (up to 3) */}
       {favoriteDrinks?.slice(0, 3).map((drink) => (
         <Button
@@ -63,6 +74,18 @@ export function FavoriteDrinksButtons({ clientId }: FavoriteDrinksButtonsProps) 
           No favorite
         </Button>
       ))}
+      
+      {/* Repeat Last Drink Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => repeatLastDrinkMutation.mutate({ clientId })}
+        disabled={repeatLastDrinkMutation.isPending}
+        className="text-xs"
+      >
+        <RotateCcw className="h-3 w-3 mr-1" />
+        Repeat Last
+      </Button>
     </div>
   );
 }

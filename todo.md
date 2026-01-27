@@ -1575,3 +1575,12 @@
 - [x] Import clearClientSessionFromStorage function
 - [x] Call clearClientSessionFromStorage before page reload
 - [x] Test TypeScript compilation
+
+## Verify Repeat Last Drink Button (Jan 27, 2026)
+- [x] Check if FavoriteDrinksButtons component includes Repeat Last Drink button
+- [x] Found missing Repeat Last button in FavoriteDrinksButtons
+- [x] Add repeatLastDrinkMutation to component
+- [x] Add Repeat Last button with RotateCcw icon
+- [x] Change grid from 3 columns to 2 columns (4 slots total: 3 favorites + 1 repeat)
+- [x] Verify drinks.repeatLast backend procedure exists (already implemented)
+- [x] Test TypeScript compilation
