@@ -86,15 +86,33 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { isValidPIN } = await import("./pinAuth");
+        const { checkRateLimit, recordLoginAttempt, getClientIP } = await import("./rateLimit");
+        
+        // Get client IP for rate limiting
+        const clientIP = getClientIP(ctx.req);
+        
+        // Check if IP is rate limited
+        const rateLimitStatus = await checkRateLimit(clientIP);
+        if (rateLimitStatus.isLocked) {
+          throw new TRPCError({
+            code: 'TOO_MANY_REQUESTS',
+            message: `Too many failed login attempts. Please try again in ${rateLimitStatus.remainingMinutes} minutes.`,
+          });
+        }
         
         if (!isValidPIN(input.pin)) {
+          await recordLoginAttempt(clientIP, false, input.pin);
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid PIN format' });
         }
         
         const client = await db.getClientByPIN(input.pin);
         if (!client) {
+          await recordLoginAttempt(clientIP, false, input.pin);
           throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid PIN' });
         }
+        
+        // Record successful login
+        await recordLoginAttempt(clientIP, true, input.pin);
         
         // Create a session cookie for the client
         // Store client ID in a simple session cookie
@@ -140,6 +158,7 @@ export const appRouter = router({
         pin: z.string().length(6).regex(/^\d{6}$/, "PIN must be 6 digits"),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { hashPIN } = await import('./pinAuth');
         const { pin, ...clientData } = input;
         
         // Check if PIN already exists
@@ -148,9 +167,12 @@ export const appRouter = router({
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'This PIN is already in use. Please choose a different PIN.' });
         }
         
+        // Hash the PIN before storing
+        const hashedPin = await hashPIN(pin);
+        
         const result = await db.createClient({
           trainerId: ctx.user.id,
-          pin,
+          pin: hashedPin,
           ...clientData,
         });
         
@@ -1929,16 +1951,45 @@ Return as JSON.`
     getScanDetails: protectedProcedure
       .input(z.object({ scanId: z.number() }))
       .query(async ({ input }) => {
+        const { storageGetPresigned } = await import('./storage');
+        
         const scan = await db.getDexaScanById(input.scanId);
         const bmdData = await db.getDexaBmdData(input.scanId);
         const bodyComp = await db.getDexaBodyComp(input.scanId);
         const images = await db.getDexaImages(input.scanId);
         
+        // Generate presigned URLs for PDF and images (5-minute expiry)
+        let presignedPdfUrl: string | null = null;
+        if (scan?.pdfKey) {
+          try {
+            const { url } = await storageGetPresigned(scan.pdfKey, 300);
+            presignedPdfUrl = url;
+          } catch (error) {
+            console.error('[DEXA] Failed to generate presigned PDF URL:', error);
+          }
+        }
+        
+        // Generate presigned URLs for images
+        const imagesWithPresignedUrls = await Promise.all(
+          images.map(async (image: any) => {
+            if (image.imageKey) {
+              try {
+                const { url } = await storageGetPresigned(image.imageKey, 300);
+                return { ...image, presignedUrl: url };
+              } catch (error) {
+                console.error('[DEXA] Failed to generate presigned image URL:', error);
+                return image;
+              }
+            }
+            return image;
+          })
+        );
+        
         return {
-          scan,
+          scan: scan ? { ...scan, presignedPdfUrl } : null,
           bmdData,
           bodyComp,
-          images,
+          images: imagesWithPresignedUrls,
         };
       }),
 
