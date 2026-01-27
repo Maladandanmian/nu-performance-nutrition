@@ -39,6 +39,9 @@ export const clients = mysqlTable("clients", {
   passwordHash: varchar("passwordHash", { length: 72 }), // bcrypt hash for email/password auth
   emailVerified: boolean("emailVerified").default(false).notNull(),
   authMethod: mysqlEnum("authMethod", ["pin", "email", "both"]).default("pin").notNull(),
+  // Password setup token for client onboarding
+  passwordSetupToken: varchar("passwordSetupToken", { length: 64 }), // Random token sent via email
+  passwordSetupTokenExpires: timestamp("passwordSetupTokenExpires"), // Token expiration time
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

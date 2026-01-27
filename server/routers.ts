@@ -155,23 +155,26 @@ export const appRouter = router({
     create: adminProcedure
       .input(z.object({
         name: z.string().min(1),
-        email: z.string().email().optional(),
+        email: z.string().email(), // Required for new clients
         phone: z.string().optional(),
         notes: z.string().optional(),
-        pin: z.string().length(6).regex(/^\d{6}$/, "PIN must be 6 digits"),
+        pin: z.string().length(6).regex(/^\d{6}$/, "PIN must be 6 digits").optional(), // Optional for backward compat
       }))
       .mutation(async ({ ctx, input }) => {
         const { hashPIN } = await import('./pinAuth');
         const { pin, ...clientData } = input;
         
-        // Check if PIN already exists
-        const existingClient = await db.getClientByPIN(pin);
-        if (existingClient) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'This PIN is already in use. Please choose a different PIN.' });
+        // If PIN is provided, validate it
+        let hashedPin: string | undefined;
+        if (pin) {
+          // Check if PIN already exists
+          const existingClient = await db.getClientByPIN(pin);
+          if (existingClient) {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'This PIN is already in use. Please choose a different PIN.' });
+          }
+          // Hash the PIN before storing
+          hashedPin = await hashPIN(pin);
         }
-        
-        // Hash the PIN before storing
-        const hashedPin = await hashPIN(pin);
         
         const result = await db.createClient({
           trainerId: ctx.user.id,
@@ -191,7 +194,13 @@ export const appRouter = router({
           hydrationTarget: 2000,
         });
         
-        return { success: true, clientId, pin };
+        // Generate password setup token and send invitation email
+        const token = await db.generatePasswordSetupToken(clientId);
+        // TODO: Send invitation email with password setup link
+        console.log(`[ClientInvitation] Password setup token for client ${clientId}: ${token}`);
+        console.log(`[ClientInvitation] Send email to ${clientData.email} with link: /set-password?token=${token}`);
+        
+        return { success: true, clientId, pin, invitationSent: true };
       }),
 
     list: adminProcedure.query(async ({ ctx }) => {

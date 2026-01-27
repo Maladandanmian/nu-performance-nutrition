@@ -338,4 +338,74 @@ export const emailAuthRouter = router({
       
       return { success: true, message: 'If an account exists, a verification email has been sent.' };
     }),
+
+  /**
+   * Set client password using invitation token
+   * Called by client after receiving email invitation
+   */
+  setPasswordWithToken: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      password: z.string().min(8),
+    }))
+    .mutation(async ({ input }) => {
+      // Verify token is valid and not expired
+      const client = await db.verifyPasswordSetupToken(input.token);
+      if (!client) {
+        throw new TRPCError({ 
+          code: 'BAD_REQUEST', 
+          message: 'Invalid or expired password setup link. Please contact your trainer for a new invitation.' 
+        });
+      }
+      
+      // Validate password strength
+      const passwordValidation = validatePassword(input.password);
+      if (!passwordValidation.isValid) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: passwordValidation.errors.join('. '),
+        });
+      }
+      
+      // Hash password and update client
+      const passwordHash = await hashPassword(input.password);
+      await db.updateClient(client.id, {
+        passwordHash,
+        emailVerified: true, // Mark email as verified since trainer provided it
+        authMethod: 'email',
+      });
+      
+      // Clear the password setup token
+      await db.clearPasswordSetupToken(client.id);
+      
+      return {
+        success: true,
+        message: 'Password set successfully. You can now log in with your email.',
+        clientId: client.id,
+      };
+    }),
+
+  /**
+   * Get password setup link status
+   * Used to check if token is valid before showing password setup form
+   */
+  checkPasswordSetupToken: publicProcedure
+    .input(z.object({
+      token: z.string(),
+    }))
+    .query(async ({ input }) => {
+      const client = await db.verifyPasswordSetupToken(input.token);
+      if (!client) {
+        return {
+          valid: false,
+          message: 'Invalid or expired password setup link',
+        };
+      }
+      
+      return {
+        valid: true,
+        clientName: client.name,
+        clientEmail: client.email,
+      };
+    }),
 });

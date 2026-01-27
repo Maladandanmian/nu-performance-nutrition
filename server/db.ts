@@ -1,5 +1,5 @@
-import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { 
   InsertUser, users,
   InsertClient, clients,
@@ -781,3 +781,63 @@ export async function markPasswordResetTokenUsed(token: string) {
     .set({ used: true })
     .where(eq(passwordResetTokens.token, token));
 }
+
+
+// ============================================================================
+// Client Password Setup Helpers
+// ============================================================================
+
+/**
+ * Generate and store a password setup token for a client
+ * Token expires in 24 hours
+ */
+export async function generatePasswordSetupToken(clientId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Generate random token
+  const token = require('crypto').randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+  
+  // Store token in client record
+  await db.update(clients).set({
+    passwordSetupToken: token,
+    passwordSetupTokenExpires: expiresAt,
+  }).where(eq(clients.id, clientId));
+  
+  return token;
+}
+
+/**
+ * Verify and consume a password setup token
+ * Returns the client if token is valid, undefined otherwise
+ */
+export async function verifyPasswordSetupToken(token: string): Promise<typeof clients.$inferSelect | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(clients)
+    .where(and(
+      eq(clients.passwordSetupToken, token),
+      // Token must not be expired
+      sql`${clients.passwordSetupTokenExpires} > NOW()`
+    ))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Clear password setup token after successful password setup
+ */
+export async function clearPasswordSetupToken(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(clients).set({
+    passwordSetupToken: null,
+    passwordSetupTokenExpires: null,
+  }).where(eq(clients.id, clientId));
+}
+
+

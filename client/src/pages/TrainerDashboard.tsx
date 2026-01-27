@@ -88,17 +88,23 @@ export default function TrainerDashboard() {
       return;
     }
 
-    if (!newClientPin.trim() || newClientPin.length !== 6 || !/^\d{6}$/.test(newClientPin)) {
-      toast.error("Please enter a valid 6-digit PIN");
+    if (!newClientEmail.trim()) {
+      toast.error("Please enter a client email");
+      return;
+    }
+
+    // PIN is optional for new clients (they will set password via email)
+    if (newClientPin && (newClientPin.length !== 6 || !/^\d{6}$/.test(newClientPin))) {
+      toast.error("PIN must be 6 digits if provided");
       return;
     }
 
     createClientMutation.mutate({
       name: newClientName,
-      email: newClientEmail || undefined,
+      email: newClientEmail,
       phone: newClientPhone || undefined,
       notes: newClientNotes || undefined,
-      pin: newClientPin,
+      pin: newClientPin || undefined,
     });
   };
 
@@ -165,22 +171,7 @@ export default function TrainerDashboard() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="client-pin">PIN Code *</Label>
-                    <Input
-                      id="client-pin"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      placeholder="Enter 6-digit PIN"
-                      value={newClientPin}
-                      onChange={(e) => setNewClientPin(e.target.value.replace(/\D/g, ''))}
-                      className="text-center text-xl tracking-widest"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">This PIN will be used by the client to log in</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="client-email">Email</Label>
+                    <Label htmlFor="client-email">Email *</Label>
                     <Input
                       id="client-email"
                       type="email"
@@ -188,6 +179,22 @@ export default function TrainerDashboard() {
                       value={newClientEmail}
                       onChange={(e) => setNewClientEmail(e.target.value)}
                     />
+                    <p className="text-xs text-gray-500 mt-1">Client will receive invitation to set password</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="client-pin">PIN Code (Optional)</Label>
+                    <Input
+                      id="client-pin"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      placeholder="Enter 6-digit PIN (optional)"
+                      value={newClientPin}
+                      onChange={(e) => setNewClientPin(e.target.value.replace(/\D/g, ''))}
+                      className="text-center text-xl tracking-widest"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">For backward compatibility. New clients should use email/password.</p>
                   </div>
                   <div>
                     <Label htmlFor="client-phone">Phone</Label>
