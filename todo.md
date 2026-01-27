@@ -1560,3 +1560,11 @@
 - [x] Ensure `meals.repeatLast` does NOT preserve favorite status (uses default false)
 - [x] Created comprehensive test suite (favorite-marking.test.ts)
 - [ ] Fix test schema issues (minor - functionality works correctly in UI)
+
+## Fix tRPC Network Errors (Jan 27, 2026)
+- [x] Add retry logic to tRPC client configuration (3 retries with exponential backoff)
+- [x] Add timeout settings to prevent hanging requests (30 second timeout)
+- [x] Add retry logic for mutations (2 retries with 1s delay)
+- [x] Configure staleTime to reduce unnecessary refetches
+- [x] Disable refetchOnWindowFocus to reduce load
+- [x] Test TypeScript compilation and server status
