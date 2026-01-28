@@ -2,7 +2,7 @@
  * PIN-based authentication utilities for client login
  * Now with bcrypt hashing for secure PIN storage
  */
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // Cost factor for bcrypt (12 is recommended for production)
 const BCRYPT_ROUNDS = 12;

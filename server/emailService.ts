@@ -2,14 +2,13 @@
  * Email Service
  * 
  * Handles sending emails for password setup invitations and other notifications.
+ * Uses SendGrid Web API for reliable email delivery.
  * 
  * Configuration:
- * - Uses nodemailer for SMTP email sending
- * - Requires EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD env vars
+ * - Requires SENDGRID_API_KEY env var (or EMAIL_PASSWORD as fallback)
+ * - Requires EMAIL_FROM env var for sender address
  * - Falls back to console.log if email is not configured
  */
-
-import { ENV } from './_core/env';
 
 interface EmailOptions {
   to: string;
@@ -19,57 +18,70 @@ interface EmailOptions {
 }
 
 /**
- * Send an email
+ * Send an email using SendGrid Web API
  * Returns true if email was sent successfully, false otherwise
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  // Check if email is configured
-  const emailHost = process.env.EMAIL_HOST;
-  const emailPort = process.env.EMAIL_PORT;
-  const emailUser = process.env.EMAIL_USER;
-  const emailPassword = process.env.EMAIL_PASSWORD;
+  // Check if email is configured - use SENDGRID_API_KEY or EMAIL_PASSWORD
+  const apiKey = process.env.SENDGRID_API_KEY || process.env.EMAIL_PASSWORD;
   const emailFrom = process.env.EMAIL_FROM || 'Nu Performance Nutrition <noreply@nunutrition.com>';
 
   // If email is not configured, log to console and return false
-  if (!emailHost || !emailUser || !emailPassword) {
+  if (!apiKey) {
     console.log('[EmailService] Email not configured. Would have sent:');
     console.log(`[EmailService] To: ${options.to}`);
     console.log(`[EmailService] Subject: ${options.subject}`);
     console.log(`[EmailService] Body (text): ${options.text || 'N/A'}`);
-    console.log(`[EmailService] Body (html): ${options.html}`);
     return false;
   }
 
   try {
-    // Dynamic import nodemailer to avoid loading it if not configured
-    const nodemailer = await import('nodemailer');
-
-    // Create transporter
-    const transporter = nodemailer.default.createTransport({
-      host: emailHost,
-      port: parseInt(emailPort || '587'),
-      secure: emailPort === '465', // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPassword,
+    // Use SendGrid Web API v3
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        personalizations: [
+          {
+            to: [{ email: options.to }],
+          },
+        ],
+        from: parseEmailAddress(emailFrom),
+        subject: options.subject,
+        content: [
+          ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
+          { type: 'text/html', value: options.html },
+        ],
+      }),
     });
 
-    // Send email
-    await transporter.sendMail({
-      from: emailFrom,
-      to: options.to,
-      subject: options.subject,
-      text: options.text,
-      html: options.html,
-    });
-
-    console.log(`[EmailService] Email sent successfully to ${options.to}`);
-    return true;
+    if (response.ok || response.status === 202) {
+      console.log(`[EmailService] Email sent successfully to ${options.to}`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      console.error(`[EmailService] SendGrid API error: ${response.status} - ${errorText}`);
+      return false;
+    }
   } catch (error) {
     console.error('[EmailService] Failed to send email:', error);
     return false;
   }
+}
+
+/**
+ * Parse email address string into SendGrid format
+ * Handles both "Name <email@example.com>" and "email@example.com" formats
+ */
+function parseEmailAddress(emailString: string): { email: string; name?: string } {
+  const match = emailString.match(/^(.+?)\s*<(.+?)>$/);
+  if (match) {
+    return { name: match[1].trim(), email: match[2].trim() };
+  }
+  return { email: emailString.trim() };
 }
 
 /**

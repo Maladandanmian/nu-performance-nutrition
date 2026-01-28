@@ -11,6 +11,14 @@ const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(
 
 export default defineConfig({
   plugins,
+  ssr: {
+    // Prevent server-only modules from being bundled into client code
+    noExternal: ['mysql2', 'bcryptjs', 'sharp', 'nodemailer'],
+  },
+  optimizeDeps: {
+    // Exclude server-only modules from client optimization
+    exclude: ['mysql2', 'bcryptjs', 'sharp', 'nodemailer'],
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

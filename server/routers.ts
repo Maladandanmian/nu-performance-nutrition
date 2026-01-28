@@ -7,7 +7,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { analyzeMealImage, calculateNutritionScore } from "./qwenVision";
-import sharp from "sharp";
+// sharp removed - not used in this file
 import { calculateScoreBreakdown, generateImprovementAdvice } from "./improvementAdvice";
 import { estimateBeverageNutrition } from "./beverageNutrition";
 import { reEstimateComponentNutrition } from "./componentReEstimation";
@@ -16,6 +16,8 @@ import { identifyMealItems } from "./mealItemIdentification";
 import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
+import { sendPasswordSetupInvitation } from "./emailService";
+import { hashPIN } from "./pinAuth";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -161,8 +163,13 @@ export const appRouter = router({
         pin: z.string().length(6).regex(/^\d{6}$/, "PIN must be 6 digits").optional(), // Optional for backward compat
       }))
       .mutation(async ({ ctx, input }) => {
-        const { hashPIN } = await import('./pinAuth');
         const { pin, ...clientData } = input;
+        
+        // Check if email already exists for this trainer
+        const existingClientByEmail = await db.getClientByEmail(clientData.email);
+        if (existingClientByEmail) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'A client with this email already exists.' });
+        }
         
         // If PIN is provided, validate it
         let hashedPin: string | undefined;
@@ -195,15 +202,19 @@ export const appRouter = router({
         });
         
         // Generate password setup token and send invitation email
-        const token = await db.generatePasswordSetupToken(clientId);
-        
-        // Send invitation email
-        const { sendPasswordSetupInvitation } = await import('./emailService');
-        const emailSent = await sendPasswordSetupInvitation(
-          clientData.email,
-          clientData.name,
-          token
-        );
+        // Wrap in try-catch to prevent mutation failure if email sending fails
+        let emailSent = false;
+        let token = '';
+        try {
+          token = await db.generatePasswordSetupToken(clientId);
+          emailSent = await sendPasswordSetupInvitation(
+            clientData.email,
+            clientData.name,
+            token
+          );
+        } catch (emailError) {
+          console.error(`[ClientInvitation] Error sending email to ${clientData.email}:`, emailError);
+        }
         
         if (!emailSent) {
           console.warn(`[ClientInvitation] Failed to send email to ${clientData.email}. Token: ${token}`);
