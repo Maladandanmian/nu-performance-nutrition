@@ -5,10 +5,12 @@
  * Uses SendGrid Web API for reliable email delivery.
  * 
  * Configuration:
- * - Requires SENDGRID_API_KEY env var (or EMAIL_PASSWORD as fallback)
+ * - Requires EMAIL_PASSWORD env var (SendGrid API key)
  * - Requires EMAIL_FROM env var for sender address
  * - Falls back to console.log if email is not configured
  */
+
+import { ENV } from './_core/env';
 
 interface EmailOptions {
   to: string;
@@ -22,9 +24,12 @@ interface EmailOptions {
  * Returns true if email was sent successfully, false otherwise
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  // Check if email is configured - use SENDGRID_API_KEY or EMAIL_PASSWORD
-  const apiKey = process.env.SENDGRID_API_KEY || process.env.EMAIL_PASSWORD;
-  const emailFrom = process.env.EMAIL_FROM || 'Nu Performance Nutrition <noreply@nunutrition.com>';
+  // Check if email is configured - use EMAIL_PASSWORD (SendGrid API key)
+  const apiKey = ENV.emailPassword;
+  const emailFrom = ENV.emailFrom || 'Nu Performance Nutrition <noreply@nunutrition.com>';
+  
+  // Debug logging
+  console.log(`[EmailService] Checking config - apiKey exists: ${!!apiKey}, emailFrom: ${emailFrom}`);
 
   // If email is not configured, log to console and return false
   if (!apiKey) {
@@ -92,7 +97,7 @@ export async function sendPasswordSetupInvitation(
   clientName: string,
   token: string
 ): Promise<boolean> {
-  const setupUrl = `${process.env.VITE_APP_URL || 'https://your-app-url.com'}/set-password?token=${token}`;
+  const setupUrl = `${ENV.appUrl || 'https://nuperformnut-cvoywtwv.manus.space'}/set-password?token=${token}`;
 
   const subject = 'Welcome to Nu Performance Nutrition - Set Your Password';
 

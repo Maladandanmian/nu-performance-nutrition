@@ -8,6 +8,13 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   adminEmails: process.env.ADMIN_EMAILS ?? "",
+  // Email configuration
+  emailHost: process.env.EMAIL_HOST ?? "",
+  emailPort: process.env.EMAIL_PORT ?? "",
+  emailUser: process.env.EMAIL_USER ?? "",
+  emailPassword: process.env.EMAIL_PASSWORD ?? "",
+  emailFrom: process.env.EMAIL_FROM ?? "",
+  appUrl: process.env.VITE_APP_URL ?? "",
 };
 
 // Parse comma-separated admin emails into an array
