@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import { eq, and, desc, sql } from "drizzle-orm";
+import { randomBytes } from "crypto";
 import { 
   InsertUser, users,
   InsertClient, clients,
@@ -796,7 +797,7 @@ export async function generatePasswordSetupToken(clientId: number): Promise<stri
   if (!db) throw new Error("Database not available");
   
   // Generate random token
-  const token = require('crypto').randomBytes(32).toString('hex');
+  const token = randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
   
   // Store token in client record
