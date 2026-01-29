@@ -1669,3 +1669,10 @@
 - [x] Add nutrition breakdown grid to drink entries (calories, protein, fat, carbs, fiber)
 - [x] Write tests to verify cumulative scoring works correctly (4 tests passing)
 - [x] Verify cumulative scoring is working correctly in practice
+
+
+## Meal Scoring Inconsistency (Jan 29, 2026)
+- [x] Fix: Meals show 4 stars in log modal but save as 5/5 in history
+- [x] Investigate: Frontend score calculation vs backend saveMeal score calculation
+- [x] Ensure: Score shown in preview matches score saved to database
+- [x] Test: Verify score consistency across multiple meal logs (3 tests passing)

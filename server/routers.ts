@@ -429,6 +429,8 @@ export const appRouter = router({
         })).optional(),
         // Source of meal entry
         source: z.enum(["meal_photo", "nutrition_label", "text_description"]).optional(),
+        // Pre-calculated score from frontend (to maintain consistency)
+        preCalculatedScore: z.number().optional(),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -464,20 +466,29 @@ export const appRouter = router({
           );
 
           // Calculate nutrition score (include beverage if present)
-          const totalNutrition = {
-            calories: input.calories + (input.beverageCalories || 0),
-            protein: input.protein + (input.beverageProtein || 0),
-            fat: input.fat + (input.beverageFat || 0),
-            carbs: input.carbs + (input.beverageCarbs || 0),
-            fibre: input.fibre + (input.beverageFibre || 0),
-          };
+          // Use pre-calculated score if provided (from frontend preview) to maintain consistency
+          let score: number;
           
-          const score = calculateNutritionScore(
-            totalNutrition,
-            goals,
-            todaysTotals,
-            new Date() // Use current time (loggedAt not available in this procedure)
-          );
+          if (input.preCalculatedScore !== undefined && input.preCalculatedScore > 0) {
+            // Use the score calculated during preview
+            score = input.preCalculatedScore;
+          } else {
+            // Recalculate score (fallback for old clients or direct API calls)
+            const totalNutrition = {
+              calories: input.calories + (input.beverageCalories || 0),
+              protein: input.protein + (input.beverageProtein || 0),
+              fat: input.fat + (input.beverageFat || 0),
+              carbs: input.carbs + (input.beverageCarbs || 0),
+              fibre: input.fibre + (input.beverageFibre || 0),
+            };
+            
+            score = calculateNutritionScore(
+              totalNutrition,
+              goals,
+              todaysTotals,
+              new Date() // Use current time (loggedAt not available in this procedure)
+            );
+          }
 
           // Save meal to database
           console.log('[saveMeal] Components being saved:', JSON.stringify(input.components));

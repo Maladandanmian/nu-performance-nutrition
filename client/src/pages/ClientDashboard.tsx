@@ -2456,6 +2456,7 @@ export default function ClientDashboard() {
                     beverageCategory: beverageNutrition?.category,
                     components: analysisResult?.components,
                     source: mealSource, // Pass the meal source (meal_photo or nutrition_label)
+                    preCalculatedScore: analysisResult?.score, // Pass the score shown in preview
                   });
                 }
                 setEditingMealId(null);
