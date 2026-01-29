@@ -1662,3 +1662,10 @@
 - [x] Test password hashing and verification
 - [ ] End-to-end authentication flow test (manual)
 - [x] Fix missing nutrition score display for drinks in log entries - all entries should show scores consistently
+
+## Cumulative Nutrition Scoring - Display Fix (Jan 29, 2026)
+- [x] Update DrinkHistoryFeed to display nutrition information (calories, macros, score)
+- [x] Add star rating display to drink entries (matching MealHistoryFeed format)
+- [x] Add nutrition breakdown grid to drink entries (calories, protein, fat, carbs, fiber)
+- [x] Write tests to verify cumulative scoring works correctly (4 tests passing)
+- [x] Verify cumulative scoring is working correctly in practice

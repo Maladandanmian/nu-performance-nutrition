@@ -114,6 +114,42 @@ export function DrinkHistoryFeed({ clientId }: DrinkHistoryFeedProps) {
               <h3 className="font-semibold text-lg">{drink.drinkType}</h3>
               <p className="text-sm text-gray-600">{drink.volumeMl}ml</p>
               
+              {/* Score */}
+              <div className="flex items-center gap-1 text-yellow-500 mb-1 mt-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span key={star} className="text-sm">
+                    {star <= (drink.nutritionScore || 0) ? '⭐' : '☆'}
+                  </span>
+                ))}
+                <span className="text-xs text-gray-500 ml-1">
+                  {drink.nutritionScore ? `${drink.nutritionScore}/5` : 'N/A'}
+                </span>
+              </div>
+
+              {/* Nutrition Info */}
+              <div className="grid grid-cols-5 gap-1 text-xs mb-1.5">
+                <div className="text-center">
+                  <div className="font-semibold text-gray-700">{drink.calories}</div>
+                  <div className="text-xs text-gray-500">kcal</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-700">{drink.protein}g</div>
+                  <div className="text-xs text-gray-500">protein</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-700">{drink.fat}g</div>
+                  <div className="text-xs text-gray-500">fat</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-700">{drink.carbs}g</div>
+                  <div className="text-xs text-gray-500">carbs</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-700">{drink.fibre}g</div>
+                  <div className="text-xs text-gray-500">fiber</div>
+                </div>
+              </div>
+              
               <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
