@@ -1542,17 +1542,8 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Meal not found' });
           }
 
-          // Check if toggling to favorite would exceed limit
-          if (!meal.isFavorite) {
-            const favorites = await db.getFavoriteMeals(input.clientId);
-            if (favorites.length >= 3) {
-              throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'Maximum 3 favorite meals allowed. Remove a favorite first.',
-              });
-            }
-          }
-
+          // With locked Quick Log, toggleMealFavorite automatically un-favorites
+          // other meals with the same description, so no need to check limit here
           await db.toggleMealFavorite(input.mealId, !meal.isFavorite);
           return { success: true, isFavorite: !meal.isFavorite };
         } catch (error) {
@@ -1593,8 +1584,9 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite meal not found' });
           }
 
-          // Create a copy of the meal with current timestamp and preserve favorite status
-          const newMeal = await db.duplicateMeal(input.mealId, new Date(), true);
+          // Create a copy of the meal with current timestamp but DON'T preserve favorite status
+          // Only the original favorite should remain marked as favorite (locked Quick Log button)
+          const newMeal = await db.duplicateMeal(input.mealId, new Date(), false);
           return { success: true, meal: newMeal };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
@@ -1716,17 +1708,8 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Drink not found' });
           }
 
-          // Check if toggling to favorite would exceed limit
-          if (!drink.isFavorite) {
-            const favorites = await db.getFavoriteDrinks(input.clientId);
-            if (favorites.length >= 3) {
-              throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: 'Maximum 3 favorite drinks allowed. Remove a favorite first.',
-              });
-            }
-          }
-
+          // With locked Quick Log, toggleDrinkFavorite automatically un-favorites
+          // other drinks of the same type, so no need to check limit here
           await db.toggleDrinkFavorite(input.drinkId, !drink.isFavorite);
           return { success: true, isFavorite: !drink.isFavorite };
         } catch (error) {
@@ -1767,8 +1750,9 @@ Return as JSON.`
             throw new TRPCError({ code: 'NOT_FOUND', message: 'Favorite drink not found' });
           }
 
-          // Create a copy of the drink with current timestamp and preserve favorite status
-          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), true);
+          // Create a copy of the drink with current timestamp but DON'T preserve favorite status
+          // Only the original favorite should remain marked as favorite (locked Quick Log button)
+          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), false);
           return { success: true, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;

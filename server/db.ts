@@ -228,16 +228,46 @@ export async function updateMeal(mealId: number, data: Partial<InsertMeal>) {
 export async function toggleMealFavorite(mealId: number, isFavorite: boolean) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // If favoriting, first get the meal details to find its description and clientId
+  if (isFavorite) {
+    const meal = await getMealById(mealId);
+    if (meal && meal.aiDescription) {
+      // Un-favorite all other meals with the same description for this client (locked Quick Log)
+      await db.update(meals)
+        .set({ isFavorite: 0 })
+        .where(and(
+          eq(meals.clientId, meal.clientId),
+          eq(meals.aiDescription, meal.aiDescription),
+          eq(meals.isFavorite, 1)
+        ));
+    }
+  }
+  
+  // Now set the favorite status for this specific meal
   return db.update(meals).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(meals.id, mealId));
 }
 
 export async function getFavoriteMeals(clientId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(meals)
+  
+  // Get all favorite meals for this client
+  const allFavorites = await db.select().from(meals)
     .where(and(eq(meals.clientId, clientId), eq(meals.isFavorite, 1)))
-    .orderBy(desc(meals.loggedAt))
-    .limit(3);
+    .orderBy(desc(meals.loggedAt));
+  
+  // Group by aiDescription and keep only the most recent one for each description
+  const uniqueFavorites = new Map<string, typeof allFavorites[0]>();
+  for (const meal of allFavorites) {
+    const key = meal.aiDescription || 'unknown';
+    if (!uniqueFavorites.has(key)) {
+      uniqueFavorites.set(key, meal);
+    }
+  }
+  
+  // Return up to 3 unique favorite meal types
+  return Array.from(uniqueFavorites.values()).slice(0, 3);
 }
 
 export async function getLastMeal(clientId: number) {
@@ -312,16 +342,45 @@ export async function getDrinkById(drinkId: number) {
 export async function toggleDrinkFavorite(drinkId: number, isFavorite: boolean) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // If favoriting, first get the drink details to find its type and clientId
+  if (isFavorite) {
+    const drink = await getDrinkById(drinkId);
+    if (drink) {
+      // Un-favorite all other drinks of the same type for this client (locked Quick Log)
+      await db.update(drinks)
+        .set({ isFavorite: 0 })
+        .where(and(
+          eq(drinks.clientId, drink.clientId),
+          eq(drinks.drinkType, drink.drinkType),
+          eq(drinks.isFavorite, 1)
+        ));
+    }
+  }
+  
+  // Now set the favorite status for this specific drink
   return db.update(drinks).set({ isFavorite: isFavorite ? 1 : 0 }).where(eq(drinks.id, drinkId));
 }
 
 export async function getFavoriteDrinks(clientId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(drinks)
+  
+  // Get all favorite drinks for this client
+  const allFavorites = await db.select().from(drinks)
     .where(and(eq(drinks.clientId, clientId), eq(drinks.isFavorite, 1)))
-    .orderBy(desc(drinks.loggedAt))
-    .limit(3);
+    .orderBy(desc(drinks.loggedAt));
+  
+  // Group by drinkType and keep only the most recent one for each type
+  const uniqueFavorites = new Map<string, typeof allFavorites[0]>();
+  for (const drink of allFavorites) {
+    if (!uniqueFavorites.has(drink.drinkType)) {
+      uniqueFavorites.set(drink.drinkType, drink);
+    }
+  }
+  
+  // Return up to 3 unique favorite drink types
+  return Array.from(uniqueFavorites.values()).slice(0, 3);
 }
 
 export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserveFavorite = false) {
@@ -339,12 +398,12 @@ export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserv
     isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
   };
   
-  await db.insert(drinks).values(newDrink);
+  const insertResult = await db.insert(drinks).values(newDrink);
+  const insertId = insertResult[0].insertId;
   
-  // Query the newly created drink by clientId and loggedAt
+  // Query the newly created drink by its ID
   const result = await db.select().from(drinks)
-    .where(and(eq(drinks.clientId, originalDrink.clientId), eq(drinks.loggedAt, newLoggedAt)))
-    .orderBy(desc(drinks.id))
+    .where(eq(drinks.id, insertId))
     .limit(1);
   
   return result.length > 0 ? result[0] : undefined;

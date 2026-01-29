@@ -1676,3 +1676,20 @@
 - [x] Investigate: Frontend score calculation vs backend saveMeal score calculation
 - [x] Ensure: Score shown in preview matches score saved to database
 - [x] Test: Verify score consistency across multiple meal logs (3 tests passing)
+
+
+## Testing Protocol (Jan 29, 2026)
+- [x] Establish designated test account (PIN 098765) for all development and testing
+- [x] Document: Never log test data to production user accounts (222222)
+- [x] Keep test data completely separate from actual user accounts
+- [ ] All future vitest tests use test database fixtures, not production clients
+
+
+## Quick Log Favorites Bug (Jan 29, 2026)
+- [x] Bug: Logging a favorited drink duplicates it in the favorites list
+- [x] Requirement: Logged drinks should NOT be marked as new favorites in database
+- [x] Requirement: Star icon should be clickable on any drink entry to toggle favorite status
+- [x] Fix: Implemented locked Quick Log - only one favorite per drink/meal type
+- [x] Fix: When favoriting a drink, automatically un-favorite other drinks of same type
+- [x] Fix: Logged drinks are not marked as favorites (preserves locked Quick Log)
+- [x] Test: All 4 tests passing (unique favorites, no duplication, 3 types max, meals)

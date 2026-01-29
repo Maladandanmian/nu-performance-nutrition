@@ -1,0 +1,22 @@
+{
+  "query": "SELECT c.id, c.name, c.email, COUNT(m.id) as meal_count FROM clients c LEFT JOIN meals m ON c.id = m.clientId WHERE c.trainerId = 1 GROUP BY c.id ORDER BY meal_count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id, c.name, c.email, COUNT(m.id) as meal_count FROM clients c LEFT JOIN meals m ON c.id = m.clientId WHERE c.trainerId = 1 GROUP BY c.id ORDER BY meal_count DESC;",
+  "rows": [
+    {
+      "id": "30001",
+      "name": "Noad",
+      "email": "NULL",
+      "meal_count": "7"
+    },
+    {
+      "id": "630001",
+      "name": "test client",
+      "email": "NULL",
+      "meal_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tmeal_count\n30001\tNoad\tNULL\t7\n630001\ttest client\tNULL\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1510
+}

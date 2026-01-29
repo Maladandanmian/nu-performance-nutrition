@@ -1,0 +1,80 @@
+{
+  "query": "SELECT c.id, c.name, c.email, COUNT(m.id) as meal_count, MAX(m.loggedAt) as last_meal\nFROM clients c\nLEFT JOIN meals m ON c.id = m.clientId\nGROUP BY c.id\nORDER BY MAX(m.loggedAt) DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id, c.name, c.email, COUNT(m.id) as meal_count, MAX(m.loggedAt) as last_meal\nFROM clients c\nLEFT JOIN meals m ON c.id = m.clientId\nGROUP BY c.id\nORDER BY MAX(m.loggedAt) DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "email": "NULL",
+      "meal_count": "69",
+      "last_meal": "2026-01-29 01:41:58"
+    },
+    {
+      "id": "570001",
+      "name": "Michelle Tenent ",
+      "email": "NULL",
+      "meal_count": "48",
+      "last_meal": "2026-01-29 00:45:00"
+    },
+    {
+      "id": "30001",
+      "name": "Noad",
+      "email": "NULL",
+      "meal_count": "7",
+      "last_meal": "2026-01-26 21:34:05"
+    },
+    {
+      "id": "540182",
+      "name": "Test Client",
+      "email": "client-1769065965388@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 07:13:26"
+    },
+    {
+      "id": "540162",
+      "name": "Test Client",
+      "email": "client-1769065684761@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 07:08:45"
+    },
+    {
+      "id": "540149",
+      "name": "Test Client",
+      "email": "client-1769065205524@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 07:00:44"
+    },
+    {
+      "id": "540136",
+      "name": "Test Client",
+      "email": "client-1769064189497@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 06:43:51"
+    },
+    {
+      "id": "540123",
+      "name": "Test Client",
+      "email": "client-1769063622242@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 06:34:25"
+    },
+    {
+      "id": "540110",
+      "name": "Test Client",
+      "email": "client-1769063213610@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 06:27:35"
+    },
+    {
+      "id": "540097",
+      "name": "Test Client",
+      "email": "client-1769063020507@test.com",
+      "meal_count": "1",
+      "last_meal": "2026-01-22 06:24:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tmeal_count\tlast_meal\n1\tAndy Knight \tNULL\t69\t2026-01-29 01:41:58\n570001\tMichelle Tenent \tNULL\t48\t2026-01-29 00:45:00\n30001\tNoad\tNULL\t7\t2026-01-26 21:34:05\n540182\tTest Client\tclient-1769065965388@test.com\t1\t2026-01-22 07:13:26\n540162\tTest Client\tclient-1769065684761@test.com\t1\t2026-01-22 07:08:45\n540149\tTest Client\tclient-1769065205524@test.com\t1\t2026-01-22 07:00:44\n540136\tTest Client\tclient-1769064189497@test.com\t1\t2026-01-22 06:43:51\n540123\tTest Client\tclient-1769063622242@test.com\t1\t2026-01-22 06:34:25\n540110\tTest Client\tclient-1769063213610@test.com\t1\t2026-01-22 06:27:35\n540097\tTest Client\tclient-1769063020507@test.com\t1\t2026-01-22 06:24:24\n",
+  "stderr": "",
+  "execution_time_ms": 1498
+}
