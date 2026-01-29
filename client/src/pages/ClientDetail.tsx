@@ -12,6 +12,7 @@ import { MealEditDialog } from "@/components/MealEditDialog";
 import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import { DexaUploadSection } from "@/components/DexaUploadSection";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
+import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -359,12 +360,13 @@ export default function ClientDetail() {
 
           {/* Data Visualization */}
           <Tabs defaultValue="nutrition" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto gap-1">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 h-auto gap-1">
               <TabsTrigger value="nutrition" className="text-xs md:text-sm">Nutrition Trends</TabsTrigger>
               <TabsTrigger value="history" className="text-xs md:text-sm">Meal History</TabsTrigger>
               <TabsTrigger value="trends" className="text-xs md:text-sm">Daily Trends</TabsTrigger>
               <TabsTrigger value="body" className="text-xs md:text-sm">Body Metrics</TabsTrigger>
               <TabsTrigger value="dexa-viz" className="text-xs md:text-sm">DEXA Insights</TabsTrigger>
+              <TabsTrigger value="athlete-monitoring" className="text-xs md:text-sm">Athlete Monitoring</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -685,6 +687,10 @@ export default function ClientDetail() {
                   <DexaUploadSection clientId={clientId!} />
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="athlete-monitoring" className="space-y-4">
+              <AthleteMonitoringSection clientId={clientId || 0} isTrainer={true} />
             </TabsContent>
           </Tabs>
         </div>

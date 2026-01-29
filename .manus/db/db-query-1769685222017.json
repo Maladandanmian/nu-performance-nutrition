@@ -1,0 +1,20 @@
+{
+  "query": "SELECT * FROM athlete_monitoring WHERE clientId = 990036 ORDER BY submittedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM athlete_monitoring WHERE clientId = 990036 ORDER BY submittedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "clientId": "990036",
+      "fatigue": "2",
+      "sleepQuality": "4",
+      "muscleSoreness": "4",
+      "stressLevels": "3",
+      "mood": "4",
+      "submittedAt": "2026-01-29 11:11:59"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tfatigue\tsleepQuality\tmuscleSoreness\tstressLevels\tmood\tsubmittedAt\n1\t990036\t2\t4\t4\t3\t4\t2026-01-29 11:11:59\n",
+  "stderr": "",
+  "execution_time_ms": 1547
+}

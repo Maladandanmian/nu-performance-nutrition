@@ -388,3 +388,22 @@ export const emailVerificationTokens = mysqlTable("email_verification_tokens", {
 export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
 export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;
 
+/**
+ * Athlete Monitoring table - stores daily wellness check-ins
+ * Tracks fatigue, sleep quality, muscle soreness, stress levels, and mood
+ * Clients can submit once per day
+ */
+export const athleteMonitoring = mysqlTable("athlete_monitoring", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  // Wellness metrics (1-5 scale)
+  fatigue: int("fatigue").notNull(), // 1=Always tired, 5=Very fresh
+  sleepQuality: int("sleepQuality").notNull(), // 1=Insomnia, 5=Very restful
+  muscleSoreness: int("muscleSoreness").notNull(), // 1=Very sore, 5=Feeling good
+  stressLevels: int("stressLevels").notNull(), // 1=Very stressed, 5=Very relaxed
+  mood: int("mood").notNull(), // 1=Highly annoyed/irritable/down, 5=Very positive mood
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+});
+
+export type AthleteMonitoring = typeof athleteMonitoring.$inferSelect;
+export type InsertAthleteMonitoring = typeof athleteMonitoring.$inferInsert;

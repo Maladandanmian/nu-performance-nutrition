@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/mysql2";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { 
   InsertUser, users,
@@ -11,6 +11,7 @@ import {
   emailVerificationTokens,
   passwordResetTokens,
   auditLogs,
+  athleteMonitoring,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -920,3 +921,84 @@ export async function clearPasswordSetupToken(clientId: number) {
 }
 
 
+
+/**
+ * Athlete Monitoring Functions
+ */
+
+/**
+ * Submit athlete monitoring data (wellness check-in)
+ * Validates that only one submission per day is allowed
+ */
+export async function submitAthleteMonitoring(data: {
+  clientId: number;
+  fatigue: number;
+  sleepQuality: number;
+  muscleSoreness: number;
+  stressLevels: number;
+  mood: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if client already submitted today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const todayStr = today.toISOString();
+  const tomorrowStr = tomorrow.toISOString();
+  
+  const existing = await db.select().from(athleteMonitoring)
+    .where(and(
+      eq(athleteMonitoring.clientId, data.clientId),
+      sql`${athleteMonitoring.submittedAt} >= ${todayStr}`,
+      sql`${athleteMonitoring.submittedAt} < ${tomorrowStr}`
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    throw new Error("You have already submitted your wellness check-in today");
+  }
+  
+  const result = await db.insert(athleteMonitoring).values(data);
+  return result;
+}
+
+/**
+ * Get the most recent athlete monitoring submission for a client
+ */
+export async function getLastAthleteMonitoring(clientId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(athleteMonitoring)
+    .where(eq(athleteMonitoring.clientId, clientId))
+    .orderBy(desc(athleteMonitoring.submittedAt))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Get athlete monitoring trend data for a client within a date range
+ */
+export async function getAthleteMonitoringTrend(clientId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Convert dates to ISO strings for proper SQL comparison
+  const startStr = startDate.toISOString();
+  const endStr = endDate.toISOString();
+  
+  const result = await db.select().from(athleteMonitoring)
+    .where(and(
+      eq(athleteMonitoring.clientId, clientId),
+      sql`${athleteMonitoring.submittedAt} >= ${startStr}`,
+      sql`${athleteMonitoring.submittedAt} <= ${endStr}`
+    ))
+    .orderBy(asc(athleteMonitoring.submittedAt));
+  
+  return result;
+}

@@ -26,6 +26,7 @@ import { useClientAuth } from "@/hooks/useClientAuth";
 import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
+import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -959,12 +960,13 @@ export default function ClientDashboard() {
           <TodaysSummary clientId={clientSession?.clientId || 0} />
           
           <Tabs defaultValue="log-meal">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 h-auto gap-2">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
             <TabsTrigger value="dexa">DEXA Scans</TabsTrigger>
+            <TabsTrigger value="athlete-monitoring">Athlete Monitoring</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -1439,6 +1441,17 @@ export default function ClientDashboard() {
                 <DexaVisualizationPanels clientId={clientSession?.clientId || 0} />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Athlete Monitoring Tab */}
+          <TabsContent value="athlete-monitoring">
+            {clientSession?.clientId ? (
+              <AthleteMonitoringSection clientId={clientSession.clientId} isTrainer={false} />
+            ) : (
+              <Card className="p-6">
+                <p className="text-center text-muted-foreground">Loading...</p>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
         </div>

@@ -2076,7 +2076,7 @@ Return as JSON.`
       }),
 
     // Get detailed scan data (BMD + Body Comp + Images)
-    getScanDetails: protectedProcedure
+    getScanDetails: authenticatedProcedure
       .input(z.object({ scanId: z.number() }))
       .query(async ({ input }) => {
         const { storageGetPresigned } = await import('./storage');
@@ -2122,7 +2122,7 @@ Return as JSON.`
       }),
 
     // Get body composition history for trend charts
-    getBodyCompTrend: protectedProcedure
+    getBodyCompTrend: authenticatedProcedure
       .input(z.object({ clientId: z.number() }))
       .query(async ({ input }) => {
         const history = await db.getDexaBodyCompHistory(input.clientId);
@@ -2131,7 +2131,7 @@ Return as JSON.`
       }),
 
     // Get BMD history for trend charts
-    getBmdTrend: protectedProcedure
+    getBmdTrend: authenticatedProcedure
       .input(z.object({ clientId: z.number() }))
       .query(async ({ input }) => {
         const history = await db.getDexaBmdHistory(input.clientId);
@@ -2166,6 +2166,54 @@ Return as JSON.`
         
         await db.upsertDexaGoals(clientId, convertedGoals);
         return { success: true };
+      }),
+  }),
+
+  /**
+   * Athlete Monitoring Router
+   * Wellness check-ins with fatigue, sleep, soreness, stress, and mood tracking
+   */
+  athleteMonitoring: router({
+    // Submit wellness check-in (client only, once per day)
+    submit: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        fatigue: z.number().min(1).max(5),
+        sleepQuality: z.number().min(1).max(5),
+        muscleSoreness: z.number().min(1).max(5),
+        stressLevels: z.number().min(1).max(5),
+        mood: z.number().min(1).max(5),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          await db.submitAthleteMonitoring(input);
+          return { success: true };
+        } catch (error: any) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: error.message || 'Failed to submit wellness check-in',
+          });
+        }
+      }),
+
+    // Get last submission for a client
+    getLastSubmission: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const result = await db.getLastAthleteMonitoring(input.clientId);
+        return result || null;
+      }),
+
+    // Get trend data for a client
+    getTrend: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+      }))
+      .query(async ({ input }) => {
+        const result = await db.getAthleteMonitoringTrend(input.clientId, input.startDate, input.endDate);
+        return result || [];
       }),
   }),
 });

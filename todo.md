@@ -1720,3 +1720,45 @@
 - [x] Implement backend deleteDexaScan procedure
 - [x] Add confirmation dialog before deletion
 - [x] Test delete functionality with duplicate scans
+
+## DEXA Client Visibility Bug (Jan 29, 2026)
+- [x] Investigate why DEXA Scan Insights are not visible on client side
+- [x] Fix client-side DEXA visualization display for approved scans
+- [x] Test and verify DEXA insights appear correctly for clients
+
+## Client Navigation Redesign & Athlete Monitoring (Jan 29, 2026)
+- [x] Update client dashboard navigation from single-row to 2-column grid layout
+- [x] Match trainer side navigation styling and spacing
+- [x] Add "Athlete Monitoring" tab to client dashboard
+- [x] Add "Athlete Monitoring" tab to trainer client detail view
+- [x] Create placeholder content for Athlete Monitoring tab
+
+## Client Dashboard Tabs Bug Fix (Jan 29, 2026)
+- [ ] Fix client dashboard to display all 6 tabs (not just 2)
+- [ ] Ensure tabs are: Log Meal, Nutrition, Trends, Metrics, DEXA Scans, Athlete Monitoring
+- [ ] Keep 2-column grid layout
+
+## Athlete Monitoring Feature (Jan 29, 2026)
+- [ ] Create athlete_monitoring table in database schema
+- [ ] Add backend procedures for submitting wellness data (one per day limit)
+- [ ] Add backend procedures for retrieving wellness trends
+- [ ] Create slider UI component with 5 metrics and exact labels
+- [ ] Build trend chart showing all 5 metrics over time
+- [ ] Add "Last Submission" date indicator
+- [ ] Integrate into client dashboard Athlete Monitoring tab
+- [ ] Integrate into trainer client detail Athlete Monitoring tab
+- [ - [ ] Test submission, validation, and visualization
+- [x] Fix getLastSubmission returning undefined instead of null
+- [x] Fix getTrend returning undefined instead of empty array
+- [x] Debug why trend chart doesn't show data points after submission
+- [x] Fix wellness trends not visible on client side (works on trainer side)
+- [x] Fix wellness scores reverting to 3 after submission (not saving properly)
+- [x] Pre-fill form with last submission values
+- [x] Disable submit button after daily submission is complete
+- [x] Fix date comparison in submitAthleteMonitoring to use ISO strings
+
+## Athlete Monitoring Chart Point Clustering (Jan 29, 2026)
+- [x] Implement point clustering/jittering in wellness trend chart
+- [x] Ensure all 5 metrics are visible even when values overlap
+- [x] Support up to 5 points clustered at same value
+- [x] Test with all metrics having same score
