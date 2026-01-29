@@ -1,0 +1,2 @@
+ALTER TABLE `drinks` ADD `sourceType` enum('manual','favorite','repeat') DEFAULT 'manual';--> statement-breakpoint
+ALTER TABLE `meals` ADD `sourceType` enum('manual','favorite','repeat') DEFAULT 'manual';

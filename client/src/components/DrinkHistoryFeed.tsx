@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
-import { Calendar, Clock, Edit2, Trash2, Droplets } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2, Droplets, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -39,6 +39,17 @@ export function DrinkHistoryFeed({ clientId }: DrinkHistoryFeedProps) {
     },
     onError: (error) => {
       toast.error(`Failed to update drink: ${error.message}`);
+    },
+  });
+
+  const toggleFavoriteMutation = trpc.drinks.toggleFavorite.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.isFavorite ? "Added to favorites" : "Removed from favorites");
+      utils.drinks.list.invalidate();
+      utils.drinks.getFavorites.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to update favorite: ${error.message}`);
     },
   });
 
@@ -169,6 +180,15 @@ export function DrinkHistoryFeed({ clientId }: DrinkHistoryFeedProps) {
             </div>
 
             <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toggleFavoriteMutation.mutate({ drinkId: drink.id, clientId })}
+                className={drink.isFavorite || drink.sourceType === 'favorite' || drink.sourceType === 'repeat' ? "text-yellow-500 hover:text-yellow-600" : "text-gray-400 hover:text-gray-500"}
+                title={drink.isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Star className={`h-4 w-4 ${drink.isFavorite || drink.sourceType === 'favorite' || drink.sourceType === 'repeat' ? 'fill-current' : ''}`} />
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

@@ -383,7 +383,7 @@ export async function getFavoriteDrinks(clientId: number) {
   return Array.from(uniqueFavorites.values()).slice(0, 3);
 }
 
-export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserveFavorite = false) {
+export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserveFavorite = false, sourceType: "manual" | "favorite" | "repeat" = "manual") {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -391,11 +391,12 @@ export async function duplicateDrink(drinkId: number, newLoggedAt: Date, preserv
   if (!originalDrink) throw new Error("Drink not found");
   
   // Create a copy without id, createdAt, and with new loggedAt
-  const { id, createdAt, isFavorite, ...drinkData} = originalDrink;
+  const { id, createdAt, isFavorite, sourceType: _, ...drinkData} = originalDrink;
   const newDrink: InsertDrink = {
     ...drinkData,
     loggedAt: newLoggedAt,
     isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
+    sourceType, // Set source type to track how this drink was logged
   };
   
   const insertResult = await db.insert(drinks).values(newDrink);

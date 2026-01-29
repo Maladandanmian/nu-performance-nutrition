@@ -1693,3 +1693,14 @@
 - [x] Fix: When favoriting a drink, automatically un-favorite other drinks of same type
 - [x] Fix: Logged drinks are not marked as favorites (preserves locked Quick Log)
 - [x] Test: All 4 tests passing (unique favorites, no duplication, 3 types max, meals)
+
+
+## Visual Star Indicators for Logged Favorites (Jan 29, 2026)
+- [x] Add sourceType field to drinks schema to track if logged from favorite
+- [x] Add sourceType field to meals schema to track if logged from favorite
+- [x] Update duplicateDrink to set sourceType='favorite' when logging from Quick Log
+- [x] Update duplicateMeal to set sourceType='favorite' when logging from Quick Log (meals use same field)
+- [x] Update DrinkHistoryFeed to show stars for drinks with sourceType='favorite'
+- [x] Update MealHistoryFeed to show stars for meals with sourceType='favorite'
+- [x] Ensure stars are clickable to toggle favorite status on any entry
+- [x] Write tests to verify visual star display works correctly (4 tests passing)

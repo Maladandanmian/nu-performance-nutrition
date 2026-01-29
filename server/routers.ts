@@ -1752,7 +1752,7 @@ Return as JSON.`
 
           // Create a copy of the drink with current timestamp but DON'T preserve favorite status
           // Only the original favorite should remain marked as favorite (locked Quick Log button)
-          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), false);
+          const newDrink = await db.duplicateDrink(input.drinkId, new Date(), false, "favorite");
           return { success: true, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
@@ -1776,7 +1776,7 @@ Return as JSON.`
           }
 
           // Create a copy of the last drink with current timestamp
-          const newDrink = await db.duplicateDrink(lastDrink.id, new Date());
+          const newDrink = await db.duplicateDrink(lastDrink.id, new Date(), false, "repeat");
           return { success: true, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;

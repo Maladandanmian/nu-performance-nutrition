@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { format, isToday, isYesterday, startOfWeek, startOfMonth, subDays } from "date-fns";
-import { Calendar, Clock, Edit2, Trash2 } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2, Star } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +15,14 @@ type TimePeriod = 'week' | 'month' | '30days' | 'all';
 export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHistoryFeedProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
   const { data: mealsData, isLoading, error } = trpc.meals.list.useQuery({ clientId });
+  const utils = trpc.useUtils();
+
+  const toggleFavoriteMutation = trpc.meals.toggleFavorite.useMutation({
+    onSuccess: () => {
+      utils.meals.list.invalidate();
+      utils.meals.getFavorites.invalidate();
+    },
+  });
 
   // Filter and sort meals
   const meals = useMemo(() => {
@@ -260,6 +268,15 @@ export function MealHistoryFeed({ clientId, onEditMeal, onDeleteMeal }: MealHist
 
             {/* Action Buttons */}
             <div className="mt-2 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toggleFavoriteMutation.mutate({ mealId: meal.id, clientId })}
+                className={meal.isFavorite || meal.sourceType === 'favorite' || meal.sourceType === 'repeat' ? "text-yellow-500 hover:text-yellow-600" : "text-gray-400 hover:text-gray-500"}
+                title={meal.isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Star className={`h-4 w-4 ${meal.isFavorite || meal.sourceType === 'favorite' || meal.sourceType === 'repeat' ? 'fill-current' : ''}`} />
+              </Button>
               {onEditMeal && (
                 <Button
                   variant="outline"
