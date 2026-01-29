@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Upload, FileText, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Upload, FileText, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 interface DexaUploadSectionProps {
   clientId: number;
@@ -52,6 +52,18 @@ export function DexaUploadSection({ clientId }: DexaUploadSectionProps) {
     },
     onError: (error) => {
       toast.error(`Failed to reject: ${error.message}`);
+    },
+  });
+
+  const deleteMutation = trpc.dexa.deleteScan.useMutation({
+    onSuccess: () => {
+      toast.success("Scan deleted successfully");
+      utils.dexa.getClientScans.invalidate({ clientId });
+      utils.dexa.getBodyCompTrend.invalidate({ clientId });
+      utils.dexa.getBmdTrend.invalidate({ clientId });
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete: ${error.message}`);
     },
   });
 
@@ -172,7 +184,12 @@ export function DexaUploadSection({ clientId }: DexaUploadSectionProps) {
                     rejectionReason: "Manual rejection",
                   })
                 }
-                isProcessing={approveMutation.isPending || rejectMutation.isPending}
+                onDelete={() => {
+                  if (confirm("Are you sure you want to delete this scan? This action cannot be undone.")) {
+                    deleteMutation.mutate({ scanId: scan.id });
+                  }
+                }}
+                isProcessing={approveMutation.isPending || rejectMutation.isPending || deleteMutation.isPending}
               />
             ))}
           </div>
@@ -192,10 +209,11 @@ interface ScanCardProps {
   onToggle: () => void;
   onApprove: () => void;
   onReject: () => void;
+  onDelete: () => void;
   isProcessing: boolean;
 }
 
-function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, isProcessing }: ScanCardProps) {
+function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, onDelete, isProcessing }: ScanCardProps) {
   const { data: details, isLoading: detailsLoading } = trpc.dexa.getScanDetails.useQuery(
     { scanId: scan.id },
     { enabled: isExpanded }
@@ -258,6 +276,20 @@ function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, isProcessin
               Rejected
             </span>
           )}
+          
+          {/* Delete button - always visible */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            disabled={isProcessing}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
           
           {isExpanded ? (
             <ChevronUp className="w-5 h-5 text-gray-400" />

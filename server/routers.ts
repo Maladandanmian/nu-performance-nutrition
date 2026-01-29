@@ -2028,6 +2028,16 @@ Return as JSON.`
         };
       }),
 
+    // Trainer: Delete a scan
+    deleteScan: adminProcedure
+      .input(z.object({
+        scanId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.deleteDexaScan(input.scanId);
+        return { success: true };
+      }),
+
     // Trainer: Approve or reject a scan
     updateScanStatus: adminProcedure
       .input(z.object({

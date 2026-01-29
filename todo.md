@@ -1714,3 +1714,9 @@
 
 ## Client ID Display in Trainer View (Jan 29, 2026)
 - [x] Add Client ID next to client name in trainer view of client details page
+
+## Delete DEXA Scans Feature (Jan 29, 2026)
+- [x] Add delete button to DEXA scan cards in uploaded scans list
+- [x] Implement backend deleteDexaScan procedure
+- [x] Add confirmation dialog before deletion
+- [x] Test delete functionality with duplicate scans

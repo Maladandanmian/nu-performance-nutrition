@@ -832,6 +832,24 @@ export async function getPasswordResetToken(token: string) {
 }
 
 /**
+ * Delete a DEXA scan and all related data (BMD, body comp, images)
+ */
+export async function deleteDexaScan(scanId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Delete related data first (foreign key constraints)
+  await db.delete(dexaBmdData).where(eq(dexaBmdData.scanId, scanId));
+  await db.delete(dexaBodyComp).where(eq(dexaBodyComp.scanId, scanId));
+  await db.delete(dexaImages).where(eq(dexaImages.scanId, scanId));
+  
+  // Delete the scan record
+  await db.delete(dexaScans).where(eq(dexaScans.id, scanId));
+  
+  return { success: true };
+}
+
+/**
  * Mark password reset token as used
  */
 export async function markPasswordResetTokenUsed(token: string) {
