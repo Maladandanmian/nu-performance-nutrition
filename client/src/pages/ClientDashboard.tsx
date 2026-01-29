@@ -2024,12 +2024,12 @@ export default function ClientDashboard() {
                   volumeMl: volumeMl ? parseInt(volumeMl) : undefined,
                 });
               }}
-              disabled={analyzeMealWithDrinkMutation.isPending}
+              disabled={analyzeMealWithDrinkMutation.isPending || estimateBeverageMutation.isPending}
             >
-              {analyzeMealWithDrinkMutation.isPending ? (
+              {(analyzeMealWithDrinkMutation.isPending || estimateBeverageMutation.isPending) ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Analyzing Meal...
+                  {estimateBeverageMutation.isPending ? "Analyzing Beverage..." : "Analyzing Meal..."}
                 </>
               ) : (
                 "Analyse Meal"
@@ -2124,12 +2124,12 @@ export default function ClientDashboard() {
                     console.error(error);
                   }
                 }}
-                disabled={analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending}
+                disabled={analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending || estimateBeverageMutation.isPending}
               >
-                {(analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending) ? (
+                {(analyzeMealWithDrinkMutation.isPending || updateMealMutation.isPending || estimateBeverageMutation.isPending) ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving Changes...
+                    {estimateBeverageMutation.isPending ? "Analyzing Beverage..." : analyzeMealWithDrinkMutation.isPending ? "Analyzing Meal..." : "Saving Changes..."}
                   </>
                 ) : (
                   "Save Changes"

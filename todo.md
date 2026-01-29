@@ -1704,3 +1704,10 @@
 - [x] Update MealHistoryFeed to show stars for meals with sourceType='favorite'
 - [x] Ensure stars are clickable to toggle favorite status on any entry
 - [x] Write tests to verify visual star display works correctly (4 tests passing)
+
+
+## Missing Analysis Animation Bug (Jan 29, 2026)
+- [x] Bug: No "Analysing" animation when logging drinks with meals
+- [x] Find where drink analysis happens and add loading state
+- [x] Standardize loading animation across all analysis operations (meals, drinks, beverages)
+- [x] Test that loading animations appear consistently for all analysis types
