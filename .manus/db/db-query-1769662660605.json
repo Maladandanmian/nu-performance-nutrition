@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM nutrition_goals WHERE clientId = 990036;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM nutrition_goals WHERE clientId = 990036;",
+  "rows": [
+    {
+      "id": "930024",
+      "clientId": "990036",
+      "caloriesTarget": "2000",
+      "proteinTarget": "150",
+      "fatTarget": "65",
+      "carbsTarget": "250",
+      "fibreTarget": "25",
+      "hydrationTarget": "2000",
+      "createdAt": "2026-01-29 04:54:26",
+      "updatedAt": "2026-01-29 04:54:26",
+      "weightTarget": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tcaloriesTarget\tproteinTarget\tfatTarget\tcarbsTarget\tfibreTarget\thydrationTarget\tcreatedAt\tupdatedAt\tweightTarget\n930024\t990036\t2000\t150\t65\t250\t25\t2000\t2026-01-29 04:54:26\t2026-01-29 04:54:26\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}
