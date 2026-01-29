@@ -1661,3 +1661,4 @@
 - [x] Write tests for audit logging
 - [x] Test password hashing and verification
 - [ ] End-to-end authentication flow test (manual)
+- [x] Fix missing nutrition score display for drinks in log entries - all entries should show scores consistently

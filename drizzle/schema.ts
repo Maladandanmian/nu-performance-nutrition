@@ -148,6 +148,8 @@ export const drinks = mysqlTable("drinks", {
   fat: int("fat").default(0).notNull(), // grams
   carbs: int("carbs").default(0).notNull(), // grams
   fibre: int("fibre").default(0).notNull(), // grams
+  // Nutrition score (1-5)
+  nutritionScore: int("nutritionScore"),
   notes: text("notes"),
   // Favorite flag for quick access
   isFavorite: int("isFavorite").default(0).notNull(), // 0 = not favorite, 1 = favorite

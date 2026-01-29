@@ -495,6 +495,11 @@ function DrinkEntry({
             <span>C: <strong>{drink.carbs || 0}</strong>g</span>
             <span>F: <strong>{drink.fat || 0}</strong>g</span>
             {drink.fibre > 0 && <span>Fiber: <strong>{drink.fibre}</strong>g</span>}
+            {drink.nutritionScore && (
+              <span className="font-medium text-primary">
+                Score: {drink.nutritionScore}/5
+              </span>
+            )}
           </div>
         )}
       </div>

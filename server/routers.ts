@@ -1631,6 +1631,7 @@ Return as JSON.`
         fat: z.number(),
         carbs: z.number(),
         fibre: z.number(),
+        nutritionScore: z.number().optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -1643,6 +1644,7 @@ Return as JSON.`
           fat: input.fat,
           carbs: input.carbs,
           fibre: input.fibre,
+          nutritionScore: input.nutritionScore,
           notes: input.notes,
           loggedAt: new Date(),
         });
@@ -1786,6 +1788,95 @@ Return as JSON.`
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : 'Failed to repeat last drink',
+          });
+        }
+      }),
+
+    // Calculate nutrition score for a drink
+    calculateScore: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        calories: z.number(),
+        protein: z.number(),
+        fat: z.number(),
+        carbs: z.number(),
+        fibre: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 1. Get client's nutrition goals
+          const goals = await db.getNutritionGoalByClientId(input.clientId);
+          if (!goals) {
+            throw new TRPCError({ 
+              code: 'NOT_FOUND', 
+              message: 'Nutrition goals not found for this client' 
+            });
+          }
+
+          // 2. Calculate today's totals (before this drink)
+          const allMeals = await db.getMealsByClientId(input.clientId);
+          const allDrinks = await db.getDrinksByClientId(input.clientId);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const todaysMeals = allMeals.filter(meal => {
+            const mealDate = new Date(meal.loggedAt);
+            mealDate.setHours(0, 0, 0, 0);
+            return mealDate.getTime() === today.getTime();
+          });
+
+          const todaysDrinks = allDrinks.filter(drink => {
+            const drinkDate = new Date(drink.loggedAt);
+            drinkDate.setHours(0, 0, 0, 0);
+            return drinkDate.getTime() === today.getTime();
+          });
+          
+          const todaysTotals = {
+            calories: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            fibre: 0,
+          };
+
+          // Sum meals
+          todaysMeals.forEach(meal => {
+            todaysTotals.calories += (meal.calories || 0) + (meal.beverageCalories || 0);
+            todaysTotals.protein += (meal.protein || 0) + (meal.beverageProtein || 0);
+            todaysTotals.fat += (meal.fat || 0) + (meal.beverageFat || 0);
+            todaysTotals.carbs += (meal.carbs || 0) + (meal.beverageCarbs || 0);
+            todaysTotals.fibre += (meal.fibre || 0) + (meal.beverageFibre || 0);
+          });
+
+          // Sum drinks
+          todaysDrinks.forEach(drink => {
+            todaysTotals.calories += drink.calories || 0;
+            todaysTotals.protein += drink.protein || 0;
+            todaysTotals.fat += drink.fat || 0;
+            todaysTotals.carbs += drink.carbs || 0;
+            todaysTotals.fibre += drink.fibre || 0;
+          });
+
+          // 3. Calculate nutrition score
+          const score = calculateNutritionScore(
+            {
+              calories: input.calories,
+              protein: input.protein,
+              fat: input.fat,
+              carbs: input.carbs,
+              fibre: input.fibre,
+            },
+            goals,
+            todaysTotals,
+            new Date()
+          );
+
+          return { success: true, score };
+        } catch (error) {
+          if (error instanceof TRPCError) throw error;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to calculate score',
           });
         }
       }),

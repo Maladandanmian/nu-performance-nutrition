@@ -469,6 +469,13 @@ export default function ClientDashboard() {
     },
   });
 
+  const calculateDrinkScoreMutation = trpc.drinks.calculateScore.useMutation({
+    onError: (error) => {
+      console.error('Failed to calculate drink score:', error);
+      // Don't show toast - score is optional
+    },
+  });
+
   const logDrinkMutation = trpc.drinks.create.useMutation({
     onSuccess: (data) => {
       toast.success("Drink logged successfully!");
@@ -627,6 +634,16 @@ export default function ClientDashboard() {
       
       // For beverage-only, create a drink entry (not a meal entry)
       try {
+        // Calculate nutrition score
+        const scoreResult = await calculateDrinkScoreMutation.mutateAsync({
+          clientId: currentClientId,
+          calories: nutritionToUse.calories,
+          protein: nutritionToUse.protein,
+          fat: nutritionToUse.fat,
+          carbs: nutritionToUse.carbs,
+          fibre: nutritionToUse.fibre,
+        });
+
         await logDrinkMutation.mutateAsync({
           clientId: currentClientId,
           drinkType,
@@ -636,6 +653,7 @@ export default function ClientDashboard() {
           fat: nutritionToUse.fat,
           carbs: nutritionToUse.carbs,
           fibre: nutritionToUse.fibre,
+          nutritionScore: scoreResult?.score,
           notes: "",
         });
         
@@ -726,6 +744,16 @@ export default function ClientDashboard() {
       return;
     }
 
+    // Calculate nutrition score
+    const scoreResult = await calculateDrinkScoreMutation.mutateAsync({
+      clientId,
+      calories: beverageNutrition.calories,
+      protein: beverageNutrition.protein,
+      fat: beverageNutrition.fat,
+      carbs: beverageNutrition.carbs,
+      fibre: beverageNutrition.fibre,
+    });
+
     await logDrinkMutation.mutateAsync({
       clientId,
       drinkType,
@@ -735,6 +763,7 @@ export default function ClientDashboard() {
       fat: beverageNutrition.fat,
       carbs: beverageNutrition.carbs,
       fibre: beverageNutrition.fibre,
+      nutritionScore: scoreResult?.score,
     });
   };
 
@@ -1252,6 +1281,16 @@ export default function ClientDashboard() {
                           volumeMl: parseInt(volumeMl),
                         });
                         
+                        // Calculate nutrition score
+                        const scoreResult = await calculateDrinkScoreMutation.mutateAsync({
+                          clientId: clientSession?.clientId || 0,
+                          calories: result.nutrition.calories,
+                          protein: result.nutrition.protein,
+                          fat: result.nutrition.fat,
+                          carbs: result.nutrition.carbs,
+                          fibre: result.nutrition.fibre,
+                        });
+
                         // Save drink directly
                         await logDrinkMutation.mutateAsync({
                           clientId: clientSession?.clientId || 0,
@@ -1262,6 +1301,7 @@ export default function ClientDashboard() {
                           fat: result.nutrition.fat,
                           carbs: result.nutrition.carbs,
                           fibre: result.nutrition.fibre,
+                          nutritionScore: scoreResult?.score,
                           notes: '',
                         });
                         
