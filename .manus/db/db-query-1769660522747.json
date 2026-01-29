@@ -1,0 +1,226 @@
+{
+  "query": "SELECT c.id, c.name, c.trainerId, u.name as trainer_name\nFROM clients c\nLEFT JOIN users u ON c.trainerId = u.id\nWHERE c.name LIKE '%test%' OR c.name LIKE '%Test%' OR c.name LIKE 'edit%' OR c.name LIKE 'delete%'\nORDER BY c.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id, c.name, c.trainerId, u.name as trainer_name\nFROM clients c\nLEFT JOIN users u ON c.trainerId = u.id\nWHERE c.name LIKE '%test%' OR c.name LIKE '%Test%' OR c.name LIKE 'edit%' OR c.name LIKE 'delete%'\nORDER BY c.id;",
+  "rows": [
+    {
+      "id": "360001",
+      "name": "Test Client",
+      "trainerId": "1530015",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "360002",
+      "name": "Test Client",
+      "trainerId": "1530018",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "360003",
+      "name": "Test Client",
+      "trainerId": "1530020",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "360004",
+      "name": "Test Client",
+      "trainerId": "1530023",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "390003",
+      "name": "Test Client",
+      "trainerId": "1650008",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "420003",
+      "name": "Test Client",
+      "trainerId": "1770005",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "450003",
+      "name": "Test Client",
+      "trainerId": "1830022",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "450016",
+      "name": "Test Client",
+      "trainerId": "1830024",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "450029",
+      "name": "Test Client",
+      "trainerId": "1830025",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "480001",
+      "name": "Test Client",
+      "trainerId": "2730027",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "480004",
+      "name": "Test Client",
+      "trainerId": "2730028",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "480017",
+      "name": "Test Client",
+      "trainerId": "2730037",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "480030",
+      "name": "Test Client",
+      "trainerId": "2730060",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "480036",
+      "name": "Test Client",
+      "trainerId": "2730063",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "510003",
+      "name": "Test Client",
+      "trainerId": "2760001",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540003",
+      "name": "Test Client",
+      "trainerId": "2790004",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540016",
+      "name": "Test Client",
+      "trainerId": "2790022",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540029",
+      "name": "Test Client",
+      "trainerId": "2790027",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540042",
+      "name": "Test Client",
+      "trainerId": "2790030",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540055",
+      "name": "Test Client",
+      "trainerId": "2790033",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540071",
+      "name": "Test Client",
+      "trainerId": "2790034",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540084",
+      "name": "Test Client",
+      "trainerId": "2790037",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540097",
+      "name": "Test Client",
+      "trainerId": "2790040",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540110",
+      "name": "Test Client",
+      "trainerId": "2790043",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540123",
+      "name": "Test Client",
+      "trainerId": "2790046",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540136",
+      "name": "Test Client",
+      "trainerId": "2790049",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540149",
+      "name": "Test Client",
+      "trainerId": "2790052",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540162",
+      "name": "Test Client",
+      "trainerId": "2790055",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "540182",
+      "name": "Test Client",
+      "trainerId": "2790056",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "630001",
+      "name": "test client",
+      "trainerId": "1",
+      "trainer_name": "Andy Knight"
+    },
+    {
+      "id": "660024",
+      "name": "Test Client",
+      "trainerId": "3120005",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "750002",
+      "name": "Test Client Both Auth",
+      "trainerId": "3870022",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "750004",
+      "name": "Test Client Both Auth",
+      "trainerId": "3870024",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "930001",
+      "name": "Testy",
+      "trainerId": "13",
+      "trainer_name": "luke"
+    },
+    {
+      "id": "990001",
+      "name": "Test Client",
+      "trainerId": "4470049",
+      "trainer_name": "Test Trainer"
+    },
+    {
+      "id": "990013",
+      "name": "Test Client for Edit/Delete",
+      "trainerId": "1",
+      "trainer_name": "Andy Knight"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttrainerId\ttrainer_name\n360001\tTest Client\t1530015\tTest Trainer\n360002\tTest Client\t1530018\tTest Trainer\n360003\tTest Client\t1530020\tTest Trainer\n360004\tTest Client\t1530023\tTest Trainer\n390003\tTest Client\t1650008\tTest Trainer\n420003\tTest Client\t1770005\tTest Trainer\n450003\tTest Client\t1830022\tTest Trainer\n450016\tTest Client\t1830024\tTest Trainer\n450029\tTest Client\t1830025\tTest Trainer\n480001\tTest Client\t2730027\tTest Trainer\n480004\tTest Client\t2730028\tTest Trainer\n480017\tTest Client\t2730037\tTest Trainer\n480030\tTest Client\t2730060\tTest Trainer\n480036\tTest Client\t2730063\tTest Trainer\n510003\tTest Client\t2760001\tTest Trainer\n540003\tTest Client\t2790004\tTest Trainer\n540016\tTest Client\t2790022\tTest Trainer\n540029\tTest Client\t2790027\tTest Trainer\n540042\tTest Client\t2790030\tTest Trainer\n540055\tTest Client\t2790033\tTest Trainer\n540071\tTest Client\t2790034\tTest Trainer\n540084\tTest Client\t2790037\tTest Trainer\n540097\tTest Client\t2790040\tTest Trainer\n540110\tTest Client\t2790043\tTest Trainer\n540123\tTest Client\t2790046\tTest Trainer\n540136\tTest Client\t2790049\tTest Trainer\n540149\tTest Client\t2790052\tTest Trainer\n540162\tTest Client\t2790055\tTest Trainer\n540182\tTest Client\t2790056\tTest Trainer\n630001\ttest client\t1\tAndy Knight\n660024\tTest Client\t3120005\tTest Trainer\n750002\tTest Client Both Auth\t3870022\tTest Trainer\n750004\tTest Client Both Auth\t3870024\tTest Trainer\n930001\tTesty\t13\tluke\n990001\tTest Client\t4470049\tTest Trainer\n990013\tTest Client for Edit/Delete\t1\tAndy Knight\n",
+  "stderr": "",
+  "execution_time_ms": 1544
+}

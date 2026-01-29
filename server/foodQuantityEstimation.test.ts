@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
+import { TEST_CLIENT_ID } from "./testSetup";
 import type { TrpcContext } from "./_core/context";
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
@@ -93,7 +94,7 @@ describe("meals.recalculateScore", () => {
     const caller = appRouter.createCaller(ctx);
 
     const input = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       calories: 500,
       protein: 30,
       fat: 20,
@@ -132,7 +133,7 @@ describe("meals.recalculateScore", () => {
 
     await expect(
       caller.meals.recalculateScore({
-        clientId: 1,
+        clientId: TEST_CLIENT_ID,
         calories: 500,
         protein: 30,
         fat: 20,

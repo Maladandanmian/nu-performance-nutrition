@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { appRouter } from './routers';
+import { TEST_CLIENT_ID } from "./testSetup";
 import { getTestClientId, createTestContext, cleanupTestData, verifyTestAccount, TEST_ACCOUNT_PIN } from './test-helpers';
 
 /**

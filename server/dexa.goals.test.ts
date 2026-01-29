@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { appRouter } from "./routers";
+import { TEST_CLIENT_ID } from "./testSetup";
 import * as db from "./db";
 
 describe("DEXA Goals", () => {

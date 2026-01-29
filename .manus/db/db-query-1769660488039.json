@@ -1,0 +1,262 @@
+{
+  "query": "SELECT c.id, c.name, u.name as trainer_name, COUNT(*) OVER() as total_clients\nFROM clients c\nLEFT JOIN users u ON c.trainerId = u.id\nORDER BY u.name, c.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id, c.name, u.name as trainer_name, COUNT(*) OVER() as total_clients\nFROM clients c\nLEFT JOIN users u ON c.trainerId = u.id\nORDER BY u.name, c.id;",
+  "rows": [
+    {
+      "id": "30001",
+      "name": "Noad",
+      "trainer_name": "Andy Knight",
+      "total_clients": "42"
+    },
+    {
+      "id": "630001",
+      "name": "test client",
+      "trainer_name": "Andy Knight",
+      "total_clients": "42"
+    },
+    {
+      "id": "990013",
+      "name": "Test Client for Edit/Delete",
+      "trainer_name": "Andy Knight",
+      "total_clients": "42"
+    },
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "330001",
+      "name": "Luke Davey ",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "570001",
+      "name": "Michelle Tenent ",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "690001",
+      "name": "Thomas Poppe",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "930001",
+      "name": "Testy",
+      "trainer_name": "luke",
+      "total_clients": "42"
+    },
+    {
+      "id": "360001",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "360002",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "360003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "360004",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "390003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "420003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "450003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "450016",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "450029",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "480001",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "480004",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "480017",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "480030",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "480036",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "510003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540003",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540016",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540029",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540042",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540055",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540071",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540084",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540097",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540110",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540123",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540136",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540149",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540162",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "540182",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "660024",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "750002",
+      "name": "Test Client Both Auth",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "750004",
+      "name": "Test Client Both Auth",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    },
+    {
+      "id": "990001",
+      "name": "Test Client",
+      "trainer_name": "Test Trainer",
+      "total_clients": "42"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttrainer_name\ttotal_clients\n30001\tNoad\tAndy Knight\t42\n630001\ttest client\tAndy Knight\t42\n990013\tTest Client for Edit/Delete\tAndy Knight\t42\n1\tAndy Knight \tluke\t42\n270001\tDavid Benskin \tluke\t42\n330001\tLuke Davey \tluke\t42\n570001\tMichelle Tenent \tluke\t42\n690001\tThomas Poppe\tluke\t42\n930001\tTesty\tluke\t42\n360001\tTest Client\tTest Trainer\t42\n360002\tTest Client\tTest Trainer\t42\n360003\tTest Client\tTest Trainer\t42\n360004\tTest Client\tTest Trainer\t42\n390003\tTest Client\tTest Trainer\t42\n420003\tTest Client\tTest Trainer\t42\n450003\tTest Client\tTest Trainer\t42\n450016\tTest Client\tTest Trainer\t42\n450029\tTest Client\tTest Trainer\t42\n480001\tTest Client\tTest Trainer\t42\n480004\tTest Client\tTest Trainer\t42\n480017\tTest Client\tTest Trainer\t42\n480030\tTest Client\tTest Trainer\t42\n480036\tTest Client\tTest Trainer\t42\n510003\tTest Client\tTest Trainer\t42\n540003\tTest Client\tTest Trainer\t42\n540016\tTest Client\tTest Trainer\t42\n540029\tTest Client\tTest Trainer\t42\n540042\tTest Client\tTest Trainer\t42\n540055\tTest Client\tTest Trainer\t42\n540071\tTest Client\tTest Trainer\t42\n540084\tTest Client\tTest Trainer\t42\n540097\tTest Client\tTest Trainer\t42\n540110\tTest Client\tTest Trainer\t42\n540123\tTest Client\tTest Trainer\t42\n540136\tTest Client\tTest Trainer\t42\n540149\tTest Client\tTest Trainer\t42\n540162\tTest Client\tTest Trainer\t42\n540182\tTest Client\tTest Trainer\t42\n660024\tTest Client\tTest Trainer\t42\n750002\tTest Client Both Auth\tTest Trainer\t42\n750004\tTest Client Both Auth\tTest Trainer\t42\n990001\tTest Client\tTest Trainer\t42\n",
+  "stderr": "",
+  "execution_time_ms": 1685
+}

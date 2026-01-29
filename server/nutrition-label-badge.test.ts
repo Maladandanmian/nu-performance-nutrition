@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { appRouter } from './routers';
+import { TEST_CLIENT_ID } from "./testSetup";
 import * as db from './db';
 import type { TrpcContext } from './_core/context';
 
@@ -22,7 +23,7 @@ function createTestContext(): TrpcContext {
 }
 
 describe('Nutrition Label Badge Feature', () => {
-  const testClientId = 1; // Use existing client from seed data
+  const testClientId = TEST_CLIENT_ID; // Use existing client from seed data
   const mealIds: number[] = [];
 
   beforeAll(async () => {

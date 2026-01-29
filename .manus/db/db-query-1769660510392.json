@@ -1,0 +1,9 @@
+{
+  "query": "SELECT c.id, c.name, c.trainerId, COUNT(*) as total_orphaned\nFROM clients c\nWHERE c.trainerId IS NULL\nGROUP BY c.id, c.name, c.trainerId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id, c.name, c.trainerId, COUNT(*) as total_orphaned\nFROM clients c\nWHERE c.trainerId IS NULL\nGROUP BY c.id, c.name, c.trainerId;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1550
+}

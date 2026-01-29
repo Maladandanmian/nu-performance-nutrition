@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
+import { TEST_CLIENT_ID } from "./testSetup";
 import type { TrpcContext } from "./_core/context";
 
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
@@ -40,7 +41,7 @@ describe("meals.dailyTotals with hydration", () => {
 
     try {
       const result = await caller.meals.dailyTotals({
-        clientId: 1,
+        clientId: TEST_CLIENT_ID,
         days: 1,
         timezoneOffset: 0,
       });
@@ -68,7 +69,7 @@ describe("meals.dailyTotals with hydration", () => {
 
     try {
       const result = await caller.meals.dailyTotals({
-        clientId: 1,
+        clientId: TEST_CLIENT_ID,
         days: 7,
         timezoneOffset: 0,
       });
@@ -103,7 +104,7 @@ describe("meals.dailyTotals with hydration", () => {
 
     await expect(
       caller.meals.dailyTotals({
-        clientId: 1,
+        clientId: TEST_CLIENT_ID,
         days: 1,
         timezoneOffset: 0,
       })

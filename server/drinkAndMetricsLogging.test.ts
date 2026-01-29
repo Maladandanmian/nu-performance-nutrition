@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 describe("Drink and Metrics Logging", () => {
   it("should validate drink input structure", () => {
     const mockDrinkInput = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       drinkType: "Water",
       volumeMl: 500,
     };
@@ -22,7 +22,7 @@ describe("Drink and Metrics Logging", () => {
 
   it("should validate body metrics input structure", () => {
     const mockMetricsInput = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       weight: 75.5,
       hydration: 500,
     };
@@ -36,13 +36,13 @@ describe("Drink and Metrics Logging", () => {
 
   it("should handle optional fields in body metrics", () => {
     const onlyWeight = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       weight: 75.5,
       hydration: undefined,
     };
     
     const onlyHydration = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       weight: undefined,
       hydration: 500,
     };

@@ -16,7 +16,7 @@ describe("Hydration Tracking from Drinks", () => {
     // 4. Today's Summary aggregates hydration from body_metrics
     
     const mockDrinkInput = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       drinkType: "Water",
       volumeMl: 500,
     };
@@ -42,7 +42,7 @@ describe("Hydration Tracking from Drinks", () => {
   it("should track hydration with timestamp", () => {
     const now = new Date();
     const mockBodyMetric = {
-      clientId: 1,
+      clientId: TEST_CLIENT_ID,
       hydration: 500,
       recordedAt: now,
     };

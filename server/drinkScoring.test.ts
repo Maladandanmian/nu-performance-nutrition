@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { appRouter } from "./routers";
+import { TEST_CLIENT_ID } from "./testSetup";
 import * as db from "./db";
 
 describe("Drink Nutrition Scoring", () => {
   // Use existing test client (ID 1) which should have nutrition goals
-  const testClientId = 1;
+  const testClientId = TEST_CLIENT_ID;
 
   beforeEach(async () => {
     // Ensure test client has nutrition goals
