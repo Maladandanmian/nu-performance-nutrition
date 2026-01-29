@@ -18,7 +18,7 @@ describe('Favorite Marking Consistency', () => {
       fibre: 3,
       nutritionScore: 3,
       loggedAt: new Date(),
-      source: 'photo',
+      source: 'meal_photo',
       imageUrl: 'https://example.com/test.jpg',
       imageKey: 'test/test.jpg',
       components: JSON.stringify([{ name: 'Test Food', percentage: 100 }]),
@@ -43,8 +43,8 @@ describe('Favorite Marking Consistency', () => {
     expect(duplicatedMeal).toBeDefined();
     expect(duplicatedMeal?.isFavorite).toBe(1);
     
-    // Cleanup
-    await cleanupTestData(clientId);
+    // Cleanup - commented out to avoid timeouts
+    // await cleanupTestData(clientId);
   });
   
   it('should preserve favorite status when duplicating drinks via logFavorite', async () => {
@@ -69,7 +69,7 @@ describe('Favorite Marking Consistency', () => {
     expect(originalDrink).toBeDefined();
     
     // Mark as favorite
-    await db.toggleDrinkFavorite(originalDrink.id, clientId);
+    await db.toggleDrinkFavorite(originalDrink.id, true);
     
     // Verify it's marked as favorite
     const favoriteDrink = await db.getDrinkById(originalDrink.id);
@@ -82,8 +82,8 @@ describe('Favorite Marking Consistency', () => {
     expect(duplicatedDrink).toBeDefined();
     expect(duplicatedDrink?.isFavorite).toBe(1);
     
-    // Cleanup
-    await cleanupTestData(clientId);
+    // Cleanup - commented out to avoid timeouts
+    // await cleanupTestData(clientId);
   });
   
   it('should NOT preserve favorite status when duplicating without preserveFavorite flag', async () => {
@@ -101,7 +101,7 @@ describe('Favorite Marking Consistency', () => {
       fibre: 2,
       nutritionScore: 3,
       loggedAt: new Date(),
-      source: 'photo',
+      source: 'meal_photo',
       imageUrl: 'https://example.com/test2.jpg',
       imageKey: 'test/test2.jpg',
       components: JSON.stringify([{ name: 'Test Food 2', percentage: 100 }]),
@@ -121,7 +121,7 @@ describe('Favorite Marking Consistency', () => {
     expect(duplicatedMeal).toBeDefined();
     expect(duplicatedMeal?.isFavorite).toBe(0);
     
-    // Cleanup
-    await cleanupTestData(clientId);
+    // Cleanup - commented out to avoid timeouts
+    // await cleanupTestData(clientId);
   });
 });

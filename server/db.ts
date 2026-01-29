@@ -295,12 +295,12 @@ export async function duplicateMeal(mealId: number, newLoggedAt: Date, preserveF
     isFavorite: preserveFavorite ? isFavorite : 0, // Preserve favorite status if requested
   };
   
-  await db.insert(meals).values(newMeal);
+  const insertResult = await db.insert(meals).values(newMeal);
+  const insertId = insertResult[0].insertId;
   
-  // Query the newly created meal by clientId and loggedAt
+  // Query the newly created meal by its ID
   const result = await db.select().from(meals)
-    .where(and(eq(meals.clientId, originalMeal.clientId), eq(meals.loggedAt, newLoggedAt)))
-    .orderBy(desc(meals.id))
+    .where(eq(meals.id, insertId))
     .limit(1);
   
   return result.length > 0 ? result[0] : undefined;

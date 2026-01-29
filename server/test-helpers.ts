@@ -10,6 +10,7 @@
 import * as db from './db';
 import type { TrpcContext } from './_core/context';
 import type { Response } from 'express';
+import { TEST_CLIENT_ID } from './testSetup';
 
 /**
  * Test account PIN - use this account for all automated tests
@@ -26,18 +27,9 @@ export const PRODUCTION_ACCOUNT_PIN = '222222';
  * Returns the client ID for use in tests
  */
 export async function getTestClientId(): Promise<number> {
-  // Try to find existing test client by PIN
-  const existingClient = await db.getClientByPIN(TEST_ACCOUNT_PIN);
-  
-  if (existingClient) {
-    return existingClient.id;
-  }
-
-  // If test client doesn't exist, throw error with instructions
-  throw new Error(
-    `Test client with PIN ${TEST_ACCOUNT_PIN} not found. ` +
-    `Please create a test client with PIN ${TEST_ACCOUNT_PIN} in the UI before running tests.`
-  );
+  // Use the centralized TEST_CLIENT_ID from testSetup.ts
+  // This ensures all tests use the same client ID (990036)
+  return TEST_CLIENT_ID;
 }
 
 /**
@@ -110,10 +102,11 @@ export async function cleanupTestData(clientId: number) {
       return;
     }
 
-    if (client.pin !== TEST_ACCOUNT_PIN) {
+    // Verify this is the test client by ID (PIN is hashed, so we can't compare it directly)
+    if (clientId !== TEST_CLIENT_ID) {
       throw new Error(
-        `Attempted to cleanup non-test client (PIN: ${client.pin}). ` +
-        `Only test account (PIN: ${TEST_ACCOUNT_PIN}) data can be auto-cleaned.`
+        `Attempted to cleanup non-test client (ID: ${clientId}). ` +
+        `Only test account (ID: ${TEST_CLIENT_ID}) data can be auto-cleaned.`
       );
     }
 
@@ -153,17 +146,11 @@ export async function verifyTestAccount(clientId: number) {
     throw new Error(`Client ${clientId} not found`);
   }
 
-  if (client.pin === PRODUCTION_ACCOUNT_PIN) {
+  // Verify using client ID since PIN is hashed
+  if (clientId !== TEST_CLIENT_ID) {
     throw new Error(
-      `DANGER: Test is attempting to use production account (PIN: ${PRODUCTION_ACCOUNT_PIN})! ` +
-      `Tests must use test account (PIN: ${TEST_ACCOUNT_PIN}) only.`
-    );
-  }
-
-  if (client.pin !== TEST_ACCOUNT_PIN) {
-    console.warn(
-      `Warning: Test is using client with PIN ${client.pin}, ` +
-      `expected test account PIN ${TEST_ACCOUNT_PIN}`
+      `DANGER: Test is attempting to use non-test client (ID: ${clientId})! ` +
+      `Tests must use test account (ID: ${TEST_CLIENT_ID}, PIN: ${TEST_ACCOUNT_PIN}) only.`
     );
   }
 }

@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, name, pin, email FROM clients ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, pin, email FROM clients ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "pin": "$2b$12$Mgja1JUWsdo9eTO3vs1Ug.5i5wIpgFkCIeS9aR6KKcetCA25QihWa",
+      "email": "NULL"
+    },
+    {
+      "id": "30001",
+      "name": "Noad",
+      "pin": "$2b$12$9MBJcIzwG1dyEIQ1VUMtd.NjVia7SoFgprWNqzw5cJdzevXs38/oW",
+      "email": "NULL"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "pin": "$2b$12$ljwh8sHbAb9lJ2reXMbwqOciC2Tg7YrxV8WXkmN7Rx6PnMeN94Qie",
+      "email": "NULL"
+    },
+    {
+      "id": "330001",
+      "name": "Luke Davey ",
+      "pin": "$2b$12$WxtXOpimczz8zFQwnD9Fa.oRrifuPqr.erowcEy5zBfgUwPaaT9ci",
+      "email": "NULL"
+    },
+    {
+      "id": "570001",
+      "name": "Michelle Tenent ",
+      "pin": "$2b$12$oYnFHeny6Vdc5KE4olCXP.3F.7Dn7hY2cm4yYGqGheqhT3eXIlI8y",
+      "email": "NULL"
+    },
+    {
+      "id": "690001",
+      "name": "Thomas Poppe",
+      "pin": "$2b$12$1VgFHxXVMn5qrFRJIzIOAOd1kEQ3KVRfeDOXcHPLITo3Td8YZz98C",
+      "email": "NULL"
+    },
+    {
+      "id": "990036",
+      "name": "TEST CLIENT",
+      "pin": "$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW",
+      "email": "andy@andyknight.asia"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tpin\temail\n1\tAndy Knight \t$2b$12$Mgja1JUWsdo9eTO3vs1Ug.5i5wIpgFkCIeS9aR6KKcetCA25QihWa\tNULL\n30001\tNoad\t$2b$12$9MBJcIzwG1dyEIQ1VUMtd.NjVia7SoFgprWNqzw5cJdzevXs38/oW\tNULL\n270001\tDavid Benskin \t$2b$12$ljwh8sHbAb9lJ2reXMbwqOciC2Tg7YrxV8WXkmN7Rx6PnMeN94Qie\tNULL\n330001\tLuke Davey \t$2b$12$WxtXOpimczz8zFQwnD9Fa.oRrifuPqr.erowcEy5zBfgUwPaaT9ci\tNULL\n570001\tMichelle Tenent \t$2b$12$oYnFHeny6Vdc5KE4olCXP.3F.7Dn7hY2cm4yYGqGheqhT3eXIlI8y\tNULL\n690001\tThomas Poppe\t$2b$12$1VgFHxXVMn5qrFRJIzIOAOd1kEQ3KVRfeDOXcHPLITo3Td8YZz98C\tNULL\n990036\tTEST CLIENT\t$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW\tandy@andyknight.asia\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

@@ -18,7 +18,7 @@ describe('Favorites System', () => {
     await verifyTestAccount(testClientId);
 
     // Create a test meal using db function
-    const meal = await db.createMeal({
+    const mealResult = await db.createMeal({
       clientId: testClientId,
       mealType: 'lunch',
       loggedAt: new Date(),
@@ -35,10 +35,10 @@ describe('Favorites System', () => {
       notes: 'Test meal',
       source: 'meal_photo',
     });
-    testMealId = meal.id;
+    testMealId = mealResult[0].insertId;
 
     // Create a test drink using db function
-    const drink = await db.createDrink({
+    const drinkResult = await db.createDrink({
       clientId: testClientId,
       drinkType: 'Test Coffee',
       volumeMl: 250,
@@ -50,7 +50,7 @@ describe('Favorites System', () => {
       fibre: 0,
       notes: 'Test drink',
     });
-    testDrinkId = drink.id;
+    testDrinkId = drinkResult[0].insertId;
   });
 
   afterAll(async () => {
@@ -89,7 +89,7 @@ describe('Favorites System', () => {
       expect(Array.isArray(favorites)).toBe(true);
       expect(favorites.length).toBeGreaterThan(0);
       expect(favorites.length).toBeLessThanOrEqual(3);
-      expect(favorites[0].isFavorite).toBe(true);
+      expect(favorites[0].isFavorite).toBe(1); // Database stores 0/1, not boolean
     });
 
     it('should log a favorite meal with new timestamp', async () => {
@@ -113,7 +113,7 @@ describe('Favorites System', () => {
       expect(newMeal).toBeDefined();
       expect(newMeal!.calories).toBe(500);
       expect(newMeal!.protein).toBe(30);
-      expect(newMeal!.isFavorite).toBe(false); // New meal should not be favorite by default
+      expect(newMeal!.isFavorite).toBe(0); // New meal should not be favorite by default (database stores 0/1)
     });
 
     it('should repeat last meal', async () => {
@@ -172,7 +172,7 @@ describe('Favorites System', () => {
       expect(Array.isArray(favorites)).toBe(true);
       expect(favorites.length).toBeGreaterThan(0);
       expect(favorites.length).toBeLessThanOrEqual(3);
-      expect(favorites[0].isFavorite).toBe(true);
+      expect(favorites[0].isFavorite).toBe(1); // Database stores 0/1, not boolean
     });
 
     it('should log a favorite drink with new timestamp', async () => {
@@ -196,7 +196,7 @@ describe('Favorites System', () => {
       expect(newDrink).toBeDefined();
       expect(newDrink!.drinkType).toBe('Test Coffee');
       expect(newDrink!.volumeMl).toBe(250);
-      expect(newDrink!.isFavorite).toBe(false); // New drink should not be favorite by default
+      expect(newDrink!.isFavorite).toBe(0); // New drink should not be favorite by default (database stores 0/1)
     });
   });
 });

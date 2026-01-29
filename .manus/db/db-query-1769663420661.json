@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, pin, email FROM clients WHERE id = 990036;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, pin, email FROM clients WHERE id = 990036;",
+  "rows": [
+    {
+      "id": "990036",
+      "name": "TEST CLIENT",
+      "pin": "$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW",
+      "email": "andy@andyknight.asia"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tpin\temail\n990036\tTEST CLIENT\t$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW\tandy@andyknight.asia\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

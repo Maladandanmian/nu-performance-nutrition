@@ -1587,7 +1587,7 @@ Return as JSON.`
           // Create a copy of the meal with current timestamp but DON'T preserve favorite status
           // Only the original favorite should remain marked as favorite (locked Quick Log button)
           const newMeal = await db.duplicateMeal(input.mealId, new Date(), false);
-          return { success: true, meal: newMeal };
+          return { success: true, newMealId: newMeal?.id };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
           throw new TRPCError({
@@ -1611,7 +1611,7 @@ Return as JSON.`
 
           // Create a copy of the last meal with current timestamp
           const newMeal = await db.duplicateMeal(lastMeal.id, new Date());
-          return { success: true, meal: newMeal };
+          return { success: true, newMealId: newMeal?.id };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
           throw new TRPCError({
@@ -1753,7 +1753,7 @@ Return as JSON.`
           // Create a copy of the drink with current timestamp but DON'T preserve favorite status
           // Only the original favorite should remain marked as favorite (locked Quick Log button)
           const newDrink = await db.duplicateDrink(input.drinkId, new Date(), false, "favorite");
-          return { success: true, drink: newDrink };
+          return { success: true, newDrinkId: newDrink?.id, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
           throw new TRPCError({
@@ -1777,7 +1777,7 @@ Return as JSON.`
 
           // Create a copy of the last drink with current timestamp
           const newDrink = await db.duplicateDrink(lastDrink.id, new Date(), false, "repeat");
-          return { success: true, drink: newDrink };
+          return { success: true, newDrinkId: newDrink?.id, drink: newDrink };
         } catch (error) {
           if (error instanceof TRPCError) throw error;
           throw new TRPCError({

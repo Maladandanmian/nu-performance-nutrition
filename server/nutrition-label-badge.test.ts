@@ -47,7 +47,7 @@ describe('Nutrition Label Badge Feature', () => {
       ],
       // No source specified - should default to 'meal_photo'
     });
-    mealIds.push(mealPhotoResult.insertId);
+    mealIds.push(mealPhotoResult.mealId);
 
     // Create test meal with nutrition_label source
     const nutritionLabelResult = await caller.meals.saveMeal({
@@ -67,7 +67,7 @@ describe('Nutrition Label Badge Feature', () => {
       ],
       source: 'nutrition_label', // Explicitly set source
     });
-    mealIds.push(nutritionLabelResult.insertId);
+    mealIds.push(nutritionLabelResult.mealId);
   });
 
   afterAll(async () => {
@@ -116,10 +116,10 @@ describe('Nutrition Label Badge Feature', () => {
       // source not specified
     });
 
-    mealIds.push(result.insertId);
+    mealIds.push(result.mealId);
 
     const meals = await caller.meals.list({ clientId: testClientId });
-    const savedMeal = meals.find(m => m.id === result.insertId);
+    const savedMeal = meals.find(m => m.id === result.mealId);
     
     // Should default to meal_photo
     expect(savedMeal?.source).toBe('meal_photo');

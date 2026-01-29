@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { TEST_CLIENT_ID } from "./testSetup";
+
 /**
  * Test suite for hydration tracking from drink logging
  * 
@@ -23,7 +25,7 @@ describe("Hydration Tracking from Drinks", () => {
     
     // Verify the input structure
     expect(mockDrinkInput.volumeMl).toBe(500);
-    expect(mockDrinkInput.clientId).toBe(1);
+    expect(mockDrinkInput.clientId).toBe(TEST_CLIENT_ID);
   });
 
   it("should aggregate hydration from multiple drinks", () => {

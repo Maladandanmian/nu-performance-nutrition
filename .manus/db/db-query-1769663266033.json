@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, name, email, phone FROM clients ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, phone FROM clients ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "30001",
+      "name": "Noad",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "330001",
+      "name": "Luke Davey ",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "570001",
+      "name": "Michelle Tenent ",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "690001",
+      "name": "Thomas Poppe",
+      "email": "NULL",
+      "phone": "NULL"
+    },
+    {
+      "id": "990036",
+      "name": "TEST CLIENT",
+      "email": "andy@andyknight.asia",
+      "phone": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tphone\n1\tAndy Knight \tNULL\tNULL\n30001\tNoad\tNULL\tNULL\n270001\tDavid Benskin \tNULL\tNULL\n330001\tLuke Davey \tNULL\tNULL\n570001\tMichelle Tenent \tNULL\tNULL\n690001\tThomas Poppe\tNULL\tNULL\n990036\tTEST CLIENT\tandy@andyknight.asia\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1515
+}
