@@ -1711,3 +1711,6 @@
 - [x] Find where drink analysis happens and add loading state
 - [x] Standardize loading animation across all analysis operations (meals, drinks, beverages)
 - [x] Test that loading animations appear consistently for all analysis types
+
+## Client ID Display in Trainer View (Jan 29, 2026)
+- [x] Add Client ID next to client name in trainer view of client details page

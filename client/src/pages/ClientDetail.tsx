@@ -207,7 +207,10 @@ export default function ClientDetail() {
               Back
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold" style={{color: '#2B2A2C'}}>{client.name}</h1>
+              <h1 className="text-xl font-bold" style={{color: '#2B2A2C'}}>
+                {client.name}
+                <span className="ml-3 text-base font-normal" style={{color: '#6F6E70'}}>ID: {client.id}</span>
+              </h1>
               <p className="text-sm" style={{color: '#6F6E70'}}>{client.email || "No email"}</p>
             </div>
           </div>
