@@ -16,8 +16,9 @@ import { identifyMealItems } from "./mealItemIdentification";
 import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
-import { sendPasswordSetupInvitation } from "./emailService";
+import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
 import { hashPIN } from "./pinAuth";
+import { randomBytes } from "crypto";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -245,6 +246,77 @@ export const appRouter = router({
         const { clientId, ...data } = input;
         await db.updateClient(clientId, data);
         return { success: true };
+      }),
+
+    // Update client info with email verification support
+    updateClientInfo: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        name: z.string().min(1).optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        age: z.number().min(1).max(150).optional(),
+        height: z.number().min(50).max(300).optional(), // cm
+        notes: z.string().optional(),
+        sendEmailVerification: z.boolean().optional(), // If true, send verification email
+      }))
+      .mutation(async ({ input }) => {
+        const { clientId, sendEmailVerification, email, height, ...data } = input;
+        
+        // Get current client data
+        const client = await db.getClientById(clientId);
+        if (!client) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Client not found' });
+        }
+        
+        let emailVerificationSent = false;
+        
+        // Prepare update data with height as string if provided
+        const baseUpdateData: any = { ...data };
+        if (height !== undefined) {
+          baseUpdateData.height = height.toString();
+        }
+        
+        // If email is being updated and verification is requested
+        if (email && email !== client.email && sendEmailVerification) {
+          try {
+            // Generate verification token
+            const token = randomBytes(32).toString('hex');
+            const expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiration
+            
+            await db.createEmailVerificationToken({
+              clientId,
+              token,
+              expiresAt,
+            });
+            
+            // Send verification email
+            emailVerificationSent = await sendVerificationEmail(
+              email,
+              data.name || client.name,
+              token
+            );
+            
+            // Update email but mark as unverified
+            await db.updateClient(clientId, {
+              ...baseUpdateData,
+              email,
+              emailVerified: false,
+            });
+          } catch (error) {
+            console.error('[UpdateClientInfo] Email verification error:', error);
+            // Still update other fields even if email verification fails
+            await db.updateClient(clientId, { ...baseUpdateData, email });
+          }
+        } else {
+          // Update without email verification
+          const updateData: any = { ...baseUpdateData };
+          if (email) updateData.email = email;
+          await db.updateClient(clientId, updateData);
+        }
+        
+        return { success: true, emailVerificationSent };
       }),
 
     delete: adminProcedure

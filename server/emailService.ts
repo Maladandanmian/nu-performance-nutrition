@@ -195,3 +195,116 @@ If you didn't request this account, please contact your trainer.
     text,
   });
 }
+
+/**
+ * Send email verification email to a client
+ */
+export async function sendEmailVerification(
+  clientEmail: string,
+  clientName: string,
+  token: string
+): Promise<boolean> {
+  const verifyUrl = `${ENV.appUrl || 'https://gymtrackapp-pxnerpfk.manus.space'}/verify-email?token=${token}`;
+
+  const subject = 'Verify Your Email - Nu Performance Nutrition';
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #578DB3; padding: 30px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Nu Performance Nutrition</h1>
+            </td>
+          </tr>
+          
+          <!-- Body -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 20px;">Verify Your Email, ${clientName}</h2>
+              
+              <p style="margin: 0 0 15px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Your trainer has updated your email address. Please verify your new email to continue accessing your nutrition dashboard.
+              </p>
+              
+              <p style="margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Click the button below to verify your email:
+              </p>
+              
+              <!-- Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <a href="${verifyUrl}" style="display: inline-block; background-color: #578DB3; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 4px; font-size: 16px; font-weight: bold;">Verify Email</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 30px 0 15px 0; color: #666666; font-size: 14px; line-height: 1.5;">
+                Or copy and paste this link into your browser:
+              </p>
+              
+              <p style="margin: 0 0 30px 0; color: #578DB3; font-size: 14px; word-break: break-all;">
+                ${verifyUrl}
+              </p>
+              
+              <p style="margin: 0 0 15px 0; color: #999999; font-size: 14px; line-height: 1.5;">
+                This link will expire in 24 hours for security reasons.
+              </p>
+              
+              <p style="margin: 0; color: #999999; font-size: 14px; line-height: 1.5;">
+                If you didn't request this email change, please contact your trainer immediately.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9f9f9; padding: 20px 40px; text-align: center; border-top: 1px solid #eeeeee;">
+              <p style="margin: 0; color: #999999; font-size: 12px;">
+                © 2026 Nu Performance Nutrition. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  const text = `
+Verify Your Email
+
+Hi ${clientName},
+
+Your trainer has updated your email address. Please verify your new email to continue accessing your nutrition dashboard.
+
+Verify your email by visiting this link:
+${verifyUrl}
+
+This link will expire in 24 hours for security reasons.
+
+If you didn't request this email change, please contact your trainer immediately.
+
+© 2026 Nu Performance Nutrition. All rights reserved.
+  `;
+
+  return sendEmail({
+    to: clientEmail,
+    subject,
+    html,
+    text,
+  });
+}

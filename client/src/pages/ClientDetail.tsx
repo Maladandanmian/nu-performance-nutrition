@@ -43,6 +43,14 @@ export default function ClientDetail() {
   const [timeRange, setTimeRange] = useState<"today" | "7days" | "30days" | "all">("30days");
   const [editingMeal, setEditingMeal] = useState<any | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  
+  // Client info edit state
+  const [isEditClientInfoOpen, setIsEditClientInfoOpen] = useState(false);
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientAge, setClientAge] = useState("");
+  const [clientHeight, setClientHeight] = useState("");
+  const [sendVerification, setSendVerification] = useState(false);
 
   const utils = trpc.useUtils();
   const { data: client } = trpc.clients.get.useQuery(
@@ -95,6 +103,21 @@ export default function ClientDetail() {
     },
     onError: (error) => {
       toast.error(`Failed to update DEXA goals: ${error.message}`);
+    },
+  });
+
+  const updateClientInfoMutation = trpc.clients.updateClientInfo.useMutation({
+    onSuccess: (data) => {
+      if (data.emailVerificationSent) {
+        toast.success("Client info updated and verification email sent");
+      } else {
+        toast.success("Client info updated");
+      }
+      utils.clients.get.invalidate({ clientId: clientId! });
+      setIsEditClientInfoOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update client info: ${error.message}`);
     },
   });
 
@@ -208,10 +231,34 @@ export default function ClientDetail() {
               Back
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold" style={{color: '#2B2A2C'}}>
-                {client.name}
-                <span className="ml-3 text-base font-normal" style={{color: '#6F6E70'}}>ID: {client.id}</span>
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-bold" style={{color: '#2B2A2C'}}>
+                  {client.name}
+                </h1>
+                {(client.age || client.height) && (
+                  <span className="text-base font-normal" style={{color: '#6F6E70'}}>
+                    {client.age && `${client.age} yrs`}
+                    {client.age && client.height && " • "}
+                    {client.height && `${client.height} cm`}
+                  </span>
+                )}
+                <span className="text-base font-normal" style={{color: '#6F6E70'}}>• ID: {client.id}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setClientName(client.name);
+                    setClientEmail(client.email || "");
+                    setClientAge(client.age?.toString() || "");
+                    setClientHeight(client.height || "");
+                    setSendVerification(false);
+                    setIsEditClientInfoOpen(true);
+                  }}
+                  style={{color: '#578DB3'}}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </div>
               <p className="text-sm" style={{color: '#6F6E70'}}>{client.email || "No email"}</p>
             </div>
           </div>
@@ -706,6 +753,89 @@ export default function ClientDetail() {
           utils.meals.list.invalidate({ clientId: clientId! });
         }}
       />
+
+      {/* Client Info Edit Dialog */}
+      <Dialog open={isEditClientInfoOpen} onOpenChange={setIsEditClientInfoOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Client Information</DialogTitle>
+            <DialogDescription>
+              Update client's personal information and contact details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="client-name">Name</Label>
+              <Input
+                id="client-name"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="client-email">Email</Label>
+              <Input
+                id="client-email"
+                type="email"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="client-age">Age (years)</Label>
+              <Input
+                id="client-age"
+                type="number"
+                min="1"
+                max="150"
+                value={clientAge}
+                onChange={(e) => setClientAge(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="client-height">Height (cm)</Label>
+              <Input
+                id="client-height"
+                type="number"
+                min="50"
+                max="300"
+                step="0.1"
+                value={clientHeight}
+                onChange={(e) => setClientHeight(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="send-verification"
+                checked={sendVerification}
+                onChange={(e) => setSendVerification(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="send-verification" className="text-sm font-normal">
+                Send email verification (if email changed)
+              </Label>
+            </div>
+            <Button
+              onClick={() => {
+                updateClientInfoMutation.mutate({
+                  clientId: clientId!,
+                  name: clientName || undefined,
+                  email: clientEmail || undefined,
+                  age: clientAge ? parseInt(clientAge) : undefined,
+                  height: clientHeight ? parseFloat(clientHeight) : undefined,
+                  sendEmailVerification: sendVerification,
+                });
+              }}
+              disabled={updateClientInfoMutation.isPending}
+              style={{backgroundColor: '#578DB3'}}
+              className="w-full"
+            >
+              {updateClientInfoMutation.isPending ? "Updating..." : "Update Client Info"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

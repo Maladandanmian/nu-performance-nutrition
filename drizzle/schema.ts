@@ -35,6 +35,8 @@ export const clients = mysqlTable("clients", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),
+  age: int("age"), // Client age in years
+  height: decimal("height", { precision: 4, scale: 1 }), // Client height in cm
   pin: varchar("pin", { length: 72 }).unique(), // 72 chars for bcrypt hash (optional during transition)
   passwordHash: varchar("passwordHash", { length: 72 }), // bcrypt hash for email/password auth
   emailVerified: boolean("emailVerified").default(false).notNull(),

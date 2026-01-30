@@ -1768,3 +1768,16 @@
 - [x] Ensure date comparison uses local timezone (Hong Kong GMT+8)
 - [x] Fix submit button not greying out after submission
 - [x] Test across timezone boundaries
+
+## Trainer Client Management Enhancements (Jan 30, 2026)
+- [x] Add age field to clients table
+- [x] Add height field to clients table
+- [x] Create backend procedure to update client email with verification
+- [x] Create backend procedure to update client age
+- [x] Create backend procedure to update client height
+- [x] Build trainer UI to edit client email (with verification trigger)
+- [x] Build trainer UI to edit client age
+- [x] Build trainer UI to edit client height
+- [x] Display age and height next to client name in trainer view
+- [ ] Test email verification flow
+- [ ] Fix athlete monitoring graph data mismatch issue
