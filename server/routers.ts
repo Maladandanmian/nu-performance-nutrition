@@ -2336,20 +2336,13 @@ Return as JSON.`
         };
       }),
 
-    // Get grip strength trend data
+    // Get grip strength trend data (all tests, filtering done on frontend)
     getGripStrengthTrend: authenticatedProcedure
       .input(z.object({
         clientId: z.number(),
-        startDate: z.date(),
-        endDate: z.date(),
       }))
       .query(async ({ input }) => {
-        const tests = await db.getStrengthTestTrend(
-          input.clientId,
-          'grip_strength',
-          input.startDate,
-          input.endDate
-        );
+        const tests = await db.getAllGripStrengthTests(input.clientId);
 
         // Get client info for scoring
         const client = await db.getClientById(input.clientId);

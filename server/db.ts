@@ -1090,3 +1090,18 @@ export async function deleteStrengthTest(testId: number) {
   
   await db.delete(strengthTests).where(eq(strengthTests.id, testId));
 }
+
+/**
+ * Get all grip strength tests for a client (no date filtering)
+ */
+export async function getAllGripStrengthTests(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(strengthTests)
+    .where(and(
+      eq(strengthTests.clientId, clientId),
+      eq(strengthTests.testType, 'grip_strength')
+    ))
+    .orderBy(asc(strengthTests.testedAt));
+}

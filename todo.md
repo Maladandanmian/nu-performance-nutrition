@@ -1836,3 +1836,9 @@
 - [x] Debug why chart is not rendering despite having data
 - [x] Simplify date filtering logic in backend
 - [x] Set default time range to all to show all tests
+
+## Grip Strength Chart Still Blank (Jan 30, 2026)
+- [ ] Add console logging to debug trendData API response
+- [ ] Check if getGripStrengthTrend is returning data
+- [ ] Fix root cause of empty trendData array
+- [ ] Verify chart renders with mock data

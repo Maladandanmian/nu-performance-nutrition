@@ -53,12 +53,17 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     return { start, end };
   };
 
-  const { start, end } = getDateRange();
-  const { data: trendData = [] } = trpc.strengthTests.getGripStrengthTrend.useQuery({
+  const { data: allTrendData = [] } = trpc.strengthTests.getGripStrengthTrend.useQuery({
     clientId,
-    startDate: start,
-    endDate: end,
   });
+  
+  // Filter data based on time range on the frontend
+  const { start, end } = getDateRange();
+  const trendData = allTrendData.filter(test => {
+    const testDate = new Date(test.date);
+    return testDate >= start && testDate <= end;
+  });
+
 
   // Add grip strength mutation
   const addGripStrengthMutation = trpc.strengthTests.addGripStrength.useMutation({
@@ -82,14 +87,15 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     const filled: Array<{ date: Date; value: number; score: string; isActual: boolean }> = [];
     const sortedTests = [...trendData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    // Start from the first test date, not from an arbitrary past date
+    const firstTestDate = new Date(sortedTests[0].date);
+    const endDate = new Date(); // Always end at today
     
     let currentValue = sortedTests[0].value;
     let currentScore = sortedTests[0].score;
     let testIndex = 0;
     
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    for (let d = new Date(firstTestDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
       
       // Check if there's an actual test on this date
@@ -105,8 +111,8 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
           isActual: true,
         });
         testIndex++;
-      } else if (testIndex > 0) {
-        // Forward-fill with last known value
+      } else {
+        // Forward-fill with last known value (always fill after first test)
         filled.push({
           date: new Date(d),
           value: currentValue,
