@@ -1781,3 +1781,24 @@
 - [x] Display age and height next to client name in trainer view
 - [ ] Test email verification flow
 - [ ] Fix athlete monitoring graph data mismatch issue
+
+## Mock Data Generation (Jan 30, 2026)
+- [x] Create seed script to generate 10 days of mock meal data for TEST Client (ID 990036)
+- [x] Include varied meal types (breakfast, lunch, dinner, snacks)
+- [x] Include realistic nutrition values and hydration data
+- [x] Execute script and verify data appears in trends
+
+## Hydration Trend Bug (Jan 30, 2026)
+- [ ] Debug why hydration data not displaying in trend chart despite being in database
+- [ ] Check getTrendData query for hydration filtering
+- [ ] Verify date range filtering in hydration query
+- [ ] Test hydration data retrieval with direct SQL query
+
+## UI Cleanup (Jan 30, 2026)
+- [x] Remove redundant Hydration Trend graph from Body Metrics section
+
+## Client Gender Field (Jan 30, 2026)
+- [x] Add gender field to clients table schema
+- [x] Update backend procedures to handle gender
+- [x] Add gender to trainer client info edit dialog
+- [x] Display gender alongside age and height in client header

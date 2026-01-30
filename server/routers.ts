@@ -257,6 +257,7 @@ export const appRouter = router({
         phone: z.string().optional(),
         age: z.number().min(1).max(150).optional(),
         height: z.number().min(50).max(300).optional(), // cm
+        gender: z.enum(["male", "female", "other"]).optional(),
         notes: z.string().optional(),
         sendEmailVerification: z.boolean().optional(), // If true, send verification email
       }))
@@ -745,6 +746,9 @@ export const appRouter = router({
         // Get drinks for hydration data
         const drinks = await db.getDrinksByClientId(input.clientId);
         
+        // Get body metrics for hydration data
+        const bodyMetrics = await db.getBodyMetricsByClientId(input.clientId);
+        
         // Group meals by date and sum nutrients
         const dailyMap = new Map<string, {
           date: string;
@@ -848,6 +852,36 @@ export const appRouter = router({
           existing.fat += drink.fat || 0;
           existing.carbs += drink.carbs || 0;
           existing.fibre += drink.fibre || 0;
+          
+          dailyMap.set(dateKey, existing);
+        });
+        
+        // Add hydration data from body_metrics table
+        bodyMetrics.forEach(metric => {
+          const metricDate = new Date(metric.recordedAt);
+          if (metricDate < cutoffDate) return;
+          
+          const metricDateUTC = new Date(metricDate.getTime() - (timezoneOffset * 60 * 1000));
+          const dateKey = new Date(Date.UTC(
+            metricDateUTC.getUTCFullYear(),
+            metricDateUTC.getUTCMonth(),
+            metricDateUTC.getUTCDate()
+          )).toISOString().split('T')[0];
+          
+          const existing = dailyMap.get(dateKey) || {
+            date: dateKey,
+            calories: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            fibre: 0,
+            hydration: 0,
+          };
+          
+          // Add body metric hydration
+          if (metric.hydration) {
+            existing.hydration += metric.hydration;
+          }
           
           dailyMap.set(dateKey, existing);
         });

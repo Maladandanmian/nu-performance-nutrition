@@ -37,6 +37,7 @@ export const clients = mysqlTable("clients", {
   phone: varchar("phone", { length: 50 }),
   age: int("age"), // Client age in years
   height: decimal("height", { precision: 4, scale: 1 }), // Client height in cm
+  gender: mysqlEnum("gender", ["male", "female", "other"]), // Client gender
   pin: varchar("pin", { length: 72 }).unique(), // 72 chars for bcrypt hash (optional during transition)
   passwordHash: varchar("passwordHash", { length: 72 }), // bcrypt hash for email/password auth
   emailVerified: boolean("emailVerified").default(false).notNull(),

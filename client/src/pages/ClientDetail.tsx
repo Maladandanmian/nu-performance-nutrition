@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { MealHistoryFeed } from "@/components/MealHistoryFeed";
@@ -50,6 +51,7 @@ export default function ClientDetail() {
   const [clientEmail, setClientEmail] = useState("");
   const [clientAge, setClientAge] = useState("");
   const [clientHeight, setClientHeight] = useState("");
+  const [clientGender, setClientGender] = useState<"male" | "female" | "other" | "">("");
   const [sendVerification, setSendVerification] = useState(false);
 
   const utils = trpc.useUtils();
@@ -235,11 +237,13 @@ export default function ClientDetail() {
                 <h1 className="text-xl font-bold" style={{color: '#2B2A2C'}}>
                   {client.name}
                 </h1>
-                {(client.age || client.height) && (
+                {(client.age || client.height || client.gender) && (
                   <span className="text-base font-normal" style={{color: '#6F6E70'}}>
                     {client.age && `${client.age} yrs`}
-                    {client.age && client.height && " • "}
+                    {client.age && (client.height || client.gender) && " • "}
                     {client.height && `${client.height} cm`}
+                    {client.height && client.gender && " • "}
+                    {client.gender && client.gender.charAt(0).toUpperCase() + client.gender.slice(1)}
                   </span>
                 )}
                 <span className="text-base font-normal" style={{color: '#6F6E70'}}>• ID: {client.id}</span>
@@ -251,6 +255,7 @@ export default function ClientDetail() {
                     setClientEmail(client.email || "");
                     setClientAge(client.age?.toString() || "");
                     setClientHeight(client.height || "");
+                    setClientGender(client.gender || "");
                     setSendVerification(false);
                     setIsEditClientInfoOpen(true);
                   }}
@@ -570,29 +575,6 @@ export default function ClientDetail() {
                   )}
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hydration Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bodyMetricsChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={bodyMetricsChartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="hydration" fill="#86BBD8" name="Hydration (ml)" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No hydration data yet</p>
-                  )}
-                </CardContent>
-              </Card>
             </TabsContent>
 
             <TabsContent value="dexa-viz" className="space-y-4">
@@ -804,6 +786,19 @@ export default function ClientDetail() {
                 onChange={(e) => setClientHeight(e.target.value)}
               />
             </div>
+            <div>
+              <Label htmlFor="client-gender">Gender</Label>
+              <Select value={clientGender} onValueChange={(value) => setClientGender(value as "male" | "female" | "other")}>
+                <SelectTrigger id="client-gender">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -824,6 +819,7 @@ export default function ClientDetail() {
                   email: clientEmail || undefined,
                   age: clientAge ? parseInt(clientAge) : undefined,
                   height: clientHeight ? parseFloat(clientHeight) : undefined,
+                  gender: clientGender || undefined,
                   sendEmailVerification: sendVerification,
                 });
               }}
