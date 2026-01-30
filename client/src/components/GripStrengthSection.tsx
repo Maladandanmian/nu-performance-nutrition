@@ -221,7 +221,7 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
       </Card>
 
       {/* Trend Chart */}
-      {chartData.length > 0 && (
+      {trendData.length > 0 && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">

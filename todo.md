@@ -1821,3 +1821,7 @@
 - [x] Apply dotted line style for forward-filled segments
 - [x] Ensure table view only shows actual test entries, not forward-filled data
 - [ ] Test forward-fill with sparse test data (weeks/months apart)
+
+## Grip Strength Chart Visibility Fix (Jan 30, 2026)
+- [x] Update chart visibility logic to show chart even with single data point
+- [x] Test chart display with one test result
