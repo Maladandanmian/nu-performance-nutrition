@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/mysql2";
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql, gte, lte } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { 
   InsertUser, users,
@@ -1066,17 +1066,17 @@ export async function getStrengthTestTrend(
   const db = await getDb();
   if (!db) return [];
   
-  const startStr = startDate.toISOString();
-  const endStr = endDate.toISOString();
-  
-  const result = await db.select().from(strengthTests)
+  const allTests = await db.select().from(strengthTests)
     .where(and(
       eq(strengthTests.clientId, clientId),
-      eq(strengthTests.testType, testType),
-      sql`${strengthTests.testedAt} >= ${startStr}`,
-      sql`${strengthTests.testedAt} <= ${endStr}`
+      eq(strengthTests.testType, testType)
     ))
     .orderBy(asc(strengthTests.testedAt));
+  
+  const result = allTests.filter(test => {
+    const testDate = new Date(test.testedAt);
+    return testDate >= startDate && testDate <= endDate;
+  });
   
   return result;
 }

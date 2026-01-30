@@ -1829,3 +1829,10 @@
 ## Mock Grip Strength Data (Jan 30, 2026)
 - [x] Create seed script for 4 weeks of grip strength test data
 - [x] Execute script and verify data appears in trends
+
+## Grip Strength Chart Debug (Jan 30, 2026)
+- [x] Verify grip strength data is in database
+- [x] Check API response for getGripStrengthTrend query
+- [x] Debug why chart is not rendering despite having data
+- [x] Simplify date filtering logic in backend
+- [x] Set default time range to all to show all tests

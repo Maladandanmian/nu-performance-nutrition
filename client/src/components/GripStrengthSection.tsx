@@ -22,7 +22,7 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
   const [gripValue, setGripValue] = useState("");
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
-  const [timeRange, setTimeRange] = useState<"all" | "30" | "7" | "today">("30");
+  const [timeRange, setTimeRange] = useState<"all" | "30" | "7" | "today">("all");
   const [smoothing, setSmoothing] = useState(true);
 
   const utils = trpc.useUtils();
