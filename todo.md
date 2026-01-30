@@ -1802,3 +1802,15 @@
 - [x] Update backend procedures to handle gender
 - [x] Add gender to trainer client info edit dialog
 - [x] Display gender alongside age and height in client header
+
+## Strength Testing Feature (Jan 30, 2026)
+- [x] Create strength_tests database table
+- [x] Add gender-based grip strength scoring logic (Weak/Normal/Strong)
+- [x] Create backend procedures for grip strength CRUD operations
+- [x] Build trainer UI for entering grip strength test results
+- [x] Build client UI for viewing grip strength results and trends
+- [x] Add "Strength Testing" tab beneath Body Metrics in both views
+- [x] Display most recent test result with score (e.g., "Last Test: 23kg - Normal")
+- [x] Create trend graph for grip strength history
+- [x] Add time range selector (All time, Last 30 Days, Last 7 Days, Today)
+- [x] Ensure only trainers can enter data, clients can only view

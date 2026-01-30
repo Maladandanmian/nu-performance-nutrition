@@ -27,6 +27,7 @@ import { fromHongKongDateTimeLocal } from "@/lib/timezone";
 import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
+import { GripStrengthSection } from "@/components/GripStrengthSection";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -964,9 +965,10 @@ export default function ClientDashboard() {
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
-            <TabsTrigger value="log-metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="body">Body Metrics</TabsTrigger>
             <TabsTrigger value="dexa">DEXA Scans</TabsTrigger>
             <TabsTrigger value="athlete-monitoring">Athlete Monitoring</TabsTrigger>
+            <TabsTrigger value="strength-testing">Strength Testing</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -1447,6 +1449,21 @@ export default function ClientDashboard() {
           <TabsContent value="athlete-monitoring">
             {clientSession?.clientId ? (
               <AthleteMonitoringSection clientId={clientSession.clientId} isTrainer={false} />
+            ) : (
+              <Card className="p-6">
+                <p className="text-center text-muted-foreground">Loading...</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="strength-testing">
+            {clientSession?.clientId ? (
+              <GripStrengthSection 
+                clientId={clientSession.clientId} 
+                clientGender={null} 
+                clientAge={null} 
+                isTrainer={false} 
+              />
             ) : (
               <Card className="p-6">
                 <p className="text-center text-muted-foreground">Loading...</p>

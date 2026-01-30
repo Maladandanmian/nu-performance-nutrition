@@ -12,6 +12,7 @@ import {
   passwordResetTokens,
   auditLogs,
   athleteMonitoring,
+  strengthTests,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1012,4 +1013,80 @@ export async function getAthleteMonitoringTrend(clientId: number, startDate: Dat
     .orderBy(asc(athleteMonitoring.submittedAt));
   
   return result;
+}
+
+/**
+ * Add a strength test result
+ */
+export async function addStrengthTest(data: {
+  clientId: number;
+  testType: string;
+  value: number;
+  unit: string;
+  testedAt: Date;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  const result = await db.insert(strengthTests).values({
+    ...data,
+    value: data.value.toString(),
+  });
+  return result;
+}
+
+/**
+ * Get the latest strength test for a client by test type
+ */
+export async function getLatestStrengthTest(clientId: number, testType: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(strengthTests)
+    .where(and(
+      eq(strengthTests.clientId, clientId),
+      eq(strengthTests.testType, testType)
+    ))
+    .orderBy(desc(strengthTests.testedAt))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Get strength test trend data for a client within a date range
+ */
+export async function getStrengthTestTrend(
+  clientId: number,
+  testType: string,
+  startDate: Date,
+  endDate: Date
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const startStr = startDate.toISOString();
+  const endStr = endDate.toISOString();
+  
+  const result = await db.select().from(strengthTests)
+    .where(and(
+      eq(strengthTests.clientId, clientId),
+      eq(strengthTests.testType, testType),
+      sql`${strengthTests.testedAt} >= ${startStr}`,
+      sql`${strengthTests.testedAt} <= ${endStr}`
+    ))
+    .orderBy(asc(strengthTests.testedAt));
+  
+  return result;
+}
+
+/**
+ * Delete a strength test by ID
+ */
+export async function deleteStrengthTest(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  await db.delete(strengthTests).where(eq(strengthTests.id, testId));
 }

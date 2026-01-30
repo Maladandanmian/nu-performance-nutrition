@@ -14,6 +14,7 @@ import { NutrientTrendGraphs } from "@/components/NutrientTrendGraphs";
 import { DexaUploadSection } from "@/components/DexaUploadSection";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
+import { GripStrengthSection } from "@/components/GripStrengthSection";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -419,6 +420,7 @@ export default function ClientDetail() {
               <TabsTrigger value="body" className="text-xs md:text-sm">Body Metrics</TabsTrigger>
               <TabsTrigger value="dexa-viz" className="text-xs md:text-sm">DEXA Insights</TabsTrigger>
               <TabsTrigger value="athlete-monitoring" className="text-xs md:text-sm">Athlete Monitoring</TabsTrigger>
+              <TabsTrigger value="strength-testing" className="text-xs md:text-sm">Strength Testing</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -720,6 +722,15 @@ export default function ClientDetail() {
 
             <TabsContent value="athlete-monitoring" className="space-y-4">
               <AthleteMonitoringSection clientId={clientId || 0} isTrainer={true} />
+            </TabsContent>
+
+            <TabsContent value="strength-testing" className="space-y-4">
+              <GripStrengthSection 
+                clientId={clientId || 0} 
+                clientGender={client.gender} 
+                clientAge={client.age} 
+                isTrainer={true} 
+              />
             </TabsContent>
           </Tabs>
         </div>

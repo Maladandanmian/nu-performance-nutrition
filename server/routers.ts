@@ -19,6 +19,7 @@ import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } f
 import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
 import { hashPIN } from "./pinAuth";
 import { randomBytes } from "crypto";
+import { calculateGripStrengthScore } from "../shared/gripStrengthScoring";
 
 // Admin-only procedure for trainers
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -2279,6 +2280,99 @@ Return as JSON.`
    * Athlete Monitoring Router
    * Wellness check-ins with fatigue, sleep, soreness, stress, and mood tracking
    */
+  /**
+   * Strength Tests Router
+   * Track various strength test results (grip strength, etc.)
+   * Only trainers can enter data, clients can view
+   */
+  strengthTests: router({    // Add grip strength test (trainer only)
+    addGripStrength: adminProcedure
+      .input(z.object({
+        clientId: z.number(),
+        value: z.number().positive(), // kg
+        testedAt: z.date(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        // Get client info for gender/age-based scoring
+        const client = await db.getClientById(input.clientId);
+        if (!client) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Client not found' });
+        }
+
+        // Insert test result
+        await db.addStrengthTest({
+          clientId: input.clientId,
+          testType: 'grip_strength',
+          value: input.value,
+          unit: 'kg',
+          testedAt: input.testedAt,
+          notes: input.notes,
+        });
+
+        // Calculate score for response
+        const score = calculateGripStrengthScore(input.value, client.gender, client.age);
+        
+        return { success: true, score };
+      }),
+
+    // Get latest grip strength test for a client
+    getLatestGripStrength: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const test = await db.getLatestStrengthTest(input.clientId, 'grip_strength');
+        if (!test) return null;
+
+        // Get client info for scoring
+        const client = await db.getClientById(input.clientId);
+        const score = client 
+          ? calculateGripStrengthScore(parseFloat(test.value), client.gender, client.age)
+          : 'Normal';
+
+        return {
+          ...test,
+          value: parseFloat(test.value),
+          score,
+        };
+      }),
+
+    // Get grip strength trend data
+    getGripStrengthTrend: authenticatedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+      }))
+      .query(async ({ input }) => {
+        const tests = await db.getStrengthTestTrend(
+          input.clientId,
+          'grip_strength',
+          input.startDate,
+          input.endDate
+        );
+
+        // Get client info for scoring
+        const client = await db.getClientById(input.clientId);
+        
+        return tests.map(test => ({
+          date: test.testedAt,
+          value: parseFloat(test.value),
+          score: client 
+            ? calculateGripStrengthScore(parseFloat(test.value), client.gender, client.age)
+            : 'Normal',
+          notes: test.notes,
+        }));
+      }),
+
+    // Delete a strength test (trainer only)
+    deleteTest: adminProcedure
+      .input(z.object({ testId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteStrengthTest(input.testId);
+        return { success: true };
+      }),
+  }),
+
   athleteMonitoring: router({
     // Submit wellness check-in (client only, once per day)
     submit: authenticatedProcedure

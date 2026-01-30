@@ -410,3 +410,21 @@ export const athleteMonitoring = mysqlTable("athlete_monitoring", {
 
 export type AthleteMonitoring = typeof athleteMonitoring.$inferSelect;
 export type InsertAthleteMonitoring = typeof athleteMonitoring.$inferInsert;
+
+/**
+ * Strength Tests table - stores various strength test results
+ * Only trainers can enter data, clients can view their results
+ */
+export const strengthTests = mysqlTable("strength_tests", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  testType: varchar("testType", { length: 50 }).notNull(), // e.g., "grip_strength", "bench_press", etc.
+  value: decimal("value", { precision: 6, scale: 2 }).notNull(), // Test result value (e.g., kg for grip strength)
+  unit: varchar("unit", { length: 20 }).notNull(), // e.g., "kg", "lbs", "reps"
+  notes: text("notes"), // Optional notes from trainer
+  testedAt: timestamp("testedAt").notNull(), // When the test was performed
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StrengthTest = typeof strengthTests.$inferSelect;
+export type InsertStrengthTest = typeof strengthTests.$inferInsert;
