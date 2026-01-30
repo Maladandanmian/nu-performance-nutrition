@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, email FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com');",
+  "rows": [
+    {
+      "id": "1050001",
+      "name": "Test Strength Client",
+      "email": "strength-test@example.com"
+    },
+    {
+      "id": "1050002",
+      "name": "Young Client",
+      "email": "young@example.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1050001\tTest Strength Client\tstrength-test@example.com\n1050002\tYoung Client\tyoung@example.com\n",
+  "stderr": "",
+  "execution_time_ms": 1569
+}

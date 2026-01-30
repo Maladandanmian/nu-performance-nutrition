@@ -1,10 +1,26 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import { appRouter } from './routers';
 import { TEST_CLIENT_ID } from './testSetup';
+import * as db from './db';
 
 describe('Strength Tests', () => {
   const testClientId = TEST_CLIENT_ID; // Use existing test client (43 yr old male)
   let testId: number;
+  const testIdsToCleanup: number[] = [];
+  const testStartTime = Date.now(); // Timestamp when tests started
+
+  afterAll(async () => {
+    // Clean up all test data created during this test suite
+    // Only delete strength tests that were created during THIS test run
+    // We track this by comparing the createdAt timestamp
+    const allTests = await db.getAllGripStrengthTests(testClientId);
+    for (const test of allTests) {
+      // Only delete tests created after this test suite started running
+      if (new Date(test.createdAt).getTime() >= testStartTime) {
+        await db.deleteStrengthTest(test.id);
+      }
+    }
+  });
 
   it('should add a grip strength test', async () => {
     const caller = appRouter.createCaller({
@@ -16,7 +32,7 @@ describe('Strength Tests', () => {
     const result = await caller.strengthTests.addGripStrength({
       clientId: testClientId,
       value: 45,
-      testedAt: new Date('2026-01-30'),
+      testedAt: new Date('2026-01-28'),
       notes: 'Test grip strength',
     });
 
