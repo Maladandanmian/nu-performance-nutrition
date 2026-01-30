@@ -1842,5 +1842,7 @@
 - [ ] Check if getGripStrengthTrend is returning data
 - [ ] Fix root cause of empty trendData array
 - [ ] Verify chart renders with mock data
-- [ ] Fix 7-day grip strength chart to show full date range (7 days ago to today) with line extending across entire period
 - [x] Fix 7-day grip strength chart to show full date range (7 days ago to today) with line extending across entire period
+- [x] Fix 7-day grip strength chart to show full date range (7 days ago to today) with line extending across entire period
+- [x] Add ability to edit the last grip strength test result
+- [x] Revert grip strength scoring to original table ranges (40-59 years: 36-50kg for males)

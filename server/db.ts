@@ -1105,3 +1105,38 @@ export async function getAllGripStrengthTests(clientId: number) {
     ))
     .orderBy(asc(strengthTests.testedAt));
 }
+
+/**
+ * Get a strength test by ID
+ */
+export async function getStrengthTestById(testId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(strengthTests)
+    .where(eq(strengthTests.id, testId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Update a strength test
+ */
+export async function updateStrengthTest(data: {
+  id: number;
+  value: number;
+  testedAt: Date;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  await db.update(strengthTests)
+    .set({
+      value: data.value.toString(),
+      testedAt: data.testedAt,
+      notes: data.notes,
+    })
+    .where(eq(strengthTests.id, data.id));
+}

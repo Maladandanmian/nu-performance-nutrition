@@ -19,6 +19,7 @@ interface GripStrengthSectionProps {
 
 export function GripStrengthSection({ clientId, clientGender, clientAge, isTrainer }: GripStrengthSectionProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [gripValue, setGripValue] = useState("");
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
@@ -89,6 +90,19 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     },
     onError: (error) => {
       toast.error(`Failed to record grip strength: ${error.message}`);
+    },
+  });
+
+  // Update grip strength mutation
+  const updateGripStrengthMutation = trpc.strengthTests.updateGripStrength.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Grip strength updated: ${gripValue}kg - ${data.score}`);
+      utils.strengthTests.getLatestGripStrength.invalidate({ clientId });
+      utils.strengthTests.getGripStrengthTrend.invalidate();
+      setIsEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update grip strength: ${error.message}`);
     },
   });
 
@@ -221,22 +235,40 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
         <CardContent>
           {latestTest ? (
             <div className="space-y-2">
-              <p className="text-2xl font-bold">
-                Last Test: {latestTest.value}kg -{" "}
-                <span style={{ color: getScoreColor(latestTest.score) }}>
-                  {latestTest.score}
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Tested on {new Date(latestTest.testedAt).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
-              {latestTest.notes && (
-                <p className="text-sm text-muted-foreground">Notes: {latestTest.notes}</p>
-              )}
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 flex-1">
+                  <p className="text-2xl font-bold">
+                    Last Test: {latestTest.value}kg -{" "}
+                    <span style={{ color: getScoreColor(latestTest.score) }}>
+                      {latestTest.score}
+                    </span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Tested on {new Date(latestTest.testedAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                  {latestTest.notes && (
+                    <p className="text-sm text-muted-foreground">Notes: {latestTest.notes}</p>
+                  )}
+                </div>
+                {isTrainer && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setGripValue(latestTest.value.toString());
+                      setTestDate(new Date(latestTest.testedAt).toISOString().split('T')[0]);
+                      setNotes(latestTest.notes || "");
+                      setIsEditDialogOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-muted-foreground">No grip strength tests recorded yet</p>
@@ -389,6 +421,71 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
                 className="w-full"
               >
                 {addGripStrengthMutation.isPending ? "Recording..." : "Record Test"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Test Dialog (Trainer Only) */}
+      {isTrainer && latestTest && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Grip Strength Test</DialogTitle>
+              <DialogDescription>
+                Update the most recent grip strength test result
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-grip-value">Grip Strength (kg)</Label>
+                <Input
+                  id="edit-grip-value"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={gripValue}
+                  onChange={(e) => setGripValue(e.target.value)}
+                  placeholder="e.g., 45.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-test-date">Test Date</Label>
+                <Input
+                  id="edit-test-date"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-notes">Notes (Optional)</Label>
+                <Input
+                  id="edit-notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any observations or comments"
+                />
+              </div>
+              <Button
+                onClick={() => {
+                  if (!gripValue) {
+                    toast.error("Please enter a grip strength value");
+                    return;
+                  }
+                  updateGripStrengthMutation.mutate({
+                    testId: latestTest.id,
+                    value: parseFloat(gripValue),
+                    testedAt: new Date(testDate),
+                    notes: notes || undefined,
+                  });
+                }}
+                disabled={updateGripStrengthMutation.isPending}
+                style={{ backgroundColor: '#578DB3' }}
+                className="w-full"
+              >
+                {updateGripStrengthMutation.isPending ? "Updating..." : "Update Test"}
               </Button>
             </div>
           </DialogContent>

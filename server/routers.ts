@@ -2316,6 +2316,40 @@ Return as JSON.`
         return { success: true, score };
       }),
 
+    // Update grip strength test (trainer only)
+    updateGripStrength: adminProcedure
+      .input(z.object({
+        testId: z.number(),
+        value: z.number().positive(), // kg
+        testedAt: z.date(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {        // Get the test to find clientId
+        const existingTest = await db.getStrengthTestById(input.testId);
+        if (!existingTest) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Test not found' });
+        }
+
+        // Get client info for gender/age-based scoring
+        const client = await db.getClientById(existingTest.clientId);
+        if (!client) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Client not found' });
+        }
+
+        // Update test result
+        await db.updateStrengthTest({
+          id: input.testId,
+          value: input.value,
+          testedAt: input.testedAt,
+          notes: input.notes,
+        });
+
+        // Calculate score for response
+        const score = calculateGripStrengthScore(input.value, client.gender, client.age);
+        
+        return { success: true, score };
+      }),
+
     // Get latest grip strength test for a client
     getLatestGripStrength: authenticatedProcedure
       .input(z.object({ clientId: z.number() }))
