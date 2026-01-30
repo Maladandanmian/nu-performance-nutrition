@@ -1814,3 +1814,10 @@
 - [x] Create trend graph for grip strength history
 - [x] Add time range selector (All time, Last 30 Days, Last 7 Days, Today)
 - [x] Ensure only trainers can enter data, clients can only view
+
+## Grip Strength Forward-Fill and Smoothing (Jan 30, 2026)
+- [x] Implement forward-fill logic to duplicate last known strength value for each day
+- [x] Add smoothing toggle to grip strength chart (like weight tracking)
+- [x] Apply dotted line style for forward-filled segments
+- [x] Ensure table view only shows actual test entries, not forward-filled data
+- [ ] Test forward-fill with sparse test data (weeks/months apart)

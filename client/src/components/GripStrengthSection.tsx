@@ -23,6 +23,7 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
   const [timeRange, setTimeRange] = useState<"all" | "30" | "7" | "today">("30");
+  const [smoothing, setSmoothing] = useState(true);
 
   const utils = trpc.useUtils();
 
@@ -74,11 +75,58 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     },
   });
 
+  // Forward-fill logic: duplicate last known value for each day
+  const forwardFillData = () => {
+    if (trendData.length === 0) return [];
+
+    const filled: Array<{ date: Date; value: number; score: string; isActual: boolean }> = [];
+    const sortedTests = [...trendData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    
+    let currentValue = sortedTests[0].value;
+    let currentScore = sortedTests[0].score;
+    let testIndex = 0;
+    
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      
+      // Check if there's an actual test on this date
+      const actualTest = sortedTests.find(t => new Date(t.date).toISOString().split('T')[0] === dateStr);
+      
+      if (actualTest) {
+        currentValue = actualTest.value;
+        currentScore = actualTest.score;
+        filled.push({
+          date: new Date(d),
+          value: currentValue,
+          score: currentScore,
+          isActual: true,
+        });
+        testIndex++;
+      } else if (testIndex > 0) {
+        // Forward-fill with last known value
+        filled.push({
+          date: new Date(d),
+          value: currentValue,
+          score: currentScore,
+          isActual: false,
+        });
+      }
+    }
+    
+    return filled;
+  };
+
+  const filledData = forwardFillData();
+  
   // Format chart data
-  const chartData = trendData.map(test => ({
-    date: new Date(test.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    value: test.value,
-    score: test.score,
+  const chartData = filledData.map(item => ({
+    date: item.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    value: item.value,
+    score: item.score,
+    isActual: item.isActual,
   }));
 
   // Calculate normal range lines based on gender and age
@@ -178,17 +226,26 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Grip Strength Trend</CardTitle>
-              <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="30">Last 30 Days</SelectItem>
-                  <SelectItem value="7">Last 7 Days</SelectItem>
-                  <SelectItem value="today">Today</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSmoothing(!smoothing)}
+                >
+                  Smoothing: {smoothing ? "On" : "Off"}
+                </Button>
+                <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="30">Last 30 Days</SelectItem>
+                    <SelectItem value="7">Last 7 Days</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -229,11 +286,18 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
                   label={{ value: 'Normal Max', position: 'right' }}
                 />
                 <Line 
-                  type="monotone" 
+                  type={smoothing ? "monotone" : "linear"}
                   dataKey="value" 
                   stroke="#578DB3" 
                   strokeWidth={2}
-                  dot={{ r: 4 }}
+                  strokeDasharray="0"
+                  dot={(props: any) => {
+                    const { cx, cy, payload } = props;
+                    if (payload.isActual) {
+                      return <circle cx={cx} cy={cy} r={4} fill="#578DB3" stroke="white" strokeWidth={2} />;
+                    }
+                    return <circle cx={cx} cy={cy} r={0} />;
+                  }}
                   name="Grip Strength (kg)"
                 />
               </LineChart>
