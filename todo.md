@@ -1825,3 +1825,7 @@
 ## Grip Strength Chart Visibility Fix (Jan 30, 2026)
 - [x] Update chart visibility logic to show chart even with single data point
 - [x] Test chart display with one test result
+
+## Mock Grip Strength Data (Jan 30, 2026)
+- [x] Create seed script for 4 weeks of grip strength test data
+- [x] Execute script and verify data appears in trends
