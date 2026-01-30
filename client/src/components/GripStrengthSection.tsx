@@ -298,11 +298,11 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
                   strokeWidth={2}
                   strokeDasharray="0"
                   dot={(props: any) => {
-                    const { cx, cy, payload } = props;
+                    const { cx, cy, payload, index } = props;
                     if (payload.isActual) {
-                      return <circle cx={cx} cy={cy} r={4} fill="#578DB3" stroke="white" strokeWidth={2} />;
+                      return <circle key={`actual-${index}`} cx={cx} cy={cy} r={4} fill="#578DB3" stroke="white" strokeWidth={2} />;
                     }
-                    return <circle cx={cx} cy={cy} r={0} />;
+                    return <circle key={`filled-${index}`} cx={cx} cy={cy} r={0} />;
                   }}
                   name="Grip Strength (kg)"
                 />
