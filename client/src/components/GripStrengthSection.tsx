@@ -40,7 +40,7 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
         start.setHours(0, 0, 0, 0);
         break;
       case "7":
-        start.setDate(start.getDate() - 7);
+        start.setDate(start.getDate() - 6); // Last 7 days including today
         break;
       case "30":
         start.setDate(start.getDate() - 30);
@@ -59,10 +59,22 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
   
   // Filter data based on time range on the frontend
   const { start, end } = getDateRange();
-  const trendData = allTrendData.filter(test => {
+  
+  // Include the last test BEFORE the range for proper forward-fill
+  const testsInRange = allTrendData.filter(test => {
     const testDate = new Date(test.date);
     return testDate >= start && testDate <= end;
   });
+  
+  // Find the last test before the range start
+  const lastTestBeforeRange = allTrendData
+    .filter(test => new Date(test.date) < start)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  
+  // Combine: last test before range + tests in range
+  const trendData = lastTestBeforeRange 
+    ? [lastTestBeforeRange, ...testsInRange]
+    : testsInRange;
 
 
   // Add grip strength mutation
@@ -87,15 +99,21 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     const filled: Array<{ date: Date; value: number; score: string; isActual: boolean }> = [];
     const sortedTests = [...trendData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
-    // Start from the first test date, not from an arbitrary past date
-    const firstTestDate = new Date(sortedTests[0].date);
+    // Always start from the selected range start (e.g., 7 days ago for "Last 7 Days")
+    const startDate = new Date(start);
     const endDate = new Date(); // Always end at today
     
-    let currentValue = sortedTests[0].value;
-    let currentScore = sortedTests[0].score;
-    let testIndex = 0;
+    // Check if the first test in sortedTests is before the range start
+    // If so, use it as the initial value and mark hasSeenFirstTest as true
+    const firstTest = sortedTests[0];
+    const firstTestDate = new Date(firstTest.date);
+    const isFirstTestBeforeRange = firstTestDate < startDate;
     
-    for (let d = new Date(firstTestDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    let currentValue = firstTest.value;
+    let currentScore = firstTest.score;
+    let hasSeenFirstTest = isFirstTestBeforeRange; // Start true if we have a test before range
+    
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
       
       // Check if there's an actual test on this date
@@ -104,15 +122,15 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
       if (actualTest) {
         currentValue = actualTest.value;
         currentScore = actualTest.score;
+        hasSeenFirstTest = true;
         filled.push({
           date: new Date(d),
           value: currentValue,
           score: currentScore,
           isActual: true,
         });
-        testIndex++;
-      } else {
-        // Forward-fill with last known value (always fill after first test)
+      } else if (hasSeenFirstTest) {
+        // Forward-fill with last known value (only after we've seen the first test)
         filled.push({
           date: new Date(d),
           value: currentValue,
