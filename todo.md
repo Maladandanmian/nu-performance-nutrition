@@ -1762,3 +1762,9 @@
 - [x] Ensure all 5 metrics are visible even when values overlap
 - [x] Support up to 5 points clustered at same value
 - [x] Test with all metrics having same score
+
+## Athlete Monitoring Timezone Bug (Jan 30, 2026)
+- [x] Fix timezone issue where yesterday's submission blocks today's submission
+- [x] Ensure date comparison uses local timezone (Hong Kong GMT+8)
+- [x] Fix submit button not greying out after submission
+- [x] Test across timezone boundaries

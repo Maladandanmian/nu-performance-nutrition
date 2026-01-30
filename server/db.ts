@@ -929,6 +929,7 @@ export async function clearPasswordSetupToken(clientId: number) {
 /**
  * Submit athlete monitoring data (wellness check-in)
  * Validates that only one submission per day is allowed
+ * Uses Hong Kong timezone (GMT+8) for date boundaries
  */
 export async function submitAthleteMonitoring(data: {
   clientId: number;
@@ -941,14 +942,24 @@ export async function submitAthleteMonitoring(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Check if client already submitted today
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  // Check if client already submitted today (using Hong Kong timezone GMT+8)
+  const now = new Date();
   
-  const todayStr = today.toISOString();
-  const tomorrowStr = tomorrow.toISOString();
+  // Get current date in Hong Kong timezone
+  const hkOffset = 8 * 60; // GMT+8 in minutes
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const hkTime = new Date(utcTime + (hkOffset * 60000));
+  
+  // Get start of today in HK timezone, then convert to UTC for DB query
+  const hkTodayStart = new Date(hkTime);
+  hkTodayStart.setHours(0, 0, 0, 0);
+  
+  // Convert HK midnight back to UTC
+  const todayStartUTC = new Date(hkTodayStart.getTime() - (hkOffset * 60000));
+  const tomorrowStartUTC = new Date(todayStartUTC.getTime() + (24 * 60 * 60 * 1000));
+  
+  const todayStr = todayStartUTC.toISOString();
+  const tomorrowStr = tomorrowStartUTC.toISOString();
   
   const existing = await db.select().from(athleteMonitoring)
     .where(and(

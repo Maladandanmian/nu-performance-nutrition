@@ -107,16 +107,17 @@ export function AthleteMonitoringSection({
   const { data: lastSubmission, refetch: refetchLast } =
     trpc.athleteMonitoring.getLastSubmission.useQuery({ clientId });
 
-  // Check if last submission was today
+  // Check if last submission was today (using local timezone)
   const isSubmittedToday = useMemo(() => {
     if (!lastSubmission) return false;
     const submittedDate = new Date(lastSubmission.submittedAt);
     const today = new Date();
-    return (
-      submittedDate.getDate() === today.getDate() &&
-      submittedDate.getMonth() === today.getMonth() &&
-      submittedDate.getFullYear() === today.getFullYear()
-    );
+    
+    // Compare using local date strings to handle timezone correctly
+    const submittedLocalDate = submittedDate.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const todayLocalDate = today.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    
+    return submittedLocalDate === todayLocalDate;
   }, [lastSubmission]);
 
   // Pre-fill form with today's submission values
