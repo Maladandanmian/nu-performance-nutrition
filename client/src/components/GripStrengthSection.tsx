@@ -19,10 +19,11 @@ interface GripStrengthSectionProps {
 
 export function GripStrengthSection({ clientId, clientGender, clientAge, isTrainer }: GripStrengthSectionProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [gripValue, setGripValue] = useState("");
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
-  const [timeRange, setTimeRange] = useState<"all" | "30" | "7" | "today">("30");
+  const [timeRange, setTimeRange] = useState<"all" | "30" | "7" | "today">("all");
   const [smoothing, setSmoothing] = useState(true);
 
   const utils = trpc.useUtils();
@@ -40,7 +41,7 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
         start.setHours(0, 0, 0, 0);
         break;
       case "7":
-        start.setDate(start.getDate() - 7);
+        start.setDate(start.getDate() - 6); // Last 7 days including today
         break;
       case "30":
         start.setDate(start.getDate() - 30);
@@ -53,12 +54,29 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     return { start, end };
   };
 
-  const { start, end } = getDateRange();
-  const { data: trendData = [] } = trpc.strengthTests.getGripStrengthTrend.useQuery({
+  const { data: allTrendData = [] } = trpc.strengthTests.getGripStrengthTrend.useQuery({
     clientId,
-    startDate: start,
-    endDate: end,
   });
+  
+  // Filter data based on time range on the frontend
+  const { start, end } = getDateRange();
+  
+  // Include the last test BEFORE the range for proper forward-fill
+  const testsInRange = allTrendData.filter(test => {
+    const testDate = new Date(test.date);
+    return testDate >= start && testDate <= end;
+  });
+  
+  // Find the last test before the range start
+  const lastTestBeforeRange = allTrendData
+    .filter(test => new Date(test.date) < start)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  
+  // Combine: last test before range + tests in range
+  const trendData = lastTestBeforeRange 
+    ? [lastTestBeforeRange, ...testsInRange]
+    : testsInRange;
+
 
   // Add grip strength mutation
   const addGripStrengthMutation = trpc.strengthTests.addGripStrength.useMutation({
@@ -75,6 +93,19 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     },
   });
 
+  // Update grip strength mutation
+  const updateGripStrengthMutation = trpc.strengthTests.updateGripStrength.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Grip strength updated: ${gripValue}kg - ${data.score}`);
+      utils.strengthTests.getLatestGripStrength.invalidate({ clientId });
+      utils.strengthTests.getGripStrengthTrend.invalidate();
+      setIsEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update grip strength: ${error.message}`);
+    },
+  });
+
   // Forward-fill logic: duplicate last known value for each day
   const forwardFillData = () => {
     if (trendData.length === 0) return [];
@@ -82,12 +113,19 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
     const filled: Array<{ date: Date; value: number; score: string; isActual: boolean }> = [];
     const sortedTests = [...trendData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
+    // Always start from the selected range start (e.g., 7 days ago for "Last 7 Days")
     const startDate = new Date(start);
-    const endDate = new Date(end);
+    const endDate = new Date(); // Always end at today
     
-    let currentValue = sortedTests[0].value;
-    let currentScore = sortedTests[0].score;
-    let testIndex = 0;
+    // Check if the first test in sortedTests is before the range start
+    // If so, use it as the initial value and mark hasSeenFirstTest as true
+    const firstTest = sortedTests[0];
+    const firstTestDate = new Date(firstTest.date);
+    const isFirstTestBeforeRange = firstTestDate < startDate;
+    
+    let currentValue = firstTest.value;
+    let currentScore = firstTest.score;
+    let hasSeenFirstTest = isFirstTestBeforeRange; // Start true if we have a test before range
     
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
@@ -98,15 +136,15 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
       if (actualTest) {
         currentValue = actualTest.value;
         currentScore = actualTest.score;
+        hasSeenFirstTest = true;
         filled.push({
           date: new Date(d),
           value: currentValue,
           score: currentScore,
           isActual: true,
         });
-        testIndex++;
-      } else if (testIndex > 0) {
-        // Forward-fill with last known value
+      } else if (hasSeenFirstTest) {
+        // Forward-fill with last known value (only after we've seen the first test)
         filled.push({
           date: new Date(d),
           value: currentValue,
@@ -197,22 +235,40 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
         <CardContent>
           {latestTest ? (
             <div className="space-y-2">
-              <p className="text-2xl font-bold">
-                Last Test: {latestTest.value}kg -{" "}
-                <span style={{ color: getScoreColor(latestTest.score) }}>
-                  {latestTest.score}
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Tested on {new Date(latestTest.testedAt).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
-              {latestTest.notes && (
-                <p className="text-sm text-muted-foreground">Notes: {latestTest.notes}</p>
-              )}
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 flex-1">
+                  <p className="text-2xl font-bold">
+                    Last Test: {latestTest.value}kg -{" "}
+                    <span style={{ color: getScoreColor(latestTest.score) }}>
+                      {latestTest.score}
+                    </span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Tested on {new Date(latestTest.testedAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                  {latestTest.notes && (
+                    <p className="text-sm text-muted-foreground">Notes: {latestTest.notes}</p>
+                  )}
+                </div>
+                {isTrainer && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setGripValue(latestTest.value.toString());
+                      setTestDate(new Date(latestTest.testedAt).toISOString().split('T')[0]);
+                      setNotes(latestTest.notes || "");
+                      setIsEditDialogOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-muted-foreground">No grip strength tests recorded yet</p>
@@ -292,11 +348,11 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
                   strokeWidth={2}
                   strokeDasharray="0"
                   dot={(props: any) => {
-                    const { cx, cy, payload } = props;
+                    const { cx, cy, payload, index } = props;
                     if (payload.isActual) {
-                      return <circle cx={cx} cy={cy} r={4} fill="#578DB3" stroke="white" strokeWidth={2} />;
+                      return <circle key={`actual-${index}`} cx={cx} cy={cy} r={4} fill="#578DB3" stroke="white" strokeWidth={2} />;
                     }
-                    return <circle cx={cx} cy={cy} r={0} />;
+                    return <circle key={`filled-${index}`} cx={cx} cy={cy} r={0} />;
                   }}
                   name="Grip Strength (kg)"
                 />
@@ -365,6 +421,71 @@ export function GripStrengthSection({ clientId, clientGender, clientAge, isTrain
                 className="w-full"
               >
                 {addGripStrengthMutation.isPending ? "Recording..." : "Record Test"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Test Dialog (Trainer Only) */}
+      {isTrainer && latestTest && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Grip Strength Test</DialogTitle>
+              <DialogDescription>
+                Update the most recent grip strength test result
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-grip-value">Grip Strength (kg)</Label>
+                <Input
+                  id="edit-grip-value"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={gripValue}
+                  onChange={(e) => setGripValue(e.target.value)}
+                  placeholder="e.g., 45.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-test-date">Test Date</Label>
+                <Input
+                  id="edit-test-date"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-notes">Notes (Optional)</Label>
+                <Input
+                  id="edit-notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any observations or comments"
+                />
+              </div>
+              <Button
+                onClick={() => {
+                  if (!gripValue) {
+                    toast.error("Please enter a grip strength value");
+                    return;
+                  }
+                  updateGripStrengthMutation.mutate({
+                    testId: latestTest.id,
+                    value: parseFloat(gripValue),
+                    testedAt: new Date(testDate),
+                    notes: notes || undefined,
+                  });
+                }}
+                disabled={updateGripStrengthMutation.isPending}
+                style={{ backgroundColor: '#578DB3' }}
+                className="w-full"
+              >
+                {updateGripStrengthMutation.isPending ? "Updating..." : "Update Test"}
               </Button>
             </div>
           </DialogContent>

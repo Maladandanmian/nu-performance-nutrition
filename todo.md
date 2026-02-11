@@ -1829,3 +1829,21 @@
 ## Mock Grip Strength Data (Jan 30, 2026)
 - [x] Create seed script for 4 weeks of grip strength test data
 - [x] Execute script and verify data appears in trends
+
+## Grip Strength Chart Debug (Jan 30, 2026)
+- [x] Verify grip strength data is in database
+- [x] Check API response for getGripStrengthTrend query
+- [x] Debug why chart is not rendering despite having data
+- [x] Simplify date filtering logic in backend
+- [x] Set default time range to all to show all tests
+
+## Grip Strength Chart Still Blank (Jan 30, 2026)
+- [ ] Add console logging to debug trendData API response
+- [ ] Check if getGripStrengthTrend is returning data
+- [ ] Fix root cause of empty trendData array
+- [ ] Verify chart renders with mock data
+- [x] Fix 7-day grip strength chart to show full date range (7 days ago to today) with line extending across entire period
+- [x] Fix 7-day grip strength chart to show full date range (7 days ago to today) with line extending across entire period
+- [x] Add ability to edit the last grip strength test result
+- [x] Revert grip strength scoring to original table ranges (40-59 years: 36-50kg for males)
+- [x] Delete accidentally created test clients (Test Strength Client, Young Client)
