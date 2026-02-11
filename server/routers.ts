@@ -2400,6 +2400,102 @@ Return as JSON.`
       }),
   }),
 
+  nutritionReports: router({
+    // Upload nutrition report PDF (trainer only)
+    upload: protectedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        filename: z.string(),
+        fileData: z.string(), // Base64 encoded PDF
+        reportDate: z.date(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { analyzeNutritionReport } = await import('./nutritionReportAnalysis');
+          const { storagePut } = await import('./storage');
+          
+          // Decode base64 and upload to S3
+          const buffer = Buffer.from(input.fileData, 'base64');
+          const fileKey = `nutrition-reports/${input.clientId}/${Date.now()}-${input.filename}`;
+          const { url } = await storagePut(fileKey, buffer, 'application/pdf');
+          
+          // Create initial report record
+          const result = await db.createNutritionReport({
+            clientId: input.clientId,
+            pdfUrl: url,
+            pdfFileKey: fileKey,
+            filename: input.filename,
+            reportDate: input.reportDate,
+            uploadedBy: ctx.user.id,
+          });
+          
+          const reportId = Number(result[0].insertId);
+          
+          // Analyze PDF with AI in background
+          analyzeNutritionReport(reportId).catch(error => {
+            console.error('Failed to analyze nutrition report:', error);
+          });
+          
+          return { success: true, reportId };
+        } catch (error) {
+          console.error('Error uploading nutrition report:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to upload nutrition report',
+          });
+        }
+      }),
+
+    // Get nutrition report for a client
+    get: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const reports = await db.getNutritionReportsByClientId(input.clientId);
+        return reports[0] || null;
+      }),
+
+    // Update nutrition report summary (trainer only)
+    updateSummary: protectedProcedure
+      .input(z.object({
+        reportId: z.number(),
+        goals: z.string().optional(),
+        currentStatus: z.string().optional(),
+        recommendations: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          await db.updateNutritionReportSummary(input.reportId, {
+            goals: input.goals,
+            currentStatus: input.currentStatus,
+            recommendations: input.recommendations,
+          });
+          return { success: true };
+        } catch (error) {
+          console.error('Error updating nutrition report summary:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to update summary',
+          });
+        }
+      }),
+
+    // Delete nutrition report (trainer only)
+    delete: protectedProcedure
+      .input(z.object({ reportId: z.number() }))
+      .mutation(async ({ input }) => {
+        try {
+          await db.deleteNutritionReport(input.reportId);
+          return { success: true };
+        } catch (error) {
+          console.error('Error deleting nutrition report:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to delete report',
+          });
+        }
+      }),
+  }),
+
   athleteMonitoring: router({
     // Submit wellness check-in (client only, once per day)
     submit: authenticatedProcedure

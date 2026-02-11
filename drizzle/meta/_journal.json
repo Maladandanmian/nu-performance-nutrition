@@ -162,6 +162,20 @@
       "when": 1769736639443,
       "tag": "0022_magenta_giant_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1770802389288,
+      "tag": "0023_black_gunslinger",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1770802888638,
+      "tag": "0024_motionless_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

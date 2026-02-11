@@ -428,3 +428,42 @@ export const strengthTests = mysqlTable("strength_tests", {
 
 export type StrengthTest = typeof strengthTests.$inferSelect;
 export type InsertStrengthTest = typeof strengthTests.$inferInsert;
+
+/**
+ * Nutrition Reports table - stores uploaded nutrition assessment PDFs and AI-generated summaries
+ * Only trainers can upload and edit, clients can view
+ */
+export const nutritionReports = mysqlTable("nutrition_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  
+  // PDF file storage
+  pdfUrl: text("pdfUrl").notNull(), // S3 URL to the uploaded PDF
+  pdfFileKey: varchar("pdfFileKey", { length: 500 }).notNull(), // S3 file key for reference
+  filename: varchar("filename", { length: 255 }).notNull(), // Original filename
+  
+  // Report metadata
+  reportDate: timestamp("reportDate").notNull(), // Date the nutrition report was created
+  preparedBy: varchar("preparedBy", { length: 255 }), // Who prepared the report (e.g., "Luke Davey, joint Dynamics")
+  // AI-generated summary (editable by trainer)
+  summary: json("summary").$type<{
+    goals?: Array<{ category: string; target: string }>;
+    currentStatus?: Array<{ metric: string; value: string }>;
+    recommendations?: Array<{ category: string; details: string }>;
+    monitoringPlan?: string[];
+  }>(), // Structured summary extracted by AI
+  
+  // Editable text summaries (formatted from AI analysis)
+  goalsText: text("goalsText"), // Formatted goals and targets text
+  currentStatusText: text("currentStatusText"), // Formatted current status text
+  recommendationsText: text("recommendationsText"), // Formatted recommendations text
+  
+  // Audit fields
+  uploadedBy: int("uploadedBy").notNull().references(() => users.id),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NutritionReport = typeof nutritionReports.$inferSelect;
+export type InsertNutritionReport = typeof nutritionReports.$inferInsert;

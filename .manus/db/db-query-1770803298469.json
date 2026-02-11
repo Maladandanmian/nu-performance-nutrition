@@ -1,0 +1,33 @@
+{
+  "query": "SELECT id, clientId, filename, uploadedAt, goalsText, currentStatusText, recommendationsText FROM nutrition_reports WHERE clientId = 990036 ORDER BY uploadedAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, filename, uploadedAt, goalsText, currentStatusText, recommendationsText FROM nutrition_reports WHERE clientId = 990036 ORDER BY uploadedAt DESC LIMIT 1;",
+  "rows": [],
+  "messages": [
+    "1\t990036\tRobertMorganReport.pdf\t2026-02-11 09:46:33\t**Weight Management:** Achieve a target body weight of under 70 kg",
+    "**Body Composition:** Reduce visceral fat accumulation",
+    "**Macronutrient Balance:** Increase daily protein intake to 2g per kilogram of body weight, equating to approximately 140-150g per day",
+    "**Sleep Quality:** Improve sleep duration and quality to achieve a consistent 7-8 hours per night",
+    "**Hydration:** Establish and maintain a consistent daily fluid intake of 3 litres, primarily from water\t**Current Weight:** 75-77 kg",
+    "**Body Mass Index (BMI):** ~27 kg/m² (overweight)",
+    "**Current Protein Intake:** 80-90g daily",
+    "**Visceral Fat:** ~5 kg",
+    "**Sleep Patterns:** Significantly disrupted, maximum 5 hours per night, frequent waking at 4:00 AM",
+    "**Hydration:** Inconsistent\t**Macronutrient Adjustments**",
+    "Nearly double protein intake; evening meal target 35-40g protein; utilize high-protein sources like 0% fat Greek yogurt and consider whey protein supplementation.",
+    "**Macronutrient Adjustments**",
+    "Reduce carbohydrate portion sizes by half in the evening meal, replace with non-starchy vegetables; limit fast-acting carbohydrates before bedtime.",
+    "**Macronutrient Adjustments**",
+    "Maintain current total fat intake (0.8-1g per kg body weight); reduce olive oil usage by substituting with calorie-controlled spray alternative.",
+    "**Meal & Snack Strategy**",
+    "Replace evening chocolate and biscuit cravings with a structured, high-protein snack (e.g., protein bar with ~20g protein, ~20g carbohydrates).",
+    "**Meal Planning**",
+    "A food template guide will be provided to assist with meal planning, especially for travel situations.",
+    "**Lifestyle Modifications**",
+    "Implement strict sleep hygiene: consistent bedtime/wake-up time, avoid blue light 60-90 minutes before bed.",
+    "**Lifestyle Modifications**",
+    "Gradually increase fluid intake towards 3 litres daily, primarily water."
+  ],
+  "stdout": "id\tclientId\tfilename\tuploadedAt\tgoalsText\tcurrentStatusText\trecommendationsText\n1\t990036\tRobertMorganReport.pdf\t2026-02-11 09:46:33\t**Weight Management:** Achieve a target body weight of under 70 kg\n\n**Body Composition:** Reduce visceral fat accumulation\n\n**Macronutrient Balance:** Increase daily protein intake to 2g per kilogram of body weight, equating to approximately 140-150g per day\n\n**Sleep Quality:** Improve sleep duration and quality to achieve a consistent 7-8 hours per night\n\n**Hydration:** Establish and maintain a consistent daily fluid intake of 3 litres, primarily from water\t**Current Weight:** 75-77 kg\n\n**Body Mass Index (BMI):** ~27 kg/m² (overweight)\n\n**Current Protein Intake:** 80-90g daily\n\n**Visceral Fat:** ~5 kg\n\n**Sleep Patterns:** Significantly disrupted, maximum 5 hours per night, frequent waking at 4:00 AM\n\n**Hydration:** Inconsistent\t**Macronutrient Adjustments**\nNearly double protein intake; evening meal target 35-40g protein; utilize high-protein sources like 0% fat Greek yogurt and consider whey protein supplementation.\n\n**Macronutrient Adjustments**\nReduce carbohydrate portion sizes by half in the evening meal, replace with non-starchy vegetables; limit fast-acting carbohydrates before bedtime.\n\n**Macronutrient Adjustments**\nMaintain current total fat intake (0.8-1g per kg body weight); reduce olive oil usage by substituting with calorie-controlled spray alternative.\n\n**Meal & Snack Strategy**\nReplace evening chocolate and biscuit cravings with a structured, high-protein snack (e.g., protein bar with ~20g protein, ~20g carbohydrates).\n\n**Meal Planning**\nA food template guide will be provided to assist with meal planning, especially for travel situations.\n\n**Lifestyle Modifications**\nImplement strict sleep hygiene: consistent bedtime/wake-up time, avoid blue light 60-90 minutes before bed.\n\n**Lifestyle Modifications**\nGradually increase fluid intake towards 3 litres daily, primarily water.\n",
+  "stderr": "",
+  "execution_time_ms": 1656
+}
