@@ -2448,12 +2448,12 @@ Return as JSON.`
         }
       }),
 
-    // Get nutrition report for a client
-    get: authenticatedProcedure
+    // Get all nutrition reports for a client (ordered by upload date, newest first)
+    getAll: authenticatedProcedure
       .input(z.object({ clientId: z.number() }))
       .query(async ({ input }) => {
         const reports = await db.getNutritionReportsByClientId(input.clientId);
-        return reports[0] || null;
+        return reports; // Return all reports, ordered by uploadedAt DESC
       }),
 
     // Update nutrition report summary (trainer only)
