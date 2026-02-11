@@ -1863,3 +1863,4 @@
 - [x] Allow trainers to edit AI-generated summaries
 - [x] Add View PDF and Delete buttons
 - [x] Write vitest tests for nutrition reports CRUD operations
+- [x] Fix AI nutrition report analysis not displaying in build preview

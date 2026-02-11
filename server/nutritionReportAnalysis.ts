@@ -16,8 +16,12 @@ export interface NutritionReportSummary {
 export async function analyzeNutritionReport(
   reportId: number
 ): Promise<NutritionReportSummary> {
+  console.log('[analyzeNutritionReport] Starting analysis for report ID:', reportId);
+  
   // Get the report from database
   const report = await db.getNutritionReportById(reportId);
+  console.log('[analyzeNutritionReport] Retrieved report:', report ? 'found' : 'not found');
+  
   if (!report) {
     throw new Error('Nutrition report not found');
   }
@@ -141,15 +145,20 @@ Return a structured JSON summary that is concise, actionable, and easy for train
   }
 
   const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
+  console.log('[analyzeNutritionReport] LLM response received, parsing...');
+  
   const summary = JSON.parse(contentStr) as NutritionReportSummary;
+  console.log('[analyzeNutritionReport] Parsed summary:', JSON.stringify(summary, null, 2));
   
   // Update the database with extracted summary
+  console.log('[analyzeNutritionReport] Updating database...');
   await db.updateNutritionReportSummary(reportId, {
     goals: formatGoalsAndTargets(summary.goals),
     currentStatus: formatCurrentStatus(summary.currentStatus),
     recommendations: formatRecommendations(summary.recommendations),
   });
   
+  console.log('[analyzeNutritionReport] Analysis complete!');
   return summary;
 }
 

@@ -243,7 +243,7 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
       </Card>
 
       {/* AI Analysis Status */}
-      {!report.summary && (
+      {!report.goalsText && !report.currentStatusText && !report.recommendationsText && (
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 text-muted-foreground">

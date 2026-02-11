@@ -2430,10 +2430,12 @@ Return as JSON.`
           });
           
           const reportId = Number(result[0].insertId);
+          console.log('[nutritionReports.upload] Created report with ID:', reportId);
           
           // Analyze PDF with AI in background
+          console.log('[nutritionReports.upload] Triggering AI analysis...');
           analyzeNutritionReport(reportId).catch(error => {
-            console.error('Failed to analyze nutrition report:', error);
+            console.error('[nutritionReports.upload] Failed to analyze nutrition report:', error);
           });
           
           return { success: true, reportId };
