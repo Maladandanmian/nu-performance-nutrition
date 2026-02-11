@@ -1864,3 +1864,4 @@
 - [x] Add View PDF and Delete buttons
 - [x] Write vitest tests for nutrition reports CRUD operations
 - [x] Fix AI nutrition report analysis not displaying in build preview
+- [x] Fix markdown rendering in nutrition report summaries to display bold text correctly

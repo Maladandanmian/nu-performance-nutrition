@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import { Streamdown } from 'streamdown';
 
 interface NutritionReportsSectionProps {
   clientId: number;
@@ -206,8 +207,8 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
             </div>
           </div>
         ) : (
-          <div className="rounded-md bg-muted p-4 whitespace-pre-wrap text-sm">
-            {displayValue}
+          <div className="rounded-md bg-muted p-4 text-sm prose prose-sm max-w-none dark:prose-invert">
+            <Streamdown>{displayValue}</Streamdown>
           </div>
         )}
       </div>
