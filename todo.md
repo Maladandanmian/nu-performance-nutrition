@@ -1866,3 +1866,10 @@
 - [x] Fix AI nutrition report analysis not displaying in build preview
 - [x] Fix markdown rendering in nutrition report summaries to display bold text correctly
 - [x] Add report versioning with Previous/Next navigation buttons to scroll through historical nutrition reports
+
+## AI Analysis Not Completing (Feb 11, 2026)
+- [ ] Investigate why AI analysis for nutrition reports is not completing after 5 minutes
+- [ ] Check server logs for errors
+- [ ] Check database to see if report was created
+- [ ] Fix AI analysis function to complete successfully
+- [ ] Test with uploaded nutrition report

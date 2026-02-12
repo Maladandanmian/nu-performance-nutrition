@@ -23,8 +23,20 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
   }>({});
   const [currentReportIndex, setCurrentReportIndex] = useState(0);
 
-  // Queries - now fetching all reports
-  const { data: reports, isLoading, refetch } = trpc.nutritionReports.getAll.useQuery({ clientId });
+  // Queries - now fetching all reports with polling for AI analysis updates
+  const { data: reports, isLoading, refetch } = trpc.nutritionReports.getAll.useQuery(
+    { clientId },
+    {
+      refetchInterval: (data) => {
+        // Poll every 5 seconds if any report is missing analysis data
+        if (!data || !Array.isArray(data)) return false;
+        const hasIncompleteAnalysis = data.some(
+          (report: any) => !report.goalsText || !report.currentStatusText || !report.recommendationsText
+        );
+        return hasIncompleteAnalysis ? 5000 : false;
+      },
+    }
+  );
 
   // Mutations
   const uploadMutation = trpc.nutritionReports.upload.useMutation({
