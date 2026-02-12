@@ -28,6 +28,7 @@ import { BodyweightTrendChart } from "@/components/BodyweightTrendChart";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
 import { GripStrengthSection } from "@/components/GripStrengthSection";
+import { NutritionReportsSection } from "@/components/NutritionReportsSection";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -969,6 +970,7 @@ export default function ClientDashboard() {
             <TabsTrigger value="dexa">DEXA Scans</TabsTrigger>
             <TabsTrigger value="athlete-monitoring">Athlete Monitoring</TabsTrigger>
             <TabsTrigger value="strength-testing">Strength Testing</TabsTrigger>
+            <TabsTrigger value="nutrition-reports">Nutrition Reports</TabsTrigger>
           </TabsList>
 
           {/* Log Meal Tab */}
@@ -1463,6 +1465,20 @@ export default function ClientDashboard() {
                 clientGender={null} 
                 clientAge={null} 
                 isTrainer={false} 
+              />
+            ) : (
+              <Card className="p-6">
+                <p className="text-center text-muted-foreground">Loading...</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Nutrition Reports Tab */}
+          <TabsContent value="nutrition-reports">
+            {clientSession?.clientId ? (
+              <NutritionReportsSection 
+                clientId={clientSession.clientId}
+                isTrainer={false}
               />
             ) : (
               <Card className="p-6">

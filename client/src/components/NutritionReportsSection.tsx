@@ -10,9 +10,10 @@ import { Streamdown } from 'streamdown';
 
 interface NutritionReportsSectionProps {
   clientId: number;
+  isTrainer?: boolean;
 }
 
-export function NutritionReportsSection({ clientId }: NutritionReportsSectionProps) {
+export function NutritionReportsSection({ clientId, isTrainer = true }: NutritionReportsSectionProps) {
   // Toast is imported from sonner
   const [isUploading, setIsUploading] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -162,39 +163,43 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
       <Card>
         <CardHeader>
           <CardTitle>Nutrition Report</CardTitle>
-          <CardDescription>Upload a nutrition report PDF to generate AI-powered insights</CardDescription>
+          <CardDescription>
+            {isTrainer ? 'Upload a nutrition report PDF to generate AI-powered insights' : 'No nutrition reports available yet'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <FileText className="h-16 w-16 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">No nutrition report uploaded yet</p>
-            <div>
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-                className="hidden"
-                id="nutrition-report-upload"
-              />
-              <label htmlFor="nutrition-report-upload">
-                <Button disabled={isUploading} asChild>
-                  <span>
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload Report
-                      </>
-                    )}
-                  </span>
-                </Button>
-              </label>
-            </div>
+            {isTrainer && (
+              <div>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                  className="hidden"
+                  id="nutrition-report-upload"
+                />
+                <label htmlFor="nutrition-report-upload">
+                  <Button disabled={isUploading} asChild>
+                    <span>
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload Report
+                        </>
+                      )}
+                    </span>
+                  </Button>
+                </label>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -211,7 +216,7 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-base font-semibold">{label}</Label>
-          {!isEditing && (
+          {!isEditing && isTrainer && (
             <Button
               variant="ghost"
               size="sm"
@@ -221,7 +226,7 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
             </Button>
           )}
         </div>
-        {isEditing ? (
+        {isEditing && isTrainer ? (
           <div className="space-y-2">
             <Textarea
               value={editedValues[field as keyof typeof editedValues] || ''}
@@ -293,38 +298,42 @@ export function NutritionReportsSection({ clientId }: NutritionReportsSectionPro
                   View PDF
                 </a>
               </Button>
-              <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleteMutation.isPending}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-              {/* Upload new report button */}
-              <div>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleFileUpload}
-                  disabled={isUploading}
-                  className="hidden"
-                  id="nutrition-report-upload-new"
-                />
-                <label htmlFor="nutrition-report-upload-new">
-                  <Button variant="default" size="sm" disabled={isUploading} asChild>
-                    <span>
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="mr-2 h-4 w-4" />
-                          Upload New
-                        </>
-                      )}
-                    </span>
+              {isTrainer && (
+                <>
+                  <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleteMutation.isPending}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
                   </Button>
-                </label>
-              </div>
+                  {/* Upload new report button */}
+                  <div>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                      id="nutrition-report-upload-new"
+                    />
+                    <label htmlFor="nutrition-report-upload-new">
+                      <Button variant="default" size="sm" disabled={isUploading} asChild>
+                        <span>
+                          {isUploading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-2 h-4 w-4" />
+                              Upload New
+                            </>
+                          )}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </CardHeader>

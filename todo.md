@@ -1873,3 +1873,11 @@
 - [ ] Check database to see if report was created
 - [ ] Fix AI analysis function to complete successfully
 - [ ] Test with uploaded nutrition report
+
+## Nutrition Reports Client Visibility (Feb 12, 2026)
+- [x] Add Nutrition Reports tab to client dashboard
+- [x] Update NutritionReportsSection to support read-only mode for clients
+- [x] Disable edit buttons for clients (show read-only view)
+- [x] Allow clients to view PDF and navigate report history
+- [ ] Test on both trainer and client sides
+- [ ] Verify edit permissions work correctly (trainers can edit, clients cannot)
