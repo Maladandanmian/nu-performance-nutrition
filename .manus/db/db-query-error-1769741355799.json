@@ -1,0 +1,8 @@
+{
+  "query": "\nDELETE FROM strength_tests WHERE client_id IN (SELECT id FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com'));\nDELETE FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nDELETE FROM strength_tests WHERE client_id IN (SELECT id FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com'));\nDELETE FROM clients WHERE email IN ('strength-test@example.com', 'young@example.com');\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'client_id' in 'where clause'"
+  ]
+}

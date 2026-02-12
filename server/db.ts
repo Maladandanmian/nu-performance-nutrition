@@ -13,6 +13,7 @@ import {
   auditLogs,
   athleteMonitoring,
   strengthTests,
+  nutritionReports,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1139,4 +1140,110 @@ export async function updateStrengthTest(data: {
       notes: data.notes,
     })
     .where(eq(strengthTests.id, data.id));
+}
+
+// ============================================================================
+// Nutrition Reports
+// ============================================================================
+
+/**
+ * Create a new nutrition report record
+ */
+export async function createNutritionReport(data: {
+  clientId: number;
+  pdfUrl: string;
+  pdfFileKey: string;
+  filename: string;
+  reportDate: Date;
+  preparedBy?: string;
+  summary?: any;
+  uploadedBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const result = await db.insert(nutritionReports).values(data);
+  return result;
+}
+
+/**
+ * Get all nutrition reports for a client
+ */
+export async function getNutritionReportsByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return db
+    .select()
+    .from(nutritionReports)
+    .where(eq(nutritionReports.clientId, clientId))
+    .orderBy(desc(nutritionReports.reportDate));
+}
+
+/**
+ * Get a single nutrition report by ID
+ */
+export async function getNutritionReportById(reportId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(nutritionReports)
+    .where(eq(nutritionReports.id, reportId))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Get the latest nutrition report for a client
+ */
+export async function getLatestNutritionReport(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(nutritionReports)
+    .where(eq(nutritionReports.clientId, clientId))
+    .orderBy(desc(nutritionReports.reportDate))
+    .limit(1);
+
+  return results[0] || null;
+}
+
+/**
+ * Update nutrition report summary (trainer can edit AI-generated summary)
+ */
+export async function updateNutritionReportSummary(
+  reportId: number,
+  updates: {
+    goals?: string;
+    currentStatus?: string;
+    recommendations?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const setData: any = { updatedAt: new Date() };
+  if (updates.goals !== undefined) setData.goalsText = updates.goals;
+  if (updates.currentStatus !== undefined) setData.currentStatusText = updates.currentStatus;
+  if (updates.recommendations !== undefined) setData.recommendationsText = updates.recommendations;
+
+  await db
+    .update(nutritionReports)
+    .set(setData)
+    .where(eq(nutritionReports.id, reportId));
+}
+
+/**
+ * Delete a nutrition report
+ */
+export async function deleteNutritionReport(reportId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.delete(nutritionReports).where(eq(nutritionReports.id, reportId));
 }

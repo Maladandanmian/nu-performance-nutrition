@@ -1847,3 +1847,29 @@
 - [x] Add ability to edit the last grip strength test result
 - [x] Revert grip strength scoring to original table ranges (40-59 years: 36-50kg for males)
 - [x] Delete accidentally created test clients (Test Strength Client, Young Client)
+
+## Nutrition Reports Feature (nutrition-reports branch)
+- [ ] Create nutritionReports table in database schema
+- [ ] Add tRPC procedures for upload, AI summarization, and CRUD
+- [ ] Build Nutrition Reports tab UI with upload functionality
+- [ ] Implement AI-powered report summarization with editable fields
+- [ ] Add trainer-only edit permissions for summaries
+- [ ] Test complete upload → summarize → edit workflow
+
+- [x] Create Nutrition Reports tab below Strength Testing
+- [x] Add PDF upload functionality for trainers
+- [x] Implement AI analysis to extract goals, current status, and recommendations
+- [x] Display AI-generated summary in editable format
+- [x] Allow trainers to edit AI-generated summaries
+- [x] Add View PDF and Delete buttons
+- [x] Write vitest tests for nutrition reports CRUD operations
+- [x] Fix AI nutrition report analysis not displaying in build preview
+- [x] Fix markdown rendering in nutrition report summaries to display bold text correctly
+- [x] Add report versioning with Previous/Next navigation buttons to scroll through historical nutrition reports
+
+## AI Analysis Not Completing (Feb 11, 2026)
+- [ ] Investigate why AI analysis for nutrition reports is not completing after 5 minutes
+- [ ] Check server logs for errors
+- [ ] Check database to see if report was created
+- [ ] Fix AI analysis function to complete successfully
+- [ ] Test with uploaded nutrition report

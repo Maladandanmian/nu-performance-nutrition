@@ -1,0 +1,27 @@
+{
+  "query": "SELECT * FROM nutrition_reports WHERE clientId = 990036 ORDER BY uploadedAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM nutrition_reports WHERE clientId = 990036 ORDER BY uploadedAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "4",
+      "clientId": "990036",
+      "pdfUrl": "https://example.com/test-report.pdf",
+      "pdfFileKey": "test-reports/test-report.pdf",
+      "filename": "test-report.pdf",
+      "reportDate": "2026-01-30 00:00:00",
+      "preparedBy": "NULL",
+      "summary": "NULL",
+      "uploadedBy": "1",
+      "createdAt": "2026-02-11 09:53:24",
+      "updatedAt": "2026-02-11 09:53:24",
+      "goalsText": "NULL",
+      "currentStatusText": "NULL",
+      "recommendationsText": "NULL",
+      "uploadedAt": "2026-02-11 09:53:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tpdfUrl\tpdfFileKey\tfilename\treportDate\tpreparedBy\tsummary\tuploadedBy\tcreatedAt\tupdatedAt\tgoalsText\tcurrentStatusText\trecommendationsText\tuploadedAt\n4\t990036\thttps://example.com/test-report.pdf\ttest-reports/test-report.pdf\ttest-report.pdf\t2026-01-30 00:00:00\tNULL\tNULL\t1\t2026-02-11 09:53:24\t2026-02-11 09:53:24\tNULL\tNULL\tNULL\t2026-02-11 09:53:24\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}

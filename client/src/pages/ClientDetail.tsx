@@ -15,6 +15,7 @@ import { DexaUploadSection } from "@/components/DexaUploadSection";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
 import { GripStrengthSection } from "@/components/GripStrengthSection";
+import { NutritionReportsSection } from "@/components/NutritionReportsSection";
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -421,6 +422,7 @@ export default function ClientDetail() {
               <TabsTrigger value="dexa-viz" className="text-xs md:text-sm">DEXA Insights</TabsTrigger>
               <TabsTrigger value="athlete-monitoring" className="text-xs md:text-sm">Athlete Monitoring</TabsTrigger>
               <TabsTrigger value="strength-testing" className="text-xs md:text-sm">Strength Testing</TabsTrigger>
+              <TabsTrigger value="nutrition-reports" className="text-xs md:text-sm">Nutrition Reports</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -731,6 +733,10 @@ export default function ClientDetail() {
                 clientAge={client.age} 
                 isTrainer={true} 
               />
+            </TabsContent>
+
+            <TabsContent value="nutrition-reports" className="space-y-4">
+              <NutritionReportsSection clientId={clientId || 0} />
             </TabsContent>
           </Tabs>
         </div>

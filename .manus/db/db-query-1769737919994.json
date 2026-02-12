@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, clientId, testType, value, testedAt FROM strength_tests WHERE clientId = 990036 ORDER BY testedAt ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, clientId, testType, value, testedAt FROM strength_tests WHERE clientId = 990036 ORDER BY testedAt ASC;",
+  "rows": [
+    {
+      "id": "2",
+      "clientId": "990036",
+      "testType": "grip_strength",
+      "value": "58.00",
+      "testedAt": "2026-01-09 00:00:00"
+    },
+    {
+      "id": "3",
+      "clientId": "990036",
+      "testType": "grip_strength",
+      "value": "60.00",
+      "testedAt": "2026-01-16 00:00:00"
+    },
+    {
+      "id": "4",
+      "clientId": "990036",
+      "testType": "grip_strength",
+      "value": "62.00",
+      "testedAt": "2026-01-23 00:00:00"
+    },
+    {
+      "id": "1",
+      "clientId": "990036",
+      "testType": "grip_strength",
+      "value": "62.00",
+      "testedAt": "2026-01-30 00:00:00"
+    },
+    {
+      "id": "5",
+      "clientId": "990036",
+      "testType": "grip_strength",
+      "value": "64.00",
+      "testedAt": "2026-01-30 00:00:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\ttestType\tvalue\ttestedAt\n2\t990036\tgrip_strength\t58.00\t2026-01-09 00:00:00\n3\t990036\tgrip_strength\t60.00\t2026-01-16 00:00:00\n4\t990036\tgrip_strength\t62.00\t2026-01-23 00:00:00\n1\t990036\tgrip_strength\t62.00\t2026-01-30 00:00:00\n5\t990036\tgrip_strength\t64.00\t2026-01-30 00:00:00\n",
+  "stderr": "",
+  "execution_time_ms": 1532
+}
