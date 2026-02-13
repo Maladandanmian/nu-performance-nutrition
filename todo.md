@@ -1915,9 +1915,9 @@
 - [x] Build VO2 Max tab UI with PDF upload functionality
 - [x] Display extracted data with full PDF viewability
 - [x] Add VO2 Max tab to trainer client detail page
-- [ ] Create anthropometric and baseline trends visualization
-- [ ] Create fitness assessment trends visualization  
-- [ ] Solve scale visibility issues for small vs large numbers in graphs
+- [x] Create anthropometric and baseline trends visualization
+- [x] Create fitness assessment trends visualization  
+- [x] Solve scale visibility issues for small vs large numbers in graphs (using metric selection dropdown)
 - [ ] Add client position indicator on VO2 max reference table
-- [ ] Write vitest tests for VO2 Max procedures
-- [ ] Test end-to-end workflow (upload, extract, visualize)
+- [x] Write vitest tests for VO2 Max procedures
+- [x] Test end-to-end workflow (upload, extract, visualize)

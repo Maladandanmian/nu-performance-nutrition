@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { trpc } from "@/lib/trpc";
 import { FileText, Upload, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { Vo2MaxVisualization } from './Vo2MaxVisualization';
 
 interface Vo2MaxSectionProps {
   clientId: number;
@@ -167,6 +168,9 @@ export function Vo2MaxSection({ clientId, isTrainer = true }: Vo2MaxSectionProps
   // Display current test
   return (
     <div className="space-y-6">
+      {/* Visualizations */}
+      <Vo2MaxVisualization clientId={clientId} />
+
       {/* Header with navigation */}
       <Card>
         <CardContent className="pt-6">
