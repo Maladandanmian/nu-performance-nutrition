@@ -63,12 +63,20 @@ SECTIONS TO EXTRACT:
    - veBtpsLMin: L/min (decimal, ventilation)
    - rpe: Rating of Perceived Exertion (integer, 1-20 scale)
 
-5. LACTATE PROFILE (array of data points from graph/table)
-   Extract all stages showing progression from low to high workload:
-   - stageNumber: Sequential number (1, 2, 3, ...)
-   - workloadSpeed: km/h (decimal)
-   - lactate: mmol/L (decimal)
-   - heartRate: bpm (integer)
+5. LACTATE PROFILE (threshold analysis from narrative text)
+   Extract the lactate threshold analysis from the paragraph describing the test results.
+   Look for text describing:
+   - At what speed the lactate level began to rise above baseline
+   - The lactate level at that speed (typically around 2mmol/L)
+   - The aerobic threshold speed and heart rate
+   - The lactate threshold speed and heart rate
+   - Any comparison to previous test results
+   
+   Return as an array with data points showing:
+   - stageNumber: Sequential number (1 for aerobic threshold, 2 for lactate threshold)
+   - workloadSpeed: km/h (decimal, e.g., 13.75)
+   - lactate: mmol/L (decimal, e.g., 2.0 for aerobic, 4.0 for lactate threshold)
+   - heartRate: bpm (integer, e.g., 154 for aerobic, 166 for lactate threshold)
 
 Return the extracted data in the specified JSON schema format.`;
 

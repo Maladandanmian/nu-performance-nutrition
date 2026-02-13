@@ -1,0 +1,19 @@
+{
+  "query": "SELECT t.id, a.temperature, a.pressure, a.humidity, an.height, an.weight, f.vo2MaxMlKgMin FROM vo2_max_tests t LEFT JOIN vo2_max_ambient_data a ON t.id = a.testId LEFT JOIN vo2_max_anthropometric an ON t.id = an.testId LEFT JOIN vo2_max_fitness_assessment f ON t.id = f.testId ORDER BY t.uploadedAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT t.id, a.temperature, a.pressure, a.humidity, an.height, an.weight, f.vo2MaxMlKgMin FROM vo2_max_tests t LEFT JOIN vo2_max_ambient_data a ON t.id = a.testId LEFT JOIN vo2_max_anthropometric an ON t.id = an.testId LEFT JOIN vo2_max_fitness_assessment f ON t.id = f.testId ORDER BY t.uploadedAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "3",
+      "temperature": "22.0",
+      "pressure": "767",
+      "humidity": "68",
+      "height": "1.86",
+      "weight": "87.6",
+      "vo2MaxMlKgMin": "47.7"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttemperature\tpressure\thumidity\theight\tweight\tvo2MaxMlKgMin\n3\t22.0\t767\t68\t1.86\t87.6\t47.7\n",
+  "stderr": "",
+  "execution_time_ms": 1708
+}

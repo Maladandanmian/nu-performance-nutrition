@@ -31,10 +31,18 @@ export function Vo2MaxSection({ clientId, isTrainer = true }: Vo2MaxSectionProps
 
   // Fetch detailed data for the current test
   const currentTest = tests[currentIndex];
-  const { data: testDetails } = trpc.vo2MaxTests.getTestDetails.useQuery(
+  const { data: testDetails, isLoading: isLoadingDetails, error: detailsError } = trpc.vo2MaxTests.getTestDetails.useQuery(
     { testId: currentTest?.id || 0 },
     { enabled: !!currentTest }
   );
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[Vo2MaxSection] Current test:', currentTest);
+    console.log('[Vo2MaxSection] Test details:', testDetails);
+    console.log('[Vo2MaxSection] Loading details:', isLoadingDetails);
+    console.log('[Vo2MaxSection] Details error:', detailsError);
+  }, [currentTest, testDetails, isLoadingDetails, detailsError]);
 
   // Upload mutation
   const uploadMutation = trpc.vo2MaxTests.upload.useMutation({

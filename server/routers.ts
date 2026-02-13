@@ -2666,6 +2666,7 @@ Return as JSON.`
     getTestDetails: authenticatedProcedure
       .input(z.object({ testId: z.number() }))
       .query(async ({ input }) => {
+        console.log('[getTestDetails] Fetching data for testId:', input.testId);
         const [test, ambientData, anthropometric, fitnessAssessment, lactateProfile] = await Promise.all([
           db.getVo2MaxTestById(input.testId),
           db.getVo2MaxAmbientData(input.testId),
@@ -2673,6 +2674,14 @@ Return as JSON.`
           db.getVo2MaxFitnessAssessment(input.testId),
           db.getVo2MaxLactateProfile(input.testId),
         ]);
+        
+        console.log('[getTestDetails] Results:', {
+          test: !!test,
+          ambientData: !!ambientData,
+          anthropometric: !!anthropometric,
+          fitnessAssessment: !!fitnessAssessment,
+          lactateProfileCount: lactateProfile.length
+        });
         
         return {
           test,

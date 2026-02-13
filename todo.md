@@ -1921,3 +1921,19 @@
 - [ ] Add client position indicator on VO2 max reference table
 - [x] Write vitest tests for VO2 Max procedures
 - [x] Test end-to-end workflow (upload, extract, visualize)
+
+## VO2 Max Data Display Fix (Feb 13, 2026)
+- [ ] Investigate why extracted VO2 Max data is not displaying in UI
+- [ ] Add Ambient Data section display
+- [ ] Fix Anthropometric & Baseline data display
+- [ ] Fix Fitness Assessment data display
+- [ ] Add Blood Lactate Profile table display with client position marker
+- [ ] Test with uploaded document to verify all sections display correctly
+
+## VO2 Max Blood Lactate Profile Extraction Fix (Feb 13, 2026)
+- [x] Remove incorrect VO2 max reference table extraction from lactate profile
+- [x] Update AI extraction to capture threshold analysis from page 5 paragraph
+- [x] Extract aerobic threshold speed and heart rate (e.g., 13.75km/h, 154bpm)
+- [x] Extract lactate threshold speed and heart rate (e.g., 14.75km/h, 166bpm)
+- [x] Extract baseline lactate level and speed where it rises
+- [ ] Test with new PDF upload to verify correct extraction
