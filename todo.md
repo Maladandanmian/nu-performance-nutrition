@@ -1954,3 +1954,13 @@
 - [x] Write vitest tests for update procedures (7/7 tests passing)
 - [ ] Create tRPC procedures for updating lactate profile data
 - [ ] Test editing functionality on all data types
+
+## Client-Side VO2 Max Viewing (Feb 13, 2026)
+- [x] Add VO2 Max tab to client dashboard navigation
+- [x] Create client VO2 Max view component (read-only)
+- [x] Display all test summaries for the logged-in client
+- [x] Show full PDF viewer for each test
+- [x] Display all extracted data sections (ambient, anthropometric, fitness assessment)
+- [x] Hide upload functionality (trainer-only)
+- [x] Hide edit buttons (trainer-only)
+- [x] Reuse Vo2MaxSection component with isTrainer prop for role-based permissions
