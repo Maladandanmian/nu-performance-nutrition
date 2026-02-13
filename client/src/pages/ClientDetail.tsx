@@ -15,7 +15,8 @@ import { DexaUploadSection } from "@/components/DexaUploadSection";
 import { DexaVisualizationPanels } from "@/components/DexaVisualizationPanels";
 import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection";
 import { GripStrengthSection } from "@/components/GripStrengthSection";
-import { NutritionReportsSection } from "@/components/NutritionReportsSection";
+import { NutritionReportsSection } from '@/components/NutritionReportsSection';
+import { Vo2MaxSection } from '@/components/Vo2MaxSection';
 import { ArrowLeft, Edit, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useRoute } from "wouter";
@@ -423,6 +424,7 @@ export default function ClientDetail() {
               <TabsTrigger value="athlete-monitoring" className="text-xs md:text-sm">Athlete Monitoring</TabsTrigger>
               <TabsTrigger value="strength-testing" className="text-xs md:text-sm">Strength Testing</TabsTrigger>
               <TabsTrigger value="nutrition-reports" className="text-xs md:text-sm">Nutrition Reports</TabsTrigger>
+              <TabsTrigger value="vo2-max" className="text-xs md:text-sm">VO2 Max</TabsTrigger>
             </TabsList>
 
             <TabsContent value="nutrition" className="space-y-4">
@@ -737,6 +739,10 @@ export default function ClientDetail() {
 
             <TabsContent value="nutrition-reports" className="space-y-4">
               <NutritionReportsSection clientId={clientId || 0} />
+            </TabsContent>
+
+            <TabsContent value="vo2-max" className="space-y-4">
+              <Vo2MaxSection clientId={clientId || 0} isTrainer={true} />
             </TabsContent>
           </Tabs>
         </div>

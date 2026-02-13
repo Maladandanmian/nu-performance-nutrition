@@ -2541,6 +2541,172 @@ Return as JSON.`
         return result || [];
       }),
   }),
+
+  vo2MaxTests: router({
+    // Upload VO2 Max test PDF (trainer only)
+    upload: protectedProcedure
+      .input(z.object({
+        clientId: z.number(),
+        filename: z.string(),
+        fileData: z.string(), // Base64 encoded PDF
+        testDate: z.date(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { analyzeVo2MaxPdf } = await import('./vo2MaxAnalysis');
+          const { storagePut } = await import('./storage');
+          
+          // Decode base64 and upload to S3
+          const buffer = Buffer.from(input.fileData, 'base64');
+          const fileKey = `vo2-max-tests/${input.clientId}/${Date.now()}-${input.filename}`;
+          const { url } = await storagePut(fileKey, buffer, 'application/pdf');
+          
+          // Create initial test record
+          const testId = await db.createVo2MaxTest({
+            clientId: input.clientId,
+            pdfUrl: url,
+            pdfFileKey: fileKey,
+            filename: input.filename,
+            testDate: input.testDate,
+            uploadedBy: ctx.user.id,
+          });
+          
+          console.log('[vo2MaxTests.upload] Created test with ID:', testId);
+          
+          // Analyze PDF with AI in background
+          console.log('[vo2MaxTests.upload] Triggering AI analysis...');
+          analyzeVo2MaxPdf(url).then(async (extracted) => {
+            console.log('[vo2MaxTests.upload] AI extraction complete, saving to database...');
+            
+            // Save ambient data
+            if (extracted.ambientData) {
+              await db.createVo2MaxAmbientData({
+                testId,
+                temperature: extracted.ambientData.temperature?.toString(),
+                pressure: extracted.ambientData.pressure || undefined,
+                humidity: extracted.ambientData.humidity || undefined,
+              });
+            }
+            
+            // Save anthropometric data
+            if (extracted.anthropometric) {
+              await db.createVo2MaxAnthropometric({
+                testId,
+                height: extracted.anthropometric.height?.toString(),
+                weight: extracted.anthropometric.weight?.toString(),
+                restingHeartRate: extracted.anthropometric.restingHeartRate || undefined,
+                restingBpSystolic: extracted.anthropometric.restingBpSystolic || undefined,
+                restingBpDiastolic: extracted.anthropometric.restingBpDiastolic || undefined,
+                restingLactate: extracted.anthropometric.restingLactate?.toString(),
+              });
+            }
+            
+            // Save fitness assessment data
+            if (extracted.fitnessAssessment) {
+              await db.createVo2MaxFitnessAssessment({
+                testId,
+                aerobicThresholdLactate: extracted.fitnessAssessment.aerobicThresholdLactate?.toString(),
+                aerobicThresholdSpeed: extracted.fitnessAssessment.aerobicThresholdSpeed?.toString(),
+                aerobicThresholdHr: extracted.fitnessAssessment.aerobicThresholdHr || undefined,
+                aerobicThresholdHrPct: extracted.fitnessAssessment.aerobicThresholdHrPct || undefined,
+                lactateThresholdLactate: extracted.fitnessAssessment.lactateThresholdLactate?.toString(),
+                lactateThresholdSpeed: extracted.fitnessAssessment.lactateThresholdSpeed?.toString(),
+                lactateThresholdHr: extracted.fitnessAssessment.lactateThresholdHr || undefined,
+                lactateThresholdHrPct: extracted.fitnessAssessment.lactateThresholdHrPct || undefined,
+                maximumLactate: extracted.fitnessAssessment.maximumLactate?.toString(),
+                maximumSpeed: extracted.fitnessAssessment.maximumSpeed?.toString(),
+                maximumHr: extracted.fitnessAssessment.maximumHr || undefined,
+                maximumHrPct: extracted.fitnessAssessment.maximumHrPct || undefined,
+                vo2MaxMlKgMin: extracted.fitnessAssessment.vo2MaxMlKgMin?.toString(),
+                vo2MaxLMin: extracted.fitnessAssessment.vo2MaxLMin?.toString(),
+                vco2LMin: extracted.fitnessAssessment.vco2LMin?.toString(),
+                rer: extracted.fitnessAssessment.rer?.toString(),
+                rrBrMin: extracted.fitnessAssessment.rrBrMin?.toString(),
+                veBtpsLMin: extracted.fitnessAssessment.veBtpsLMin?.toString(),
+                rpe: extracted.fitnessAssessment.rpe || undefined,
+              });
+            }
+            
+            // Save lactate profile data points
+            if (extracted.lactateProfile && extracted.lactateProfile.length > 0) {
+              const profileData = extracted.lactateProfile.map((point: { stageNumber: number; workloadSpeed: number; lactate: number; heartRate: number }) => ({
+                testId,
+                stageNumber: point.stageNumber,
+                workloadSpeed: point.workloadSpeed.toString(),
+                lactate: point.lactate.toString(),
+                heartRate: point.heartRate,
+              }));
+              await db.createVo2MaxLactateProfile(profileData);
+            }
+            
+            console.log('[vo2MaxTests.upload] AI analysis saved successfully');
+          }).catch(error => {
+            console.error('[vo2MaxTests.upload] Failed to analyze VO2 Max test:', error);
+          });
+          
+          return { success: true, testId };
+        } catch (error) {
+          console.error('Error uploading VO2 Max test:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to upload VO2 Max test',
+          });
+        }
+      }),
+
+    // Get all VO2 Max tests for a client (ordered by test date, newest first)
+    getAll: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const tests = await db.getVo2MaxTestsByClientId(input.clientId);
+        return tests;
+      }),
+
+    // Get detailed data for a specific test
+    getTestDetails: authenticatedProcedure
+      .input(z.object({ testId: z.number() }))
+      .query(async ({ input }) => {
+        const [test, ambientData, anthropometric, fitnessAssessment, lactateProfile] = await Promise.all([
+          db.getVo2MaxTestById(input.testId),
+          db.getVo2MaxAmbientData(input.testId),
+          db.getVo2MaxAnthropometric(input.testId),
+          db.getVo2MaxFitnessAssessment(input.testId),
+          db.getVo2MaxLactateProfile(input.testId),
+        ]);
+        
+        return {
+          test,
+          ambientData,
+          anthropometric,
+          fitnessAssessment,
+          lactateProfile,
+        };
+      }),
+
+    // Get trend data for anthropometric metrics across all tests
+    getAnthropometricTrend: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const data = await db.getVo2MaxAnthropometricByClientId(input.clientId);
+        return data;
+      }),
+
+    // Get trend data for fitness assessment metrics across all tests
+    getFitnessAssessmentTrend: authenticatedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        const data = await db.getVo2MaxFitnessAssessmentByClientId(input.clientId);
+        return data;
+      }),
+
+    // Delete a VO2 Max test (trainer only)
+    delete: protectedProcedure
+      .input(z.object({ testId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteVo2MaxTest(input.testId);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

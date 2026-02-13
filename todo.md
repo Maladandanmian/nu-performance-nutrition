@@ -1909,11 +1909,12 @@
 ## VO2 Max Tracking System (Feb 13, 2026)
 - [x] Design and create database schema for VO2 Max tests
 - [x] Create database helper functions for VO2 Max data
-- [ ] Create tRPC procedures for VO2 Max CRUD operations
-- [ ] Implement AI extraction for ambient data, anthropometric/baseline, and fitness assessment
-- [ ] Implement AI extraction for blood lactate profile table recreation
-- [ ] Build VO2 Max tab UI with PDF upload functionality
-- [ ] Display extracted data with full PDF viewability
+- [x] Create tRPC procedures for VO2 Max CRUD operations
+- [x] Implement AI extraction for ambient data, anthropometric/baseline, and fitness assessment
+- [x] Implement AI extraction for blood lactate profile table recreation
+- [x] Build VO2 Max tab UI with PDF upload functionality
+- [x] Display extracted data with full PDF viewability
+- [x] Add VO2 Max tab to trainer client detail page
 - [ ] Create anthropometric and baseline trends visualization
 - [ ] Create fitness assessment trends visualization  
 - [ ] Solve scale visibility issues for small vs large numbers in graphs
