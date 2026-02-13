@@ -1943,3 +1943,14 @@
 - [x] Poll every 5 seconds until all data fields are populated
 - [x] Stop polling once analysis is complete
 - [ ] Test with new upload to verify automatic display
+
+## VO2 Max Edit Functionality (Feb 13, 2026)
+- [x] Add edit buttons to all ambient data fields
+- [x] Add edit buttons to all anthropometric and baseline fields
+- [x] Add edit buttons to all fitness assessment fields
+- [x] Create tRPC update procedures for ambient, anthropometric, and fitness assessment data
+- [x] Implement inline editing with save/cancel functionality
+- [x] Add role-based permissions (trainers only can edit)
+- [x] Write vitest tests for update procedures (7/7 tests passing)
+- [ ] Create tRPC procedures for updating lactate profile data
+- [ ] Test editing functionality on all data types

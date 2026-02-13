@@ -1517,3 +1517,71 @@ export async function getVo2MaxLactateProfile(testId: number) {
     .where(eq(vo2MaxLactateProfile.testId, testId))
     .orderBy(vo2MaxLactateProfile.stageNumber);
 }
+
+/**
+ * Update ambient data for a VO2 Max test
+ */
+export async function updateVo2MaxAmbientData(testId: number, data: {
+  temperature?: string;
+  pressure?: number;
+  humidity?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Use insert with onDuplicateKeyUpdate to handle both create and update
+  await db
+    .insert(vo2MaxAmbientData)
+    .values({ testId, ...data })
+    .onDuplicateKeyUpdate({ set: data });
+}
+
+/**
+ * Update anthropometric data for a VO2 Max test
+ */
+export async function updateVo2MaxAnthropometric(testId: number, data: {
+  height?: string;
+  weight?: string;
+  restingHr?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Map restingHr to restingHeartRate for database schema
+  const dbData: any = {};
+  if (data.height !== undefined) dbData.height = data.height;
+  if (data.weight !== undefined) dbData.weight = data.weight;
+  if (data.restingHr !== undefined) dbData.restingHeartRate = data.restingHr;
+
+  // Use insert with onDuplicateKeyUpdate to handle both create and update
+  await db
+    .insert(vo2MaxAnthropometric)
+    .values({ testId, ...dbData })
+    .onDuplicateKeyUpdate({ set: dbData });
+}
+
+/**
+ * Update fitness assessment data for a VO2 Max test
+ */
+export async function updateVo2MaxFitnessAssessment(testId: number, data: {
+  aerobicThresholdLactate?: string;
+  aerobicThresholdSpeed?: string;
+  aerobicThresholdHr?: number;
+  lactateThresholdLactate?: string;
+  lactateThresholdSpeed?: string;
+  lactateThresholdHr?: number;
+  maximumLactate?: string;
+  maximumSpeed?: string;
+  maximumHr?: number;
+  vo2MaxMlKgMin?: string;
+  vo2MaxLMin?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  // Use insert with onDuplicateKeyUpdate to handle both create and update
+  await db
+    .insert(vo2MaxFitnessAssessment)
+    .values({ testId, ...data })
+    .onDuplicateKeyUpdate({ set: data });
+}

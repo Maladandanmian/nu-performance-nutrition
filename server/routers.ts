@@ -2708,6 +2708,73 @@ Return as JSON.`
         return data;
       }),
 
+    // Update ambient data (trainer only)
+    updateAmbientData: protectedProcedure
+      .input(z.object({
+        testId: z.number(),
+        temperature: z.string().optional(),
+        pressure: z.string().optional(),
+        humidity: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateVo2MaxAmbientData(input.testId, {
+          temperature: input.temperature,
+          pressure: input.pressure ? parseInt(input.pressure, 10) : undefined,
+          humidity: input.humidity ? parseInt(input.humidity, 10) : undefined,
+        });
+        return { success: true };
+      }),
+
+    // Update anthropometric data (trainer only)
+    updateAnthropometric: protectedProcedure
+      .input(z.object({
+        testId: z.number(),
+        height: z.string().optional(),
+        weight: z.string().optional(),
+        restingHr: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateVo2MaxAnthropometric(input.testId, {
+          height: input.height,
+          weight: input.weight,
+          restingHr: input.restingHr,
+        });
+        return { success: true };
+      }),
+
+    // Update fitness assessment data (trainer only)
+    updateFitnessAssessment: protectedProcedure
+      .input(z.object({
+        testId: z.number(),
+        aerobicThresholdLactate: z.string().optional(),
+        aerobicThresholdSpeed: z.string().optional(),
+        aerobicThresholdHr: z.number().optional(),
+        lactateThresholdLactate: z.string().optional(),
+        lactateThresholdSpeed: z.string().optional(),
+        lactateThresholdHr: z.number().optional(),
+        maximumLactate: z.string().optional(),
+        maximumSpeed: z.string().optional(),
+        maximumHr: z.number().optional(),
+        vo2MaxMlKgMin: z.string().optional(),
+        vo2MaxLMin: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateVo2MaxFitnessAssessment(input.testId, {
+          aerobicThresholdLactate: input.aerobicThresholdLactate,
+          aerobicThresholdSpeed: input.aerobicThresholdSpeed,
+          aerobicThresholdHr: input.aerobicThresholdHr,
+          lactateThresholdLactate: input.lactateThresholdLactate,
+          lactateThresholdSpeed: input.lactateThresholdSpeed,
+          lactateThresholdHr: input.lactateThresholdHr,
+          maximumLactate: input.maximumLactate,
+          maximumSpeed: input.maximumSpeed,
+          maximumHr: input.maximumHr,
+          vo2MaxMlKgMin: input.vo2MaxMlKgMin,
+          vo2MaxLMin: input.vo2MaxLMin,
+        });
+        return { success: true };
+      }),
+
     // Delete a VO2 Max test (trainer only)
     delete: protectedProcedure
       .input(z.object({ testId: z.number() }))
