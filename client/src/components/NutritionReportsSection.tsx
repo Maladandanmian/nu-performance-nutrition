@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, FileText, Loader2, Pencil, Trash2, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,7 @@ interface NutritionReportsSectionProps {
 export function NutritionReportsSection({ clientId, isTrainer = true }: NutritionReportsSectionProps) {
   // Toast is imported from sonner
   const [isUploading, setIsUploading] = useState(false);
+  const [pollingActive, setPollingActive] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editedValues, setEditedValues] = useState<{
     goals?: string;
@@ -24,20 +25,39 @@ export function NutritionReportsSection({ clientId, isTrainer = true }: Nutritio
   }>({});
   const [currentReportIndex, setCurrentReportIndex] = useState(0);
 
-  // Queries - now fetching all reports with polling for AI analysis updates
+  // Queries - now fetching all reports
   const { data: reports, isLoading, refetch } = trpc.nutritionReports.getAll.useQuery(
     { clientId },
     {
-      refetchInterval: (data) => {
-        // Poll every 5 seconds if any report is missing analysis data
-        if (!data || !Array.isArray(data)) return false;
-        const hasIncompleteAnalysis = data.some(
-          (report: any) => !report.goalsText || !report.currentStatusText || !report.recommendationsText
-        );
-        return hasIncompleteAnalysis ? 5000 : false;
-      },
+      refetchOnMount: true,
     }
   );
+
+  // Manual polling with setInterval when analysis is incomplete
+  useEffect(() => {
+    if (reports && Array.isArray(reports)) {
+      const hasIncomplete = reports.some(
+        (report: any) => !report.goalsText || !report.currentStatusText || !report.recommendationsText
+      );
+      setPollingActive(hasIncomplete);
+      console.log('[NutritionReports] Reports updated:', { reportCount: reports.length, hasIncomplete });
+
+      // Start polling if there are incomplete reports
+      if (hasIncomplete) {
+        console.log('[NutritionReports] Starting manual polling...');
+        const pollInterval = setInterval(() => {
+          console.log('[NutritionReports] Polling check - refetching...');
+          refetch();
+        }, 5000);
+
+        // Cleanup interval on unmount or when analysis completes
+        return () => {
+          console.log('[NutritionReports] Stopping polling');
+          clearInterval(pollInterval);
+        };
+      }
+    }
+  }, [reports, refetch]);
 
   // Mutations
   const uploadMutation = trpc.nutritionReports.upload.useMutation({
@@ -259,82 +279,87 @@ export function NutritionReportsSection({ clientId, isTrainer = true }: Nutritio
       {/* Report Header with Navigation */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-4">
+          <div className="space-y-4">
+            {/* Title and Upload Date */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
                 <CardTitle>Nutrition Report</CardTitle>
-                {reports.length > 1 && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToPreviousReport}
-                      disabled={currentReportIndex === 0}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
+                <CardDescription className="mt-1">
+                  Uploaded on {new Date(currentReport.uploadedAt).toLocaleDateString()}
+                </CardDescription>
+              </div>
+              {/* Action buttons - stack on mobile, inline on desktop */}
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <a href={currentReport.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <FileText className="h-4 w-4 mr-2" />
+                    View PDF
+                  </a>
+                </Button>
+                {isTrainer && (
+                  <>
+                    <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleteMutation.isPending}>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
                     </Button>
-                    <span className="text-sm text-muted-foreground min-w-[100px] text-center">
-                      Report {currentReportIndex + 1} of {reports.length}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToNextReport}
-                      disabled={currentReportIndex === reports.length - 1}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+                    {/* Upload new report button */}
+                    <div>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileUpload}
+                        disabled={isUploading}
+                        className="hidden"
+                        id="nutrition-report-upload-new"
+                      />
+                      <label htmlFor="nutrition-report-upload-new">
+                        <Button variant="default" size="sm" disabled={isUploading} asChild>
+                          <span>
+                            {isUploading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload New
+                              </>
+                            )}
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
+                  </>
                 )}
               </div>
-              <CardDescription>
-                Uploaded on {new Date(currentReport.uploadedAt).toLocaleDateString()}
-              </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <a href={currentReport.pdfUrl} target="_blank" rel="noopener noreferrer">
-                  <FileText className="h-4 w-4 mr-2" />
-                  View PDF
-                </a>
-              </Button>
-              {isTrainer && (
-                <>
-                  <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleteMutation.isPending}>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                  {/* Upload new report button */}
-                  <div>
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleFileUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                      id="nutrition-report-upload-new"
-                    />
-                    <label htmlFor="nutrition-report-upload-new">
-                      <Button variant="default" size="sm" disabled={isUploading} asChild>
-                        <span>
-                          {isUploading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Uploading...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="mr-2 h-4 w-4" />
-                              Upload New
-                            </>
-                          )}
-                        </span>
-                      </Button>
-                    </label>
-                  </div>
-                </>
-              )}
-            </div>
+            {/* Navigation - centered below on all screen sizes */}
+            {reports.length > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-2 border-t">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={goToPreviousReport}
+                  disabled={currentReportIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground min-w-[100px] text-center font-medium">
+                  Report {currentReportIndex + 1} of {reports.length}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={goToNextReport}
+                  disabled={currentReportIndex === reports.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </CardHeader>
       </Card>

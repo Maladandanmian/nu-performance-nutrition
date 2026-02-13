@@ -31,22 +31,51 @@ export async function analyzeNutritionReport(
     messages: [
       {
         role: "system",
-        content: `You are a nutrition report analysis assistant. Extract and summarize key information from nutrition assessment reports.
+        content: `You are a nutrition report analysis assistant. Extract and summarize key information from nutrition assessment reports with STRICT adherence to the standardised structure below.
 
-Focus on extracting:
-1. Goals & Objectives - specific, measurable targets (e.g., weight goals, macronutrient targets, sleep hours, hydration)
-2. Current Status - baseline measurements and current state
-3. Key Recommendations - actionable intervention strategies
-4. Monitoring Plan - follow-up actions and tracking methods
+**CRITICAL FORMATTING RULES:**
+1. Goals Section - MUST include exactly these 5 categories (extract relevant data for each, or mark as "Not specified" if absent):
+   - Weight Management
+   - Body Composition
+   - Macronutrient Balance
+   - Sleep Quality
+   - Hydration
 
-Return a structured JSON summary that is concise, actionable, and easy for trainers to review and edit.`,
+2. Current Status Section - MUST include exactly these 10 categories (extract relevant data for each, or mark as "Not specified" if absent):
+   - Current Weight (include BMI if available)
+   - Body Composition (visceral fat, muscle mass, bone density if applicable)
+   - Protein Intake
+   - Carbohydrate Intake
+   - Fat Intake
+   - Hydration Patterns
+   - Sleep Patterns
+   - Diet Composition
+   - Meal Timing & Eating Patterns
+   - Notable Dietary Habits
+
+3. Recommendations Section - MUST group all recommendations under exactly these 4 categories:
+   - Macronutrient Adjustments (protein, carbs, fats, timing)
+   - Meal & Snack Strategy (meal planning, snack replacements, portion control)
+   - Lifestyle Modifications (sleep, hydration, stress management)
+   - Supplementation (if applicable, otherwise omit)
+
+**FORMATTING STANDARDS:**
+- Goals: Use format "**Category:** Specific measurable target with units and timeframe"
+- Current Status: Use format "**Metric:** Factual statement with measurements, ranges, or observations"
+- Recommendations: Group by category, then provide numbered details with specific actions and examples
+
+**PRIORITY:**
+- Focus on nutrition-related metrics and interventions
+- Include specific numbers, units, and targets wherever possible
+- For follow-up reports, note progress against previous goals where evident
+- Maintain professional, objective tone throughout`,
       },
       {
         role: "user",
         content: [
           {
             type: "text",
-            text: "Please analyze this nutrition assessment report and extract the goals, current status, key recommendations, and monitoring plan.",
+            text: "Please analyze this nutrition assessment report and extract the goals, current status, and key recommendations following the EXACT standardised structure specified in the system prompt. Ensure all required categories are present.",
           },
           {
             type: "file_url",
@@ -68,17 +97,17 @@ Return a structured JSON summary that is concise, actionable, and easy for train
           properties: {
             goals: {
               type: "array",
-              description: "List of specific goals and targets from the report",
+              description: "MUST include exactly 5 categories: Weight Management, Body Composition, Macronutrient Balance, Sleep Quality, Hydration",
               items: {
                 type: "object",
                 properties: {
                   category: {
                     type: "string",
-                    description: "Goal category (e.g., Weight Management, Macronutrient Balance, Sleep Quality)",
+                    description: "MUST be one of: Weight Management, Body Composition, Macronutrient Balance, Sleep Quality, Hydration",
                   },
                   target: {
                     type: "string",
-                    description: "Specific measurable target (e.g., 'Target weight <70 kg', 'Protein 140-150g/day')",
+                    description: "Specific measurable target with units (e.g., 'Target weight <70 kg', 'Protein 140-150g/day', '7-8 hours sleep', '3L water daily')",
                   },
                 },
                 required: ["category", "target"],
@@ -87,17 +116,17 @@ Return a structured JSON summary that is concise, actionable, and easy for train
             },
             currentStatus: {
               type: "array",
-              description: "Current baseline measurements and status",
+              description: "MUST include exactly 10 categories: Current Weight, Body Composition, Protein Intake, Carbohydrate Intake, Fat Intake, Hydration Patterns, Sleep Patterns, Diet Composition, Meal Timing & Eating Patterns, Notable Dietary Habits",
               items: {
                 type: "object",
                 properties: {
                   metric: {
                     type: "string",
-                    description: "Metric name (e.g., Current Weight, Current Protein Intake)",
+                    description: "MUST be one of: Current Weight, Body Composition, Protein Intake, Carbohydrate Intake, Fat Intake, Hydration Patterns, Sleep Patterns, Diet Composition, Meal Timing & Eating Patterns, Notable Dietary Habits",
                   },
                   value: {
                     type: "string",
-                    description: "Current value (e.g., '75-77 kg', '80-90g/day')",
+                    description: "Current value with measurements, ranges, or detailed observations (e.g., '75-77 kg, BMI ~27', '80-90g/day', 'Predominantly plant-based for 25 years')",
                   },
                 },
                 required: ["metric", "value"],
@@ -106,17 +135,17 @@ Return a structured JSON summary that is concise, actionable, and easy for train
             },
             recommendations: {
               type: "array",
-              description: "Key actionable recommendations from the intervention plan",
+              description: "MUST group under exactly 3-4 categories: Macronutrient Adjustments, Meal & Snack Strategy, Lifestyle Modifications, and optionally Supplementation",
               items: {
                 type: "object",
                 properties: {
                   category: {
                     type: "string",
-                    description: "Recommendation category (e.g., Macronutrient Adjustments, Meal Strategy)",
+                    description: "MUST be one of: Macronutrient Adjustments, Meal & Snack Strategy, Lifestyle Modifications, Supplementation",
                   },
                   details: {
                     type: "string",
-                    description: "Specific recommendation details",
+                    description: "Specific, actionable recommendation with examples and alternatives (e.g., 'Increase protein to 140-150g/day. Evening meals should target 35-40g protein. Use 0% fat Greek yogurt and whey protein post-training.')",
                   },
                 },
                 required: ["category", "details"],
@@ -128,7 +157,7 @@ Return a structured JSON summary that is concise, actionable, and easy for train
               description: "Follow-up and monitoring actions",
               items: {
                 type: "string",
-                description: "Monitoring action (e.g., 'Weekly weigh-ins', 'Baseline DEXA scan')",
+                description: "Monitoring action (e.g., 'Weekly weigh-ins', 'Baseline DEXA scan', 'Monthly progress photos')",
               },
             },
           },
@@ -166,7 +195,22 @@ Return a structured JSON summary that is concise, actionable, and easy for train
 function formatGoalsAndTargets(goals: NutritionReportSummary['goals']): string {
   if (!goals || goals.length === 0) return '';
   
-  return goals
+  // Enforce standard order
+  const standardOrder = [
+    'Weight Management',
+    'Body Composition',
+    'Macronutrient Balance',
+    'Sleep Quality',
+    'Hydration'
+  ];
+  
+  const sortedGoals = goals.sort((a, b) => {
+    const indexA = standardOrder.indexOf(a.category);
+    const indexB = standardOrder.indexOf(b.category);
+    return indexA - indexB;
+  });
+  
+  return sortedGoals
     .map(goal => `**${goal.category}:** ${goal.target}`)
     .join('\n\n');
 }
@@ -174,7 +218,27 @@ function formatGoalsAndTargets(goals: NutritionReportSummary['goals']): string {
 function formatCurrentStatus(status: NutritionReportSummary['currentStatus']): string {
   if (!status || status.length === 0) return '';
   
-  return status
+  // Enforce standard order
+  const standardOrder = [
+    'Current Weight',
+    'Body Composition',
+    'Protein Intake',
+    'Carbohydrate Intake',
+    'Fat Intake',
+    'Hydration Patterns',
+    'Sleep Patterns',
+    'Diet Composition',
+    'Meal Timing & Eating Patterns',
+    'Notable Dietary Habits'
+  ];
+  
+  const sortedStatus = status.sort((a, b) => {
+    const indexA = standardOrder.indexOf(a.metric);
+    const indexB = standardOrder.indexOf(b.metric);
+    return indexA - indexB;
+  });
+  
+  return sortedStatus
     .map(item => `**${item.metric}:** ${item.value}`)
     .join('\n\n');
 }
@@ -182,7 +246,21 @@ function formatCurrentStatus(status: NutritionReportSummary['currentStatus']): s
 function formatRecommendations(recommendations?: Array<{ category: string; details: string }>): string {
   if (!recommendations || recommendations.length === 0) return '';
   
-  return recommendations
-    .map(rec => `**${rec.category}**\n${rec.details}`)
+  // Enforce standard order
+  const standardOrder = [
+    'Macronutrient Adjustments',
+    'Meal & Snack Strategy',
+    'Lifestyle Modifications',
+    'Supplementation'
+  ];
+  
+  const sortedRecs = recommendations.sort((a, b) => {
+    const indexA = standardOrder.indexOf(a.category);
+    const indexB = standardOrder.indexOf(b.category);
+    return indexA - indexB;
+  });
+  
+  return sortedRecs
+    .map(rec => `**${rec.category}**; ${rec.details}`)
     .join('\n\n');
 }

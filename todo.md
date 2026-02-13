@@ -1881,3 +1881,27 @@
 - [x] Allow clients to view PDF and navigate report history
 - [ ] Test on both trainer and client sides
 - [ ] Verify edit permissions work correctly (trainers can edit, clients cannot)
+
+## Nutrition Report Analysis Standardisation (Feb 13, 2026)
+- [x] Update AI analysis prompt to enforce standardised structure
+- [x] Define fixed category sets for Goals, Current Status, and Recommendations
+- [x] Update JSON schema to constrain LLM category selection
+- [x] Update formatting functions to match standardised output
+- [ ] Test with new report upload to verify consistency
+- [ ] Write vitest tests for standardised formatting
+
+## Nutrition Reports Polling Fix (Feb 13, 2026)
+- [x] Investigate why polling doesn't detect completed AI analysis
+- [x] Fix refetch mechanism to automatically show results
+- [x] Add console logging for debugging polling behavior
+- [ ] Test with new upload to verify automatic updates work
+
+## Nutrition Report Formatting Fix (Feb 13, 2026)
+- [x] Change semicolon separators to line breaks in Goals & Targets
+- [x] Change semicolon separators to line breaks in Current Status
+- [x] Keep current formatting for Recommendations (already uses line breaks)
+
+## Nutrition Reports UI Spacing Fix (Feb 13, 2026)
+- [x] Fix spacing and alignment for navigation buttons and report counter
+- [x] Improve visual balance between left and right button groups
+- [x] Make header layout fully responsive to prevent overlaps on smaller screens
