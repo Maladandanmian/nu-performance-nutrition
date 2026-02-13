@@ -31,18 +31,49 @@ export function Vo2MaxSection({ clientId, isTrainer = true }: Vo2MaxSectionProps
 
   // Fetch detailed data for the current test
   const currentTest = tests[currentIndex];
-  const { data: testDetails, isLoading: isLoadingDetails, error: detailsError } = trpc.vo2MaxTests.getTestDetails.useQuery(
+  const { data: testDetails, isLoading: isLoadingDetails, error: detailsError, refetch: refetchDetails } = trpc.vo2MaxTests.getTestDetails.useQuery(
     { testId: currentTest?.id || 0 },
     { enabled: !!currentTest }
   );
 
+  // Check if analysis is incomplete
+  const hasIncompleteAnalysis = testDetails && (
+    !testDetails.ambientData || 
+    !testDetails.anthropometric || 
+    !testDetails.fitnessAssessment || 
+    testDetails.lactateProfile.length === 0
+  );
+
+  // Manual polling for AI analysis completion
+  useEffect(() => {
+    if (!hasIncompleteAnalysis) {
+      console.log('[Vo2MaxSection] Analysis complete, stopping polling');
+      return;
+    }
+
+    console.log('[Vo2MaxSection] Starting manual polling for incomplete analysis...');
+    const interval = setInterval(() => {
+      console.log('[Vo2MaxSection] Polling check - refetching...');
+      refetchDetails();
+    }, 5000); // Poll every 5 seconds
+
+    return () => {
+      console.log('[Vo2MaxSection] Cleaning up polling interval');
+      clearInterval(interval);
+    };
+  }, [hasIncompleteAnalysis, refetchDetails]);
+
   // Debug logging
   useEffect(() => {
-    console.log('[Vo2MaxSection] Current test:', currentTest);
-    console.log('[Vo2MaxSection] Test details:', testDetails);
-    console.log('[Vo2MaxSection] Loading details:', isLoadingDetails);
-    console.log('[Vo2MaxSection] Details error:', detailsError);
-  }, [currentTest, testDetails, isLoadingDetails, detailsError]);
+    console.log('[Vo2MaxSection] Test details updated:', {
+      hasTest: !!testDetails,
+      hasAmbient: !!testDetails?.ambientData,
+      hasAnthropometric: !!testDetails?.anthropometric,
+      hasFitness: !!testDetails?.fitnessAssessment,
+      lactateCount: testDetails?.lactateProfile?.length || 0,
+      hasIncomplete: hasIncompleteAnalysis
+    });
+  }, [testDetails, hasIncompleteAnalysis]);
 
   // Upload mutation
   const uploadMutation = trpc.vo2MaxTests.upload.useMutation({

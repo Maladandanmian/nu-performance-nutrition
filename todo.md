@@ -1937,3 +1937,9 @@
 - [x] Extract lactate threshold speed and heart rate (e.g., 14.75km/h, 166bpm)
 - [x] Extract baseline lactate level and speed where it rises
 - [ ] Test with new PDF upload to verify correct extraction
+
+## VO2 Max Auto-Refresh Polling (Feb 13, 2026)
+- [x] Add automatic polling to Vo2MaxSection to detect completed AI analysis
+- [x] Poll every 5 seconds until all data fields are populated
+- [x] Stop polling once analysis is complete
+- [ ] Test with new upload to verify automatic display
