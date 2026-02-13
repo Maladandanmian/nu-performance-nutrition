@@ -14,6 +14,11 @@ import {
   athleteMonitoring,
   strengthTests,
   nutritionReports,
+  vo2MaxTests,
+  vo2MaxAmbientData,
+  vo2MaxAnthropometric,
+  vo2MaxFitnessAssessment,
+  vo2MaxLactateProfile,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1246,4 +1251,269 @@ export async function deleteNutritionReport(reportId: number) {
   if (!db) throw new Error("Database connection failed");
 
   await db.delete(nutritionReports).where(eq(nutritionReports.id, reportId));
+}
+
+// ============================================================================
+// VO2 Max Tests
+// ============================================================================
+
+/**
+ * Create a new VO2 Max test record
+ */
+export async function createVo2MaxTest(data: {
+  clientId: number;
+  pdfUrl: string;
+  pdfFileKey: string;
+  filename: string;
+  testDate: Date;
+  testAdministrator?: string;
+  testLocation?: string;
+  uploadedBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const result = await db.insert(vo2MaxTests).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Get all VO2 Max tests for a client, ordered by test date (newest first)
+ */
+export async function getVo2MaxTestsByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return db
+    .select()
+    .from(vo2MaxTests)
+    .where(eq(vo2MaxTests.clientId, clientId))
+    .orderBy(desc(vo2MaxTests.testDate));
+}
+
+/**
+ * Get a single VO2 Max test by ID
+ */
+export async function getVo2MaxTestById(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(vo2MaxTests)
+    .where(eq(vo2MaxTests.id, testId));
+  
+  return results[0] || null;
+}
+
+/**
+ * Delete a VO2 Max test (cascade deletes related data)
+ */
+export async function deleteVo2MaxTest(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.delete(vo2MaxTests).where(eq(vo2MaxTests.id, testId));
+}
+
+/**
+ * Create ambient data for a VO2 Max test
+ */
+export async function createVo2MaxAmbientData(data: {
+  testId: number;
+  temperature?: string;
+  pressure?: number;
+  humidity?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.insert(vo2MaxAmbientData).values(data);
+}
+
+/**
+ * Get ambient data for a VO2 Max test
+ */
+export async function getVo2MaxAmbientData(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(vo2MaxAmbientData)
+    .where(eq(vo2MaxAmbientData.testId, testId));
+  
+  return results[0] || null;
+}
+
+/**
+ * Create anthropometric data for a VO2 Max test
+ */
+export async function createVo2MaxAnthropometric(data: {
+  testId: number;
+  height?: string;
+  weight?: string;
+  restingHeartRate?: number;
+  restingBpSystolic?: number;
+  restingBpDiastolic?: number;
+  restingLactate?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.insert(vo2MaxAnthropometric).values(data);
+}
+
+/**
+ * Get anthropometric data for a VO2 Max test
+ */
+export async function getVo2MaxAnthropometric(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(vo2MaxAnthropometric)
+    .where(eq(vo2MaxAnthropometric.testId, testId));
+  
+  return results[0] || null;
+}
+
+/**
+ * Get all anthropometric data for a client across all tests
+ */
+export async function getVo2MaxAnthropometricByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return db
+    .select({
+      testId: vo2MaxAnthropometric.testId,
+      testDate: vo2MaxTests.testDate,
+      height: vo2MaxAnthropometric.height,
+      weight: vo2MaxAnthropometric.weight,
+      restingHeartRate: vo2MaxAnthropometric.restingHeartRate,
+      restingBpSystolic: vo2MaxAnthropometric.restingBpSystolic,
+      restingBpDiastolic: vo2MaxAnthropometric.restingBpDiastolic,
+      restingLactate: vo2MaxAnthropometric.restingLactate,
+    })
+    .from(vo2MaxAnthropometric)
+    .innerJoin(vo2MaxTests, eq(vo2MaxAnthropometric.testId, vo2MaxTests.id))
+    .where(eq(vo2MaxTests.clientId, clientId))
+    .orderBy(vo2MaxTests.testDate);
+}
+
+/**
+ * Create fitness assessment data for a VO2 Max test
+ */
+export async function createVo2MaxFitnessAssessment(data: {
+  testId: number;
+  aerobicThresholdLactate?: string;
+  aerobicThresholdSpeed?: string;
+  aerobicThresholdHr?: number;
+  aerobicThresholdHrPct?: number;
+  lactateThresholdLactate?: string;
+  lactateThresholdSpeed?: string;
+  lactateThresholdHr?: number;
+  lactateThresholdHrPct?: number;
+  maximumLactate?: string;
+  maximumSpeed?: string;
+  maximumHr?: number;
+  maximumHrPct?: number;
+  vo2MaxMlKgMin?: string;
+  vo2MaxLMin?: string;
+  vco2LMin?: string;
+  rer?: string;
+  rrBrMin?: string;
+  veBtpsLMin?: string;
+  rpe?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db.insert(vo2MaxFitnessAssessment).values(data);
+}
+
+/**
+ * Get fitness assessment data for a VO2 Max test
+ */
+export async function getVo2MaxFitnessAssessment(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const results = await db
+    .select()
+    .from(vo2MaxFitnessAssessment)
+    .where(eq(vo2MaxFitnessAssessment.testId, testId));
+  
+  return results[0] || null;
+}
+
+/**
+ * Get all fitness assessment data for a client across all tests
+ */
+export async function getVo2MaxFitnessAssessmentByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return db
+    .select({
+      testId: vo2MaxFitnessAssessment.testId,
+      testDate: vo2MaxTests.testDate,
+      aerobicThresholdLactate: vo2MaxFitnessAssessment.aerobicThresholdLactate,
+      aerobicThresholdSpeed: vo2MaxFitnessAssessment.aerobicThresholdSpeed,
+      aerobicThresholdHr: vo2MaxFitnessAssessment.aerobicThresholdHr,
+      aerobicThresholdHrPct: vo2MaxFitnessAssessment.aerobicThresholdHrPct,
+      lactateThresholdLactate: vo2MaxFitnessAssessment.lactateThresholdLactate,
+      lactateThresholdSpeed: vo2MaxFitnessAssessment.lactateThresholdSpeed,
+      lactateThresholdHr: vo2MaxFitnessAssessment.lactateThresholdHr,
+      lactateThresholdHrPct: vo2MaxFitnessAssessment.lactateThresholdHrPct,
+      maximumLactate: vo2MaxFitnessAssessment.maximumLactate,
+      maximumSpeed: vo2MaxFitnessAssessment.maximumSpeed,
+      maximumHr: vo2MaxFitnessAssessment.maximumHr,
+      maximumHrPct: vo2MaxFitnessAssessment.maximumHrPct,
+      vo2MaxMlKgMin: vo2MaxFitnessAssessment.vo2MaxMlKgMin,
+      vo2MaxLMin: vo2MaxFitnessAssessment.vo2MaxLMin,
+      vco2LMin: vo2MaxFitnessAssessment.vco2LMin,
+      rer: vo2MaxFitnessAssessment.rer,
+      rrBrMin: vo2MaxFitnessAssessment.rrBrMin,
+      veBtpsLMin: vo2MaxFitnessAssessment.veBtpsLMin,
+      rpe: vo2MaxFitnessAssessment.rpe,
+    })
+    .from(vo2MaxFitnessAssessment)
+    .innerJoin(vo2MaxTests, eq(vo2MaxFitnessAssessment.testId, vo2MaxTests.id))
+    .where(eq(vo2MaxTests.clientId, clientId))
+    .orderBy(vo2MaxTests.testDate);
+}
+
+/**
+ * Create lactate profile data points for a VO2 Max test
+ */
+export async function createVo2MaxLactateProfile(data: Array<{
+  testId: number;
+  stageNumber: number;
+  workloadSpeed: string;
+  lactate: string;
+  heartRate: number;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  if (data.length > 0) {
+    await db.insert(vo2MaxLactateProfile).values(data);
+  }
+}
+
+/**
+ * Get lactate profile data for a VO2 Max test
+ */
+export async function getVo2MaxLactateProfile(testId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  return db
+    .select()
+    .from(vo2MaxLactateProfile)
+    .where(eq(vo2MaxLactateProfile.testId, testId))
+    .orderBy(vo2MaxLactateProfile.stageNumber);
 }

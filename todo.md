@@ -1905,3 +1905,18 @@
 - [x] Fix spacing and alignment for navigation buttons and report counter
 - [x] Improve visual balance between left and right button groups
 - [x] Make header layout fully responsive to prevent overlaps on smaller screens
+
+## VO2 Max Tracking System (Feb 13, 2026)
+- [x] Design and create database schema for VO2 Max tests
+- [x] Create database helper functions for VO2 Max data
+- [ ] Create tRPC procedures for VO2 Max CRUD operations
+- [ ] Implement AI extraction for ambient data, anthropometric/baseline, and fitness assessment
+- [ ] Implement AI extraction for blood lactate profile table recreation
+- [ ] Build VO2 Max tab UI with PDF upload functionality
+- [ ] Display extracted data with full PDF viewability
+- [ ] Create anthropometric and baseline trends visualization
+- [ ] Create fitness assessment trends visualization  
+- [ ] Solve scale visibility issues for small vs large numbers in graphs
+- [ ] Add client position indicator on VO2 max reference table
+- [ ] Write vitest tests for VO2 Max procedures
+- [ ] Test end-to-end workflow (upload, extract, visualize)

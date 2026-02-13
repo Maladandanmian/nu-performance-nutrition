@@ -467,3 +467,130 @@ export const nutritionReports = mysqlTable("nutrition_reports", {
 
 export type NutritionReport = typeof nutritionReports.$inferSelect;
 export type InsertNutritionReport = typeof nutritionReports.$inferInsert;
+
+/**
+ * VO2 Max Tests table - stores uploaded VO2 Max test reports
+ * Trainer uploads PDF, AI extracts data, both trainer and client can view
+ */
+export const vo2MaxTests = mysqlTable("vo2_max_tests", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  
+  // PDF file storage
+  pdfUrl: text("pdfUrl").notNull(), // S3 URL to the uploaded PDF
+  pdfFileKey: varchar("pdfFileKey", { length: 500 }).notNull(), // S3 file key for reference
+  filename: varchar("filename", { length: 255 }).notNull(), // Original filename
+  
+  // Test metadata
+  testDate: date("testDate").notNull(), // Date the VO2 Max test was performed
+  testAdministrator: varchar("testAdministrator", { length: 255 }), // Who administered the test (e.g., "Glen Joe")
+  testLocation: varchar("testLocation", { length: 255 }), // Where the test was conducted
+  
+  // Audit fields
+  uploadedBy: int("uploadedBy").notNull().references(() => users.id),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Vo2MaxTest = typeof vo2MaxTests.$inferSelect;
+export type InsertVo2MaxTest = typeof vo2MaxTests.$inferInsert;
+
+/**
+ * VO2 Max Ambient Data - environmental conditions during test
+ * One row per test
+ */
+export const vo2MaxAmbientData = mysqlTable("vo2_max_ambient_data", {
+  id: int("id").autoincrement().primaryKey(),
+  testId: int("testId").notNull().references(() => vo2MaxTests.id, { onDelete: "cascade" }),
+  
+  temperature: decimal("temperature", { precision: 4, scale: 1 }), // °C
+  pressure: int("pressure"), // mmHg
+  humidity: int("humidity"), // %
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Vo2MaxAmbientData = typeof vo2MaxAmbientData.$inferSelect;
+export type InsertVo2MaxAmbientData = typeof vo2MaxAmbientData.$inferInsert;
+
+/**
+ * VO2 Max Anthropometric Data - baseline measurements
+ * One row per test
+ */
+export const vo2MaxAnthropometric = mysqlTable("vo2_max_anthropometric", {
+  id: int("id").autoincrement().primaryKey(),
+  testId: int("testId").notNull().references(() => vo2MaxTests.id, { onDelete: "cascade" }),
+  
+  height: decimal("height", { precision: 4, scale: 2 }), // meters (e.g., 1.86)
+  weight: decimal("weight", { precision: 5, scale: 1 }), // kg (e.g., 85.7)
+  restingHeartRate: int("restingHeartRate"), // bpm
+  restingBpSystolic: int("restingBpSystolic"), // mmHg
+  restingBpDiastolic: int("restingBpDiastolic"), // mmHg
+  restingLactate: decimal("restingLactate", { precision: 4, scale: 2 }), // mmol/L
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Vo2MaxAnthropometric = typeof vo2MaxAnthropometric.$inferSelect;
+export type InsertVo2MaxAnthropometric = typeof vo2MaxAnthropometric.$inferInsert;
+
+/**
+ * VO2 Max Fitness Assessment - test results at different thresholds
+ * One row per test with data at aerobic threshold, lactate threshold, and maximum
+ */
+export const vo2MaxFitnessAssessment = mysqlTable("vo2_max_fitness_assessment", {
+  id: int("id").autoincrement().primaryKey(),
+  testId: int("testId").notNull().references(() => vo2MaxTests.id, { onDelete: "cascade" }),
+  
+  // Aerobic Threshold values
+  aerobicThresholdLactate: decimal("aerobicThresholdLactate", { precision: 4, scale: 2 }), // mmol/L
+  aerobicThresholdSpeed: decimal("aerobicThresholdSpeed", { precision: 5, scale: 2 }), // km/h
+  aerobicThresholdHr: int("aerobicThresholdHr"), // bpm
+  aerobicThresholdHrPct: int("aerobicThresholdHrPct"), // %
+  
+  // Lactate Threshold values
+  lactateThresholdLactate: decimal("lactateThresholdLactate", { precision: 4, scale: 2 }), // mmol/L
+  lactateThresholdSpeed: decimal("lactateThresholdSpeed", { precision: 5, scale: 2 }), // km/h
+  lactateThresholdHr: int("lactateThresholdHr"), // bpm
+  lactateThresholdHrPct: int("lactateThresholdHrPct"), // %
+  
+  // Maximum values
+  maximumLactate: decimal("maximumLactate", { precision: 4, scale: 2 }), // mmol/L
+  maximumSpeed: decimal("maximumSpeed", { precision: 5, scale: 2 }), // km/h
+  maximumHr: int("maximumHr"), // bpm
+  maximumHrPct: int("maximumHrPct"), // %
+  
+  // VO2 Max detailed metrics
+  vo2MaxMlKgMin: decimal("vo2MaxMlKgMin", { precision: 5, scale: 1 }), // ml/kg/min (relative)
+  vo2MaxLMin: decimal("vo2MaxLMin", { precision: 4, scale: 1 }), // L/min (absolute)
+  vco2LMin: decimal("vco2LMin", { precision: 4, scale: 1 }), // L/min
+  rer: decimal("rer", { precision: 3, scale: 2 }), // Respiratory Exchange Ratio
+  rrBrMin: decimal("rrBrMin", { precision: 5, scale: 1 }), // br/min (respiratory rate)
+  veBtpsLMin: decimal("veBtpsLMin", { precision: 6, scale: 1 }), // L/min (ventilation)
+  rpe: int("rpe"), // Rating of Perceived Exertion (1-20 scale)
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Vo2MaxFitnessAssessment = typeof vo2MaxFitnessAssessment.$inferSelect;
+export type InsertVo2MaxFitnessAssessment = typeof vo2MaxFitnessAssessment.$inferInsert;
+
+/**
+ * VO2 Max Lactate Profile - blood lactate data points for graphing
+ * Multiple rows per test, one for each stage/workload
+ */
+export const vo2MaxLactateProfile = mysqlTable("vo2_max_lactate_profile", {
+  id: int("id").autoincrement().primaryKey(),
+  testId: int("testId").notNull().references(() => vo2MaxTests.id, { onDelete: "cascade" }),
+  
+  stageNumber: int("stageNumber").notNull(), // Sequential stage number (1, 2, 3, ...)
+  workloadSpeed: decimal("workloadSpeed", { precision: 5, scale: 2 }).notNull(), // km/h
+  lactate: decimal("lactate", { precision: 4, scale: 2 }).notNull(), // mmol/L
+  heartRate: int("heartRate").notNull(), // bpm
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Vo2MaxLactateProfile = typeof vo2MaxLactateProfile.$inferSelect;
+export type InsertVo2MaxLactateProfile = typeof vo2MaxLactateProfile.$inferInsert;

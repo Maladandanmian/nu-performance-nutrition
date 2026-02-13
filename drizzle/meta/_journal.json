@@ -176,6 +176,13 @@
       "when": 1770802888638,
       "tag": "0024_motionless_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1770944114172,
+      "tag": "0025_flippant_wolfpack",
+      "breakpoints": true
     }
   ]
 }
