@@ -2000,3 +2000,11 @@
 - [x] Set up scheduled task using Manus schedule tool
 - [ ] Monitor first automated execution (will run tomorrow at 8am)
 - [ ] Verify email alerts are sent automatically (requires real client data)
+
+## Test Data Cleanup (Feb 17, 2026)
+- [x] Delete all test clients with vo2test-* email addresses from database
+- [x] Create shared test utilities (testUtils.ts) with getTestClient helper
+- [x] Update notifications.test.ts to use existing TEST CLIENT
+- [x] Document proper testing workflow in TESTING.md
+- [ ] Update remaining test files to use getTestClient helper (beverageInMeal, clientInvitation, dexa.goals, drinkEditNutrition, drinks, mealDrinkEditDelete, newMealFlow)
+- [ ] Add afterAll cleanup hooks to all tests

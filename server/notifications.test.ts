@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import * as db from "./db";
+import { getTestClient, getTestTrainerId } from "./testUtils";
 import {
   detectNutritionDeviationPattern,
   detectWellnessPoorScorePattern,
@@ -13,27 +14,10 @@ describe("Trainer Notification System", () => {
   let clientId: number;
 
   beforeAll(async () => {
-    // Create a test trainer
-    const trainerOpenId = `test-trainer-${Date.now()}`;
-    await db.upsertUser({
-      openId: trainerOpenId,
-      name: "Test Trainer",
-      email: "trainer@test.com",
-      role: "admin",
-    });
-
-    const trainer = await db.getUserByOpenId(trainerOpenId);
-    if (!trainer) throw new Error("Failed to create test trainer");
-    trainerId = trainer.id;
-
-    // Create a test client
-    const [clientResult] = await db.createClient({
-      trainerId,
-      name: "Test Client",
-      email: "client@test.com",
-      authMethod: "email",
-    });
-    clientId = clientResult.insertId;
+    // Use existing TEST CLIENT
+    const testClient = await getTestClient();
+    clientId = testClient.id;
+    trainerId = await getTestTrainerId();
 
     // Create nutrition goals for the client
     await db.createNutritionGoal({
