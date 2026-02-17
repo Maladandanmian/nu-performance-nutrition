@@ -1993,3 +1993,10 @@
 - [x] Add getUserById helper function to db.ts
 - [x] Update tRPC updateSettings procedure to accept emailNotificationsEnabled
 - [ ] Test email notifications with real trainer accounts (requires user testing)
+
+## Automated Daily Pattern Checks (Feb 17, 2026)
+- [x] Create scheduled cron job to run checkAllClients daily
+- [x] Configure cron to run every morning at 8am (Hong Kong time)
+- [x] Set up scheduled task using Manus schedule tool
+- [ ] Monitor first automated execution (will run tomorrow at 8am)
+- [ ] Verify email alerts are sent automatically (requires real client data)
