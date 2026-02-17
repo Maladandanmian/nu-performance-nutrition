@@ -634,6 +634,9 @@ export const notificationSettings = mysqlTable("notification_settings", {
   wellnessPoorScoreThreshold: int("wellnessPoorScoreThreshold").default(2).notNull(), // Score of 2 or below is "poor"
   wellnessPoorScoreDays: int("wellnessPoorScoreDays").default(5).notNull(), // Consecutive days
   
+  // Email notification settings
+  emailNotificationsEnabled: boolean("emailNotificationsEnabled").default(true).notNull(),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

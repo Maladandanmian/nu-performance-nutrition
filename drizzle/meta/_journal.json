@@ -190,6 +190,13 @@
       "when": 1771325461608,
       "tag": "0026_tiresome_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1771326570510,
+      "tag": "0027_wealthy_radioactive_man",
+      "breakpoints": true
     }
   ]
 }

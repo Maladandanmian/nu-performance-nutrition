@@ -1981,3 +1981,15 @@
 - [x] Implement manual "Check Now" button for immediate pattern detection
 - [ ] Create scheduled job to check patterns daily (requires cron setup)
 - [ ] Test notification system with real client data
+
+## Email Notifications for Trainers (Feb 17, 2026)
+- [x] Add email notification preferences to notification settings schema
+- [x] Add emailNotificationsEnabled field to notificationSettings table
+- [x] Create email template for nutrition deviation alerts
+- [x] Create email template for wellness poor score alerts
+- [x] Integrate email sending into notification service (sendNutritionDeviationNotification)
+- [x] Integrate email sending into notification service (sendWellnessPoorScoreNotification)
+- [x] Add email notification toggle to trainer settings UI
+- [x] Add getUserById helper function to db.ts
+- [x] Update tRPC updateSettings procedure to accept emailNotificationsEnabled
+- [ ] Test email notifications with real trainer accounts (requires user testing)

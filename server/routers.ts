@@ -2831,6 +2831,7 @@ Return as JSON.`
           wellnessAlertsEnabled: z.boolean().optional(),
           wellnessPoorScoreThreshold: z.number().optional(),
           wellnessPoorScoreDays: z.number().optional(),
+          emailNotificationsEnabled: z.boolean().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {

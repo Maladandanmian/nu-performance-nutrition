@@ -62,6 +62,9 @@ export default function TrainerNotifications() {
   const [wellnessPoorScoreDays, setWellnessPoorScoreDays] = useState(
     settings?.wellnessPoorScoreDays ?? 5
   );
+  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(
+    settings?.emailNotificationsEnabled ?? true
+  );
 
   // Update state when settings load
   useState(() => {
@@ -72,6 +75,7 @@ export default function TrainerNotifications() {
       setWellnessAlertsEnabled(settings.wellnessAlertsEnabled);
       setWellnessPoorScoreThreshold(settings.wellnessPoorScoreThreshold);
       setWellnessPoorScoreDays(settings.wellnessPoorScoreDays);
+      setEmailNotificationsEnabled(settings.emailNotificationsEnabled);
     }
   });
 
@@ -125,6 +129,7 @@ export default function TrainerNotifications() {
       wellnessAlertsEnabled,
       wellnessPoorScoreThreshold,
       wellnessPoorScoreDays,
+      emailNotificationsEnabled,
     });
   };
 
@@ -485,6 +490,30 @@ export default function TrainerNotifications() {
                       value={wellnessPoorScoreDays}
                       onChange={(e) => setWellnessPoorScoreDays(Number(e.target.value))}
                       disabled={!wellnessAlertsEnabled}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Email Notifications</CardTitle>
+                  <CardDescription>
+                    Receive email alerts when critical patterns are detected
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label htmlFor="email-enabled">Enable email notifications</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Send email alerts to {user?.email || "your registered email"}
+                      </p>
+                    </div>
+                    <Switch
+                      id="email-enabled"
+                      checked={emailNotificationsEnabled}
+                      onCheckedChange={setEmailNotificationsEnabled}
                     />
                   </div>
                 </CardContent>

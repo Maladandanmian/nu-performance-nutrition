@@ -6,7 +6,11 @@ import {
   createTrainerNotification,
   hasRecentNotification,
   getClientById,
+  getUserById,
 } from "./db";
+import { sendEmail } from "./emailService";
+import { generateNutritionDeviationEmail, generateWellnessPoorScoreEmail } from "./emailTemplates";
+import { ENV } from "./_core/env";
 
 /**
  * Nutrition deviation pattern detection
@@ -219,6 +223,33 @@ export async function sendNutritionDeviationNotification(
     isRead: false,
     isDismissed: false,
   });
+
+  // Send email notification if enabled
+  const settings = await getNotificationSettings(trainerId);
+  if (settings.emailNotificationsEnabled) {
+    const trainer = await getUserById(trainerId);
+    if (trainer && trainer.email) {
+      const dashboardUrl = `${ENV.appUrl}/trainer/client/${clientId}`;
+      const emailData = generateNutritionDeviationEmail({
+        trainerName: trainer.name || "Trainer",
+        clientName: client.name,
+        problematicNutrients: details.problematicNutrients.map((n: any) => ({
+          nutrient: n.nutrient,
+          direction: n.direction,
+          averageDeviation: n.avgDeviation,
+        })),
+        consecutiveDays: details.consecutiveDays,
+        dashboardUrl,
+      });
+
+      await sendEmail({
+        to: trainer.email,
+        subject: emailData.subject,
+        html: emailData.html,
+        text: emailData.text,
+      });
+    }
+  }
 }
 
 /**
@@ -266,6 +297,32 @@ export async function sendWellnessPoorScoreNotification(
     isRead: false,
     isDismissed: false,
   });
+
+  // Send email notification if enabled
+  const settings = await getNotificationSettings(trainerId);
+  if (settings.emailNotificationsEnabled) {
+    const trainer = await getUserById(trainerId);
+    if (trainer && trainer.email) {
+      const dashboardUrl = `${ENV.appUrl}/trainer/client/${clientId}`;
+      const emailData = generateWellnessPoorScoreEmail({
+        trainerName: trainer.name || "Trainer",
+        clientName: client.name,
+        problematicMetrics: details.problematicMetrics.map((m: any) => ({
+          metric: m.metric,
+          averageScore: m.avgScore,
+        })),
+        consecutiveDays: details.consecutiveDays,
+        dashboardUrl,
+      });
+
+      await sendEmail({
+        to: trainer.email,
+        subject: emailData.subject,
+        html: emailData.html,
+        text: emailData.text,
+      });
+    }
+  }
 }
 
 /**

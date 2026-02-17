@@ -1,0 +1,1 @@
+ALTER TABLE `notification_settings` ADD `emailNotificationsEnabled` boolean DEFAULT true NOT NULL;
