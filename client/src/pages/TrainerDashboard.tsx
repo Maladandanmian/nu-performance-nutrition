@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { LogOut, Plus, Users } from "lucide-react";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -128,6 +129,7 @@ export default function TrainerDashboard() {
             <img src="/nu-logo.png" alt="Nu Performance" className="h-12 w-auto" />
           </div>
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <span className="text-sm" style={{color: '#6F6E70'}}>{user?.name}</span>
             <Button 
               variant="outline" 

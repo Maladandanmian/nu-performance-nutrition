@@ -214,7 +214,8 @@ export function Vo2MaxSection({ clientId, isTrainer = true }: Vo2MaxSectionProps
       await uploadMutation.mutateAsync({
         clientId,
         testDate: new Date(testDate),
-        pdfBase64: base64,
+        filename: selectedFile.name,
+        fileData: base64,
       });
     };
     reader.readAsDataURL(selectedFile);

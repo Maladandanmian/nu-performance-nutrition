@@ -2783,6 +2783,77 @@ Return as JSON.`
         return { success: true };
       }),
   }),
+
+  // ============================================================================
+  // Trainer Notifications
+  // ============================================================================
+  notifications: router({
+    // Get unread notifications for the logged-in trainer
+    getUnread: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadNotifications(ctx.user.id);
+    }),
+
+    // Get all notifications for the logged-in trainer
+    getAll: protectedProcedure
+      .input(z.object({ limit: z.number().optional().default(50) }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTrainerNotifications(ctx.user.id, input.limit);
+      }),
+
+    // Mark notification as read
+    markAsRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markNotificationAsRead(input.notificationId);
+        return { success: true };
+      }),
+
+    // Dismiss notification
+    dismiss: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.dismissNotification(input.notificationId);
+        return { success: true };
+      }),
+
+    // Get notification settings
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getNotificationSettings(ctx.user.id);
+    }),
+
+    // Update notification settings
+    updateSettings: protectedProcedure
+      .input(
+        z.object({
+          nutritionDeviationEnabled: z.boolean().optional(),
+          nutritionDeviationThreshold: z.number().optional(),
+          nutritionDeviationDays: z.number().optional(),
+          wellnessAlertsEnabled: z.boolean().optional(),
+          wellnessPoorScoreThreshold: z.number().optional(),
+          wellnessPoorScoreDays: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateNotificationSettings(ctx.user.id, input);
+        return { success: true };
+      }),
+
+    // Manually trigger pattern check for a specific client (trainer only)
+    checkClientPatterns: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { checkClientPatterns } = await import("./notificationService");
+        await checkClientPatterns(input.clientId, ctx.user.id);
+        return { success: true };
+      }),
+
+    // Manually trigger pattern check for all clients (trainer only)
+    checkAllClients: protectedProcedure.mutation(async ({ ctx }) => {
+      const { checkAllClientsForTrainer } = await import("./notificationService");
+      await checkAllClientsForTrainer(ctx.user.id);
+      return { success: true };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -594,3 +594,49 @@ export const vo2MaxLactateProfile = mysqlTable("vo2_max_lactate_profile", {
 
 export type Vo2MaxLactateProfile = typeof vo2MaxLactateProfile.$inferSelect;
 export type InsertVo2MaxLactateProfile = typeof vo2MaxLactateProfile.$inferInsert;
+
+/**
+ * Trainer notifications table - stores alerts sent to trainers about client issues
+ * Notifications are generated when patterns are detected (e.g., 5-day nutrition deviation)
+ */
+export const trainerNotifications = mysqlTable("trainer_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  type: mysqlEnum("type", ["nutrition_deviation", "wellness_poor_scores"]).notNull(),
+  severity: mysqlEnum("severity", ["info", "warning", "critical"]).default("warning").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  metadata: json("metadata"), // Stores additional context (e.g., deviation percentages, affected metrics)
+  isRead: boolean("isRead").default(false).notNull(),
+  isDismissed: boolean("isDismissed").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TrainerNotification = typeof trainerNotifications.$inferSelect;
+export type InsertTrainerNotification = typeof trainerNotifications.$inferInsert;
+
+/**
+ * Notification settings table - stores trainer preferences for notification thresholds
+ * Allows trainers to customize when they receive alerts
+ */
+export const notificationSettings = mysqlTable("notification_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  
+  // Nutrition deviation settings
+  nutritionDeviationEnabled: boolean("nutritionDeviationEnabled").default(true).notNull(),
+  nutritionDeviationThreshold: int("nutritionDeviationThreshold").default(20).notNull(), // Percentage (e.g., 20%)
+  nutritionDeviationDays: int("nutritionDeviationDays").default(5).notNull(), // Consecutive days
+  
+  // Wellness questionnaire settings
+  wellnessAlertsEnabled: boolean("wellnessAlertsEnabled").default(true).notNull(),
+  wellnessPoorScoreThreshold: int("wellnessPoorScoreThreshold").default(2).notNull(), // Score of 2 or below is "poor"
+  wellnessPoorScoreDays: int("wellnessPoorScoreDays").default(5).notNull(), // Consecutive days
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NotificationSetting = typeof notificationSettings.$inferSelect;
+export type InsertNotificationSetting = typeof notificationSettings.$inferInsert;

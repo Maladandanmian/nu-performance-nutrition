@@ -1964,3 +1964,20 @@
 - [x] Hide upload functionality (trainer-only)
 - [x] Hide edit buttons (trainer-only)
 - [x] Reuse Vo2MaxSection component with isTrainer prop for role-based permissions
+
+## Trainer Notification System (Feb 13, 2026)
+- [x] Design database schema for trainer notifications and alert history
+- [x] Create notification types table (nutrition_deviation, wellness_poor_scores)
+- [x] Build detection logic for 5-day nutrition deviation patterns (20%+ above/below targets)
+- [x] Build detection logic for 5-day wellness questionnaire poor score patterns
+- [x] Create notification generation service
+- [x] Implement notification delivery to trainer (in-app alerts)
+- [x] Create trainer notification dashboard/inbox UI
+- [x] Add notification preferences (enable/disable, threshold adjustments)
+- [x] Build notification history tracking (prevent duplicate alerts)
+- [x] Create tRPC procedures for notification management
+- [x] Add notification bell icon to trainer dashboard header
+- [x] Create notifications page with settings and history
+- [x] Implement manual "Check Now" button for immediate pattern detection
+- [ ] Create scheduled job to check patterns daily (requires cron setup)
+- [ ] Test notification system with real client data

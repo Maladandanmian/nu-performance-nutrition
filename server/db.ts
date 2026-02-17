@@ -19,6 +19,10 @@ import {
   vo2MaxAnthropometric,
   vo2MaxFitnessAssessment,
   vo2MaxLactateProfile,
+  trainerNotifications,
+  InsertTrainerNotification,
+  notificationSettings,
+  InsertNotificationSetting,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1584,4 +1588,269 @@ export async function updateVo2MaxFitnessAssessment(testId: number, data: {
     .insert(vo2MaxFitnessAssessment)
     .values({ testId, ...data })
     .onDuplicateKeyUpdate({ set: data });
+}
+
+// ============================================================================
+// Trainer Notifications
+// ============================================================================
+
+/**
+ * Create a trainer notification
+ */
+export async function createTrainerNotification(notification: InsertTrainerNotification) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const [result] = await db.insert(trainerNotifications).values(notification);
+  return result.insertId;
+}
+
+/**
+ * Get unread notifications for a trainer
+ */
+export async function getUnreadNotifications(trainerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(trainerNotifications)
+    .where(
+      and(
+        eq(trainerNotifications.trainerId, trainerId),
+        eq(trainerNotifications.isRead, false),
+        eq(trainerNotifications.isDismissed, false)
+      )
+    )
+    .orderBy(desc(trainerNotifications.createdAt));
+}
+
+/**
+ * Get all notifications for a trainer (with pagination)
+ */
+export async function getTrainerNotifications(trainerId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(trainerNotifications)
+    .where(eq(trainerNotifications.trainerId, trainerId))
+    .orderBy(desc(trainerNotifications.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Mark notification as read
+ */
+export async function markNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db
+    .update(trainerNotifications)
+    .set({ isRead: true })
+    .where(eq(trainerNotifications.id, notificationId));
+}
+
+/**
+ * Dismiss notification
+ */
+export async function dismissNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db
+    .update(trainerNotifications)
+    .set({ isDismissed: true })
+    .where(eq(trainerNotifications.id, notificationId));
+}
+
+/**
+ * Get or create notification settings for a trainer
+ */
+export async function getNotificationSettings(trainerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const [settings] = await db
+    .select()
+    .from(notificationSettings)
+    .where(eq(notificationSettings.trainerId, trainerId));
+
+  if (!settings) {
+    // Create default settings
+    await db.insert(notificationSettings).values({ trainerId });
+    const [newSettings] = await db
+      .select()
+      .from(notificationSettings)
+      .where(eq(notificationSettings.trainerId, trainerId));
+    return newSettings;
+  }
+
+  return settings;
+}
+
+/**
+ * Update notification settings for a trainer
+ */
+export async function updateNotificationSettings(
+  trainerId: number,
+  data: Partial<InsertNotificationSetting>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db
+    .update(notificationSettings)
+    .set(data)
+    .where(eq(notificationSettings.trainerId, trainerId));
+}
+
+/**
+ * Check if a similar notification was already sent recently (within 24 hours)
+ * to prevent duplicate alerts
+ */
+export async function hasRecentNotification(
+  trainerId: number,
+  clientId: number,
+  type: "nutrition_deviation" | "wellness_poor_scores",
+  hoursAgo: number = 24
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const cutoffDate = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+
+  const [result] = await db
+    .select()
+    .from(trainerNotifications)
+    .where(
+      and(
+        eq(trainerNotifications.trainerId, trainerId),
+        eq(trainerNotifications.clientId, clientId),
+        eq(trainerNotifications.type, type),
+        gte(trainerNotifications.createdAt, cutoffDate)
+      )
+    )
+    .limit(1);
+
+  return !!result;
+}
+
+/**
+ * Get daily nutrition totals for a client for the last N days
+ * Returns data needed for deviation pattern detection
+ */
+export async function getDailyNutritionTotals(clientId: number, days: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Get meals and drinks for the period
+  const mealsData = await db
+    .select()
+    .from(meals)
+    .where(
+      and(
+        eq(meals.clientId, clientId),
+        gte(meals.loggedAt, startDate)
+      )
+    )
+    .orderBy(asc(meals.loggedAt));
+
+  const drinksData = await db
+    .select()
+    .from(drinks)
+    .where(
+      and(
+        eq(drinks.clientId, clientId),
+        gte(drinks.loggedAt, startDate)
+      )
+    )
+    .orderBy(asc(drinks.loggedAt));
+
+  // Group by date and calculate totals
+  const dailyTotals = new Map<string, {
+    date: string;
+    calories: number;
+    protein: number;
+    fat: number;
+    carbs: number;
+    fibre: number;
+    hydration: number;
+  }>();
+
+  // Process meals
+  for (const meal of mealsData) {
+    const dateKey = meal.loggedAt.toISOString().split('T')[0];
+    const existing = dailyTotals.get(dateKey) || {
+      date: dateKey,
+      calories: 0,
+      protein: 0,
+      fat: 0,
+      carbs: 0,
+      fibre: 0,
+      hydration: 0,
+    };
+
+    existing.calories += meal.calories || 0;
+    existing.protein += meal.protein || 0;
+    existing.fat += meal.fat || 0;
+    existing.carbs += meal.carbs || 0;
+    existing.fibre += meal.fibre || 0;
+
+    dailyTotals.set(dateKey, existing);
+  }
+
+  // Process drinks
+  for (const drink of drinksData) {
+    const dateKey = drink.loggedAt.toISOString().split('T')[0];
+    const existing = dailyTotals.get(dateKey) || {
+      date: dateKey,
+      calories: 0,
+      protein: 0,
+      fat: 0,
+      carbs: 0,
+      fibre: 0,
+      hydration: 0,
+    };
+
+    existing.calories += drink.calories || 0;
+    existing.protein += drink.protein || 0;
+    existing.fat += drink.fat || 0;
+    existing.carbs += drink.carbs || 0;
+    existing.hydration += drink.volumeMl || 0;
+
+    dailyTotals.set(dateKey, existing);
+  }
+
+  return Array.from(dailyTotals.values()).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/**
+ * Get athlete monitoring scores for the last N days
+ * Returns data needed for wellness pattern detection
+ */
+export async function getAthleteMonitoringScores(clientId: number, days: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  startDate.setHours(0, 0, 0, 0);
+
+  return await db
+    .select()
+    .from(athleteMonitoring)
+    .where(
+      and(
+        eq(athleteMonitoring.clientId, clientId),
+        gte(athleteMonitoring.submittedAt, startDate)
+      )
+    )
+    .orderBy(asc(athleteMonitoring.submittedAt));
 }
