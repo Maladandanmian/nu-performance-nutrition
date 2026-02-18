@@ -1110,39 +1110,47 @@ export default function ClientDashboard() {
                   <SupplementManager clientId={clientSession.clientId} />
                 )}
 
-                <div>
-                  <Label htmlFor="meal-type">Meal Type</Label>
-                  <Select value={mealType} onValueChange={(value: any) => setMealType(value)}>
-                    <SelectTrigger id="meal-type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="breakfast">Breakfast</SelectItem>
-                      <SelectItem value="lunch">Lunch</SelectItem>
-                      <SelectItem value="dinner">Dinner</SelectItem>
-                      <SelectItem value="snack">Snack</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Quick Log Meals */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    <Label className="text-sm font-semibold">Quick Log Meals</Label>
+                {/* Meal Type - hide in supplement mode */}
+                {inputMode !== "supplements" && (
+                  <div>
+                    <Label htmlFor="meal-type">Meal Type</Label>
+                    <Select value={mealType} onValueChange={(value: any) => setMealType(value)}>
+                      <SelectTrigger id="meal-type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="breakfast">Breakfast</SelectItem>
+                        <SelectItem value="lunch">Lunch</SelectItem>
+                        <SelectItem value="dinner">Dinner</SelectItem>
+                        <SelectItem value="snack">Snack</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
-                </div>
+                )}
 
-                <div>
-                  <Label htmlFor="meal-notes">Notes (optional)</Label>
-                  <Textarea
-                    id="meal-notes"
-                    placeholder="Any additional notes about this meal..."
-                    value={mealNotes}
-                    onChange={(e) => setMealNotes(e.target.value)}
-                  />
-                </div>
+                {/* Quick Log Meals - hide in supplement mode */}
+                {inputMode !== "supplements" && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <Label className="text-sm font-semibold">Quick Log Meals</Label>
+                    </div>
+                    <FavoriteMealsButtons clientId={clientSession?.clientId || 0} />
+                  </div>
+                )}
+
+                {/* Notes - hide in supplement mode */}
+                {inputMode !== "supplements" && (
+                  <div>
+                    <Label htmlFor="meal-notes">Notes (optional)</Label>
+                    <Textarea
+                      id="meal-notes"
+                      placeholder="Any additional notes about this meal..."
+                      value={mealNotes}
+                      onChange={(e) => setMealNotes(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 {/* Beverage Section */}
                 <div className="border-t pt-4 space-y-4">

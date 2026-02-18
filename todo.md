@@ -2044,3 +2044,9 @@
 - [x] Display logged supplements in Nutrition History
 - [x] Add supplement compliance tracking for trainers
 - [x] Write vitest tests for supplement logging
+
+## Clean Up Supplement Tab UI (Feb 18, 2026)
+- [x] Hide "Meal Type" dropdown when in supplement mode
+- [x] Hide "Quick Log Meals" section when in supplement mode
+- [x] Hide "Notes" field when in supplement mode
+- [x] Test supplement tab shows only supplement manager
