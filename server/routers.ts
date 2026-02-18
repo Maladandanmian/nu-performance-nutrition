@@ -1264,24 +1264,34 @@ export const appRouter = router({
                     type: "text",
                     text: `Extract the following from this nutrition label:
 
+**SUPPLEMENT DETECTION (CRITICAL):**
+Before extracting nutrition data, check if this is a vitamin/mineral supplement:
+- Look for keywords: "vitamin", "supplement", "capsule", "tablet", "softgel", "multivitamin"
+- If detected, set calories=5, protein=0, carbs=1, fat=0, fiber=0 (typical binder/coating values)
+- Do NOT extract food-like nutrition values for supplements
+
 1. **Reference Serving**: The serving size that nutrition values on the label are based on
    - IMPORTANT: Always extract the weight/volume in grams or ml, NOT a count like "1 serving"
    - Example: If label says "Per Serving (35.5g)", extract referenceSize=35.5, referenceUnit="g"
    - Example: If label says "Per 100g", extract referenceSize=100, referenceUnit="g"
    - Example: If label says "Per 100ml", extract referenceSize=100, referenceUnit="ml"
-   - referenceSize: number (the gram/ml amount, e.g., 35.5, 100)
+   - For supplements: Extract the tablet/capsule weight if shown, otherwise use 1g as default
+   - referenceSize: number (the gram/ml amount, e.g., 35.5, 100, or 1 for supplements)
    - referenceUnit: string (must be "g" or "ml", never "serving")
 
 2. **Actual Serving**: The recommended serving size per consumption (if different from reference)
    - Only fill this if the label shows a DIFFERENT serving size than the reference
    - Example: Label shows "Per 100g" but recommends "1 sachet (3.5g)" → actualServingSize=3.5
    - Example: Label shows "Per Serving (35.5g)" with no other serving → actualServingSize=35.5 (same as reference)
-   - actualServingSize: number (e.g., 3.5, 35.5)
+   - For supplements: Use "1 tablet" or "1 capsule" as serving description
+   - actualServingSize: number (e.g., 3.5, 35.5, or 1 for supplements)
    - actualServingUnit: string (e.g., "g", "ml")
-   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "1 rounded scoop")
+   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "1 tablet", "1 capsule")
    - If not found or same as reference, set actualServingSize = referenceSize
 
 3. **Nutrition per reference serving**:
+   - REMINDER: For supplements, use minimal values (calories=5, protein=0, carbs=1, fat=0, fiber=0)
+   - For food products, extract actual values:
    - calories (kcal/kJ - convert kJ to kcal by dividing by 4.184)
    - protein (g)
    - carbs (g - total carbohydrates, or 碳水化合物)

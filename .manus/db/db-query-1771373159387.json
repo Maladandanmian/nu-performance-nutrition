@@ -1,0 +1,9 @@
+{
+  "query": "\nSELECT \n  m.id,\n  m.clientId,\n  c.name as clientName,\n  m.mealType,\n  m.createdAt,\n  m.aiDescription,\n  m.calories,\n  m.protein,\n  m.carbs,\n  m.fat,\n  m.fibre\nFROM meals m\nLEFT JOIN clients c ON m.clientId = c.id\nWHERE m.source = 'nutrition_label'\n  AND (m.calories > 1000 OR m.protein > 100 OR m.carbs > 200)\nORDER BY m.createdAt DESC\nLIMIT 50;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  m.id,\n  m.clientId,\n  c.name as clientName,\n  m.mealType,\n  m.createdAt,\n  m.aiDescription,\n  m.calories,\n  m.protein,\n  m.carbs,\n  m.fat,\n  m.fibre\nFROM meals m\nLEFT JOIN clients c ON m.clientId = c.id\nWHERE m.source = 'nutrition_label'\n  AND (m.calories > 1000 OR m.protein > 100 OR m.carbs > 200)\nORDER BY m.createdAt DESC\nLIMIT 50;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1539
+}

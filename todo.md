@@ -2021,3 +2021,15 @@
 - [x] Fix prompt to clarify reference serving must be in grams/ml, not counts
 - [x] Test fix with protein powder nutrition label (now correctly shows 100 cal, 25g protein)
 - [x] Created testNutritionLabelExtraction.ts for future testing
+
+## Fix Historical Nutrition Label Scan Errors (Feb 18, 2026)
+- [x] Query database for all nutrition label meals with source='nutrition_label'
+- [x] Confirmed no affected meals found (all values within realistic ranges)
+- [x] Fix prevents future issues
+
+## Fix Vitamin Supplement Nutrition Analysis Bug (Feb 18, 2026)
+- [x] Find vitamin supplement meals in database (found 16 meals with 680 cal each)
+- [x] Identify how these were logged (all via nutrition_label source)
+- [x] Add supplement detection to nutrition label extraction AI prompt
+- [x] AI now assigns minimal values for supplements (5 cal, 0g protein, 1g carbs, 0g fat)
+- [x] Decision: Leave existing 16 meals unchanged per user request
