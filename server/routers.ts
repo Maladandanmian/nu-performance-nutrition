@@ -1264,15 +1264,22 @@ export const appRouter = router({
                     type: "text",
                     text: `Extract the following from this nutrition label:
 
-1. **Reference Serving**: The serving size that nutrition values are based on (e.g., "per 100g", "per serving", "每100g")
-   - referenceSize: number (e.g., 100)
-   - referenceUnit: string (e.g., "g", "ml", "serving")
+1. **Reference Serving**: The serving size that nutrition values on the label are based on
+   - IMPORTANT: Always extract the weight/volume in grams or ml, NOT a count like "1 serving"
+   - Example: If label says "Per Serving (35.5g)", extract referenceSize=35.5, referenceUnit="g"
+   - Example: If label says "Per 100g", extract referenceSize=100, referenceUnit="g"
+   - Example: If label says "Per 100ml", extract referenceSize=100, referenceUnit="ml"
+   - referenceSize: number (the gram/ml amount, e.g., 35.5, 100)
+   - referenceUnit: string (must be "g" or "ml", never "serving")
 
-2. **Actual Serving**: The recommended serving size per consumption (e.g., "3.5g per sachet", "1 scoop = 35g")
-   - actualServingSize: number (e.g., 3.5)
+2. **Actual Serving**: The recommended serving size per consumption (if different from reference)
+   - Only fill this if the label shows a DIFFERENT serving size than the reference
+   - Example: Label shows "Per 100g" but recommends "1 sachet (3.5g)" → actualServingSize=3.5
+   - Example: Label shows "Per Serving (35.5g)" with no other serving → actualServingSize=35.5 (same as reference)
+   - actualServingSize: number (e.g., 3.5, 35.5)
    - actualServingUnit: string (e.g., "g", "ml")
-   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "每袋")
-   - If not found, set actualServingSize = referenceSize
+   - actualServingDescription: string (e.g., "per sachet", "1 scoop", "1 rounded scoop")
+   - If not found or same as reference, set actualServingSize = referenceSize
 
 3. **Nutrition per reference serving**:
    - calories (kcal/kJ - convert kJ to kcal by dividing by 4.184)

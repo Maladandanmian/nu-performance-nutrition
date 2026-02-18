@@ -2008,3 +2008,16 @@
 - [x] Document proper testing workflow in TESTING.md
 - [ ] Update remaining test files to use getTestClient helper (beverageInMeal, clientInvitation, dexa.goals, drinkEditNutrition, drinks, mealDrinkEditDelete, newMealFlow)
 - [ ] Add afterAll cleanup hooks to all tests
+
+## Demo Trainer Alert Emails (Feb 17, 2026)
+- [x] Find email addresses for trainer Luke and trainer Andy
+- [x] Send demo nutrition deviation alert email to both trainers
+- [x] Send demo wellness poor score alert email to both trainers
+- [x] Created sendDemoEmails.ts script for future demo email sending
+
+## Nutrition Analysis AI Prompt Bug Fix (Feb 17, 2026)
+- [x] Locate nutrition label analysis prompt in codebase (server/routers.ts extractNutritionLabel)
+- [x] Analyse prompt to identify why values are being multiplied by 100x (AI was extracting referenceSize=1 for "per serving" instead of 35.5g)
+- [x] Fix prompt to clarify reference serving must be in grams/ml, not counts
+- [x] Test fix with protein powder nutrition label (now correctly shows 100 cal, 25g protein)
+- [x] Created testNutritionLabelExtraction.ts for future testing
