@@ -23,6 +23,10 @@ import {
   InsertTrainerNotification,
   notificationSettings,
   InsertNotificationSetting,
+  supplementTemplates,
+  InsertSupplementTemplate,
+  supplementLogs,
+  InsertSupplementLog,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1865,4 +1869,105 @@ export async function getAthleteMonitoringScores(clientId: number, days: number)
       )
     )
     .orderBy(asc(athleteMonitoring.submittedAt));
+}
+
+// ============================================================================
+// Supplement Template Functions
+// ============================================================================
+
+export async function createSupplementTemplate(template: InsertSupplementTemplate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(supplementTemplates).values(template);
+  const insertId = result[0].insertId;
+  
+  // Fetch and return the created template
+  const created = await db
+    .select()
+    .from(supplementTemplates)
+    .where(eq(supplementTemplates.id, insertId));
+  
+  return created[0];
+}
+
+export async function getSupplementTemplatesByClient(clientId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(supplementTemplates)
+    .where(eq(supplementTemplates.clientId, clientId))
+    .orderBy(asc(supplementTemplates.createdAt));
+}
+
+export async function updateSupplementTemplate(id: number, updates: { name?: string; dose?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db
+    .update(supplementTemplates)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(supplementTemplates.id, id));
+}
+
+export async function deleteSupplementTemplate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .delete(supplementTemplates)
+    .where(eq(supplementTemplates.id, id));
+  
+  return { success: true };
+}
+
+// ============================================================================
+// Supplement Log Functions
+// ============================================================================
+
+export async function createSupplementLog(log: InsertSupplementLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(supplementLogs).values(log);
+  const insertId = result[0].insertId;
+  
+  // Fetch and return the created log
+  const created = await db
+    .select()
+    .from(supplementLogs)
+    .where(eq(supplementLogs.id, insertId));
+  
+  return created[0];
+}
+
+export async function getSupplementLogsByClient(clientId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(supplementLogs.clientId, clientId)];
+  
+  if (startDate && endDate) {
+    conditions.push(gte(supplementLogs.loggedAt, startDate));
+    conditions.push(lte(supplementLogs.loggedAt, endDate));
+  }
+  
+  return db
+    .select()
+    .from(supplementLogs)
+    .where(and(...conditions))
+    .orderBy(desc(supplementLogs.loggedAt));
+}
+
+export async function deleteSupplementLog(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .delete(supplementLogs)
+    .where(eq(supplementLogs.id, id));
+  
+  return { success: true };
 }

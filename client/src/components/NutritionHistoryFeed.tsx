@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { format, isToday, isYesterday, startOfWeek, startOfMonth, subDays } from "date-fns";
-import { Calendar, Clock, Edit2, Trash2, Droplet, Utensils, Star } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2, Droplet, Utensils, Star, Pill } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +14,7 @@ interface NutritionHistoryFeedProps {
 }
 
 type TimePeriod = 'today' | '7days' | '30days' | 'all';
-type EntryType = 'meal' | 'drink';
+type EntryType = 'meal' | 'drink' | 'supplement';
 type CategoryFilter = 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'beverage';
 
 interface NutritionEntry {
@@ -38,6 +38,10 @@ export function NutritionHistoryFeed({
     { enabled: clientId > 0 }
   );
   const { data: drinksData, isLoading: drinksLoading } = trpc.drinks.list.useQuery(
+    { clientId },
+    { enabled: clientId > 0 }
+  );
+  const { data: supplementLogsData, isLoading: supplementLogsLoading } = trpc.supplements.getLogs.useQuery(
     { clientId },
     { enabled: clientId > 0 }
   );
@@ -68,6 +72,18 @@ export function NutritionHistoryFeed({
           type: 'drink',
           loggedAt: new Date(drink.loggedAt),
           data: drink,
+        });
+      });
+    }
+    
+    // Add supplement logs
+    if (supplementLogsData) {
+      supplementLogsData.forEach(log => {
+        combined.push({
+          id: log.id,
+          type: 'supplement',
+          loggedAt: new Date(log.loggedAt),
+          data: log,
         });
       });
     }
@@ -163,7 +179,7 @@ export function NutritionHistoryFeed({
     return groups;
   }, [entries]);
 
-  if (mealsLoading || drinksLoading) {
+  if (mealsLoading || drinksLoading || supplementLogsLoading) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map(i => (
@@ -248,11 +264,15 @@ export function NutritionHistoryFeed({
                     onEdit={onEditMeal}
                     onDelete={onDeleteMeal}
                   />
-                ) : (
+                ) : entry.type === 'drink' ? (
                   <DrinkEntry 
                     drink={entry.data}
                     onEdit={onEditDrink}
                     onDelete={onDeleteDrink}
+                  />
+                ) : (
+                  <SupplementEntry 
+                    log={entry.data}
                   />
                 )}
               </div>
@@ -502,6 +522,41 @@ function DrinkEntry({
             )}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+
+function SupplementEntry({ log }: { log: any }) {
+  return (
+    <div className="flex gap-4">
+      {/* Supplement Icon */}
+      <div className="flex-shrink-0 w-20 h-20 bg-purple-50 rounded-md flex items-center justify-center">
+        <Pill className="h-8 w-8 text-purple-500" />
+      </div>
+      
+      {/* Supplement Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div>
+            <div className="font-medium">{log.name}</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {new Date(log.loggedAt).toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Hong_Kong'
+              })}
+            </div>
+          </div>
+        </div>
+        
+        {/* Dose Info */}
+        <div className="flex gap-3 text-xs flex-wrap">
+          <span className="text-muted-foreground">Dose: {log.dose}</span>
+        </div>
       </div>
     </div>
   );

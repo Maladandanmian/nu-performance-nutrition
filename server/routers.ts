@@ -2872,6 +2872,98 @@ Return as JSON.`
       return { success: true };
     }),
   }),
+
+  // Supplement management
+  supplements: router({
+    // Get all supplement templates for a client
+    getTemplates: publicProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getSupplementTemplatesByClient(input.clientId);
+      }),
+
+    // Create a new supplement template
+    createTemplate: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          name: z.string().min(1).max(255),
+          dose: z.string().min(1).max(100),
+        })
+      )
+      .mutation(async ({ input }) => {
+        // Check if client already has 5 templates
+        const existing = await db.getSupplementTemplatesByClient(input.clientId);
+        if (existing.length >= 5) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Maximum 5 supplement templates allowed per client",
+          });
+        }
+        
+        return db.createSupplementTemplate(input);
+      }),
+
+    // Update a supplement template
+    updateTemplate: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().min(1).max(255).optional(),
+          dose: z.string().min(1).max(100).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        return db.updateSupplementTemplate(id, updates);
+      }),
+
+    // Delete a supplement template
+    deleteTemplate: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.deleteSupplementTemplate(input.id);
+      }),
+
+    // Log a supplement intake
+    logSupplement: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          supplementTemplateId: z.number(),
+          name: z.string(),
+          dose: z.string(),
+          loggedAt: z.date(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return db.createSupplementLog(input);
+      }),
+
+    // Get supplement logs for a client
+    getLogs: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.getSupplementLogsByClient(
+          input.clientId,
+          input.startDate,
+          input.endDate
+        );
+      }),
+
+    // Delete a supplement log
+    deleteLog: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.deleteSupplementLog(input.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

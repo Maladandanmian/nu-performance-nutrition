@@ -30,6 +30,7 @@ import { AthleteMonitoringSection } from "@/components/AthleteMonitoringSection"
 import { GripStrengthSection } from "@/components/GripStrengthSection";
 import { NutritionReportsSection } from "@/components/NutritionReportsSection";
 import { Vo2MaxSection } from "@/components/Vo2MaxSection";
+import { SupplementManager } from "@/components/SupplementManager";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -111,7 +112,7 @@ export default function ClientDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Input mode state (meal photo, nutrition label, or text description)
-  const [inputMode, setInputMode] = useState<"meal" | "label" | "text">("meal");
+  const [inputMode, setInputMode] = useState<"meal" | "label" | "text" | "supplements">("meal");
   const [mealTextDescription, setMealTextDescription] = useState("");
   const [extractedNutrition, setExtractedNutrition] = useState<any>(null);
   const [showNutritionEditor, setShowNutritionEditor] = useState(false);
@@ -1035,10 +1036,25 @@ export default function ClientDashboard() {
                   >
                     ✍️ Text Description
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("supplements");
+                      setIdentifiedItems([]);
+                      setShowItemEditor(false);
+                    }}
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                      inputMode === "supplements"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    💊 Supplements
+                  </button>
                 </div>
 
                 {/* Photo input for meal photo and nutrition label modes */}
-                {inputMode !== "text" && (
+                {inputMode !== "text" && inputMode !== "supplements" && (
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <Label htmlFor="meal-image">{inputMode === "meal" ? "Meal Photo" : "Nutrition Label Photo"}</Label>
@@ -1072,7 +1088,7 @@ export default function ClientDashboard() {
                   </div>
                 )}
 
-                {/* Text input for text description mode */}
+                   {/* Text description input */}
                 {inputMode === "text" && (
                   <div>
                     <Label htmlFor="meal-description">Meal Description</Label>
@@ -1087,6 +1103,11 @@ export default function ClientDashboard() {
                       💡 Be as specific as possible for better nutrition estimates
                     </p>
                   </div>
+                )}
+
+                {/* Supplements input */}
+                {inputMode === "supplements" && clientSession?.clientId && (
+                  <SupplementManager clientId={clientSession.clientId} />
                 )}
 
                 <div>

@@ -2033,3 +2033,14 @@
 - [x] Add supplement detection to nutrition label extraction AI prompt
 - [x] AI now assigns minimal values for supplements (5 cal, 0g protein, 1g carbs, 0g fat)
 - [x] Decision: Leave existing 16 meals unchanged per user request
+
+## Supplement Logging System (Feb 18, 2026)
+- [x] Design database schema for supplement tracking (supplementTemplates, supplementLogs tables)
+- [x] Create tRPC procedures for managing supplement templates (add, edit, delete, list)
+- [x] Create tRPC procedures for logging supplement intake
+- [x] Add "Supplements" tab to Log Meal page (after Text Description tab)
+- [x] Build "Add Supplement" UI (name + dose fields, max 5 supplements)
+- [x] Build supplement selection UI (click to log)
+- [x] Display logged supplements in Nutrition History
+- [x] Add supplement compliance tracking for trainers
+- [x] Write vitest tests for supplement logging

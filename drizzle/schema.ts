@@ -643,3 +643,36 @@ export const notificationSettings = mysqlTable("notification_settings", {
 
 export type NotificationSetting = typeof notificationSettings.$inferSelect;
 export type InsertNotificationSetting = typeof notificationSettings.$inferInsert;
+
+/**
+ * Supplement Templates - stores client's saved supplements (up to 5)
+ * Each client can create templates for supplements they take regularly
+ */
+export const supplementTemplates = mysqlTable("supplement_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(), // e.g., "Brand Vitamin C tablet"
+  dose: varchar("dose", { length: 100 }).notNull(), // e.g., "1 tablet", "2 capsules"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SupplementTemplate = typeof supplementTemplates.$inferSelect;
+export type InsertSupplementTemplate = typeof supplementTemplates.$inferInsert;
+
+/**
+ * Supplement Logs - tracks when clients take supplements
+ * Links to supplement templates for compliance tracking
+ */
+export const supplementLogs = mysqlTable("supplement_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  supplementTemplateId: int("supplementTemplateId").notNull().references(() => supplementTemplates.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(), // Denormalized for history preservation
+  dose: varchar("dose", { length: 100 }).notNull(), // Denormalized for history preservation
+  loggedAt: timestamp("loggedAt").notNull(), // When the supplement was taken
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SupplementLog = typeof supplementLogs.$inferSelect;
+export type InsertSupplementLog = typeof supplementLogs.$inferInsert;

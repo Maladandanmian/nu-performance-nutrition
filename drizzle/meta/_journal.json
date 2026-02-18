@@ -197,6 +197,13 @@
       "when": 1771326570510,
       "tag": "0027_wealthy_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1771404998117,
+      "tag": "0028_long_harrier",
+      "breakpoints": true
     }
   ]
 }
