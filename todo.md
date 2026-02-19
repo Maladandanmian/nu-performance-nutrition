@@ -2057,3 +2057,10 @@
 - [x] Adjust orange threshold to 121-140% (previously 101-120%)
 - [x] Adjust red threshold to <80% and >140% (previously <90% and >120%)
 - [x] Test with various intake levels to verify colour changes
+
+## Fix Log Meal Input Mode Button Layout (Feb 19, 2026)
+- [x] Locate input mode button section in ClientDashboard
+- [x] Change from horizontal flex layout to 2×2 grid
+- [x] Remove emojis from button labels
+- [x] Ensure buttons are properly sized and spaced
+- [x] Test on mobile and desktop viewports

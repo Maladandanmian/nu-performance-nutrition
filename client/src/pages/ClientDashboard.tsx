@@ -989,8 +989,8 @@ export default function ClientDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Mode Toggle */}
-                <div className="flex items-center justify-center gap-2 p-1 bg-gray-100 rounded-lg">
+                {/* Mode Toggle - 2x2 Grid */}
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -998,13 +998,13 @@ export default function ClientDashboard() {
                       setExtractedNutrition(null);
                       setShowNutritionEditor(false);
                     }}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    className={`py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                       inputMode === "meal"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
-                    📸 Meal Photo
+                    Meal Photo
                   </button>
                   <button
                     type="button"
@@ -1013,13 +1013,13 @@ export default function ClientDashboard() {
                       setIdentifiedItems([]);
                       setShowItemEditor(false);
                     }}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    className={`py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                       inputMode === "label"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
-                    🏷️ Nutrition Label
+                    Nutrition Label
                   </button>
                   <button
                     type="button"
@@ -1028,13 +1028,13 @@ export default function ClientDashboard() {
                       setIdentifiedItems([]);
                       setShowItemEditor(false);
                     }}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    className={`py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                       inputMode === "text"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
-                    ✍️ Text Description
+                    Text Description
                   </button>
                   <button
                     type="button"
@@ -1043,13 +1043,13 @@ export default function ClientDashboard() {
                       setIdentifiedItems([]);
                       setShowItemEditor(false);
                     }}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    className={`py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                       inputMode === "supplements"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
-                    💊 Supplements
+                    Supplements
                   </button>
                 </div>
 
