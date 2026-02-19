@@ -2050,3 +2050,10 @@
 - [x] Hide "Quick Log Meals" section when in supplement mode
 - [x] Hide "Notes" field when in supplement mode
 - [x] Test supplement tab shows only supplement manager
+
+## Update Nutrition Circle Colour Thresholds (Feb 18, 2026)
+- [x] Locate circular progress indicator components (TodaysSummary)
+- [x] Change green threshold to ±20% of target (80-120%)
+- [x] Adjust orange threshold to 121-140% (previously 101-120%)
+- [x] Adjust red threshold to <80% and >140% (previously <90% and >120%)
+- [x] Test with various intake levels to verify colour changes

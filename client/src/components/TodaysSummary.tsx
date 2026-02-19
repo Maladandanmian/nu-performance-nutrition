@@ -21,24 +21,31 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (displayPercentage / 100) * circumference;
   
-  // Determine base color (always green when at or over 100%)
-  let statusColor = "#10b981"; // green
-  if (actualPercentage < 90) {
-    statusColor = "#ef4444"; // red (under target)
+  // Determine base color based on ±20% threshold
+  let statusColor = "#10b981"; // green (within ±20% of target)
+  
+  if (actualPercentage < 80) {
+    // More than 20% under target
+    statusColor = "#ef4444"; // red
   } else if (actualPercentage < 100) {
-    statusColor = "#f59e0b"; // orange (close to target)
+    // Between 80-100% (within 20% under target)
+    statusColor = "#10b981"; // green
+  } else if (actualPercentage <= 120) {
+    // Between 100-120% (within 20% over target)
+    statusColor = "#10b981"; // green
   }
   
   // Determine warning color and dash pattern for over-target
   let warningColor: string | null = null;
   let useDashedStroke = false;
   
-  if (actualPercentage > 100) {
+  if (actualPercentage > 120) {
+    // Only show warning pattern when more than 20% over target
     useDashedStroke = true;
-    if (actualPercentage <= 120) {
-      warningColor = "#f59e0b"; // orange (slightly over)
+    if (actualPercentage <= 140) {
+      warningColor = "#f59e0b"; // orange (21-40% over)
     } else {
-      warningColor = "#ef4444"; // red (significantly over)
+      warningColor = "#ef4444"; // red (more than 40% over)
     }
   }
   
@@ -61,7 +68,7 @@ function CircularProgress({ value, max, label, unit, emoji, color }: CircularPro
             strokeWidth="8"
             fill="none"
           />
-          {/* Progress circle (always solid green when over target, normal progress when not) */}
+          {/* Progress circle (green within ±20%, red when <80%, striped pattern when >120%) */}
           <circle
             cx="48"
             cy="48"
