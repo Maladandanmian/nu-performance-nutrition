@@ -60,7 +60,7 @@ export function PackageSelector({
       </div>
 
       <Select
-        value={selectedPackageId?.toString() || ""}
+        value={selectedPackageId?.toString()}
         onValueChange={(value) => onSelectPackage(value ? parseInt(value) : undefined)}
       >
         <SelectTrigger id="package">

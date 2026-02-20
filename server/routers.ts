@@ -3044,15 +3044,18 @@ Return as JSON.`
     getByTrainer: adminProcedure
       .input(
         z.object({
-          startDate: z.date().optional(),
-          endDate: z.date().optional(),
+          startDate: z.string().optional(), // YYYY-MM-DD format
+          endDate: z.string().optional(), // YYYY-MM-DD format
         })
       )
       .query(async ({ ctx, input }) => {
+        // Convert string dates to Date objects if provided
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
         return db.getTrainingSessionsByTrainer(
           ctx.user.id,
-          input.startDate,
-          input.endDate
+          startDate,
+          endDate
         );
       }),
 

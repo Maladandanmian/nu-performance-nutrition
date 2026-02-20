@@ -2349,3 +2349,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Write vitest tests for package checkout
 - [x] Verify package balance decrements correctly
 - [x] Test edge cases (zero balance, multiple packages)
+
+
+## Bug Fixes (Complete) ✅
+
+- [x] Fix date validation error in SessionList query (expected date, received string)
+- [x] Fix empty Select.Item value error in PackageSelector component
