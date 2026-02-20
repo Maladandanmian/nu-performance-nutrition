@@ -19,13 +19,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Plus, Users, Dumbbell, Repeat, Package, ArrowLeft } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Users, Dumbbell, Repeat, Package, ArrowLeft, CalendarDays, List } from "lucide-react";
 import SessionList from "@/components/SessionList";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PackageCreationForm } from "@/components/PackageCreationForm";
 import { PackageList } from "@/components/PackageList";
 import { PackageSelector } from "@/components/PackageSelector";
+import { TrainerCalendar } from "@/components/TrainerCalendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SESSION_TYPES = [
   { value: "1on1_pt", label: "1-on-1 Personal Training" },
@@ -45,6 +47,7 @@ const CLASS_TYPES = [
 export default function TrainerSchedule() {
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [classDialogOpen, setClassDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("list");
 
   // Get current user (trainer)
   const { data: currentUser } = trpc.auth.me.useQuery();
@@ -242,7 +245,7 @@ export default function TrainerSchedule() {
             <Card className="p-6 hover:bg-accent cursor-pointer transition-colors">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
-                  <Calendar className="h-6 w-6 text-primary" />
+                  <CalendarIcon className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-1">
@@ -372,9 +375,10 @@ export default function TrainerSchedule() {
               </div>
 
               {/* Package Selector (shown when payment is from_package) */}
-              {sessionForm.paymentStatus === "from_package" && sessionForm.clientId && (
+              {sessionForm.paymentStatus === "from_package" && sessionForm.clientId && sessionForm.sessionType && (
                 <PackageSelector
                   clientId={parseInt(sessionForm.clientId)}
+                  sessionType={sessionForm.sessionType}
                   selectedPackageId={sessionForm.packageId}
                   onSelectPackage={(packageId) =>
                     setSessionForm({ ...sessionForm, packageId })
@@ -620,13 +624,30 @@ export default function TrainerSchedule() {
         </div>
       </div>
 
-      {/* Upcoming Schedule */}
+      {/* Schedule View Tabs */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <Dumbbell className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
+          <CalendarDays className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Schedule</h2>
         </div>
-        <SessionList />
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="list" className="gap-2">
+              <List className="h-4 w-4" />
+              List View
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="gap-2">
+              <CalendarDays className="h-4 w-4" />
+              Calendar View
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="list">
+            <SessionList />
+          </TabsContent>
+          <TabsContent value="calendar">
+            <TrainerCalendar trainerId={currentUser?.id || 0} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

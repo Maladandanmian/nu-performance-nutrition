@@ -2982,10 +2982,8 @@ Return as JSON.`
         })
       )
       .mutation(async ({ ctx, input }) => {
-        // If payment is from package, checkout from package
-        if (input.paymentStatus === "from_package" && input.packageId) {
-          await db.checkoutSessionFromPackage(input.packageId);
-        }
+         // Note: Package balance is now calculated dynamically based on completed sessions
+        // We no longer decrement immediately on booking
         
         // Cast to any to avoid type issues with date strings
         const session = await db.createTrainingSession({

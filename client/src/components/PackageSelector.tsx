@@ -13,12 +13,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PackageSelectorProps {
   clientId: number;
+  sessionType: string; // The session type being booked
   selectedPackageId?: number;
   onSelectPackage: (packageId: number | undefined) => void;
 }
 
 export function PackageSelector({
   clientId,
+  sessionType,
   selectedPackageId,
   onSelectPackage,
 }: PackageSelectorProps) {
@@ -26,8 +28,10 @@ export function PackageSelector({
     clientId,
   });
 
-  // Filter to show only active packages (with remaining sessions)
-  const activePackages = packages?.filter((pkg) => pkg.sessionsRemaining > 0) || [];
+  // Filter to show only active packages matching the session type
+  const activePackages = packages?.filter(
+    (pkg) => pkg.sessionsRemaining > 0 && pkg.packageType === sessionType
+  ) || [];
 
   if (isLoading) {
     return (

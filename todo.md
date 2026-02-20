@@ -2367,3 +2367,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## UX Improvements (Current) ✅
 
 - [x] Add navigation button from Schedule screen back to My Clients screen
+
+## Critical Bug Fixes (Complete) ✅
+
+- [x] Fix package type validation - only show packages matching the selected session type
+- [x] Fix session counting logic - only count sessions as "used" after their date has passed
+- [x] Implement trainer calendar view showing all sessions across all clients and group classes
+- [x] Implement client calendar view showing their own sessions (private and group)

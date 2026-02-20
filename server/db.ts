@@ -2154,21 +2154,49 @@ export async function createSessionPackage(pkg: InsertSessionPackage) {
 }
 
 /**
- * Get all packages for a specific client
+ * Get all packages for a specific client with dynamic session counts
  */
 export async function getSessionPackagesByClient(clientId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  return db
+  const packages = await db
     .select()
     .from(sessionPackages)
     .where(eq(sessionPackages.clientId, clientId))
     .orderBy(desc(sessionPackages.createdAt));
+  
+  // Calculate sessions used dynamically based on past sessions
+  const now = new Date();
+  const packagesWithCounts = await Promise.all(
+    packages.map(async (pkg) => {
+      // Count completed sessions (past date) that used this package
+      const completedSessions = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(trainingSessions)
+        .where(
+          and(
+            eq(trainingSessions.packageId, pkg.id),
+            lte(trainingSessions.sessionDate, now),
+            sql`${trainingSessions.cancelledAt} IS NULL`
+          )
+        );
+      
+      const sessionsUsed = Number(completedSessions[0]?.count || 0);
+      const sessionsRemaining = pkg.sessionsTotal - sessionsUsed;
+      
+      return {
+        ...pkg,
+        sessionsRemaining,
+      };
+    })
+  );
+  
+  return packagesWithCounts;
 }
 
 /**
- * Get all packages for a specific trainer with client names
+ * Get all packages for a specific trainer with client names and dynamic session counts
  */
 export async function getSessionPackagesByTrainer(trainerId: number) {
   const db = await getDb();
@@ -2182,7 +2210,6 @@ export async function getSessionPackagesByTrainer(trainerId: number) {
       trainerId: sessionPackages.trainerId,
       packageType: sessionPackages.packageType,
       sessionsTotal: sessionPackages.sessionsTotal,
-      sessionsRemaining: sessionPackages.sessionsRemaining,
       purchaseDate: sessionPackages.purchaseDate,
       expiryDate: sessionPackages.expiryDate,
       notes: sessionPackages.notes,
@@ -2194,7 +2221,33 @@ export async function getSessionPackagesByTrainer(trainerId: number) {
     .where(eq(sessionPackages.trainerId, trainerId))
     .orderBy(desc(sessionPackages.createdAt));
   
-  return packages;
+  // Calculate sessions used dynamically based on past sessions
+  const now = new Date();
+  const packagesWithCounts = await Promise.all(
+    packages.map(async (pkg) => {
+      // Count completed sessions (past date) that used this package
+      const completedSessions = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(trainingSessions)
+        .where(
+          and(
+            eq(trainingSessions.packageId, pkg.id),
+            lte(trainingSessions.sessionDate, now),
+            sql`${trainingSessions.cancelledAt} IS NULL`
+          )
+        );
+      
+      const sessionsUsed = Number(completedSessions[0]?.count || 0);
+      const sessionsRemaining = pkg.sessionsTotal - sessionsUsed;
+      
+      return {
+        ...pkg,
+        sessionsRemaining,
+      };
+    })
+  );
+  
+  return packagesWithCounts;
 }
 
 /**
