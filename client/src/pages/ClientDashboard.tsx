@@ -31,6 +31,7 @@ import { GripStrengthSection } from "@/components/GripStrengthSection";
 import { NutritionReportsSection } from "@/components/NutritionReportsSection";
 import { Vo2MaxSection } from "@/components/Vo2MaxSection";
 import { SupplementManager } from "@/components/SupplementManager";
+import { ClientSchedule } from "@/components/ClientSchedule";
 
 // Helper function to determine meal type based on current time
 const getMealTypeFromTime = (): "breakfast" | "lunch" | "dinner" | "snack" => {
@@ -966,6 +967,7 @@ export default function ClientDashboard() {
           <Tabs defaultValue="log-meal">
           <TabsList className="grid w-full grid-cols-2 h-auto gap-2">
             <TabsTrigger value="log-meal">Log Meal</TabsTrigger>
+            <TabsTrigger value="schedule">My Schedule</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="body">Body Metrics</TabsTrigger>
@@ -1379,6 +1381,11 @@ export default function ClientDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Schedule Tab */}
+          <TabsContent value="schedule">
+            <ClientSchedule clientId={clientSession?.clientId || 0} />
           </TabsContent>
 
           {/* Nutrition History Tab (Meals + Drinks) */}

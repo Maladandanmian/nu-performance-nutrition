@@ -192,7 +192,7 @@ export const appRouter = router({
         });
         
         // Create default nutrition goals for new client
-        const clientId = Number(result[0].insertId);
+        const clientId = result.id;
         await db.createNutritionGoal({
           clientId,
           caloriesTarget: 2000,
@@ -3076,6 +3076,28 @@ Return as JSON.`
       .mutation(async ({ input }) => {
         return db.deleteTrainingSession(input.sessionId);
       }),
+
+    // Get upcoming sessions for a client (client-accessible)
+    getUpcoming: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          days: z.number().default(30), // Number of days to look ahead
+        })
+      )
+      .query(async ({ input }) => {
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + input.days);
+
+        const sessions = await db.getTrainingSessionsByClient(
+          input.clientId,
+          new Date(startDate.toISOString().split('T')[0]),
+          new Date(endDate.toISOString().split('T')[0])
+        );
+
+        return sessions;
+      }),
   }),
 
   // Session Packages
@@ -3283,6 +3305,26 @@ Return as JSON.`
       )
       .mutation(async ({ input }) => {
         return db.markGroupClassAttendance(input.attendanceId, input.attended);
+      }),
+
+    // Get upcoming group classes for a client (client-accessible)
+    getClientClasses: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          days: z.number().default(30),
+        })
+      )
+      .query(async ({ input }) => {
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + input.days);
+
+        return db.getGroupClassesByClient(
+          input.clientId,
+          new Date(startDate.toISOString().split('T')[0]),
+          new Date(endDate.toISOString().split('T')[0])
+        );
       }),
   }),
 });

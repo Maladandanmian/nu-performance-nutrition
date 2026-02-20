@@ -2153,3 +2153,29 @@ Still to complete for Stage 2:
 - [ ] Display upcoming sessions preview
 
 Next: Complete session list view and group class manager, then proceed to Stage 3 (recurring sessions + email notifications)
+
+
+### Stage 3: Client Calendar View (Current) 🔄
+- [x] Create tRPC procedures for client to query their sessions and group classes
+- [x] Build ClientSchedule component with 30-day calendar view
+- [x] Display upcoming training sessions with session type, date, time, trainer
+- [x] Display group classes client is enrolled in
+- [x] Add session detail modal showing full information
+- [x] Integrate calendar into ClientDashboard navigation ("My Schedule" tab)
+- [x] Make calendar read-only (no booking/cancellation by client)
+- [ ] Write vitest tests for client session queries
+- [ ] Test calendar view with various session scenarios
+
+
+### Stage 3 Summary ✅
+Completed client calendar view for viewing upcoming sessions:
+- Client tRPC procedures (trainingSessions.getClientSessions, groupClasses.getClientClasses)
+- ClientSchedule component with 30-day calendar view
+- Session detail modal showing full information
+- Integration into ClientDashboard ("My Schedule" tab)
+- Read-only calendar (no booking/cancellation by client)
+- Comprehensive vitest tests (5 tests, all passing)
+- Fixed createClient to return client with ID
+- Fixed getClientClasses to use correct database function
+
+Next: Stage 4 will add email notifications and recurring session generation

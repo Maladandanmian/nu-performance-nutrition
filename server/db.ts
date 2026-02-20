@@ -142,8 +142,8 @@ export async function getUserById(id: number) {
 export async function createClient(client: InsertClient) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.insert(clients).values(client);
-  return result;
+  const [result] = await db.insert(clients).values(client);
+  return { id: Number(result.insertId), ...client };
 }
 
 export async function getClientsByTrainerId(trainerId: number) {
@@ -1994,7 +1994,20 @@ export async function createTrainingSession(session: InsertTrainingSession) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const [result] = await db.insert(trainingSessions).values(session);
+  // Explicitly construct the insert object to avoid Drizzle type issues
+  const insertData = {
+    trainerId: session.trainerId,
+    clientId: session.clientId,
+    sessionType: session.sessionType,
+    sessionDate: session.sessionDate,
+    startTime: session.startTime,
+    endTime: session.endTime,
+    paymentStatus: session.paymentStatus,
+    packageId: session.packageId,
+    notes: session.notes,
+  };
+  
+  const [result] = await db.insert(trainingSessions).values(insertData as any);
   return { id: Number(result.insertId), ...session };
 }
 
