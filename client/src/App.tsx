@@ -10,6 +10,7 @@ import TrainerDashboard from "./pages/TrainerDashboard";
 import ClientDetail from "./pages/ClientDetail";
 import SetPassword from "./pages/SetPassword";
 import TrainerNotifications from "./pages/TrainerNotifications";
+import TrainerSchedule from "./pages/TrainerSchedule";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -18,8 +19,8 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/set-password"} component={SetPassword} />
       <Route path={"/client"} component={ClientDashboard} />
-      <Route path={"/trainer"} component={TrainerDashboard} />
-      <Route path={"/trainer/notifications"} component={TrainerNotifications} />
+      <Route path={"/trainer"} component={TrainerDashboard} />      <Route path={"/trainer/notifications"} component={TrainerNotifications} />
+      <Route path={"/trainer/schedule"} component={TrainerSchedule} />
       <Route path={"/trainer/client/:id"} component={ClientDetail} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

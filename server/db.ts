@@ -2182,3 +2182,221 @@ export async function updateSessionPackage(packageId: number, updates: Partial<I
   
   return { success: true };
 }
+
+
+// ============================================================================
+// Group Classes
+// ============================================================================
+
+/**
+ * Create a new group class
+ */
+export async function createGroupClass(groupClass: InsertGroupClass) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(groupClasses).values(groupClass);
+  return { id: Number(result.insertId), ...groupClass };
+}
+
+/**
+ * Get all group classes for a trainer
+ */
+export async function getGroupClassesByTrainer(trainerId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let conditions = [eq(groupClasses.trainerId, trainerId), eq(groupClasses.cancelled, false)];
+  
+  if (startDate) {
+    conditions.push(sql`${groupClasses.classDate} >= ${startDate.toISOString().split('T')[0]}`);
+  }
+  if (endDate) {
+    conditions.push(sql`${groupClasses.classDate} <= ${endDate.toISOString().split('T')[0]}`);
+  }
+  
+  return db
+    .select()
+    .from(groupClasses)
+    .where(and(...conditions))
+    .orderBy(asc(groupClasses.classDate), asc(groupClasses.startTime));
+}
+
+/**
+ * Get a specific group class by ID
+ */
+export async function getGroupClassById(classId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [groupClass] = await db
+    .select()
+    .from(groupClasses)
+    .where(eq(groupClasses.id, classId))
+    .limit(1);
+  
+  return groupClass;
+}
+
+/**
+ * Update a group class
+ */
+export async function updateGroupClass(classId: number, updates: Partial<InsertGroupClass>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(groupClasses)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(groupClasses.id, classId));
+  
+  return { success: true };
+}
+
+/**
+ * Cancel a group class (soft delete)
+ */
+export async function cancelGroupClass(classId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(groupClasses)
+    .set({ cancelled: true, cancelledAt: new Date(), updatedAt: new Date() })
+    .where(eq(groupClasses.id, classId));
+  
+  return { success: true };
+}
+
+/**
+ * Delete a group class (hard delete)
+ */
+export async function deleteGroupClass(classId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(groupClasses).where(eq(groupClasses.id, classId));
+  return { success: true };
+}
+
+// ============================================================================
+// Group Class Attendance
+// ============================================================================
+
+/**
+ * Add a client to a group class
+ */
+export async function addClientToGroupClass(attendance: InsertGroupClassAttendance) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if client is already signed up
+  const [existing] = await db
+    .select()
+    .from(groupClassAttendance)
+    .where(
+      and(
+        eq(groupClassAttendance.groupClassId, attendance.groupClassId),
+        eq(groupClassAttendance.clientId, attendance.clientId)
+      )
+    )
+    .limit(1);
+  
+  if (existing) {
+    throw new Error("Client is already signed up for this class");
+  }
+  
+  // Check class capacity
+  const groupClass = await getGroupClassById(attendance.groupClassId);
+  if (!groupClass) throw new Error("Group class not found");
+  
+  const attendees = await getGroupClassAttendees(attendance.groupClassId);
+  if (attendees.length >= groupClass.capacity) {
+    throw new Error("Class is at full capacity");
+  }
+  
+  // If payment is from package, checkout from package
+  if (attendance.paymentStatus === "from_package" && attendance.packageId) {
+    await checkoutSessionFromPackage(attendance.packageId);
+  }
+  
+  const [result] = await db.insert(groupClassAttendance).values(attendance);
+  return { id: Number(result.insertId), ...attendance };
+}
+
+/**
+ * Remove a client from a group class
+ */
+export async function removeClientFromGroupClass(attendanceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(groupClassAttendance).where(eq(groupClassAttendance.id, attendanceId));
+  return { success: true };
+}
+
+/**
+ * Get all attendees for a group class
+ */
+export async function getGroupClassAttendees(classId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db
+    .select()
+    .from(groupClassAttendance)
+    .where(eq(groupClassAttendance.groupClassId, classId))
+    .orderBy(asc(groupClassAttendance.createdAt));
+}
+
+/**
+ * Get all group classes for a client
+ */
+export async function getGroupClassesByClient(clientId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get attendance records for the client
+  const attendance = await db
+    .select()
+    .from(groupClassAttendance)
+    .where(eq(groupClassAttendance.clientId, clientId));
+  
+  if (attendance.length === 0) return [];
+  
+  const classIds = attendance.map(a => a.groupClassId);
+  
+  // Get the group classes
+  let conditions = [
+    sql`${groupClasses.id} IN (${classIds.join(',')})`,
+    eq(groupClasses.cancelled, false)
+  ];
+  
+  if (startDate) {
+    conditions.push(sql`${groupClasses.classDate} >= ${startDate.toISOString().split('T')[0]}`);
+  }
+  if (endDate) {
+    conditions.push(sql`${groupClasses.classDate} <= ${endDate.toISOString().split('T')[0]}`);
+  }
+  
+  return db
+    .select()
+    .from(groupClasses)
+    .where(and(...conditions))
+    .orderBy(asc(groupClasses.classDate), asc(groupClasses.startTime));
+}
+
+/**
+ * Mark attendance for a client in a group class
+ */
+export async function markGroupClassAttendance(attendanceId: number, attended: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(groupClassAttendance)
+    .set({ attended })
+    .where(eq(groupClassAttendance.id, attendanceId));
+  
+  return { success: true };
+}

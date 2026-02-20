@@ -2078,7 +2078,7 @@
 ### Backend (tRPC Procedures)
 - [x] Create session management procedures (create, update, delete, getByClient, getByTrainer, getByDateRange)
 - [x] Create package management procedures (create, update, checkOut, getBalance)
-- [ ] Create group class procedures (create, update, delete, getSchedule, addAttendee, removeAttendee) - Stage 2
+- [x] Create group class procedures (create, update, delete, getSchedule, addAttendee, removeAttendee)
 - [ ] Create recurring session logic (generateRecurringSessions, updateRecurringSeries) - Stage 3
 - [ ] Create notification procedures (sendBookingEmail, send24HourReminder, sendCancellationEmail)
 - [ ] Add email templates for booking confirmations and reminders
@@ -2130,3 +2130,26 @@ Completed backend foundation for training sessions and packages:
 
 Next: Stage 2 will add group class procedures and trainer UI for session management
 - [ ] Write vitest tests for email notification triggers
+
+
+### Stage 2 Progress (Partial) 🔄
+Completed group class backend and trainer scheduling UI:
+- [x] Group class database helpers (create, read, update, delete, attendance management)
+- [x] Group class tRPC procedures (groupClasses router with 10 procedures)
+- [x] TrainerSchedule page created at /trainer/schedule
+- [x] Session creation form (client selector, session type, date/time, payment status)
+- [x] Group class creation form (class type, date/time, capacity, notes)
+- [x] Navigation link in trainer dashboard header
+- [x] Capacity validation for group classes
+- [x] Package checkout integration in attendance
+
+Still to complete for Stage 2:
+- [ ] Session list view with date range filters
+- [ ] Group class weekly schedule manager
+- [ ] Client assignment to group classes UI
+- [ ] Edit/cancel/delete actions for sessions and classes
+- [ ] Package creation and management UI
+- [ ] Vitest tests for group class procedures
+- [ ] Display upcoming sessions preview
+
+Next: Complete session list view and group class manager, then proceed to Stage 3 (recurring sessions + email notifications)

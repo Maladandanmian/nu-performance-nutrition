@@ -3136,6 +3136,155 @@ Return as JSON.`
         return db.updateSessionPackage(packageId, updates as any);
       }),
   }),
+
+  // Group Classes
+  groupClasses: router({
+    // Create a new group class (trainer only)
+    create: adminProcedure
+      .input(
+        z.object({
+          classType: z.enum(["hyrox", "mobility", "rehab", "conditioning", "strength_conditioning"]),
+          classDate: z.string(), // YYYY-MM-DD format
+          startTime: z.string(), // HH:MM format
+          endTime: z.string(), // HH:MM format
+          capacity: z.number().default(20),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Cast to any to avoid type issues with date strings
+        return db.createGroupClass({
+          trainerId: ctx.user.id,
+          classType: input.classType,
+          classDate: input.classDate,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          capacity: input.capacity,
+          notes: input.notes || null,
+          recurringRuleId: null,
+          cancelled: false,
+          cancelledAt: null,
+        } as any);
+      }),
+
+    // Get group classes for a trainer
+    getByTrainer: adminProcedure
+      .input(
+        z.object({
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getGroupClassesByTrainer(
+          ctx.user.id,
+          input.startDate,
+          input.endDate
+        );
+      }),
+
+    // Get group classes for a client
+    getByClient: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.getGroupClassesByClient(
+          input.clientId,
+          input.startDate,
+          input.endDate
+        );
+      }),
+
+    // Get a specific group class by ID
+    getById: publicProcedure
+      .input(z.object({ classId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getGroupClassById(input.classId);
+      }),
+
+    // Update a group class (trainer only)
+    update: adminProcedure
+      .input(
+        z.object({
+          classId: z.number(),
+          classDate: z.string().optional(),
+          startTime: z.string().optional(),
+          endTime: z.string().optional(),
+          capacity: z.number().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { classId, ...updates } = input;
+        // Cast to any to avoid type issues with date strings
+        return db.updateGroupClass(classId, updates as any);
+      }),
+
+    // Cancel a group class (trainer only)
+    cancel: adminProcedure
+      .input(z.object({ classId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.cancelGroupClass(input.classId);
+      }),
+
+    // Delete a group class (trainer only)
+    delete: adminProcedure
+      .input(z.object({ classId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.deleteGroupClass(input.classId);
+      }),
+
+    // Add a client to a group class (trainer only)
+    addClient: adminProcedure
+      .input(
+        z.object({
+          classId: z.number(),
+          clientId: z.number(),
+          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).default("unpaid"),
+          packageId: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return db.addClientToGroupClass({
+          groupClassId: input.classId,
+          clientId: input.clientId,
+          paymentStatus: input.paymentStatus,
+          packageId: input.packageId || null,
+          attended: false,
+        });
+      }),
+
+    // Remove a client from a group class (trainer only)
+    removeClient: adminProcedure
+      .input(z.object({ attendanceId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.removeClientFromGroupClass(input.attendanceId);
+      }),
+
+    // Get attendees for a group class
+    getAttendees: publicProcedure
+      .input(z.object({ classId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getGroupClassAttendees(input.classId);
+      }),
+
+    // Mark attendance (trainer only)
+    markAttendance: adminProcedure
+      .input(
+        z.object({
+          attendanceId: z.number(),
+          attended: z.boolean(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return db.markGroupClassAttendance(input.attendanceId, input.attended);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
