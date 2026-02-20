@@ -198,11 +198,15 @@ function VisceralFatGauge({ data }: { data: any[] }) {
 
   // Data is ordered newest→oldest from DB, so latest is at index 0
   const latest = data[0];
-  const vatArea = parseFloat(latest.vatArea || "0");
+  const vatAreaRaw = parseFloat(latest.vatArea || "0");
+  const vatArea = isNaN(vatAreaRaw) ? 0 : vatAreaRaw;
   
   // Get last 6 scans for sparkline (take from start, reverse for oldest→newest display)
   const recentScans = data.slice(0, 6).reverse();
-  const vatTrend = recentScans.map(scan => parseFloat(scan.vatArea || "0"));
+  const vatTrend = recentScans.map(scan => {
+    const val = parseFloat(scan.vatArea || "0");
+    return isNaN(val) ? 0 : val;
+  });
   
   // Determine health zone based on new VAT thresholds
   // <100 (normal), 100-160 (increased risk), >160 (high risk)
@@ -228,7 +232,8 @@ function VisceralFatGauge({ data }: { data: any[] }) {
   
   // Calculate trend (previous is second item since data is newest-first)
   const previous = data.length > 1 ? data[1] : null;
-  const previousVat = previous ? parseFloat(previous.vatArea || "0") : vatArea;
+  const previousVatRaw = previous ? parseFloat(previous.vatArea || "0") : vatArea;
+  const previousVat = isNaN(previousVatRaw) ? 0 : previousVatRaw;
   const change = vatArea - previousVat;
   const changePercent = previousVat > 0 ? ((change / previousVat) * 100).toFixed(1) : "0";
   

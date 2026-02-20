@@ -2431,3 +2431,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Ensure proper array handling for images and bmdData
 - [x] Reverted incorrect "fix" from commit 6338fcd that broke working code
 - [x] Restored original working DexaUploadSection component
+
+## VisceralFatGauge toFixed Error (Feb 20, 2026)
+- [x] Fix TypeError: toFixed is not a function in VisceralFatGauge component
+- [x] Add proper type checking and null handling for VAT values
+- [x] Added isNaN() checks after parseFloat() to prevent NaN.toFixed() errors
