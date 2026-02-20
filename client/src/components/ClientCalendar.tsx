@@ -57,15 +57,18 @@ export function ClientCalendar({ clientId }: ClientCalendarProps) {
   const events: CalendarEvent[] = useMemo(() => {
     const sessionEvents: CalendarEvent[] =
       sessions?.map((session) => {
+        // Parse date in UTC to avoid timezone shifts
         const sessionDate = new Date(session.sessionDate);
+        const year = sessionDate.getUTCFullYear();
+        const month = sessionDate.getUTCMonth();
+        const day = sessionDate.getUTCDate();
+        
         const [startHour, startMinute] = session.startTime.split(":").map(Number);
         const [endHour, endMinute] = session.endTime.split(":").map(Number);
 
-        const start = new Date(sessionDate);
-        start.setHours(startHour, startMinute, 0);
-
-        const end = new Date(sessionDate);
-        end.setHours(endHour, endMinute, 0);
+        // Create dates in local timezone using UTC date components
+        const start = new Date(year, month, day, startHour, startMinute, 0);
+        const end = new Date(year, month, day, endHour, endMinute, 0);
 
         return {
           id: session.id,
@@ -83,15 +86,18 @@ export function ClientCalendar({ clientId }: ClientCalendarProps) {
 
     const groupClassEvents: CalendarEvent[] =
       groupClasses?.map((groupClass) => {
+        // Parse date in UTC to avoid timezone shifts
         const classDate = new Date(groupClass.classDate);
+        const year = classDate.getUTCFullYear();
+        const month = classDate.getUTCMonth();
+        const day = classDate.getUTCDate();
+        
         const [startHour, startMinute] = groupClass.startTime.split(":").map(Number);
         const [endHour, endMinute] = groupClass.endTime.split(":").map(Number);
 
-        const start = new Date(classDate);
-        start.setHours(startHour, startMinute, 0);
-
-        const end = new Date(classDate);
-        end.setHours(endHour, endMinute, 0);
+        // Create dates in local timezone using UTC date components
+        const start = new Date(year, month, day, startHour, startMinute, 0);
+        const end = new Date(year, month, day, endHour, endMinute, 0);
 
         return {
           id: groupClass.id,

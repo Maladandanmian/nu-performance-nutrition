@@ -2385,3 +2385,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [ ] Add email notification when session is rescheduled or modified (TODO for future)
 - [x] Handle edge cases (warning for past sessions)
 - [x] Write vitest tests for session editing (6 tests passing)
+
+
+## Calendar Timezone Bug (Fixed) ✅
+
+- [x] Fix timezone offset in TrainerCalendar causing sessions to appear one day earlier (Monday/Thursday instead of Tuesday/Friday)
+- [x] Ensure calendar displays sessions on the correct day regardless of user timezone
+- [x] Apply same fix to ClientCalendar component
