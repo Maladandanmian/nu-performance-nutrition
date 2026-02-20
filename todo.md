@@ -2424,3 +2424,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Investigate DEXA scan upload code to identify map() error
 - [x] Fix the error preventing DEXA scan uploads (changed imageUrl to presignedUrl, added Array.isArray checks)
 - [x] Test DEXA scan upload functionality
+
+## DEXA Scan Approval Error (Feb 20, 2026)
+- [x] Fix React rendering error when approving DEXA scans
+- [x] Investigate getScanDetails query response structure
+- [x] Ensure proper array handling for images and bmdData
+- [x] Reverted incorrect "fix" from commit 6338fcd that broke working code
+- [x] Restored original working DexaUploadSection component

@@ -26,7 +26,10 @@ export function DexaUploadSection({ clientId }: DexaUploadSectionProps) {
       utils.dexa.getClientScans.invalidate({ clientId });
     },
     onError: (error) => {
-      toast.error(`Upload failed: ${error.message}`);
+      const errorMessage = error.message.includes('aborted') || error.message.includes('timeout')
+        ? 'Upload timed out. The PDF may be too large or complex. Please try again or contact support.'
+        : `Upload failed: ${error.message}`;
+      toast.error(errorMessage, { duration: 6000 });
       setIsUploading(false);
     },
   });
@@ -310,14 +313,14 @@ function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, onDelete, i
           ) : details ? (
             <div className="space-y-4">
               {/* Extracted Images */}
-              {Array.isArray(details.images) && details.images.length > 0 && (
+              {details.images && details.images.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-3">Extracted Images</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {details.images.map((image: any) => (
                       <div key={image.id} className="border rounded-lg overflow-hidden bg-white">
                         <img
-                          src={image.presignedUrl || image.imageUrl}
+                          src={image.imageUrl}
                           alt={formatImageType(image.imageType)}
                           className="w-full h-auto"
                         />
@@ -355,7 +358,7 @@ function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, onDelete, i
               )}
 
               {/* BMD Data */}
-              {Array.isArray(details.bmdData) && details.bmdData.length > 0 && (
+              {details.bmdData && details.bmdData.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-3">Bone Mineral Density</h4>
                   <div className="overflow-x-auto">
@@ -415,10 +418,12 @@ function MetricCard({ label, value }: { label: string; value: string }) {
 
 function formatImageType(type: string): string {
   const labels: Record<string, string> = {
-    body_scan_colorized: "Body Scan (Color)",
-    body_scan_grayscale: "Body Scan (Skeletal)",
-    fracture_risk_chart: "Fracture Risk Chart",
-    body_fat_chart: "Body Fat % Chart",
+    body_composition: "Body Composition",
+    bmd_summary: "BMD Summary",
+    bmd_detail: "BMD Detail",
+    body_scan: "Body Scan Image",
+    trend_graph: "Trend Graph",
+    reference_data: "Reference Data",
   };
   return labels[type] || type;
 }

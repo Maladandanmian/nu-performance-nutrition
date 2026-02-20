@@ -66,9 +66,15 @@ const trpcClient = trpc.createClient({
           headers.set('X-Client-Session', clientSession);
         }
         
+        // Determine timeout based on request path
+        // DEXA upload needs longer timeout due to LLM analysis
+        const url = typeof input === 'string' ? input : (input instanceof Request ? input.url : input.toString());
+        const isDexaUpload = url.includes('dexa.uploadScan');
+        const timeoutMs = isDexaUpload ? 120000 : 30000; // 120s for DEXA, 30s for others
+        
         // Add timeout to prevent hanging requests
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         
         return globalThis.fetch(input, {
           ...(init ?? {}),
