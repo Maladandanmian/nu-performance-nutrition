@@ -3146,6 +3146,64 @@ Return as JSON.`
 
         return sessions;
       }),
+
+    // Create recurring training sessions (trainer only)
+    createRecurring: adminProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]),
+          startTime: z.string(), // HH:MM format
+          endTime: z.string(), // HH:MM format
+          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).default("unpaid"),
+          packageId: z.number().optional(),
+          notes: z.string().optional(),
+          startDate: z.string(), // YYYY-MM-DD format
+          endDate: z.string(), // YYYY-MM-DD format
+          daysOfWeek: z.array(z.number().min(0).max(6)), // 0 = Sunday, 6 = Saturday
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { generateRecurringSessions } = await import('./recurringSessionGenerator');
+        
+        const sessionIds = await generateRecurringSessions({
+          trainerId: ctx.user.id,
+          clientId: input.clientId,
+          sessionType: input.sessionType,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          paymentStatus: input.paymentStatus,
+          packageId: input.packageId,
+          notes: input.notes,
+          startDate: input.startDate,
+          endDate: input.endDate,
+          daysOfWeek: input.daysOfWeek,
+        });
+
+        // Send booking confirmation emails for all sessions
+        const client = await db.getClientById(input.clientId);
+        if (client && client.email) {
+          const { sendSessionBookingConfirmation } = await import('./sessionEmailNotifications');
+          
+          // Send one email summarizing the recurring sessions
+          const firstSession = await db.getTrainingSessionById(sessionIds[0]);
+          if (firstSession) {
+            await sendSessionBookingConfirmation({
+              id: firstSession.id,
+              clientName: client.name,
+              clientEmail: client.email,
+              sessionType: input.sessionType,
+              sessionDate: firstSession.sessionDate.toString().split('T')[0],
+              startTime: input.startTime,
+              endTime: input.endTime,
+              trainerName: ctx.user.name || 'Your Trainer',
+              notes: `Recurring session: ${sessionIds.length} sessions created`,
+            });
+          }
+        }
+
+        return { success: true, sessionIds, count: sessionIds.length };
+      }),
   }),
 
   // Session Packages
@@ -3373,6 +3431,38 @@ Return as JSON.`
           new Date(startDate.toISOString().split('T')[0]),
           new Date(endDate.toISOString().split('T')[0])
         );
+      }),
+
+    // Create recurring group classes (trainer only)
+    createRecurring: adminProcedure
+      .input(
+        z.object({
+          classType: z.enum(["hyrox", "mobility", "rehab", "conditioning", "strength_conditioning"]),
+          startTime: z.string(), // HH:MM format
+          endTime: z.string(), // HH:MM format
+          capacity: z.number().default(20),
+          notes: z.string().optional(),
+          startDate: z.string(), // YYYY-MM-DD format
+          endDate: z.string(), // YYYY-MM-DD format
+          daysOfWeek: z.array(z.number().min(0).max(6)), // 0 = Sunday, 6 = Saturday
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { generateRecurringGroupClasses } = await import('./recurringSessionGenerator');
+        
+        const classIds = await generateRecurringGroupClasses({
+          trainerId: ctx.user.id,
+          classType: input.classType,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          capacity: input.capacity,
+          notes: input.notes,
+          startDate: input.startDate,
+          endDate: input.endDate,
+          daysOfWeek: input.daysOfWeek,
+        });
+
+        return { success: true, classIds, count: classIds.length };
       }),
   }),
 });

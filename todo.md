@@ -2207,3 +2207,43 @@ Completed email notification infrastructure:
 - Professional HTML templates with Nu Performance branding
 
 Next: Recurring session generation and scheduled reminder task
+
+
+### Remaining Implementation Tasks (Current Priority)
+
+#### Stage 4 Completion: Recurring Sessions & Reminders
+- [x] Implement recurring session generation logic (weekly patterns with custom days)
+- [x] Add tRPC procedures for recurring sessions and group classes
+- [ ] Add recurring session creation to TrainerSchedule UI
+- [ ] Create scheduled task for 24-hour reminder emails (daily cron job)
+- [ ] Test recurring session generation with various patterns
+- [ ] Test reminder email dispatch
+
+#### Trainer Management UI (Priority 2)
+- [ ] Build session list/calendar view for trainers
+- [ ] Add filters (by client, date range, payment status)
+- [ ] Add edit/delete actions for individual sessions
+- [ ] Build package creation form
+- [ ] Display package balance in session creation
+- [ ] Build group class weekly schedule manager
+- [ ] Add drag-and-drop rescheduling (optional enhancement)
+
+#### Final Testing & Polish
+- [ ] Write vitest tests for recurring session generation
+- [ ] Write vitest tests for reminder email logic
+- [ ] End-to-end testing of complete scheduling workflow
+- [ ] Final checkpoint with all features complete
+
+
+### Stage 4 Recurring Sessions Complete ✅
+Implemented recurring session generation with weekly patterns:
+- Created `recurringSessionGenerator.ts` with generation logic for sessions and group classes
+- Added `trainingSessions.createRecurring` tRPC procedure
+- Added `groupClasses.createRecurring` tRPC procedure
+- Supports custom day selection (0-6, Sunday-Saturday)
+- Supports custom end dates
+- Validates operating hours (5am-9pm)
+- Automatically sends booking confirmation email for recurring series
+- Handles package checkout for recurring sessions
+
+Next: Scheduled reminder task and trainer management UI
