@@ -337,7 +337,7 @@ function VisceralFatGauge({ data }: { data: any[] }) {
                       height: `${height}%`,
                       transform: 'translateX(-50%)'
                     }}
-                    title={`${new Date(scan.scanDate).toLocaleDateString()}: ${(scan.vatArea || 0).toFixed(1)} cm²`}
+                    title={`${new Date(scan.scanDate).toLocaleDateString()}: ${(parseFloat(scan.vatArea) || 0).toFixed(1)} cm²`}
                   />
                 );
               })}
@@ -1220,14 +1220,29 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
   const timeline = scans.map((scan, idx) => {
     const prevScan = idx > 0 ? scans[idx - 1] : null;
     
+    const vatAreaRaw = parseFloat(scan.vatArea || "0");
+    const vatArea = isNaN(vatAreaRaw) ? 0 : vatAreaRaw;
+    const prevVatRaw = prevScan ? parseFloat(prevScan.vatArea || "0") : 0;
+    const prevVat = isNaN(prevVatRaw) ? 0 : prevVatRaw;
+    
+    const bodyFatRaw = parseFloat(scan.totalBodyFatPct || "0");
+    const bodyFat = isNaN(bodyFatRaw) ? 0 : bodyFatRaw;
+    const prevBodyFatRaw = prevScan ? parseFloat(prevScan.totalBodyFatPct || "0") : 0;
+    const prevBodyFat = isNaN(prevBodyFatRaw) ? 0 : prevBodyFatRaw;
+    
+    const leanMassRaw = parseFloat(scan.totalLeanMass || "0") / 1000;
+    const leanMass = isNaN(leanMassRaw) ? 0 : leanMassRaw;
+    const prevLeanRaw = prevScan ? parseFloat(prevScan.totalLeanMass || "0") / 1000 : 0;
+    const prevLean = isNaN(prevLeanRaw) ? 0 : prevLeanRaw;
+    
     return {
       date: new Date(scan.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      vatArea: parseFloat(scan.vatArea || "0"),
-      vatChange: prevScan ? parseFloat(scan.vatArea || "0") - parseFloat(prevScan.vatArea || "0") : 0,
-      bodyFat: parseFloat(scan.totalBodyFatPct || "0"),
-      bodyFatChange: prevScan ? parseFloat(scan.totalBodyFatPct || "0") - parseFloat(prevScan.totalBodyFatPct || "0") : 0,
-      leanMass: parseFloat(scan.totalLeanMass || "0") / 1000, // Convert grams to kg
-      leanMassChange: prevScan ? (parseFloat(scan.totalLeanMass || "0") - parseFloat(prevScan.totalLeanMass || "0")) / 1000 : 0, // Convert grams to kg
+      vatArea,
+      vatChange: prevScan ? vatArea - prevVat : 0,
+      bodyFat,
+      bodyFatChange: prevScan ? bodyFat - prevBodyFat : 0,
+      leanMass,
+      leanMassChange: prevScan ? leanMass - prevLean : 0,
       isFirst: idx === 0,
     };
   });
@@ -1237,7 +1252,8 @@ function MonthlyProgressSummary({ bodyComp, bmd }: { bodyComp: any[]; bmd: any[]
   bmd.forEach(item => {
     if (item.region === 'Total Body' && item.bmd) {
       const dateKey = new Date(item.scanDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      bmdByDate[dateKey] = parseFloat(item.bmd);
+      const bmdVal = parseFloat(item.bmd);
+      bmdByDate[dateKey] = isNaN(bmdVal) ? 0 : bmdVal;
     }
   });
   

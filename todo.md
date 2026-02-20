@@ -2436,3 +2436,6 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix TypeError: toFixed is not a function in VisceralFatGauge component
 - [x] Add proper type checking and null handling for VAT values
 - [x] Added isNaN() checks after parseFloat() to prevent NaN.toFixed() errors
+- [x] Fixed line 340 scan.vatArea tooltip in VisceralFatGauge sparkline
+- [x] Fixed MonthlyProgressSummary timeline map to validate all parseFloat results
+- [x] Fixed bmdByDate to handle NaN values
