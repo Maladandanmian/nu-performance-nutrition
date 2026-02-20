@@ -2271,3 +2271,41 @@ Implemented automated reminder email system:
 - System will run automatically every day to keep clients informed
 
 Next: Trainer management UI (session list view, package creation, group class schedule)
+
+
+## Trainer UI Implementation (Current) 🔄
+
+### Phase 1: Enhance TrainerSchedule with Recurring Controls
+- [x] Add recurring session toggle to session creation form
+- [x] Add day-of-week checkboxes (Sun-Sat) when recurring enabled
+- [x] Add end date picker for recurring series
+- [x] Update form submission to call recurring procedure when enabled
+- [ ] Add recurring controls to group class form as well (can add later if needed)
+
+### Phase 2: Session List/Calendar View
+- [x] Create session list component showing upcoming sessions
+- [x] Add filters: by client, by date range, by payment status
+- [x] Add delete button with confirmation dialog
+- [x] Display session details: client, type, date, time, payment status
+- [ ] Add edit button for each session (opens edit modal) - deferred to later
+
+### Phase 3: Package Management UI
+- [ ] Create package creation form (client selector, package type, sessions count)
+- [ ] Add package list view showing active packages per client
+- [ ] Display remaining balance in session creation form
+- [ ] Add "Use Package" option in payment status dropdown
+- [ ] Show package deduction confirmation when booking
+
+### Phase 4: Group Class Weekly Schedule
+- [ ] Create weekly timetable view for group classes
+- [ ] Add client assignment interface (select clients for each class)
+- [ ] Show current attendees for each class
+- [ ] Add remove attendee button
+- [ ] Display capacity warnings when class is full
+
+### Phase 5: Testing & Polish
+- [ ] Test session creation with recurring options
+- [ ] Test package creation and checkout flow
+- [ ] Test group class assignment
+- [ ] Test edit/delete actions
+- [ ] Verify all email notifications work correctly

@@ -19,7 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Plus, Users, Dumbbell } from "lucide-react";
+import { Calendar, Plus, Users, Dumbbell, Repeat } from "lucide-react";
+import SessionList from "@/components/SessionList";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 const SESSION_TYPES = [
@@ -54,6 +56,9 @@ export default function TrainerSchedule() {
     paymentStatus: "unpaid" as "paid" | "unpaid" | "from_package",
     packageId: undefined as number | undefined,
     notes: "",
+    isRecurring: false,
+    recurringDays: [] as number[],
+    recurringEndDate: "",
   });
 
   // Group class form state
@@ -64,6 +69,30 @@ export default function TrainerSchedule() {
     endTime: "",
     capacity: 20,
     notes: "",
+  });
+
+  // Create recurring session mutation
+  const createRecurringSession = trpc.trainingSessions.createRecurring.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Created ${data.count} recurring sessions successfully.`);
+      setSessionDialogOpen(false);
+      setSessionForm({
+        clientId: "",
+        sessionType: "",
+        sessionDate: "",
+        startTime: "",
+        endTime: "",
+        paymentStatus: "unpaid",
+        packageId: undefined,
+        notes: "",
+        isRecurring: false,
+        recurringDays: [],
+        recurringEndDate: "",
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   // Create session mutation
@@ -80,6 +109,9 @@ export default function TrainerSchedule() {
         paymentStatus: "unpaid",
         packageId: undefined,
         notes: "",
+        isRecurring: false,
+        recurringDays: [],
+        recurringEndDate: "",
       });
     },
     onError: (error) => {
@@ -118,16 +150,41 @@ export default function TrainerSchedule() {
       return;
     }
 
-    createSession.mutate({
-      clientId: parseInt(sessionForm.clientId),
-      sessionType: sessionForm.sessionType as any,
-      sessionDate: sessionForm.sessionDate,
-      startTime: sessionForm.startTime,
-      endTime: sessionForm.endTime,
-      paymentStatus: sessionForm.paymentStatus,
-      packageId: sessionForm.packageId,
-      notes: sessionForm.notes || undefined,
-    });
+    // Validate recurring fields if enabled
+    if (sessionForm.isRecurring) {
+      if (sessionForm.recurringDays.length === 0) {
+        toast.error("Please select at least one day for recurring sessions.");
+        return;
+      }
+      if (!sessionForm.recurringEndDate) {
+        toast.error("Please select an end date for recurring sessions.");
+        return;
+      }
+
+      createRecurringSession.mutate({
+        clientId: parseInt(sessionForm.clientId),
+        sessionType: sessionForm.sessionType as any,
+        startDate: sessionForm.sessionDate,
+        endDate: sessionForm.recurringEndDate,
+        startTime: sessionForm.startTime,
+        endTime: sessionForm.endTime,
+        daysOfWeek: sessionForm.recurringDays,
+        paymentStatus: sessionForm.paymentStatus,
+        packageId: sessionForm.packageId,
+        notes: sessionForm.notes || undefined,
+      });
+    } else {
+      createSession.mutate({
+        clientId: parseInt(sessionForm.clientId),
+        sessionType: sessionForm.sessionType as any,
+        sessionDate: sessionForm.sessionDate,
+        startTime: sessionForm.startTime,
+        endTime: sessionForm.endTime,
+        paymentStatus: sessionForm.paymentStatus,
+        packageId: sessionForm.packageId,
+        notes: sessionForm.notes || undefined,
+      });
+    }
   };
 
   const handleCreateClass = () => {
@@ -297,7 +354,7 @@ export default function TrainerSchedule() {
                 </Select>
               </div>
 
-              {/* Notes */}
+                       {/* Notes */}
               <div className="space-y-2">
                 <Label htmlFor="notes">Notes (Optional)</Label>
                 <Textarea
@@ -307,16 +364,88 @@ export default function TrainerSchedule() {
                   onChange={(e) =>
                     setSessionForm({ ...sessionForm, notes: e.target.value })
                   }
-                  rows={3}
                 />
               </div>
+
+              {/* Recurring Session Toggle */}
+              <div className="flex items-center space-x-2 border-t pt-4">
+                <Checkbox
+                  id="recurring"
+                  checked={sessionForm.isRecurring}
+                  onCheckedChange={(checked) =>
+                    setSessionForm({ ...sessionForm, isRecurring: !!checked })
+                  }
+                />
+                <Label htmlFor="recurring" className="flex items-center gap-2 cursor-pointer">
+                  <Repeat className="h-4 w-4" />
+                  Make this a recurring session
+                </Label>
+              </div>
+
+              {/* Recurring Options */}
+              {sessionForm.isRecurring && (
+                <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+                  <div className="space-y-2">
+                    <Label>Repeat on days *</Label>
+                    <div className="grid grid-cols-7 gap-2">
+                      {[
+                        { value: 0, label: "Sun" },
+                        { value: 1, label: "Mon" },
+                        { value: 2, label: "Tue" },
+                        { value: 3, label: "Wed" },
+                        { value: 4, label: "Thu" },
+                        { value: 5, label: "Fri" },
+                        { value: 6, label: "Sat" },
+                      ].map((day) => (
+                        <button
+                          key={day.value}
+                          type="button"
+                          onClick={() => {
+                            const days = sessionForm.recurringDays.includes(day.value)
+                              ? sessionForm.recurringDays.filter((d) => d !== day.value)
+                              : [...sessionForm.recurringDays, day.value];
+                            setSessionForm({ ...sessionForm, recurringDays: days });
+                          }}
+                          className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            sessionForm.recurringDays.includes(day.value)
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-background border hover:bg-accent"
+                          }`}
+                        >
+                          {day.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringEndDate">End Date *</Label>
+                    <Input
+                      id="recurringEndDate"
+                      type="date"
+                      value={sessionForm.recurringEndDate}
+                      onChange={(e) =>
+                        setSessionForm({
+                          ...sessionForm,
+                          recurringEndDate: e.target.value,
+                        })
+                      }
+                      min={sessionForm.sessionDate}
+                    />
+                  </div>
+                </div>
+              )}
 
               <Button
                 onClick={handleCreateSession}
                 className="w-full"
-                disabled={createSession.isPending}
+                disabled={createSession.isPending || createRecurringSession.isPending}
               >
-                {createSession.isPending ? "Creating..." : "Schedule Session"}
+                {createSession.isPending || createRecurringSession.isPending
+                  ? "Creating..."
+                  : sessionForm.isRecurring
+                  ? "Create Recurring Sessions"
+                  : "Schedule Session"}
               </Button>
             </div>
           </DialogContent>
@@ -451,16 +580,14 @@ export default function TrainerSchedule() {
         </Dialog>
       </div>
 
-      {/* Upcoming Schedule Preview */}
-      <Card className="p-6">
+      {/* Upcoming Schedule */}
+      <div>
         <div className="flex items-center gap-3 mb-4">
           <Dumbbell className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Upcoming Schedule</h2>
+          <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
         </div>
-        <p className="text-muted-foreground text-sm">
-          Session list and calendar view coming in Phase 3
-        </p>
-      </Card>
+        <SessionList />
+      </div>
     </div>
   );
 }

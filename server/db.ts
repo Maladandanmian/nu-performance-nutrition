@@ -2060,11 +2060,25 @@ export async function getTrainingSessionsByTrainer(trainerId: number, startDate?
     conditions.push(sql`${trainingSessions.sessionDate} <= ${endDate.toISOString().split('T')[0]}`);
   }
   
-  return db
+  const sessions = await db
     .select()
     .from(trainingSessions)
     .where(and(...conditions))
     .orderBy(asc(trainingSessions.sessionDate), asc(trainingSessions.startTime));
+  
+  // Fetch client information for each session
+  const sessionsWithClients = await Promise.all(
+    sessions.map(async (session) => {
+      const [client] = await db
+        .select({ id: clients.id, name: clients.name, email: clients.email })
+        .from(clients)
+        .where(eq(clients.id, session.clientId))
+        .limit(1);
+      return { ...session, client };
+    })
+  );
+  
+  return sessionsWithClients;
 }
 
 /**
