@@ -2988,7 +2988,7 @@ Return as JSON.`
         }
         
         // Cast to any to avoid type issues with date strings
-        return db.createTrainingSession({
+        const session = await db.createTrainingSession({
           trainerId: ctx.user.id,
           clientId: input.clientId,
           sessionType: input.sessionType,
@@ -3002,6 +3002,25 @@ Return as JSON.`
           cancelled: false,
           cancelledAt: null,
         } as any);
+
+        // Send booking confirmation email
+        const client = await db.getClientById(input.clientId);
+        if (client && client.email) {
+          const { sendSessionBookingConfirmation } = await import('./sessionEmailNotifications');
+          await sendSessionBookingConfirmation({
+            id: session.id,
+            clientName: client.name,
+            clientEmail: client.email,
+            sessionType: input.sessionType,
+            sessionDate: input.sessionDate,
+            startTime: input.startTime,
+            endTime: input.endTime,
+            trainerName: ctx.user.name || 'Your Trainer',
+            notes: input.notes,
+          });
+        }
+
+        return session;
       }),
 
     // Get sessions for a client
@@ -3073,8 +3092,37 @@ Return as JSON.`
     // Delete a training session (trainer only)
     delete: adminProcedure
       .input(z.object({ sessionId: z.number() }))
-      .mutation(async ({ input }) => {
-        return db.deleteTrainingSession(input.sessionId);
+      .mutation(async ({ ctx, input }) => {
+        // Get session details before deletion for email notification
+        const session = await db.getTrainingSessionById(input.sessionId);
+        
+        if (session && !session.cancelled) {
+          // Get client details
+          const client = await db.getClientById(session.clientId);
+          
+          // Delete the session
+          await db.deleteTrainingSession(input.sessionId);
+          
+          // Send cancellation email
+          if (client && client.email) {
+            const { sendSessionCancellationNotification } = await import('./sessionEmailNotifications');
+            await sendSessionCancellationNotification({
+              id: session.id,
+              clientName: client.name,
+              clientEmail: client.email,
+              sessionType: session.sessionType,
+              sessionDate: new Date(session.sessionDate).toISOString().split('T')[0],
+              startTime: session.startTime,
+              endTime: session.endTime,
+              trainerName: ctx.user.name || 'Your Trainer',
+              notes: session.notes || undefined,
+            });
+          }
+        } else {
+          await db.deleteTrainingSession(input.sessionId);
+        }
+        
+        return { success: true };
       }),
 
     // Get upcoming sessions for a client (client-accessible)

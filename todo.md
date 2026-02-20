@@ -2179,3 +2179,31 @@ Completed client calendar view for viewing upcoming sessions:
 - Fixed getClientClasses to use correct database function
 
 Next: Stage 4 will add email notifications and recurring session generation
+
+
+### Stage 4: Email Notifications & Recurring Sessions (Current) 🔄
+- [x] Examine existing email infrastructure (server/emailService.ts with SendGrid)
+- [x] Create email template functions for session notifications
+- [x] Implement booking confirmation email (sent when trainer creates session)
+- [x] Implement cancellation notification email (sent when trainer deletes session)
+- [ ] Implement 24-hour reminder email (sent daily via scheduled task)
+- [ ] Add recurring session generation logic (weekly patterns with custom days)
+- [ ] Update session creation to support recurring rules
+- [ ] Create scheduled task for daily reminder email dispatch
+- [ ] Write vitest tests for email functions
+- [ ] Write vitest tests for recurring session generation
+- [ ] Test email delivery end-to-end
+
+
+### Stage 4 Progress (Partial) ⏳
+Completed email notification infrastructure:
+- Created sessionEmailNotifications.ts with 6 email functions
+- Booking confirmations for training sessions and group classes
+- Cancellation notifications for training sessions
+- 24-hour reminder templates (ready for scheduled task)
+- Integrated booking emails into trainingSessions.create procedure
+- Integrated cancellation emails into trainingSessions.delete procedure
+- All emails use Hong Kong timezone (GMT+8) for date/time formatting
+- Professional HTML templates with Nu Performance branding
+
+Next: Recurring session generation and scheduled reminder task
