@@ -2400,3 +2400,20 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Ensure packages with remaining sessions are correctly filtered and displayed
 - [x] Fix PackageCreationForm to store only packageType enum value, not display string with price
 - [x] Update existing package in database to remove price from packageType field
+
+
+## Calendar Edit Functionality (Current) 📅
+
+- [ ] Add Edit and Cancel buttons to TrainerCalendar event details dialog
+- [ ] Integrate SessionEditModal to allow inline editing from calendar
+- [ ] Add cancel session functionality with confirmation dialog
+- [ ] Implement email notification system for session changes (create, edit, cancel)
+- [ ] Send email to client detailing what changed (date, time, payment status, etc.)
+
+
+## Calendar Edit Functionality (Complete) ✅
+
+- [x] Add Edit and Cancel buttons to calendar event dialog
+- [x] Integrate SessionEditModal for editing from calendar
+- [x] Add sendSessionUpdateNotification function to existing email system
+- [x] Calendar cancellation uses existing sendSessionCancellationNotification

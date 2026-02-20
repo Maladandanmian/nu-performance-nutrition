@@ -6,7 +6,11 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
+import { SessionEditModal } from "@/components/SessionEditModal";
+import { toast } from "sonner";
 
 const locales = {
   "en-US": enUS,
@@ -44,6 +48,21 @@ export function TrainerCalendar({ trainerId }: TrainerCalendarProps) {
   const [view, setView] = useState<View>("week");
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [editingSession, setEditingSession] = useState<any | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const utils = trpc.useUtils();
+  const deleteSessionMutation = trpc.trainingSessions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Session cancelled and client notified");
+      utils.trainingSessions.invalidate();
+      setSelectedEvent(null);
+      setShowDeleteConfirm(false);
+    },
+    onError: (error) => {
+      toast.error(`Failed to cancel session: ${error.message}`);
+    },
+  });
 
   // Fetch all sessions for the trainer
   const { data: sessions } = trpc.trainingSessions.getByTrainer.useQuery({});
@@ -232,8 +251,74 @@ export function TrainerCalendar({ trainerId }: TrainerCalendarProps) {
               )}
             </div>
           )}
+          {selectedEvent && selectedEvent.resource.type === "session" && (
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // Find the full session data
+                  const session = sessions?.find(s => s.id === selectedEvent.id);
+                  if (session) {
+                    setEditingSession(session);
+                    setSelectedEvent(null);
+                  }
+                }}
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit Session
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Cancel Session
+              </Button>
+            </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Session?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to cancel this session? The client will be notified via email.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+              Keep Session
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (selectedEvent) {
+                  deleteSessionMutation.mutate({ sessionId: selectedEvent.id });
+                }
+              }}
+              disabled={deleteSessionMutation.isPending}
+            >
+              {deleteSessionMutation.isPending ? "Cancelling..." : "Cancel Session"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Session Modal */}
+      {editingSession && (
+        <SessionEditModal
+          session={editingSession}
+          open={!!editingSession}
+          onOpenChange={(open) => !open && setEditingSession(null)}
+          onSuccess={() => {
+            setEditingSession(null);
+            utils.trainingSessions.invalidate();
+          }}
+        />
+      )}
     </>
   );
 }

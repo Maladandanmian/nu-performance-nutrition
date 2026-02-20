@@ -641,3 +641,149 @@ See you tomorrow!
     text,
   });
 }
+
+
+interface SessionChangeDetails {
+  oldDate?: string;
+  newDate?: string;
+  oldStartTime?: string;
+  newStartTime?: string;
+  oldEndTime?: string;
+  newEndTime?: string;
+  oldSessionType?: string;
+  newSessionType?: string;
+}
+
+/**
+ * Send notification email when a session is updated
+ */
+export async function sendSessionUpdateNotification(
+  session: SessionDetails,
+  changes: SessionChangeDetails
+): Promise<boolean> {
+  const subject = 'Training Session Updated - Nu Performance Nutrition';
+  const dateTime = formatDateTime(session.sessionDate, session.startTime);
+  
+  // Build list of changes
+  let changesList = '';
+  if (changes.oldDate && changes.newDate && changes.oldDate !== changes.newDate) {
+    const oldDateTime = formatDateTime(changes.oldDate, changes.oldStartTime || session.startTime);
+    const newDateTime = formatDateTime(changes.newDate, changes.newStartTime || session.startTime);
+    changesList += `<li><strong>Date & Time:</strong> ${oldDateTime} → ${newDateTime}</li>`;
+  } else if (changes.oldStartTime && changes.newStartTime && 
+             (changes.oldStartTime !== changes.newStartTime || changes.oldEndTime !== changes.newEndTime)) {
+    changesList += `<li><strong>Time:</strong> ${changes.oldStartTime} - ${changes.oldEndTime} → ${changes.newStartTime} - ${changes.newEndTime}</li>`;
+  }
+  
+  if (changes.oldSessionType && changes.newSessionType && changes.oldSessionType !== changes.newSessionType) {
+    changesList += `<li><strong>Session Type:</strong> ${changes.oldSessionType} → ${changes.newSessionType}</li>`;
+  }
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #578DB3; padding: 30px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Nu Performance Nutrition</h1>
+            </td>
+          </tr>
+          
+          <!-- Body -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 20px;">Training Session Updated</h2>
+              
+              <p style="margin: 0 0 15px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Hi ${session.clientName},
+              </p>
+              
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Your training session has been updated. Here's what changed:
+              </p>
+              
+              <!-- Changes List -->
+              <ul style="margin: 0 0 30px 0; padding-left: 20px; color: #666666; font-size: 16px; line-height: 1.8;">
+                ${changesList}
+              </ul>
+              
+              <!-- Current Session Details Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9f9f9; border-radius: 4px; margin-bottom: 30px;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <p style="margin: 0 0 10px 0; color: #333333; font-size: 16px; font-weight: bold;">Current Session Details:</p>
+                    <p style="margin: 0 0 8px 0; color: #666666; font-size: 15px;"><strong>Session Type:</strong> ${session.sessionType}</p>
+                    <p style="margin: 0 0 8px 0; color: #666666; font-size: 15px;"><strong>Date & Time:</strong> ${dateTime}</p>
+                    <p style="margin: 0 0 8px 0; color: #666666; font-size: 15px;"><strong>Duration:</strong> ${session.startTime} - ${session.endTime}</p>
+                    <p style="margin: 0; color: #666666; font-size: 15px;"><strong>Trainer:</strong> ${session.trainerName}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 0 0 15px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                If you have any questions or concerns about these changes, please contact your trainer directly.
+              </p>
+              
+              <p style="margin: 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                See you at your session!
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9f9f9; padding: 20px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © ${new Date().getFullYear()} Nu Performance Nutrition
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  const text = `
+Nu Performance Nutrition
+
+Training Session Updated
+
+Hi ${session.clientName},
+
+Your training session has been updated. Here's what changed:
+
+${changesList.replace(/<[^>]*>/g, '').replace(/&rarr;/g, '→')}
+
+Current Session Details:
+- Session Type: ${session.sessionType}
+- Date & Time: ${dateTime}
+- Duration: ${session.startTime} - ${session.endTime}
+- Trainer: ${session.trainerName}
+
+If you have any questions or concerns about these changes, please contact your trainer directly.
+
+See you at your session!
+
+© ${new Date().getFullYear()} Nu Performance Nutrition
+  `.trim();
+
+  return sendEmail({
+    to: session.clientEmail,
+    subject,
+    html,
+    text,
+  });
+}
