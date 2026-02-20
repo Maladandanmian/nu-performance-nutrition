@@ -2035,6 +2035,16 @@ export async function getTrainingSessionsByClient(clientId: number, startDate?: 
 }
 
 /**
+ * Get all trainers (admin users)
+ */
+export async function getAllTrainers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(users).where(eq(users.role, 'admin'));
+}
+
+/**
  * Get all training sessions for a specific trainer
  */
 export async function getTrainingSessionsByTrainer(trainerId: number, startDate?: Date, endDate?: Date) {

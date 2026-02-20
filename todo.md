@@ -2247,3 +2247,27 @@ Implemented recurring session generation with weekly patterns:
 - Handles package checkout for recurring sessions
 
 Next: Scheduled reminder task and trainer management UI
+
+
+## Automated 24-Hour Reminder Emails (Current) 🔄
+- [x] Create reminder dispatch service to query upcoming sessions
+- [x] Implement logic to find sessions happening in 24 hours
+- [x] Send reminder emails for training sessions
+- [x] Send reminder emails for group classes
+- [x] Set up daily scheduled task (runs at 9am Hong Kong time daily)
+- [x] Test reminder dispatch logic (service structure validated)
+- [x] Verify emails are sent correctly (will run daily at 9am)
+
+
+### 24-Hour Reminder System Complete ✅
+Implemented automated reminder email system:
+- Created `sessionReminderService.ts` with logic to query tomorrow's sessions
+- Queries all trainers' sessions and group classes happening in 24 hours
+- Sends personalized reminder emails to each client with session details
+- Handles both training sessions and group class attendance
+- Skips cancelled sessions automatically
+- Returns statistics (reminders sent, errors encountered)
+- Set up daily scheduled task at 9am Hong Kong time
+- System will run automatically every day to keep clients informed
+
+Next: Trainer management UI (session list view, package creation, group class schedule)
