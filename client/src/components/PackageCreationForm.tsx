@@ -57,15 +57,9 @@ export function PackageCreationForm() {
       return;
     }
 
-    // Build package type string with price if provided
-    let packageTypeStr = packageType;
-    if (totalPrice) {
-      packageTypeStr += ` - $${totalPrice}`;
-    }
-
     createPackageMutation.mutate({
       clientId: parseInt(clientId),
-      packageType: packageTypeStr,
+      packageType: packageType,
       sessionsTotal: sessions,
       purchaseDate: new Date().toISOString().split("T")[0], // Today's date
       expiryDate: expiryDate || undefined,

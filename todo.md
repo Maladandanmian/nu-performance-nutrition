@@ -2392,3 +2392,11 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix timezone offset in TrainerCalendar causing sessions to appear one day earlier (Monday/Thursday instead of Tuesday/Friday)
 - [x] Ensure calendar displays sessions on the correct day regardless of user timezone
 - [x] Apply same fix to ClientCalendar component
+
+
+## Package Selector Bug (Fixed) ✅
+
+- [x] Fix PackageSelector not detecting active packages when "From Package" payment status is selected
+- [x] Ensure packages with remaining sessions are correctly filtered and displayed
+- [x] Fix PackageCreationForm to store only packageType enum value, not display string with price
+- [x] Update existing package in database to remove price from packageType field
