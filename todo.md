@@ -2417,3 +2417,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Integrate SessionEditModal for editing from calendar
 - [x] Add sendSessionUpdateNotification function to existing email system
 - [x] Calendar cancellation uses existing sendSessionCancellationNotification
+
+
+## DEXA Scan Upload Error (Fixed) ✅
+
+- [x] Investigate DEXA scan upload code to identify map() error
+- [x] Fix the error preventing DEXA scan uploads (changed imageUrl to presignedUrl, added Array.isArray checks)
+- [x] Test DEXA scan upload functionality

@@ -310,14 +310,14 @@ function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, onDelete, i
           ) : details ? (
             <div className="space-y-4">
               {/* Extracted Images */}
-              {details.images && details.images.length > 0 && (
+              {Array.isArray(details.images) && details.images.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-3">Extracted Images</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {details.images.map((image: any) => (
                       <div key={image.id} className="border rounded-lg overflow-hidden bg-white">
                         <img
-                          src={image.imageUrl}
+                          src={image.presignedUrl || image.imageUrl}
                           alt={formatImageType(image.imageType)}
                           className="w-full h-auto"
                         />
@@ -355,7 +355,7 @@ function ScanCard({ scan, isExpanded, onToggle, onApprove, onReject, onDelete, i
               )}
 
               {/* BMD Data */}
-              {details.bmdData && details.bmdData.length > 0 && (
+              {Array.isArray(details.bmdData) && details.bmdData.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-3">Bone Mineral Density</h4>
                   <div className="overflow-x-auto">
