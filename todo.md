@@ -2355,3 +2355,7 @@ Next: Trainer management UI (session list view, package creation, group class sc
 
 - [x] Fix date validation error in SessionList query (expected date, received string)
 - [x] Fix empty Select.Item value error in PackageSelector component
+
+## Bug Fixes (Current) ✅
+
+- [x] Fix remaining Select.Item empty value error in SessionList filters

@@ -42,8 +42,8 @@ export default function SessionList() {
     startDate: new Date().toISOString().split("T")[0],
     endDate: "",
   });
-  const [clientFilter, setClientFilter] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState("");
+  const [clientFilter, setClientFilter] = useState("all");
+  const [paymentFilter, setPaymentFilter] = useState("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
 
@@ -71,8 +71,8 @@ export default function SessionList() {
 
   // Filter sessions based on client and payment status
   const filteredSessions = sessions?.filter((session: any) => {
-    if (clientFilter && session.clientId.toString() !== clientFilter) return false;
-    if (paymentFilter && session.paymentStatus !== paymentFilter) return false;
+    if (clientFilter && clientFilter !== "all" && session.clientId.toString() !== clientFilter) return false;
+    if (paymentFilter && paymentFilter !== "all" && session.paymentStatus !== paymentFilter) return false;
     return true;
   });
 
@@ -126,7 +126,7 @@ export default function SessionList() {
                 <SelectValue placeholder="All clients" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All clients</SelectItem>
+                <SelectItem value="all">All clients</SelectItem>
                 {clients?.map((client: any) => (
                   <SelectItem key={client.id} value={client.id.toString()}>
                     {client.name}
@@ -142,7 +142,7 @@ export default function SessionList() {
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
+                <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
                 <SelectItem value="unpaid">Unpaid</SelectItem>
                 <SelectItem value="from_package">From Package</SelectItem>
