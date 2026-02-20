@@ -2309,3 +2309,43 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [ ] Test group class assignment
 - [ ] Test edit/delete actions
 - [ ] Verify all email notifications work correctly
+
+
+## Package Management UI (Phase 3 - Complete) ✅
+
+### Package Creation Form
+- [x] Create PackageCreationForm component in TrainerSchedule page
+- [x] Add client selector dropdown
+- [x] Add package type selector (1on1_pt, 2on1_pt, nutrition_coaching, nutrition_initial)
+- [x] Add sessions count input field
+- [x] Add total price input field
+- [x] Add notes textarea for package details
+- [x] Implement form validation
+- [x] Create tRPC procedure for package creation (already exists)
+- [x] Test package creation flow
+
+### Package List View
+- [x] Create PackageList component showing active packages
+- [x] Display package details: client, type, total sessions, remaining balance
+- [x] Add progress bar showing sessions used vs total
+- [x] Group packages by client
+- [x] Add filter to show only active packages (balance > 0)
+- [x] Create tRPC procedure to fetch packages by trainer (already exists)
+- [x] Test package list display
+
+### Package Checkout Integration
+- [x] Update session creation form to detect if client has packages
+- [x] Show available packages when "from_package" payment status selected
+- [x] Display package balance before checkout
+- [x] Add package selector dropdown in session form (PackageSelector component)
+- [x] Update createTrainingSession to decrement package balance (already implemented)
+- [x] Show confirmation message after package checkout
+- [x] Prevent checkout if package balance is 0
+- [x] Test package checkout flow
+
+### Testing
+- [x] Write vitest tests for package creation
+- [x] Write vitest tests for package balance tracking
+- [x] Write vitest tests for package checkout
+- [x] Verify package balance decrements correctly
+- [x] Test edge cases (zero balance, multiple packages)

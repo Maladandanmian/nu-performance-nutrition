@@ -19,10 +19,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Plus, Users, Dumbbell, Repeat } from "lucide-react";
+import { Calendar, Plus, Users, Dumbbell, Repeat, Package } from "lucide-react";
 import SessionList from "@/components/SessionList";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { PackageCreationForm } from "@/components/PackageCreationForm";
+import { PackageList } from "@/components/PackageList";
+import { PackageSelector } from "@/components/PackageSelector";
 
 const SESSION_TYPES = [
   { value: "1on1_pt", label: "1-on-1 Personal Training" },
@@ -43,6 +46,9 @@ export default function TrainerSchedule() {
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [classDialogOpen, setClassDialogOpen] = useState(false);
 
+  // Get current user (trainer)
+  const { data: currentUser } = trpc.auth.me.useQuery();
+  
   // Get all clients for the dropdown
   const { data: clients } = trpc.clients.list.useQuery();
 
@@ -339,9 +345,9 @@ export default function TrainerSchedule() {
                 <Label htmlFor="paymentStatus">Payment Status</Label>
                 <Select
                   value={sessionForm.paymentStatus}
-                  onValueChange={(value: any) =>
-                    setSessionForm({ ...sessionForm, paymentStatus: value })
-                  }
+                  onValueChange={(value: any) => {
+                    setSessionForm({ ...sessionForm, paymentStatus: value, packageId: undefined });
+                  }}
                 >
                   <SelectTrigger id="paymentStatus">
                     <SelectValue />
@@ -353,6 +359,17 @@ export default function TrainerSchedule() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Package Selector (shown when payment is from_package) */}
+              {sessionForm.paymentStatus === "from_package" && sessionForm.clientId && (
+                <PackageSelector
+                  clientId={parseInt(sessionForm.clientId)}
+                  selectedPackageId={sessionForm.packageId}
+                  onSelectPackage={(packageId) =>
+                    setSessionForm({ ...sessionForm, packageId })
+                  }
+                />
+              )}
 
                        {/* Notes */}
               <div className="space-y-2">
@@ -578,6 +595,18 @@ export default function TrainerSchedule() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* Package Management Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Package className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Session Packages</h2>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PackageCreationForm />
+          <PackageList trainerId={currentUser?.id || 0} />
+        </div>
       </div>
 
       {/* Upcoming Schedule */}
