@@ -2439,3 +2439,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fixed line 340 scan.vatArea tooltip in VisceralFatGauge sparkline
 - [x] Fixed MonthlyProgressSummary timeline map to validate all parseFloat results
 - [x] Fixed bmdByDate to handle NaN values
+
+## Weekly Database Backup Email System (Feb 20, 2026)
+- [x] Create database backup script that exports all tables to SQL
+- [x] Create email functionality to send SQL file as attachment
+- [x] Set up weekly scheduled task (every Monday at 9am)
+- [x] Added tRPC procedure for manual backup triggering
+- [x] Configured recipient email: lukusdavey@gmail.com

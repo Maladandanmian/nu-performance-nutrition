@@ -17,6 +17,10 @@ interface EmailOptions {
   subject: string;
   html: string;
   text?: string;
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+  }>;
 }
 
 /**
@@ -60,6 +64,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
           ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
           { type: 'text/html', value: options.html },
         ],
+        ...(options.attachments && options.attachments.length > 0 ? {
+          attachments: options.attachments.map(att => ({
+            filename: att.filename,
+            content: att.content.toString('base64'),
+            type: 'application/octet-stream',
+            disposition: 'attachment',
+          })),
+        } : {}),
       }),
     });
 

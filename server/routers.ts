@@ -3484,6 +3484,25 @@ Return as JSON.`
         return { success: true, classIds, count: classIds.length };
       }),
   }),
+
+  // Database Backup
+  backup: router({
+    // Manually trigger database backup email (admin only)
+    sendBackup: adminProcedure
+      .input(z.object({
+        recipientEmail: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createAndEmailBackup } = await import('./backup');
+        const result = await createAndEmailBackup(input.recipientEmail);
+        
+        if (!result.success) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: result.message });
+        }
+        
+        return result;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
