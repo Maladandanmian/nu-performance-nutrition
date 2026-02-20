@@ -2967,6 +2967,36 @@ Return as JSON.`
 
   // Training Sessions & Scheduling
   trainingSessions: router({
+    // Update an existing training session (trainer only)
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          sessionDate: z.string().optional(), // YYYY-MM-DD format
+          startTime: z.string().optional(), // HH:MM format
+          endTime: z.string().optional(), // HH:MM format
+          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]).optional(),
+          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).optional(),
+          packageId: z.number().optional().nullable(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const updates: any = {};
+        if (input.sessionDate) updates.sessionDate = new Date(input.sessionDate);
+        if (input.startTime) updates.startTime = input.startTime;
+        if (input.endTime) updates.endTime = input.endTime;
+        if (input.sessionType) updates.sessionType = input.sessionType;
+        if (input.paymentStatus) updates.paymentStatus = input.paymentStatus;
+        if (input.packageId !== undefined) updates.packageId = input.packageId;
+
+        const session = await db.updateTrainingSession(input.id, updates);
+
+        // TODO: Send email notification to client about session changes
+        // await sendSessionUpdateEmail(session);
+
+        return session;
+      }),
+
     // Create a new training session (trainer only)
     create: adminProcedure
       .input(
@@ -3062,25 +3092,6 @@ Return as JSON.`
       .input(z.object({ sessionId: z.number() }))
       .query(async ({ input }) => {
         return db.getTrainingSessionById(input.sessionId);
-      }),
-
-    // Update a training session (trainer only)
-    update: adminProcedure
-      .input(
-        z.object({
-          sessionId: z.number(),
-          sessionDate: z.string().optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
-          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).optional(),
-          packageId: z.number().optional(),
-          notes: z.string().optional(),
-        })
-      )
-      .mutation(async ({ input }) => {
-        const { sessionId, ...updates } = input;
-        // Cast to any to avoid type issues with date strings
-        return db.updateTrainingSession(sessionId, updates as any);
       }),
 
     // Cancel a training session (trainer only)

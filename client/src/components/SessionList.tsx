@@ -20,7 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, DollarSign, Trash2, Edit, Filter } from "lucide-react";
+import { Calendar, Clock, User, DollarSign, Trash2, Edit, Filter, Pencil } from "lucide-react";
+import { SessionEditModal } from "@/components/SessionEditModal";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -46,6 +47,8 @@ export default function SessionList() {
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [sessionToEdit, setSessionToEdit] = useState<any | null>(null);
 
   // Get all clients for filter dropdown
   const { data: clients } = trpc.clients.list.useQuery();
@@ -207,6 +210,17 @@ export default function SessionList() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => {
+                      setSessionToEdit(session);
+                      setEditDialogOpen(true);
+                    }}
+                    className="hover:bg-primary/10"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDeleteClick(session.id)}
                     className="text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
@@ -224,6 +238,14 @@ export default function SessionList() {
           </Card>
         )}
       </div>
+
+      {/* Edit Session Modal */}
+      <SessionEditModal
+        session={sessionToEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={() => refetch()}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

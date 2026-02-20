@@ -2374,3 +2374,14 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix session counting logic - only count sessions as "used" after their date has passed
 - [x] Implement trainer calendar view showing all sessions across all clients and group classes
 - [x] Implement client calendar view showing their own sessions (private and group)
+
+
+## Session Edit Functionality (Complete) ✅
+
+- [x] Create SessionEditModal component with form fields (client, date, time, type, payment status)
+- [x] Add edit button to SessionList cards
+- [x] Create tRPC updateSession procedure with validation
+- [x] Package balance adjustment handled automatically (dynamic calculation based on completed sessions)
+- [ ] Add email notification when session is rescheduled or modified (TODO for future)
+- [x] Handle edge cases (warning for past sessions)
+- [x] Write vitest tests for session editing (6 tests passing)
