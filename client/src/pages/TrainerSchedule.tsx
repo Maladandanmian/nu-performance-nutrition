@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Plus, Users, Dumbbell, Repeat, Package } from "lucide-react";
+import { Calendar, Plus, Users, Dumbbell, Repeat, Package, ArrowLeft } from "lucide-react";
 import SessionList from "@/components/SessionList";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -217,6 +217,17 @@ export default function TrainerSchedule() {
   return (
     <div className="container py-8">
       <div className="mb-8">
+        <div className="flex items-center gap-4 mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.location.href = "/trainer"}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to My Clients
+          </Button>
+        </div>
         <h1 className="text-3xl font-bold mb-2">Schedule Management</h1>
         <p className="text-muted-foreground">
           Manage training sessions and group classes

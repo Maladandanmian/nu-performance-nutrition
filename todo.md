@@ -2363,3 +2363,7 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Bug Fixes (Current) ✅
 
 - [x] Fix React Hooks violation in PackageList component (conditional hook calls)
+
+## UX Improvements (Current) ✅
+
+- [x] Add navigation button from Schedule screen back to My Clients screen
