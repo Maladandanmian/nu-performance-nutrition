@@ -2064,3 +2064,69 @@
 - [x] Remove emojis from button labels
 - [x] Ensure buttons are properly sized and spaced
 - [x] Test on mobile and desktop viewports
+
+## Client Scheduling & Group Class System (Feb 19, 2026)
+
+### Database Schema
+- [x] Design sessions table (id, clientId, trainerId, sessionType, date, startTime, endTime, paymentStatus, packageId, notes)
+- [x] Design groupClasses table (id, trainerId, classType, date, startTime, endTime, capacity, notes)
+- [x] Design groupClassAttendance table (id, groupClassId, clientId, paymentStatus, packageId)
+- [x] Design recurringSessionRules table (id, sessionId, frequency, daysOfWeek, endDate)
+- [x] Design sessionPackages table (id, clientId, packageType, sessionsTotal, sessionsRemaining, purchaseDate, expiryDate)
+- [x] Create and push database migrations
+
+### Backend (tRPC Procedures)
+- [x] Create session management procedures (create, update, delete, getByClient, getByTrainer, getByDateRange)
+- [x] Create package management procedures (create, update, checkOut, getBalance)
+- [ ] Create group class procedures (create, update, delete, getSchedule, addAttendee, removeAttendee) - Stage 2
+- [ ] Create recurring session logic (generateRecurringSessions, updateRecurringSeries) - Stage 3
+- [ ] Create notification procedures (sendBookingEmail, send24HourReminder, sendCancellationEmail)
+- [ ] Add email templates for booking confirmations and reminders
+
+### Trainer Interface
+- [ ] Create TrainerSchedule page with calendar component
+- [ ] Build session creation form (client selector, session type, date/time, duration, payment status)
+- [ ] Build recurring session form (weekly frequency, day selection, end date)
+- [ ] Build group class schedule manager (weekly timetable view)
+- [ ] Add group class creation form (class type, date/time, duration, client assignment)
+- [ ] Add month view showing all sessions and group classes
+- [ ] Add session edit/delete functionality with 24-hour cancellation warning
+
+### Client Interface
+- [ ] Create ClientSchedule page with 30-day calendar view
+- [ ] Display personal training sessions on calendar
+- [ ] Display group classes on calendar
+- [ ] Show session details (type, time, duration, trainer, payment status)
+- [ ] Add read-only mode (no booking/cancellation buttons)
+- [ ] Add "Contact trainer to reschedule" message
+
+### Email Notifications
+- [ ] Implement booking confirmation email (sent when session created)
+- [ ] Implement 24-hour reminder email (scheduled job)
+- [ ] Implement cancellation notification email
+- [ ] Implement change notification email (when session rescheduled)
+- [ ] Test email delivery for all notification types
+
+### Payment Tracking
+- [ ] Add payment status field (paid, unpaid, from_package)
+- [ ] Build package checkout logic (decrement sessionsRemaining)
+- [ ] Add package balance display for trainers
+- [ ] Add package balance display for clients
+
+### Testing
+- [x] Write vitest tests for session CRUD operations (14 tests passing)
+- [x] Write vitest tests for package checkout logic
+- [ ] Write vitest tests for recurring session generation - Stage 3
+- [ ] Write vitest tests for group class attendance - Stage 2
+
+### Stage 1 Summary ✅
+Completed backend foundation for training sessions and packages:
+- Database schema (6 tables: trainingSessions, groupClasses, groupClassAttendance, recurringSessionRules, sessionPackages)
+- Database helpers (create, read, update, delete, filter by date/client/trainer)
+- tRPC procedures (trainingSessions router, sessionPackages router)
+- Comprehensive vitest tests (14 tests, all passing)
+- Payment tracking (paid/unpaid/from_package)
+- Package checkout logic with balance validation
+
+Next: Stage 2 will add group class procedures and trainer UI for session management
+- [ ] Write vitest tests for email notification triggers

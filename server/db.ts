@@ -27,6 +27,16 @@ import {
   InsertSupplementTemplate,
   supplementLogs,
   InsertSupplementLog,
+  trainingSessions,
+  InsertTrainingSession,
+  groupClasses,
+  InsertGroupClass,
+  groupClassAttendance,
+  InsertGroupClassAttendance,
+  sessionPackages,
+  InsertSessionPackage,
+  recurringSessionRules,
+  InsertRecurringSessionRule,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -1968,6 +1978,207 @@ export async function deleteSupplementLog(id: number) {
   await db
     .delete(supplementLogs)
     .where(eq(supplementLogs.id, id));
+  
+  return { success: true };
+}
+
+
+// ============================================================================
+// Training Sessions & Scheduling
+// ============================================================================
+
+/**
+ * Create a new training session
+ */
+export async function createTrainingSession(session: InsertTrainingSession) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(trainingSessions).values(session);
+  return { id: Number(result.insertId), ...session };
+}
+
+/**
+ * Get all training sessions for a specific client
+ */
+export async function getTrainingSessionsByClient(clientId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let conditions = [eq(trainingSessions.clientId, clientId), eq(trainingSessions.cancelled, false)];
+  
+  if (startDate) {
+    conditions.push(sql`${trainingSessions.sessionDate} >= ${startDate.toISOString().split('T')[0]}`);
+  }
+  if (endDate) {
+    conditions.push(sql`${trainingSessions.sessionDate} <= ${endDate.toISOString().split('T')[0]}`);
+  }
+  
+  return db
+    .select()
+    .from(trainingSessions)
+    .where(and(...conditions))
+    .orderBy(asc(trainingSessions.sessionDate), asc(trainingSessions.startTime));
+}
+
+/**
+ * Get all training sessions for a specific trainer
+ */
+export async function getTrainingSessionsByTrainer(trainerId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let conditions = [eq(trainingSessions.trainerId, trainerId), eq(trainingSessions.cancelled, false)];
+  
+  if (startDate) {
+    conditions.push(sql`${trainingSessions.sessionDate} >= ${startDate.toISOString().split('T')[0]}`);
+  }
+  if (endDate) {
+    conditions.push(sql`${trainingSessions.sessionDate} <= ${endDate.toISOString().split('T')[0]}`);
+  }
+  
+  return db
+    .select()
+    .from(trainingSessions)
+    .where(and(...conditions))
+    .orderBy(asc(trainingSessions.sessionDate), asc(trainingSessions.startTime));
+}
+
+/**
+ * Get a specific training session by ID
+ */
+export async function getTrainingSessionById(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [session] = await db
+    .select()
+    .from(trainingSessions)
+    .where(eq(trainingSessions.id, sessionId))
+    .limit(1);
+  
+  return session;
+}
+
+/**
+ * Update a training session
+ */
+export async function updateTrainingSession(sessionId: number, updates: Partial<InsertTrainingSession>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(trainingSessions)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(trainingSessions.id, sessionId));
+  
+  return { success: true };
+}
+
+/**
+ * Cancel a training session (soft delete)
+ */
+export async function cancelTrainingSession(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(trainingSessions)
+    .set({ cancelled: true, cancelledAt: new Date(), updatedAt: new Date() })
+    .where(eq(trainingSessions.id, sessionId));
+  
+  return { success: true };
+}
+
+/**
+ * Delete a training session (hard delete)
+ */
+export async function deleteTrainingSession(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(trainingSessions).where(eq(trainingSessions.id, sessionId));
+  return { success: true };
+}
+
+// ============================================================================
+// Session Packages
+// ============================================================================
+
+/**
+ * Create a new session package
+ */
+export async function createSessionPackage(pkg: InsertSessionPackage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(sessionPackages).values(pkg);
+  return { id: Number(result.insertId), ...pkg };
+}
+
+/**
+ * Get all packages for a specific client
+ */
+export async function getSessionPackagesByClient(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db
+    .select()
+    .from(sessionPackages)
+    .where(eq(sessionPackages.clientId, clientId))
+    .orderBy(desc(sessionPackages.createdAt));
+}
+
+/**
+ * Get a specific package by ID
+ */
+export async function getSessionPackageById(packageId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [pkg] = await db
+    .select()
+    .from(sessionPackages)
+    .where(eq(sessionPackages.id, packageId))
+    .limit(1);
+  
+  return pkg;
+}
+
+/**
+ * Checkout a session from a package (decrement sessionsRemaining)
+ */
+export async function checkoutSessionFromPackage(packageId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const pkg = await getSessionPackageById(packageId);
+  if (!pkg) throw new Error("Package not found");
+  if (pkg.sessionsRemaining <= 0) throw new Error("No sessions remaining in package");
+  
+  await db
+    .update(sessionPackages)
+    .set({ 
+      sessionsRemaining: pkg.sessionsRemaining - 1,
+      updatedAt: new Date()
+    })
+    .where(eq(sessionPackages.id, packageId));
+  
+  return { success: true, sessionsRemaining: pkg.sessionsRemaining - 1 };
+}
+
+/**
+ * Update a session package
+ */
+export async function updateSessionPackage(packageId: number, updates: Partial<InsertSessionPackage>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(sessionPackages)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(sessionPackages.id, packageId));
   
   return { success: true };
 }

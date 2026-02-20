@@ -204,6 +204,13 @@
       "when": 1771404998117,
       "tag": "0028_long_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1771546399688,
+      "tag": "0029_stiff_snowbird",
+      "breakpoints": true
     }
   ]
 }

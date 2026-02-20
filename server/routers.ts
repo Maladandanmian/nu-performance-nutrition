@@ -2964,6 +2964,178 @@ Return as JSON.`
         return db.deleteSupplementLog(input.id);
       }),
   }),
+
+  // Training Sessions & Scheduling
+  trainingSessions: router({
+    // Create a new training session (trainer only)
+    create: adminProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]),
+          sessionDate: z.string(), // YYYY-MM-DD format
+          startTime: z.string(), // HH:MM format
+          endTime: z.string(), // HH:MM format
+          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).default("unpaid"),
+          packageId: z.number().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // If payment is from package, checkout from package
+        if (input.paymentStatus === "from_package" && input.packageId) {
+          await db.checkoutSessionFromPackage(input.packageId);
+        }
+        
+        // Cast to any to avoid type issues with date strings
+        return db.createTrainingSession({
+          trainerId: ctx.user.id,
+          clientId: input.clientId,
+          sessionType: input.sessionType,
+          sessionDate: input.sessionDate,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          paymentStatus: input.paymentStatus,
+          packageId: input.packageId || null,
+          notes: input.notes || null,
+          recurringRuleId: null,
+          cancelled: false,
+          cancelledAt: null,
+        } as any);
+      }),
+
+    // Get sessions for a client
+    getByClient: publicProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.getTrainingSessionsByClient(
+          input.clientId,
+          input.startDate,
+          input.endDate
+        );
+      }),
+
+    // Get sessions for a trainer
+    getByTrainer: adminProcedure
+      .input(
+        z.object({
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getTrainingSessionsByTrainer(
+          ctx.user.id,
+          input.startDate,
+          input.endDate
+        );
+      }),
+
+    // Get a specific session by ID
+    getById: publicProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getTrainingSessionById(input.sessionId);
+      }),
+
+    // Update a training session (trainer only)
+    update: adminProcedure
+      .input(
+        z.object({
+          sessionId: z.number(),
+          sessionDate: z.string().optional(),
+          startTime: z.string().optional(),
+          endTime: z.string().optional(),
+          paymentStatus: z.enum(["paid", "unpaid", "from_package"]).optional(),
+          packageId: z.number().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { sessionId, ...updates } = input;
+        // Cast to any to avoid type issues with date strings
+        return db.updateTrainingSession(sessionId, updates as any);
+      }),
+
+    // Cancel a training session (trainer only)
+    cancel: adminProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.cancelTrainingSession(input.sessionId);
+      }),
+
+    // Delete a training session (trainer only)
+    delete: adminProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.deleteTrainingSession(input.sessionId);
+      }),
+  }),
+
+  // Session Packages
+  sessionPackages: router({
+    // Create a new package (trainer only)
+    create: adminProcedure
+      .input(
+        z.object({
+          clientId: z.number(),
+          packageType: z.string(),
+          sessionsTotal: z.number(),
+          purchaseDate: z.string(), // YYYY-MM-DD format
+          expiryDate: z.string().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Cast to any to avoid type issues with date strings
+        return db.createSessionPackage({
+          trainerId: ctx.user.id,
+          clientId: input.clientId,
+          packageType: input.packageType,
+          sessionsTotal: input.sessionsTotal,
+          sessionsRemaining: input.sessionsTotal, // Start with full balance
+          purchaseDate: input.purchaseDate,
+          expiryDate: input.expiryDate || null,
+          notes: input.notes || null,
+        } as any);
+      }),
+
+    // Get packages for a client
+    getByClient: publicProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getSessionPackagesByClient(input.clientId);
+      }),
+
+    // Get a specific package by ID
+    getById: publicProcedure
+      .input(z.object({ packageId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getSessionPackageById(input.packageId);
+      }),
+
+    // Update a package (trainer only)
+    update: adminProcedure
+      .input(
+        z.object({
+          packageId: z.number(),
+          sessionsRemaining: z.number().optional(),
+          expiryDate: z.string().optional(), // YYYY-MM-DD format
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { packageId, ...updates } = input;
+        // Cast to any to avoid type issues with date strings
+        return db.updateSessionPackage(packageId, updates as any);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

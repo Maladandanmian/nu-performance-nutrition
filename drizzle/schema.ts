@@ -676,3 +676,107 @@ export const supplementLogs = mysqlTable("supplement_logs", {
 
 export type SupplementLog = typeof supplementLogs.$inferSelect;
 export type InsertSupplementLog = typeof supplementLogs.$inferInsert;
+
+/**
+ * Training Sessions - stores personal training sessions scheduled by trainers
+ * Supports 1-on-1, 2-on-1, and nutrition consultation sessions
+ */
+export const trainingSessions = mysqlTable("training_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  sessionType: mysqlEnum("sessionType", ["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]).notNull(),
+  sessionDate: date("sessionDate").notNull(), // Date of the session
+  startTime: varchar("startTime", { length: 5 }).notNull(), // HH:MM format (e.g., "09:00")
+  endTime: varchar("endTime", { length: 5 }).notNull(), // HH:MM format (e.g., "10:00")
+  paymentStatus: mysqlEnum("paymentStatus", ["paid", "unpaid", "from_package"]).default("unpaid").notNull(),
+  packageId: int("packageId").references(() => sessionPackages.id, { onDelete: "set null" }), // Link to package if from_package
+  recurringRuleId: int("recurringRuleId").references(() => recurringSessionRules.id, { onDelete: "set null" }), // Link to recurring rule if part of series
+  notes: text("notes"),
+  cancelled: boolean("cancelled").default(false).notNull(),
+  cancelledAt: timestamp("cancelledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TrainingSession = typeof trainingSessions.$inferSelect;
+export type InsertTrainingSession = typeof trainingSessions.$inferInsert;
+
+/**
+ * Group Classes - stores group fitness classes scheduled by trainers
+ * Supports Hyrox, Mobility, Rehab, Conditioning, Strength and Conditioning
+ */
+export const groupClasses = mysqlTable("group_classes", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  classType: mysqlEnum("classType", ["hyrox", "mobility", "rehab", "conditioning", "strength_conditioning"]).notNull(),
+  classDate: date("classDate").notNull(), // Date of the class
+  startTime: varchar("startTime", { length: 5 }).notNull(), // HH:MM format
+  endTime: varchar("endTime", { length: 5 }).notNull(), // HH:MM format
+  capacity: int("capacity").default(20).notNull(), // Maximum number of clients
+  recurringRuleId: int("recurringRuleId").references(() => recurringSessionRules.id, { onDelete: "set null" }),
+  notes: text("notes"),
+  cancelled: boolean("cancelled").default(false).notNull(),
+  cancelledAt: timestamp("cancelledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GroupClass = typeof groupClasses.$inferSelect;
+export type InsertGroupClass = typeof groupClasses.$inferInsert;
+
+/**
+ * Group Class Attendance - tracks which clients are signed up for group classes
+ * Managed by trainers only
+ */
+export const groupClassAttendance = mysqlTable("group_class_attendance", {
+  id: int("id").autoincrement().primaryKey(),
+  groupClassId: int("groupClassId").notNull().references(() => groupClasses.id, { onDelete: "cascade" }),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  paymentStatus: mysqlEnum("paymentStatus", ["paid", "unpaid", "from_package"]).default("unpaid").notNull(),
+  packageId: int("packageId").references(() => sessionPackages.id, { onDelete: "set null" }),
+  attended: boolean("attended").default(false).notNull(), // Mark attendance after class
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type GroupClassAttendance = typeof groupClassAttendance.$inferSelect;
+export type InsertGroupClassAttendance = typeof groupClassAttendance.$inferInsert;
+
+/**
+ * Recurring Session Rules - defines recurring patterns for sessions and classes
+ * Supports weekly recurrence with custom day selection and end dates
+ */
+export const recurringSessionRules = mysqlTable("recurring_session_rules", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  frequency: mysqlEnum("frequency", ["weekly"]).default("weekly").notNull(),
+  daysOfWeek: json("daysOfWeek").$type<number[]>().notNull(), // Array of day numbers: 0=Sunday, 1=Monday, etc.
+  startDate: date("startDate").notNull(), // When the recurrence starts
+  endDate: date("endDate"), // When the recurrence ends (null = indefinite)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecurringSessionRule = typeof recurringSessionRules.$inferSelect;
+export type InsertRecurringSessionRule = typeof recurringSessionRules.$inferInsert;
+
+/**
+ * Session Packages - tracks pre-purchased session packages for clients
+ * Allows checkout from package balance instead of individual payment
+ */
+export const sessionPackages = mysqlTable("session_packages", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  packageType: varchar("packageType", { length: 100 }).notNull(), // e.g., "10 Session Package", "Monthly Unlimited"
+  sessionsTotal: int("sessionsTotal").notNull(), // Total sessions in package
+  sessionsRemaining: int("sessionsRemaining").notNull(), // Sessions left
+  purchaseDate: date("purchaseDate").notNull(),
+  expiryDate: date("expiryDate"), // Optional expiry date
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SessionPackage = typeof sessionPackages.$inferSelect;
+export type InsertSessionPackage = typeof sessionPackages.$inferInsert;
