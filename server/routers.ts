@@ -3244,6 +3244,13 @@ Return as JSON.`
         return db.getSessionPackagesByClient(input.clientId);
       }),
 
+    // Get packages for a trainer
+    getByTrainer: adminProcedure
+      .input(z.object({ trainerId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getSessionPackagesByTrainer(input.trainerId);
+      }),
+
     // Get a specific package by ID
     getById: publicProcedure
       .input(z.object({ packageId: z.number() }))

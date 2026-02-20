@@ -9,33 +9,13 @@ interface PackageListProps {
 }
 
 export function PackageList({ trainerId }: PackageListProps) {
-  const { data: clients } = trpc.clients.list.useQuery();
-  const { data: allPackages, isLoading } = trpc.sessionPackages.getByClient.useQuery(
-    { clientId: 0 }, // We'll fetch all packages and filter by trainer
-    { enabled: false } // Disable automatic query, we'll fetch per client
-  );
-
-  // Fetch packages for all clients
-  const clientPackages = clients?.map((client) => {
-    const { data: packages } = trpc.sessionPackages.getByClient.useQuery({
-      clientId: client.id,
-    });
-    return { client, packages: packages || [] };
+  // Fetch all packages for the trainer
+  const { data: allPackages, isLoading } = trpc.sessionPackages.getByTrainer.useQuery({
+    trainerId,
   });
 
   // Filter to show only active packages (with remaining sessions)
-  const activePackages = clientPackages
-    ?.flatMap(({ client, packages }) =>
-      packages
-        .filter((pkg) => pkg.sessionsRemaining > 0)
-        .map((pkg) => ({ ...pkg, clientName: client.name }))
-    )
-    .sort((a, b) => {
-      // Sort by client name, then by creation date
-      if (a.clientName < b.clientName) return -1;
-      if (a.clientName > b.clientName) return 1;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  const activePackages = allPackages?.filter((pkg) => pkg.sessionsRemaining > 0) || [];
 
   if (isLoading) {
     return (
@@ -48,7 +28,7 @@ export function PackageList({ trainerId }: PackageListProps) {
     );
   }
 
-  if (!activePackages || activePackages.length === 0) {
+  if (activePackages.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -64,12 +44,13 @@ export function PackageList({ trainerId }: PackageListProps) {
     );
   }
 
-  // Group packages by client
+  // Group packages by client name
   const packagesByClient = activePackages.reduce((acc, pkg) => {
-    if (!acc[pkg.clientName]) {
-      acc[pkg.clientName] = [];
+    const clientName = pkg.clientName || "Unknown Client";
+    if (!acc[clientName]) {
+      acc[clientName] = [];
     }
-    acc[pkg.clientName].push(pkg);
+    acc[clientName].push(pkg);
     return acc;
   }, {} as Record<string, typeof activePackages>);
 

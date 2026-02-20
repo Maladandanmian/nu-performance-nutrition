@@ -2359,3 +2359,7 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Bug Fixes (Current) ✅
 
 - [x] Fix remaining Select.Item empty value error in SessionList filters
+
+## Bug Fixes (Current) ✅
+
+- [x] Fix React Hooks violation in PackageList component (conditional hook calls)

@@ -2168,6 +2168,36 @@ export async function getSessionPackagesByClient(clientId: number) {
 }
 
 /**
+ * Get all packages for a specific trainer with client names
+ */
+export async function getSessionPackagesByTrainer(trainerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const packages = await db
+    .select({
+      id: sessionPackages.id,
+      clientId: sessionPackages.clientId,
+      clientName: clients.name,
+      trainerId: sessionPackages.trainerId,
+      packageType: sessionPackages.packageType,
+      sessionsTotal: sessionPackages.sessionsTotal,
+      sessionsRemaining: sessionPackages.sessionsRemaining,
+      purchaseDate: sessionPackages.purchaseDate,
+      expiryDate: sessionPackages.expiryDate,
+      notes: sessionPackages.notes,
+      createdAt: sessionPackages.createdAt,
+      updatedAt: sessionPackages.updatedAt,
+    })
+    .from(sessionPackages)
+    .leftJoin(clients, eq(sessionPackages.clientId, clients.id))
+    .where(eq(sessionPackages.trainerId, trainerId))
+    .orderBy(desc(sessionPackages.createdAt));
+  
+  return packages;
+}
+
+/**
  * Get a specific package by ID
  */
 export async function getSessionPackageById(packageId: number) {
