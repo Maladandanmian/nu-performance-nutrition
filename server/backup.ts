@@ -47,13 +47,12 @@ export async function createAndEmailBackup(recipientEmail: string) {
     const dbConfig = parseMySQLUrl(ENV.databaseUrl);
     
     // Create mysqldump command
-    // Note: Using --single-transaction for InnoDB tables to get consistent backup without locking
+    // Note: --single-transaction is omitted as TiDB Cloud does not support SAVEPOINT
     const dumpCommand = `mysqldump \\
       --host=${dbConfig.host} \\
       --port=${dbConfig.port} \\
       --user=${dbConfig.user} \\
       --password='${dbConfig.password}' \\
-      --single-transaction \\
       --routines \\
       --triggers \\
       --events \\
