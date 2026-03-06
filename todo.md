@@ -2446,3 +2446,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Set up weekly scheduled task (every Monday at 9am)
 - [x] Added tRPC procedure for manual backup triggering
 - [x] Configured recipient email: lukusdavey@gmail.com
+
+## Login Page Redesign (Mar 6, 2026)
+- [x] Remove PIN login tab from client login card
+- [x] Make email sign-in the only client login method
+- [x] Remove large Trainer Login card from main login page
+- [x] Add small, discreet trainer login link in top-right corner of header
