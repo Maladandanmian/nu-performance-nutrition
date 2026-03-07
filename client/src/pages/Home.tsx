@@ -10,7 +10,7 @@ import { useLocation } from "wouter";
 import { useClientAuth } from "@/hooks/useClientAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { setClientSessionInStorage, clearClientSessionFromStorage } from "@/lib/clientSession";
+import { setClientSessionInStorage } from "@/lib/clientSession";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -34,14 +34,21 @@ export default function Home() {
     },
   });
 
-  // Redirect authenticated trainers to their dashboard
+  // Auto-redirect: trainers go to /trainer, clients go to /client
+  // This runs once auth state is resolved — returning users skip the login screen entirely
   useEffect(() => {
-    if (isAuthenticated && user) {
-      if (user.role === 'admin') {
-        setLocation('/trainer');
-      }
+    if (loading || clientLoading) return;
+
+    if (isAuthenticated && user?.role === 'admin') {
+      setLocation('/trainer');
+      return;
     }
-  }, [isAuthenticated, user, setLocation]);
+
+    if (clientSession) {
+      // Valid session found — redirect immediately without showing the login form
+      window.location.href = '/client';
+    }
+  }, [isAuthenticated, user, clientSession, loading, clientLoading, setLocation]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +59,9 @@ export default function Home() {
     await loginWithEmailMutation.mutateAsync({ email, password });
   };
 
-  if (loading) {
+  // Show spinner while resolving auth — prevents the login form flashing briefly
+  // for users who are already authenticated
+  if (loading || clientLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{background: 'linear-gradient(135deg, #86BBD8 0%, #578DB3 100%)'}}>
         <div className="text-center">
@@ -99,49 +108,6 @@ export default function Home() {
             AI-powered nutrition tracking for elite performance
           </p>
         </div>
-
-        {/* Already logged in */}
-        {(isAuthenticated || clientSession) && (
-          <div className="max-w-md mx-auto mb-8">
-            <Card className="bg-white/95 backdrop-blur border-none shadow-lg">
-              <CardContent className="p-6 text-center">
-                <p className="text-lg mb-4" style={{color: '#2B2A2C'}}>
-                  {clientSession
-                    ? `Logged in as ${clientSession.name}`
-                    : `Logged in as ${user?.name || 'Trainer'}`}
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    onClick={() => {
-                      if (clientSession) {
-                        setLocation('/client');
-                      } else if (user?.role === 'admin') {
-                        setLocation('/trainer');
-                      }
-                    }}
-                    style={{backgroundColor: '#578DB3'}}
-                  >
-                    Go to Dashboard
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (confirm('Are you sure you want to log out?')) {
-                        clearClientSessionFromStorage();
-                        document.cookie.split(";").forEach((c) => {
-                          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                        });
-                        window.location.href = '/';
-                      }
-                    }}
-                  >
-                    Switch User / Logout
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         {/* Client Login Card — centred, single column */}
         <div className="max-w-md mx-auto mb-16">

@@ -37,37 +37,51 @@ export const appRouter = router({
     
     clientSession: publicProcedure.query(({ ctx }) => {
       console.log('[clientSession] Checking session...');
-      
+
+      const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days, matches cookie maxAge
+
+      function decodeAndValidate(token: string) {
+        try {
+          const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+          // Reject if timestamp is present and older than 7 days
+          if (typeof decoded.timestamp === 'number') {
+            if (Date.now() - decoded.timestamp > SESSION_MAX_AGE_MS) {
+              console.log('[clientSession] Token expired (timestamp check)');
+              return null;
+            }
+          }
+          // Reject if expiresAt is present and in the past
+          if (typeof decoded.expiresAt === 'number') {
+            if (Date.now() > decoded.expiresAt) {
+              console.log('[clientSession] Token expired (expiresAt check)');
+              return null;
+            }
+          }
+          if (!decoded.clientId || !decoded.name) return null;
+          return { clientId: decoded.clientId, name: decoded.name };
+        } catch {
+          return null;
+        }
+      }
+
       // First, try to get from cookie
       const clientCookie = ctx.req.cookies?.['client_session'];
       if (clientCookie) {
         console.log('[clientSession] Found cookie');
-        try {
-          const decoded = JSON.parse(Buffer.from(clientCookie, 'base64').toString());
-          return {
-            clientId: decoded.clientId,
-            name: decoded.name,
-          };
-        } catch (e) {
-          console.log('[clientSession] Failed to decode cookie');
-        }
+        const result = decodeAndValidate(clientCookie);
+        if (result) return result;
+        console.log('[clientSession] Cookie invalid or expired');
       }
-      
+
       // Fallback: try to get from X-Client-Session header
       const sessionHeader = ctx.req.headers['x-client-session'] as string | undefined;
       if (sessionHeader) {
         console.log('[clientSession] Found header');
-        try {
-          const decoded = JSON.parse(Buffer.from(sessionHeader, 'base64').toString());
-          return {
-            clientId: decoded.clientId,
-            name: decoded.name,
-          };
-        } catch (e) {
-          console.log('[clientSession] Failed to decode header');
-        }
+        const result = decodeAndValidate(sessionHeader);
+        if (result) return result;
+        console.log('[clientSession] Header invalid or expired');
       }
-      
+
       console.log('[clientSession] No session found');
       return null;
     }),

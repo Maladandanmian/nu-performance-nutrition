@@ -2452,3 +2452,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Make email sign-in the only client login method
 - [x] Remove large Trainer Login card from main login page
 - [x] Add small, discreet trainer login link in top-right corner of header
+
+## Session Expiry & Auto-Redirect Fix (Mar 7, 2026)
+- [x] Add 7-day expiry check to localStorage session token
+- [x] Auto-redirect returning clients to dashboard on page load
+- [x] Handle expired/invalid server token gracefully (clear localStorage, show login)
+- [x] Add server-side expiry validation to clientSession procedure
+- [x] Remove redundant "Logged in as" card from Home page
