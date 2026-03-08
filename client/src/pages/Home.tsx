@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getLoginUrl } from "@/const";
-import { Activity, TrendingUp, Users, Lock, Mail } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useClientAuth } from "@/hooks/useClientAuth";
@@ -168,38 +168,6 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Features Section */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <Card className="bg-white/95 backdrop-blur border-none shadow-lg">
-            <CardHeader>
-              <Activity className="h-12 w-12 mb-4" style={{color: '#CE4C27'}} />
-              <CardTitle style={{color: '#2B2A2C'}}>AI-Powered Analysis</CardTitle>
-              <CardDescription style={{color: '#6F6E70'}}>
-                Take a photo of your meal and get instant nutritional breakdown using advanced AI
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur border-none shadow-lg">
-            <CardHeader>
-              <TrendingUp className="h-12 w-12 mb-4" style={{color: '#CE4C27'}} />
-              <CardTitle style={{color: '#2B2A2C'}}>Track Your Progress</CardTitle>
-              <CardDescription style={{color: '#6F6E70'}}>
-                Monitor calories, protein, carbs, fat, fibre, and hydration with clear charts
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur border-none shadow-lg">
-            <CardHeader>
-              <Users className="h-12 w-12 mb-4" style={{color: '#CE4C27'}} />
-              <CardTitle style={{color: '#2B2A2C'}}>Trainer Dashboard</CardTitle>
-              <CardDescription style={{color: '#6F6E70'}}>
-                Trainers can manage clients, set nutrition goals, and track progress
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
       </main>
     </div>
   );

@@ -2459,3 +2459,6 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Handle expired/invalid server token gracefully (clear localStorage, show login)
 - [x] Add server-side expiry validation to clientSession procedure
 - [x] Remove redundant "Logged in as" card from Home page
+
+## Login Page Cleanup (Mar 8, 2026)
+- [x] Remove feature description cards (AI-Powered Analysis, Track Your Progress, Trainer Dashboard) from Home page
