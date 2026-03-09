@@ -2462,3 +2462,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 
 ## Login Page Cleanup (Mar 8, 2026)
 - [x] Remove feature description cards (AI-Powered Analysis, Track Your Progress, Trainer Dashboard) from Home page
+
+## Mandatory Email in Add Client Form (Mar 8, 2026)
+- [x] Make email field required in Add Client frontend form (was already enforced)
+- [x] Add frontend validation error if email is missing (was already present)
+- [x] Enforce email as required in backend createClient procedure (was already z.string().email())
+- [x] Remove redundant optional PIN field from Add Client form
+- [x] Clean up PIN state variables and validation logic from TrainerDashboard
