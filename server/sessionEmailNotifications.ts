@@ -34,12 +34,25 @@ interface GroupClassDetails {
 }
 
 /**
- * Format date and time for display in Hong Kong timezone
+ * Format date and time for email display
+ * The date and time are already in Hong Kong time from trainer input
+ * We format them directly without timezone conversion to avoid double-conversion errors
  */
 function formatDateTime(date: string, time: string): string {
+  // date format: "2026-02-20"
+  // time format: "14:30"
   const [year, month, day] = date.split('-');
   const [hours, minutes] = time.split(':');
-  const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
+  
+  // Parse the components as numbers
+  const yearNum = parseInt(year);
+  const monthNum = parseInt(month);
+  const dayNum = parseInt(day);
+  const hoursNum = parseInt(hours);
+  const minutesNum = parseInt(minutes);
+  
+  // Create date object and format without timezone conversion
+  const dateObj = new Date(yearNum, monthNum - 1, dayNum, hoursNum, minutesNum);
   
   // Format as "Monday, 20 February 2026 at 2:00 PM"
   const options: Intl.DateTimeFormatOptions = {
@@ -49,10 +62,10 @@ function formatDateTime(date: string, time: string): string {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
-    timeZone: 'Asia/Hong_Kong'
+    hour12: true
   };
   
+  // Use UTC formatting to preserve the exact time without timezone adjustment
   return dateObj.toLocaleString('en-GB', options);
 }
 

@@ -2469,3 +2469,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Enforce email as required in backend createClient procedure (was already z.string().email())
 - [x] Remove redundant optional PIN field from Add Client form
 - [x] Clean up PIN state variables and validation logic from TrainerDashboard
+
+## Booking Email Timezone Bug (Mar 9, 2026)
+- [x] Fix Date & Time showing 7pm instead of 11am in booking confirmation email
+- [x] Removed double timezone conversion in formatDateTime function
+- [x] Now formats trainer-entered times directly without UTC conversion
