@@ -2474,3 +2474,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix Date & Time showing 7pm instead of 11am in booking confirmation email
 - [x] Removed double timezone conversion in formatDateTime function
 - [x] Now formats trainer-entered times directly without UTC conversion
+
+## Hydration Stats Tracking Bug (Mar 11, 2026)
+- [x] Investigate wildly incorrect hydration stats
+- [x] Review hydration calculation logic
+- [x] Identify root cause: double-counting from meals + body_metrics
+- [x] Remove body_metrics entry creation when beverage is logged with meal
