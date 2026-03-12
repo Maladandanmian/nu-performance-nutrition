@@ -2516,3 +2516,11 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update ClientCalendar eventStyleGetter to apply session type colours
 - [x] Test colour coding in trainer calendar view
 - [x] Test colour coding in client calendar view
+
+
+## Test Client Management Protocol
+- [x] Designate andy@andyknight.asia as protected primary test client
+- [x] Document test client cleanup protocol in TEST_CLIENT_CLEANUP.md
+- [x] Create SQL cleanup query for removing test clients
+- [x] Implement automatic cleanup at end of each development task
+- [x] Verify protected client is preserved after cleanup

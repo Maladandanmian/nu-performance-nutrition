@@ -1,0 +1,215 @@
+{
+  "query": "SELECT id, name, email FROM clients ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email FROM clients ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight ",
+      "email": "NULL"
+    },
+    {
+      "id": "270001",
+      "name": "David Benskin ",
+      "email": "NULL"
+    },
+    {
+      "id": "570001",
+      "name": "Michelle Tenent ",
+      "email": "NULL"
+    },
+    {
+      "id": "990036",
+      "name": "TEST CLIENT",
+      "email": "andy@andyknight.asia"
+    },
+    {
+      "id": "1110001",
+      "name": "Stuart Sharpless",
+      "email": "Stuartps@me.com"
+    },
+    {
+      "id": "1320025",
+      "name": "Ben Davey",
+      "email": "ben.davey@jointdynamics.com.hk"
+    },
+    {
+      "id": "1350001",
+      "name": "Shirley Dirkin ",
+      "email": "shirleyd@me.com"
+    },
+    {
+      "id": "1380001",
+      "name": "Daniel Zammit",
+      "email": "dbzammit@gmail.com"
+    },
+    {
+      "id": "1410001",
+      "name": "Benjamin Lohr",
+      "email": "Benjamin.Lohr@gmail.com"
+    },
+    {
+      "id": "1440001",
+      "name": "Paul Haswell",
+      "email": "paulhaswell@mac.com"
+    },
+    {
+      "id": "1470001",
+      "name": "Thomas Poppe",
+      "email": "thomaspoppe@yahoo.com"
+    },
+    {
+      "id": "1500001",
+      "name": "sofie Jacobs",
+      "email": "sofiejacobs77@icloud.com"
+    },
+    {
+      "id": "1530001",
+      "name": "Alex Howarth ",
+      "email": "alexhowarth78@hotmail.com"
+    },
+    {
+      "id": "1560001",
+      "name": "Luke Davey Testing ",
+      "email": "lukusdavey@gmail.com"
+    },
+    {
+      "id": "1590063",
+      "name": "Test Client",
+      "email": "client-1773276710826@test.com"
+    },
+    {
+      "id": "1590069",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276721099@example.com"
+    },
+    {
+      "id": "1590071",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276722483@example.com"
+    },
+    {
+      "id": "1590072",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276722710@example.com"
+    },
+    {
+      "id": "1590073",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276722940@example.com"
+    },
+    {
+      "id": "1590074",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276723168@example.com"
+    },
+    {
+      "id": "1590075",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276723396@example.com"
+    },
+    {
+      "id": "1590076",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276723622@example.com"
+    },
+    {
+      "id": "1590077",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276723847@example.com"
+    },
+    {
+      "id": "1590079",
+      "name": "VO2 Max Test Client",
+      "email": "vo2test-1773276727226@example.com"
+    },
+    {
+      "id": "1590081",
+      "name": "Test Client",
+      "email": "client-1773276737974@test.com"
+    },
+    {
+      "id": "1590089",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276750512@example.com"
+    },
+    {
+      "id": "1590090",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276752063@example.com"
+    },
+    {
+      "id": "1590091",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276752299@example.com"
+    },
+    {
+      "id": "1590092",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276752530@example.com"
+    },
+    {
+      "id": "1590093",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276752762@example.com"
+    },
+    {
+      "id": "1590094",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276752995@example.com"
+    },
+    {
+      "id": "1590095",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276753227@example.com"
+    },
+    {
+      "id": "1590096",
+      "name": "Test Client for Edit/Delete",
+      "email": "editdelete1773276753459@example.com"
+    },
+    {
+      "id": "1590097",
+      "name": "VO2 Max Test Client",
+      "email": "vo2test-1773276758741@example.com"
+    },
+    {
+      "id": "1590098",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276762150@test.com"
+    },
+    {
+      "id": "1590099",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276763600@test.com"
+    },
+    {
+      "id": "1590100",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276765048@test.com"
+    },
+    {
+      "id": "1590101",
+      "name": "Test Client Schedule",
+      "email": "schedule1773276764393@test.com"
+    },
+    {
+      "id": "1590102",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276766443@test.com"
+    },
+    {
+      "id": "1590103",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276768102@test.com"
+    },
+    {
+      "id": "1590107",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773276789766@test.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1\tAndy Knight \tNULL\n270001\tDavid Benskin \tNULL\n570001\tMichelle Tenent \tNULL\n990036\tTEST CLIENT\tandy@andyknight.asia\n1110001\tStuart Sharpless\tStuartps@me.com\n1320025\tBen Davey\tben.davey@jointdynamics.com.hk\n1350001\tShirley Dirkin \tshirleyd@me.com\n1380001\tDaniel Zammit\tdbzammit@gmail.com\n1410001\tBenjamin Lohr\tBenjamin.Lohr@gmail.com\n1440001\tPaul Haswell\tpaulhaswell@mac.com\n1470001\tThomas Poppe\tthomaspoppe@yahoo.com\n1500001\tsofie Jacobs\tsofiejacobs77@icloud.com\n1530001\tAlex Howarth \talexhowarth78@hotmail.com\n1560001\tLuke Davey Testing \tlukusdavey@gmail.com\n1590063\tTest Client\tclient-1773276710826@test.com\n1590069\tTest Client for Edit/Delete\teditdelete1773276721099@example.com\n1590071\tTest Client for Edit/Delete\teditdelete1773276722483@example.com\n1590072\tTest Client for Edit/Delete\teditdelete1773276722710@example.com\n1590073\tTest Client for Edit/Delete\teditdelete1773276722940@example.com\n1590074\tTest Client for Edit/Delete\teditdelete1773276723168@example.com\n1590075\tTest Client for Edit/Delete\teditdelete1773276723396@example.com\n1590076\tTest Client for Edit/Delete\teditdelete1773276723622@example.com\n1590077\tTest Client for Edit/Delete\teditdelete1773276723847@example.com\n1590079\tVO2 Max Test Client\tvo2test-1773276727226@example.com\n1590081\tTest Client\tclient-1773276737974@test.com\n1590089\tTest Client for Edit/Delete\teditdelete1773276750512@example.com\n1590090\tTest Client for Edit/Delete\teditdelete1773276752063@example.com\n1590091\tTest Client for Edit/Delete\teditdelete1773276752299@example.com\n1590092\tTest Client for Edit/Delete\teditdelete1773276752530@example.com\n1590093\tTest Client for Edit/Delete\teditdelete1773276752762@example.com\n1590094\tTest Client for Edit/Delete\teditdelete1773276752995@example.com\n1590095\tTest Client for Edit/Delete\teditdelete1773276753227@example.com\n1590096\tTest Client for Edit/Delete\teditdelete1773276753459@example.com\n1590097\tVO2 Max Test Client\tvo2test-1773276758741@example.com\n1590098\tTest Client for Edit\tclient-edit-1773276762150@test.com\n1590099\tTest Client for Edit\tclient-edit-1773276763600@test.com\n1590100\tTest Client for Edit\tclient-edit-1773276765048@test.com\n1590101\tTest Client Schedule\tschedule1773276764393@test.com\n1590102\tTest Client for Edit\tclient-edit-1773276766443@test.com\n1590103\tTest Client for Edit\tclient-edit-1773276768102@test.com\n1590107\tTest Client for Edit\tclient-edit-1773276789766@test.com\n",
+  "stderr": "",
+  "execution_time_ms": 1605
+}

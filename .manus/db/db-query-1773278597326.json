@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, email FROM clients WHERE email != 'andy@andyknight.asia' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email FROM clients WHERE email != 'andy@andyknight.asia' ORDER BY id;",
+  "rows": [
+    {
+      "id": "1110001",
+      "name": "Stuart Sharpless",
+      "email": "Stuartps@me.com"
+    },
+    {
+      "id": "1320025",
+      "name": "Ben Davey",
+      "email": "ben.davey@jointdynamics.com.hk"
+    },
+    {
+      "id": "1350001",
+      "name": "Shirley Dirkin ",
+      "email": "shirleyd@me.com"
+    },
+    {
+      "id": "1380001",
+      "name": "Daniel Zammit",
+      "email": "dbzammit@gmail.com"
+    },
+    {
+      "id": "1410001",
+      "name": "Benjamin Lohr",
+      "email": "Benjamin.Lohr@gmail.com"
+    },
+    {
+      "id": "1440001",
+      "name": "Paul Haswell",
+      "email": "paulhaswell@mac.com"
+    },
+    {
+      "id": "1470001",
+      "name": "Thomas Poppe",
+      "email": "thomaspoppe@yahoo.com"
+    },
+    {
+      "id": "1500001",
+      "name": "sofie Jacobs",
+      "email": "sofiejacobs77@icloud.com"
+    },
+    {
+      "id": "1530001",
+      "name": "Alex Howarth ",
+      "email": "alexhowarth78@hotmail.com"
+    },
+    {
+      "id": "1560001",
+      "name": "Luke Davey Testing ",
+      "email": "lukusdavey@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1110001\tStuart Sharpless\tStuartps@me.com\n1320025\tBen Davey\tben.davey@jointdynamics.com.hk\n1350001\tShirley Dirkin \tshirleyd@me.com\n1380001\tDaniel Zammit\tdbzammit@gmail.com\n1410001\tBenjamin Lohr\tBenjamin.Lohr@gmail.com\n1440001\tPaul Haswell\tpaulhaswell@mac.com\n1470001\tThomas Poppe\tthomaspoppe@yahoo.com\n1500001\tsofie Jacobs\tsofiejacobs77@icloud.com\n1530001\tAlex Howarth \talexhowarth78@hotmail.com\n1560001\tLuke Davey Testing \tlukusdavey@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}
