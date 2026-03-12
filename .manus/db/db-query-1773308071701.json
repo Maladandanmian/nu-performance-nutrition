@@ -1,0 +1,1120 @@
+{
+  "query": "SELECT id, name, email, role FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, role FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight",
+      "email": "andy@andyknight.asia",
+      "role": "admin"
+    },
+    {
+      "id": "13",
+      "name": "luke",
+      "email": "luke@nuperformancecoaching.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530015",
+      "name": "Test Trainer",
+      "email": "trainer-1767999855478@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530018",
+      "name": "Test Trainer",
+      "email": "trainer-1767999909501@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530020",
+      "name": "Test Trainer",
+      "email": "trainer-1768000060580@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530023",
+      "name": "Test Trainer",
+      "email": "trainer-1768000201474@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1650008",
+      "name": "Test Trainer",
+      "email": "trainer-1768175380914@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1770005",
+      "name": "Test Trainer",
+      "email": "trainer-1768433755748@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1830022",
+      "name": "Test Trainer",
+      "email": "trainer-1768522385393@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1830024",
+      "name": "Test Trainer",
+      "email": "trainer-1768522507641@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1830025",
+      "name": "Test Trainer",
+      "email": "trainer-1768522579486@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2730027",
+      "name": "Test Trainer",
+      "email": "trainer-1769052698069@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2730028",
+      "name": "Test Trainer",
+      "email": "trainer-1769052759521@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2730037",
+      "name": "Test Trainer",
+      "email": "trainer-1769053212279@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2730060",
+      "name": "Test Trainer",
+      "email": "trainer-1769054446122@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2730063",
+      "name": "Test Trainer",
+      "email": "trainer-1769054963037@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2760001",
+      "name": "Test Trainer",
+      "email": "trainer-1769056345501@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790004",
+      "name": "Test Trainer",
+      "email": "trainer-1769058974211@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790022",
+      "name": "Test Trainer",
+      "email": "trainer-1769060488425@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790027",
+      "name": "Test Trainer",
+      "email": "trainer-1769061296425@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790030",
+      "name": "Test Trainer",
+      "email": "trainer-1769061537174@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790033",
+      "name": "Test Trainer",
+      "email": "trainer-1769061797916@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790034",
+      "name": "Test Trainer",
+      "email": "trainer-1769061914967@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790037",
+      "name": "Test Trainer",
+      "email": "trainer-1769062641452@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790040",
+      "name": "Test Trainer",
+      "email": "trainer-1769063018925@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790043",
+      "name": "Test Trainer",
+      "email": "trainer-1769063212013@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790046",
+      "name": "Test Trainer",
+      "email": "trainer-1769063620633@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790049",
+      "name": "Test Trainer",
+      "email": "trainer-1769064187921@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790052",
+      "name": "Test Trainer",
+      "email": "trainer-1769065203777@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790055",
+      "name": "Test Trainer",
+      "email": "trainer-1769065683171@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790056",
+      "name": "Test Trainer",
+      "email": "trainer-1769065963805@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "2790059",
+      "name": "Test Trainer",
+      "email": "trainer-1769066494066@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3120004",
+      "name": "Test Trainer",
+      "email": "trainer-1769228388377@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3120005",
+      "name": "Test Trainer",
+      "email": "trainer-1769228550547@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3120008",
+      "name": "Test Trainer",
+      "email": "trainer-1769228879706@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3120009",
+      "name": "Test Trainer",
+      "email": "trainer-1769228913478@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3750014",
+      "name": "Test Trainer",
+      "email": "trainer-1769495900393@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3870022",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "3870024",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "3870025",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "3870032",
+      "name": "Test Trainer",
+      "email": "trainer-1769509667276@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "3870033",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470049",
+      "name": "Test Trainer",
+      "email": "trainer-1769659686941@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470050",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470057",
+      "name": "Test Trainer",
+      "email": "trainer-1769660758542@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470058",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470124",
+      "name": "Test Trainer",
+      "email": "trainer-1769662594710@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470125",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470130",
+      "name": "Test Trainer",
+      "email": "trainer-1769662727592@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470131",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470136",
+      "name": "Test Trainer",
+      "email": "trainer-1769662856405@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470137",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470141",
+      "name": "Test Trainer",
+      "email": "trainer-1769663017022@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470142",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470144",
+      "name": "Test Trainer",
+      "email": "trainer-1769663290237@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470145",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470154",
+      "name": "Test Trainer",
+      "email": "trainer-1769663896213@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470155",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470162",
+      "name": "Test Trainer",
+      "email": "trainer-1769664228811@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470163",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470168",
+      "name": "Test Trainer",
+      "email": "trainer-1769664656167@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470169",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470170",
+      "name": "Test Trainer",
+      "email": "trainer-1769664738398@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "4470171",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "6480001",
+      "name": "Test Trainer",
+      "email": "trainer@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6480002",
+      "name": "Test Trainer",
+      "email": "trainer@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6480003",
+      "name": "Test Trainer",
+      "email": "trainer@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6480004",
+      "name": "Test Trainer",
+      "email": "trainer@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6480005",
+      "name": "Test Trainer",
+      "email": "trainer@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960023",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564747304@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960024",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564749828@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960025",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564751841@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960026",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564753850@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960027",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564755967@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960028",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564758832@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960029",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564760634@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960031",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564784031@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960032",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564786623@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960033",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564788689@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960034",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564790798@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960035",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564792865@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960036",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564795925@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960037",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564797776@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960038",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564806902@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960039",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564809482@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960040",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564811573@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960041",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564813650@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960042",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564815913@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960043",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564818878@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960044",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564820729@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960046",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564841905@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960047",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564844386@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960048",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564846423@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960049",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564848391@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960050",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564850374@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960051",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564853218@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6960052",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771564854996@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990057",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567571474@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990058",
+      "name": "Test Trainer",
+      "email": "trainer-1771567571929@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990059",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567574130@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990060",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567577618@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990061",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567579723@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990062",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567582037@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990063",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567585068@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990064",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1771567586951@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "6990065",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020054",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575266512@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020055",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575267883@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020056",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575268109@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020057",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575268329@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020058",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575268550@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020059",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575268771@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020060",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575306027@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020061",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575308661@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020062",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575310040@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020063",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575311448@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020064",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575312618@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020065",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575313778@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020066",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575338210@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020067",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575340662@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020068",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575341959@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020070",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575343266@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020071",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575344374@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020072",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575345456@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020074",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575367340@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020075",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575369878@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020076",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575371197@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020077",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575372520@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020078",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575374065@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020079",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575375839@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020082",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575396360@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020083",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575398837@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020084",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575400162@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020085",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575401481@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020086",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575403022@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "7020087",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1771575404801@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150028",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273805927@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150029",
+      "name": "Test Trainer",
+      "email": "trainer-1773273806208@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150030",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273808779@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150031",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273812234@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150032",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273814278@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150033",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273816319@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150034",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273819244@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150035",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773273821068@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150036",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773273827832@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150037",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773273830458@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150038",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773273831854@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150055",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274891583@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150056",
+      "name": "Test Trainer",
+      "email": "trainer-1773274891858@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150057",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274894264@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150058",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274897806@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150060",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274899948@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150061",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274902068@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150062",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274905113@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150063",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773274907012@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150064",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274913986@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150065",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274916486@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150066",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274917828@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150067",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274919168@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150068",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274920736@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150069",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773274922526@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150070",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150116",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276708959@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150117",
+      "name": "Test Trainer",
+      "email": "trainer-1773276709204@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150118",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276711654@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150119",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276715040@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150120",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276717026@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150121",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276719010@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150122",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276721860@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150123",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276723634@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150124",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276735975@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150125",
+      "name": "Test Trainer",
+      "email": "trainer-1773276736317@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150126",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276738499@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150127",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276741822@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150128",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276744212@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150129",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276746327@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150130",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276749526@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150131",
+      "name": "TEST TRAINER PACKAGE",
+      "email": "trainer-package-1773276751383@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150132",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276760187@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150133",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276763091@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150134",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276764585@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150135",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276765972@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150136",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276767626@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150137",
+      "name": "Test Trainer",
+      "email": "trainer-edit-1773276781669@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "9150207",
+      "name": "Test Trainer",
+      "email": "test-trainer@example.com",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tAndy Knight\tandy@andyknight.asia\tadmin\n13\tluke\tluke@nuperformancecoaching.com\tadmin\n1530015\tTest Trainer\ttrainer-1767999855478@test.com\tadmin\n1530018\tTest Trainer\ttrainer-1767999909501@test.com\tadmin\n1530020\tTest Trainer\ttrainer-1768000060580@test.com\tadmin\n1530023\tTest Trainer\ttrainer-1768000201474@test.com\tadmin\n1650008\tTest Trainer\ttrainer-1768175380914@test.com\tadmin\n1770005\tTest Trainer\ttrainer-1768433755748@test.com\tadmin\n1830022\tTest Trainer\ttrainer-1768522385393@test.com\tadmin\n1830024\tTest Trainer\ttrainer-1768522507641@test.com\tadmin\n1830025\tTest Trainer\ttrainer-1768522579486@test.com\tadmin\n2730027\tTest Trainer\ttrainer-1769052698069@test.com\tadmin\n2730028\tTest Trainer\ttrainer-1769052759521@test.com\tadmin\n2730037\tTest Trainer\ttrainer-1769053212279@test.com\tadmin\n2730060\tTest Trainer\ttrainer-1769054446122@test.com\tadmin\n2730063\tTest Trainer\ttrainer-1769054963037@test.com\tadmin\n2760001\tTest Trainer\ttrainer-1769056345501@test.com\tadmin\n2790004\tTest Trainer\ttrainer-1769058974211@test.com\tadmin\n2790022\tTest Trainer\ttrainer-1769060488425@test.com\tadmin\n2790027\tTest Trainer\ttrainer-1769061296425@test.com\tadmin\n2790030\tTest Trainer\ttrainer-1769061537174@test.com\tadmin\n2790033\tTest Trainer\ttrainer-1769061797916@test.com\tadmin\n2790034\tTest Trainer\ttrainer-1769061914967@test.com\tadmin\n2790037\tTest Trainer\ttrainer-1769062641452@test.com\tadmin\n2790040\tTest Trainer\ttrainer-1769063018925@test.com\tadmin\n2790043\tTest Trainer\ttrainer-1769063212013@test.com\tadmin\n2790046\tTest Trainer\ttrainer-1769063620633@test.com\tadmin\n2790049\tTest Trainer\ttrainer-1769064187921@test.com\tadmin\n2790052\tTest Trainer\ttrainer-1769065203777@test.com\tadmin\n2790055\tTest Trainer\ttrainer-1769065683171@test.com\tadmin\n2790056\tTest Trainer\ttrainer-1769065963805@test.com\tadmin\n2790059\tTest Trainer\ttrainer-1769066494066@test.com\tadmin\n3120004\tTest Trainer\ttrainer-1769228388377@test.com\tadmin\n3120005\tTest Trainer\ttrainer-1769228550547@test.com\tadmin\n3120008\tTest Trainer\ttrainer-1769228879706@test.com\tadmin\n3120009\tTest Trainer\ttrainer-1769228913478@test.com\tadmin\n3750014\tTest Trainer\ttrainer-1769495900393@test.com\tadmin\n3870022\tTest Trainer\ttest-trainer@example.com\tadmin\n3870024\tTest Trainer\ttest-trainer@example.com\tadmin\n3870025\tTest Trainer\ttest-trainer@example.com\tadmin\n3870032\tTest Trainer\ttrainer-1769509667276@test.com\tadmin\n3870033\tTest Trainer\ttest-trainer@example.com\tadmin\n4470049\tTest Trainer\ttrainer-1769659686941@test.com\tadmin\n4470050\tTest Trainer\ttest-trainer@example.com\tadmin\n4470057\tTest Trainer\ttrainer-1769660758542@test.com\tadmin\n4470058\tTest Trainer\ttest-trainer@example.com\tadmin\n4470124\tTest Trainer\ttrainer-1769662594710@test.com\tadmin\n4470125\tTest Trainer\ttest-trainer@example.com\tadmin\n4470130\tTest Trainer\ttrainer-1769662727592@test.com\tadmin\n4470131\tTest Trainer\ttest-trainer@example.com\tadmin\n4470136\tTest Trainer\ttrainer-1769662856405@test.com\tadmin\n4470137\tTest Trainer\ttest-trainer@example.com\tadmin\n4470141\tTest Trainer\ttrainer-1769663017022@test.com\tadmin\n4470142\tTest Trainer\ttest-trainer@example.com\tadmin\n4470144\tTest Trainer\ttrainer-1769663290237@test.com\tadmin\n4470145\tTest Trainer\ttest-trainer@example.com\tadmin\n4470154\tTest Trainer\ttrainer-1769663896213@test.com\tadmin\n4470155\tTest Trainer\ttest-trainer@example.com\tadmin\n4470162\tTest Trainer\ttrainer-1769664228811@test.com\tadmin\n4470163\tTest Trainer\ttest-trainer@example.com\tadmin\n4470168\tTest Trainer\ttrainer-1769664656167@test.com\tadmin\n4470169\tTest Trainer\ttest-trainer@example.com\tadmin\n4470170\tTest Trainer\ttrainer-1769664738398@test.com\tadmin\n4470171\tTest Trainer\ttest-trainer@example.com\tadmin\n6480001\tTest Trainer\ttrainer@test.com\tadmin\n6480002\tTest Trainer\ttrainer@test.com\tadmin\n6480003\tTest Trainer\ttrainer@test.com\tadmin\n6480004\tTest Trainer\ttrainer@test.com\tadmin\n6480005\tTest Trainer\ttrainer@test.com\tadmin\n6960023\tTEST TRAINER PACKAGE\ttrainer-package-1771564747304@test.com\tadmin\n6960024\tTEST TRAINER PACKAGE\ttrainer-package-1771564749828@test.com\tadmin\n6960025\tTEST TRAINER PACKAGE\ttrainer-package-1771564751841@test.com\tadmin\n6960026\tTEST TRAINER PACKAGE\ttrainer-package-1771564753850@test.com\tadmin\n6960027\tTEST TRAINER PACKAGE\ttrainer-package-1771564755967@test.com\tadmin\n6960028\tTEST TRAINER PACKAGE\ttrainer-package-1771564758832@test.com\tadmin\n6960029\tTEST TRAINER PACKAGE\ttrainer-package-1771564760634@test.com\tadmin\n6960031\tTEST TRAINER PACKAGE\ttrainer-package-1771564784031@test.com\tadmin\n6960032\tTEST TRAINER PACKAGE\ttrainer-package-1771564786623@test.com\tadmin\n6960033\tTEST TRAINER PACKAGE\ttrainer-package-1771564788689@test.com\tadmin\n6960034\tTEST TRAINER PACKAGE\ttrainer-package-1771564790798@test.com\tadmin\n6960035\tTEST TRAINER PACKAGE\ttrainer-package-1771564792865@test.com\tadmin\n6960036\tTEST TRAINER PACKAGE\ttrainer-package-1771564795925@test.com\tadmin\n6960037\tTEST TRAINER PACKAGE\ttrainer-package-1771564797776@test.com\tadmin\n6960038\tTEST TRAINER PACKAGE\ttrainer-package-1771564806902@test.com\tadmin\n6960039\tTEST TRAINER PACKAGE\ttrainer-package-1771564809482@test.com\tadmin\n6960040\tTEST TRAINER PACKAGE\ttrainer-package-1771564811573@test.com\tadmin\n6960041\tTEST TRAINER PACKAGE\ttrainer-package-1771564813650@test.com\tadmin\n6960042\tTEST TRAINER PACKAGE\ttrainer-package-1771564815913@test.com\tadmin\n6960043\tTEST TRAINER PACKAGE\ttrainer-package-1771564818878@test.com\tadmin\n6960044\tTEST TRAINER PACKAGE\ttrainer-package-1771564820729@test.com\tadmin\n6960046\tTEST TRAINER PACKAGE\ttrainer-package-1771564841905@test.com\tadmin\n6960047\tTEST TRAINER PACKAGE\ttrainer-package-1771564844386@test.com\tadmin\n6960048\tTEST TRAINER PACKAGE\ttrainer-package-1771564846423@test.com\tadmin\n6960049\tTEST TRAINER PACKAGE\ttrainer-package-1771564848391@test.com\tadmin\n6960050\tTEST TRAINER PACKAGE\ttrainer-package-1771564850374@test.com\tadmin\n6960051\tTEST TRAINER PACKAGE\ttrainer-package-1771564853218@test.com\tadmin\n6960052\tTEST TRAINER PACKAGE\ttrainer-package-1771564854996@test.com\tadmin\n6990057\tTEST TRAINER PACKAGE\ttrainer-package-1771567571474@test.com\tadmin\n6990058\tTest Trainer\ttrainer-1771567571929@test.com\tadmin\n6990059\tTEST TRAINER PACKAGE\ttrainer-package-1771567574130@test.com\tadmin\n6990060\tTEST TRAINER PACKAGE\ttrainer-package-1771567577618@test.com\tadmin\n6990061\tTEST TRAINER PACKAGE\ttrainer-package-1771567579723@test.com\tadmin\n6990062\tTEST TRAINER PACKAGE\ttrainer-package-1771567582037@test.com\tadmin\n6990063\tTEST TRAINER PACKAGE\ttrainer-package-1771567585068@test.com\tadmin\n6990064\tTEST TRAINER PACKAGE\ttrainer-package-1771567586951@test.com\tadmin\n6990065\tTest Trainer\ttest-trainer@example.com\tadmin\n7020054\tTest Trainer\ttrainer-edit-1771575266512@test.com\tadmin\n7020055\tTest Trainer\ttrainer-edit-1771575267883@test.com\tadmin\n7020056\tTest Trainer\ttrainer-edit-1771575268109@test.com\tadmin\n7020057\tTest Trainer\ttrainer-edit-1771575268329@test.com\tadmin\n7020058\tTest Trainer\ttrainer-edit-1771575268550@test.com\tadmin\n7020059\tTest Trainer\ttrainer-edit-1771575268771@test.com\tadmin\n7020060\tTest Trainer\ttrainer-edit-1771575306027@test.com\tadmin\n7020061\tTest Trainer\ttrainer-edit-1771575308661@test.com\tadmin\n7020062\tTest Trainer\ttrainer-edit-1771575310040@test.com\tadmin\n7020063\tTest Trainer\ttrainer-edit-1771575311448@test.com\tadmin\n7020064\tTest Trainer\ttrainer-edit-1771575312618@test.com\tadmin\n7020065\tTest Trainer\ttrainer-edit-1771575313778@test.com\tadmin\n7020066\tTest Trainer\ttrainer-edit-1771575338210@test.com\tadmin\n7020067\tTest Trainer\ttrainer-edit-1771575340662@test.com\tadmin\n7020068\tTest Trainer\ttrainer-edit-1771575341959@test.com\tadmin\n7020070\tTest Trainer\ttrainer-edit-1771575343266@test.com\tadmin\n7020071\tTest Trainer\ttrainer-edit-1771575344374@test.com\tadmin\n7020072\tTest Trainer\ttrainer-edit-1771575345456@test.com\tadmin\n7020074\tTest Trainer\ttrainer-edit-1771575367340@test.com\tadmin\n7020075\tTest Trainer\ttrainer-edit-1771575369878@test.com\tadmin\n7020076\tTest Trainer\ttrainer-edit-1771575371197@test.com\tadmin\n7020077\tTest Trainer\ttrainer-edit-1771575372520@test.com\tadmin\n7020078\tTest Trainer\ttrainer-edit-1771575374065@test.com\tadmin\n7020079\tTest Trainer\ttrainer-edit-1771575375839@test.com\tadmin\n7020082\tTest Trainer\ttrainer-edit-1771575396360@test.com\tadmin\n7020083\tTest Trainer\ttrainer-edit-1771575398837@test.com\tadmin\n7020084\tTest Trainer\ttrainer-edit-1771575400162@test.com\tadmin\n7020085\tTest Trainer\ttrainer-edit-1771575401481@test.com\tadmin\n7020086\tTest Trainer\ttrainer-edit-1771575403022@test.com\tadmin\n7020087\tTest Trainer\ttrainer-edit-1771575404801@test.com\tadmin\n9150028\tTEST TRAINER PACKAGE\ttrainer-package-1773273805927@test.com\tadmin\n9150029\tTest Trainer\ttrainer-1773273806208@test.com\tadmin\n9150030\tTEST TRAINER PACKAGE\ttrainer-package-1773273808779@test.com\tadmin\n9150031\tTEST TRAINER PACKAGE\ttrainer-package-1773273812234@test.com\tadmin\n9150032\tTEST TRAINER PACKAGE\ttrainer-package-1773273814278@test.com\tadmin\n9150033\tTEST TRAINER PACKAGE\ttrainer-package-1773273816319@test.com\tadmin\n9150034\tTEST TRAINER PACKAGE\ttrainer-package-1773273819244@test.com\tadmin\n9150035\tTEST TRAINER PACKAGE\ttrainer-package-1773273821068@test.com\tadmin\n9150036\tTest Trainer\ttrainer-edit-1773273827832@test.com\tadmin\n9150037\tTest Trainer\ttrainer-edit-1773273830458@test.com\tadmin\n9150038\tTest Trainer\ttrainer-edit-1773273831854@test.com\tadmin\n9150055\tTEST TRAINER PACKAGE\ttrainer-package-1773274891583@test.com\tadmin\n9150056\tTest Trainer\ttrainer-1773274891858@test.com\tadmin\n9150057\tTEST TRAINER PACKAGE\ttrainer-package-1773274894264@test.com\tadmin\n9150058\tTEST TRAINER PACKAGE\ttrainer-package-1773274897806@test.com\tadmin\n9150060\tTEST TRAINER PACKAGE\ttrainer-package-1773274899948@test.com\tadmin\n9150061\tTEST TRAINER PACKAGE\ttrainer-package-1773274902068@test.com\tadmin\n9150062\tTEST TRAINER PACKAGE\ttrainer-package-1773274905113@test.com\tadmin\n9150063\tTEST TRAINER PACKAGE\ttrainer-package-1773274907012@test.com\tadmin\n9150064\tTest Trainer\ttrainer-edit-1773274913986@test.com\tadmin\n9150065\tTest Trainer\ttrainer-edit-1773274916486@test.com\tadmin\n9150066\tTest Trainer\ttrainer-edit-1773274917828@test.com\tadmin\n9150067\tTest Trainer\ttrainer-edit-1773274919168@test.com\tadmin\n9150068\tTest Trainer\ttrainer-edit-1773274920736@test.com\tadmin\n9150069\tTest Trainer\ttrainer-edit-1773274922526@test.com\tadmin\n9150070\tTest Trainer\ttest-trainer@example.com\tadmin\n9150116\tTEST TRAINER PACKAGE\ttrainer-package-1773276708959@test.com\tadmin\n9150117\tTest Trainer\ttrainer-1773276709204@test.com\tadmin\n9150118\tTEST TRAINER PACKAGE\ttrainer-package-1773276711654@test.com\tadmin\n9150119\tTEST TRAINER PACKAGE\ttrainer-package-1773276715040@test.com\tadmin\n9150120\tTEST TRAINER PACKAGE\ttrainer-package-1773276717026@test.com\tadmin\n9150121\tTEST TRAINER PACKAGE\ttrainer-package-1773276719010@test.com\tadmin\n9150122\tTEST TRAINER PACKAGE\ttrainer-package-1773276721860@test.com\tadmin\n9150123\tTEST TRAINER PACKAGE\ttrainer-package-1773276723634@test.com\tadmin\n9150124\tTEST TRAINER PACKAGE\ttrainer-package-1773276735975@test.com\tadmin\n9150125\tTest Trainer\ttrainer-1773276736317@test.com\tadmin\n9150126\tTEST TRAINER PACKAGE\ttrainer-package-1773276738499@test.com\tadmin\n9150127\tTEST TRAINER PACKAGE\ttrainer-package-1773276741822@test.com\tadmin\n9150128\tTEST TRAINER PACKAGE\ttrainer-package-1773276744212@test.com\tadmin\n9150129\tTEST TRAINER PACKAGE\ttrainer-package-1773276746327@test.com\tadmin\n9150130\tTEST TRAINER PACKAGE\ttrainer-package-1773276749526@test.com\tadmin\n9150131\tTEST TRAINER PACKAGE\ttrainer-package-1773276751383@test.com\tadmin\n9150132\tTest Trainer\ttrainer-edit-1773276760187@test.com\tadmin\n9150133\tTest Trainer\ttrainer-edit-1773276763091@test.com\tadmin\n9150134\tTest Trainer\ttrainer-edit-1773276764585@test.com\tadmin\n9150135\tTest Trainer\ttrainer-edit-1773276765972@test.com\tadmin\n9150136\tTest Trainer\ttrainer-edit-1773276767626@test.com\tadmin\n9150137\tTest Trainer\ttrainer-edit-1773276781669@test.com\tadmin\n9150207\tTest Trainer\ttest-trainer@example.com\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 1483
+}

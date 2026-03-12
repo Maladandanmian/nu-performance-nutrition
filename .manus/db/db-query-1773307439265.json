@@ -1,0 +1,112 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "athlete_monitoring"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "audit_logs"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "body_metrics"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "clients"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "dexa_bmd_data"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "dexa_body_comp"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "dexa_goals"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "dexa_images"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "dexa_scans"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "drinks"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "email_verification_tokens"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "group_class_attendance"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "group_classes"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "login_attempts"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "meals"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "notification_settings"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "nutrition_goals"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "nutrition_reports"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "password_reset_tokens"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "rate_limit_locks"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "recurring_session_rules"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "session_packages"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "strength_tests"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "supplement_logs"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "supplement_templates"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "trainer_notifications"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "training_sessions"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "users"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "vo2_max_ambient_data"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "vo2_max_anthropometric"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "vo2_max_fitness_assessment"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "vo2_max_lactate_profile"
+    },
+    {
+      "Tables_in_CVoYWTwV8QMMBSnZsHHM3q": "vo2_max_tests"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_CVoYWTwV8QMMBSnZsHHM3q\n__drizzle_migrations\nathlete_monitoring\naudit_logs\nbody_metrics\nclients\ndexa_bmd_data\ndexa_body_comp\ndexa_goals\ndexa_images\ndexa_scans\ndrinks\nemail_verification_tokens\ngroup_class_attendance\ngroup_classes\nlogin_attempts\nmeals\nnotification_settings\nnutrition_goals\nnutrition_reports\npassword_reset_tokens\nrate_limit_locks\nrecurring_session_rules\nsession_packages\nstrength_tests\nsupplement_logs\nsupplement_templates\ntrainer_notifications\ntraining_sessions\nusers\nvo2_max_ambient_data\nvo2_max_anthropometric\nvo2_max_fitness_assessment\nvo2_max_lactate_profile\nvo2_max_tests\n",
+  "stderr": "",
+  "execution_time_ms": 1585
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT t.id as trainerId, t.name, t.email FROM trainers t;\nSELECT c.id as clientId, c.name, c.email, c.trainerId FROM clients c;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT t.id as trainerId, t.name, t.email FROM trainers t;\nSELECT c.id as clientId, c.name, c.email, c.trainerId FROM clients c;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'cvoywtwv8qmmbsnzshhm3q.trainers' doesn't exist"
+  ]
+}

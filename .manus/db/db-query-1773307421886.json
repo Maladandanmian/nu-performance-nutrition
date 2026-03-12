@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM session_packages;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM session_packages;",
+  "rows": [
+    {
+      "id": "60001",
+      "clientId": "990036",
+      "trainerId": "1",
+      "packageType": "2on1_pt",
+      "sessionsTotal": "10",
+      "sessionsRemaining": "4",
+      "purchaseDate": "2026-02-20",
+      "expiryDate": "2026-03-20",
+      "notes": "NULL",
+      "createdAt": "2026-02-20 05:53:04",
+      "updatedAt": "2026-02-20 08:48:34"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\ttrainerId\tpackageType\tsessionsTotal\tsessionsRemaining\tpurchaseDate\texpiryDate\tnotes\tcreatedAt\tupdatedAt\n60001\t990036\t1\t2on1_pt\t10\t4\t2026-02-20\t2026-03-20\tNULL\t2026-02-20 05:53:04\t2026-02-20 08:48:34\n",
+  "stderr": "",
+  "execution_time_ms": 1509
+}

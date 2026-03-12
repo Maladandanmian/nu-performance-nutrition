@@ -1,0 +1,26 @@
+{
+  "query": "SELECT c.id as clientId, c.name as clientName, c.email as clientEmail, c.trainerId, u.name as trainerName, u.email as trainerEmail FROM clients c JOIN users u ON c.trainerId = u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT c.id as clientId, c.name as clientName, c.email as clientEmail, c.trainerId, u.name as trainerName, u.email as trainerEmail FROM clients c JOIN users u ON c.trainerId = u.id;",
+  "rows": [
+    {
+      "clientId": "990036",
+      "clientName": "TEST CLIENT",
+      "clientEmail": "andy@andyknight.asia",
+      "trainerId": "1",
+      "trainerName": "Andy Knight",
+      "trainerEmail": "andy@andyknight.asia"
+    },
+    {
+      "clientId": "1590110",
+      "clientName": "Test Client Invitation",
+      "clientEmail": "test-client-invitation@example.com",
+      "trainerId": "9150207",
+      "trainerName": "Test Trainer",
+      "trainerEmail": "test-trainer@example.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "clientId\tclientName\tclientEmail\ttrainerId\ttrainerName\ttrainerEmail\n990036\tTEST CLIENT\tandy@andyknight.asia\t1\tAndy Knight\tandy@andyknight.asia\n1590110\tTest Client Invitation\ttest-client-invitation@example.com\t9150207\tTest Trainer\ttest-trainer@example.com\n",
+  "stderr": "",
+  "execution_time_ms": 1632
+}

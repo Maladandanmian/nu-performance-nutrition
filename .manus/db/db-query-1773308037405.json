@@ -1,0 +1,112 @@
+{
+  "query": "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE();",
+  "rows": [
+    {
+      "table_name": "dexa_goals"
+    },
+    {
+      "table_name": "vo2_max_ambient_data"
+    },
+    {
+      "table_name": "vo2_max_lactate_profile"
+    },
+    {
+      "table_name": "__drizzle_migrations"
+    },
+    {
+      "table_name": "nutrition_reports"
+    },
+    {
+      "table_name": "vo2_max_tests"
+    },
+    {
+      "table_name": "supplement_templates"
+    },
+    {
+      "table_name": "meals"
+    },
+    {
+      "table_name": "body_metrics"
+    },
+    {
+      "table_name": "audit_logs"
+    },
+    {
+      "table_name": "vo2_max_anthropometric"
+    },
+    {
+      "table_name": "group_classes"
+    },
+    {
+      "table_name": "session_packages"
+    },
+    {
+      "table_name": "dexa_bmd_data"
+    },
+    {
+      "table_name": "password_reset_tokens"
+    },
+    {
+      "table_name": "supplement_logs"
+    },
+    {
+      "table_name": "training_sessions"
+    },
+    {
+      "table_name": "nutrition_goals"
+    },
+    {
+      "table_name": "dexa_body_comp"
+    },
+    {
+      "table_name": "login_attempts"
+    },
+    {
+      "table_name": "rate_limit_locks"
+    },
+    {
+      "table_name": "group_class_attendance"
+    },
+    {
+      "table_name": "dexa_images"
+    },
+    {
+      "table_name": "email_verification_tokens"
+    },
+    {
+      "table_name": "strength_tests"
+    },
+    {
+      "table_name": "notification_settings"
+    },
+    {
+      "table_name": "users"
+    },
+    {
+      "table_name": "clients"
+    },
+    {
+      "table_name": "athlete_monitoring"
+    },
+    {
+      "table_name": "vo2_max_fitness_assessment"
+    },
+    {
+      "table_name": "trainer_notifications"
+    },
+    {
+      "table_name": "recurring_session_rules"
+    },
+    {
+      "table_name": "drinks"
+    },
+    {
+      "table_name": "dexa_scans"
+    }
+  ],
+  "messages": [],
+  "stdout": "table_name\ndexa_goals\nvo2_max_ambient_data\nvo2_max_lactate_profile\n__drizzle_migrations\nnutrition_reports\nvo2_max_tests\nsupplement_templates\nmeals\nbody_metrics\naudit_logs\nvo2_max_anthropometric\ngroup_classes\nsession_packages\ndexa_bmd_data\npassword_reset_tokens\nsupplement_logs\ntraining_sessions\nnutrition_goals\ndexa_body_comp\nlogin_attempts\nrate_limit_locks\ngroup_class_attendance\ndexa_images\nemail_verification_tokens\nstrength_tests\nnotification_settings\nusers\nclients\nathlete_monitoring\nvo2_max_fitness_assessment\ntrainer_notifications\nrecurring_session_rules\ndrinks\ndexa_scans\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

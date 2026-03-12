@@ -1,0 +1,48 @@
+{
+  "query": "SELECT * FROM clients;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM clients;",
+  "rows": [
+    {
+      "id": "990036",
+      "trainerId": "1",
+      "name": "TEST CLIENT",
+      "email": "andy@andyknight.asia",
+      "phone": "NULL",
+      "pin": "$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW",
+      "notes": "NULL",
+      "createdAt": "2026-01-29 04:54:25",
+      "updatedAt": "2026-01-30 01:23:05",
+      "passwordHash": "$2b$12$ciFughIYBPoT6qTEobMKNunObkLA1cREHhgEGO7Gi8J1oX1v9.dHa",
+      "emailVerified": "1",
+      "authMethod": "email",
+      "passwordSetupToken": "NULL",
+      "passwordSetupTokenExpires": "NULL",
+      "age": "43",
+      "height": "172.0",
+      "gender": "male"
+    },
+    {
+      "id": "1590110",
+      "trainerId": "9150207",
+      "name": "Test Client Invitation",
+      "email": "test-client-invitation@example.com",
+      "phone": "NULL",
+      "pin": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-03-12 01:46:24",
+      "updatedAt": "2026-03-12 01:46:24",
+      "passwordHash": "NULL",
+      "emailVerified": "0",
+      "authMethod": "pin",
+      "passwordSetupToken": "NULL",
+      "passwordSetupTokenExpires": "NULL",
+      "age": "NULL",
+      "height": "NULL",
+      "gender": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tname\temail\tphone\tpin\tnotes\tcreatedAt\tupdatedAt\tpasswordHash\temailVerified\tauthMethod\tpasswordSetupToken\tpasswordSetupTokenExpires\tage\theight\tgender\n990036\t1\tTEST CLIENT\tandy@andyknight.asia\tNULL\t$2b$12$s9vAAj9WHZvlSV5KR7DiJuMNJ7ulnR29twEp8jXJflTG.OV.0wGuW\tNULL\t2026-01-29 04:54:25\t2026-01-30 01:23:05\t$2b$12$ciFughIYBPoT6qTEobMKNunObkLA1cREHhgEGO7Gi8J1oX1v9.dHa\t1\temail\tNULL\tNULL\t43\t172.0\tmale\n1590110\t9150207\tTest Client Invitation\ttest-client-invitation@example.com\tNULL\tNULL\tNULL\t2026-03-12 01:46:24\t2026-03-12 01:46:24\tNULL\t0\tpin\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1610
+}

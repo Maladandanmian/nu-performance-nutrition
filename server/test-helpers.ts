@@ -1,66 +1,67 @@
 /**
- * Test helpers for authenticating with the dedicated test account
+ * Test Helpers
+ * ============
  * 
- * Test Account Details:
- * - PIN: 098765
- * - Purpose: Isolated test environment to prevent polluting production data
- * - All automated tests should use this account
+ * CRITICAL PROTOCOL — READ BEFORE WRITING ANY TEST OR DATABASE OPERATION
+ * -----------------------------------------------------------------------
+ * 
+ * Andy Knight's account (trainer ID: 1) is the DESIGNATED TEST ACCOUNT.
+ * All test clients and data must be created under trainerId = 1.
+ * 
+ * Luke's account is PRODUCTION. His trainer ID must NEVER appear in any
+ * DELETE, UPDATE, or INSERT during development or testing.
+ * 
+ * The ONLY safe cleanup pattern:
+ *   DELETE FROM clients WHERE trainerId = 1 AND id != 990036
+ * 
+ * The permanent test client (ID 990036, andy@andyknight.asia) must never
+ * be deleted.
  */
 
 import * as db from './db';
 import type { TrpcContext } from './_core/context';
 import type { Response } from 'express';
-import { TEST_CLIENT_ID } from './testSetup';
+import { TEST_CLIENT_ID, ANDY_TRAINER_ID, getTestCleanupWhereClause } from './testSetup';
 
 /**
- * Test account PIN - use this account for all automated tests
- */
-export const TEST_ACCOUNT_PIN = '098765';
-
-/**
- * Production account PIN - DO NOT use in tests
- */
-export const PRODUCTION_ACCOUNT_PIN = '222222';
-
-/**
- * Get or create the test client account (PIN 098765)
- * Returns the client ID for use in tests
+ * Get the permanent test client record.
+ * Returns the client ID for use in tests.
  */
 export async function getTestClientId(): Promise<number> {
-  // Use the centralized TEST_CLIENT_ID from testSetup.ts
-  // This ensures all tests use the same client ID (990036)
   return TEST_CLIENT_ID;
 }
 
 /**
- * Create a test tRPC context for the test account
- * Use this in tests that need authentication
+ * Create a test tRPC context authenticated as Andy Knight (trainer ID: 1).
+ * Use this in all tests that require trainer-level authentication.
  */
 export async function createTestContext(): Promise<TrpcContext> {
   const testClient = await db.getClientById(TEST_CLIENT_ID);
-  
+
   if (!testClient) {
     throw new Error(
-      `Test client with ID ${TEST_CLIENT_ID} not found. ` +
-      `Please ensure the test client exists before running tests.`
+      `Permanent test client (ID: ${TEST_CLIENT_ID}) not found. ` +
+      `This client must always exist — do not delete it.`
     );
   }
 
-  // Get the trainer (owner) of the test client
-  // Query users table directly by trainerId
   const { getDb } = await import('./db');
   const dbInstance = await getDb();
   if (!dbInstance) {
     throw new Error('Database not available');
   }
-  
+
   const { users } = await import('../drizzle/schema');
   const { eq } = await import('drizzle-orm');
-  const trainerResults = await dbInstance.select().from(users).where(eq(users.id, testClient.trainerId)).limit(1);
+  const trainerResults = await dbInstance
+    .select()
+    .from(users)
+    .where(eq(users.id, ANDY_TRAINER_ID))
+    .limit(1);
   const trainer = trainerResults[0];
-  
+
   if (!trainer) {
-    throw new Error(`Trainer for test client not found (trainerId: ${testClient.trainerId})`);
+    throw new Error(`Andy Knight (trainer ID: ${ANDY_TRAINER_ID}) not found in users table`);
   }
 
   const ctx: TrpcContext = {
@@ -89,46 +90,35 @@ export async function createTestContext(): Promise<TrpcContext> {
 }
 
 /**
- * Clean up test data created during tests
- * Call this in afterEach or afterAll hooks
+ * Clean up test data for the permanent test client.
+ * Only clears logged data (meals, drinks, metrics) — never deletes the client itself.
  */
 export async function cleanupTestData(clientId: number) {
+  if (clientId !== TEST_CLIENT_ID) {
+    throw new Error(
+      `BLOCKED: Attempted to clean up client ID ${clientId}. ` +
+      `Only the permanent test client (ID: ${TEST_CLIENT_ID}) can be cleaned up via this function. ` +
+      `This safeguard prevents accidental deletion of production data.`
+    );
+  }
+
   try {
-    // Get test client to verify it's the test account
-    const client = await db.getClientById(clientId);
-    
-    if (!client) {
-      console.warn(`Client ${clientId} not found during cleanup`);
-      return;
-    }
-
-    // Verify this is the test client by ID (PIN is hashed, so we can't compare it directly)
-    if (clientId !== TEST_CLIENT_ID) {
-      throw new Error(
-        `Attempted to cleanup non-test client (ID: ${clientId}). ` +
-        `Only test account (ID: ${TEST_CLIENT_ID}) data can be auto-cleaned.`
-      );
-    }
-
-    // Delete test data using existing db functions
-    // Note: We don't delete the client itself, just the test data
-    // Get all meals and drinks for this client and delete them
     const clientMeals = await db.getMealsByClientId(clientId);
     for (const meal of clientMeals) {
       await db.deleteMeal(meal.id);
     }
-    
+
     const clientDrinks = await db.getDrinksByClientId(clientId);
     for (const drink of clientDrinks) {
       await db.deleteDrink(drink.id);
     }
-    
+
     const clientMetrics = await db.getBodyMetricsByClientId(clientId);
     for (const metric of clientMetrics) {
       await db.deleteBodyMetric(metric.id);
     }
 
-    console.log(`Cleaned up test data for client ${clientId} (PIN: ${TEST_ACCOUNT_PIN})`);
+    console.log(`Cleaned up test data for permanent test client (ID: ${clientId})`);
   } catch (error) {
     console.error('Failed to clean up test data:', error);
     throw error;
@@ -136,21 +126,47 @@ export async function cleanupTestData(clientId: number) {
 }
 
 /**
- * Verify we're using the test account, not production
- * Call this at the start of tests that modify data
+ * Delete all temporary test clients created under Andy's trainer account.
+ * The permanent test client (ID: 990036) is always preserved.
+ * 
+ * Safe cleanup query pattern — this is the ONLY permitted way to bulk-delete test clients.
  */
-export async function verifyTestAccount(clientId: number) {
-  const client = await db.getClientById(clientId);
-  
-  if (!client) {
-    throw new Error(`Client ${clientId} not found`);
+export async function cleanupTestClients() {
+  const { getDb } = await import('./db');
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    throw new Error('Database not available');
   }
 
-  // Verify using client ID since PIN is hashed
+  const { clients } = await import('../drizzle/schema');
+  const { and, eq, ne } = await import('drizzle-orm');
+
+  // Safe pattern: only delete clients under Andy's trainer ID, never the permanent test client
+  const deleted = await dbInstance
+    .delete(clients)
+    .where(
+      and(
+        eq(clients.trainerId, ANDY_TRAINER_ID),
+        ne(clients.id, TEST_CLIENT_ID)
+      )
+    );
+
+  console.log(`Cleaned up test clients under trainer ID ${ANDY_TRAINER_ID} (preserved ID: ${TEST_CLIENT_ID})`);
+  return deleted;
+}
+
+/**
+ * Verify a client ID belongs to the test account before any operation.
+ * Call this at the start of any test that modifies client data.
+ */
+export async function verifyTestAccount(clientId: number) {
   if (clientId !== TEST_CLIENT_ID) {
     throw new Error(
-      `DANGER: Test is attempting to use non-test client (ID: ${clientId})! ` +
-      `Tests must use test account (ID: ${TEST_CLIENT_ID}, PIN: ${TEST_ACCOUNT_PIN}) only.`
+      `BLOCKED: Test attempted to operate on client ID ${clientId}. ` +
+      `Tests must only use the permanent test client (ID: ${TEST_CLIENT_ID}).`
     );
   }
 }
+
+// Re-export for convenience
+export { getTestCleanupWhereClause, ANDY_TRAINER_ID, TEST_CLIENT_ID };

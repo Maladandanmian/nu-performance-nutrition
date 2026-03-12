@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name, email, trainerId FROM clients;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, trainerId FROM clients;",
+  "rows": [
+    {
+      "id": "990036",
+      "name": "TEST CLIENT",
+      "email": "andy@andyknight.asia",
+      "trainerId": "1"
+    },
+    {
+      "id": "1590110",
+      "name": "Test Client Invitation",
+      "email": "test-client-invitation@example.com",
+      "trainerId": "9150207"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\ttrainerId\n990036\tTEST CLIENT\tandy@andyknight.asia\t1\n1590110\tTest Client Invitation\ttest-client-invitation@example.com\t9150207\n",
+  "stderr": "",
+  "execution_time_ms": 1506
+}

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE email = 'andy@andyknight.asia' OR role = 'trainer' OR role = 'admin' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, role FROM users WHERE email = 'andy@andyknight.asia' OR role = 'trainer' OR role = 'admin' LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Andy Knight",
+      "email": "andy@andyknight.asia",
+      "role": "admin"
+    },
+    {
+      "id": "13",
+      "name": "luke",
+      "email": "luke@nuperformancecoaching.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530015",
+      "name": "Test Trainer",
+      "email": "trainer-1767999855478@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530018",
+      "name": "Test Trainer",
+      "email": "trainer-1767999909501@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530020",
+      "name": "Test Trainer",
+      "email": "trainer-1768000060580@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1530023",
+      "name": "Test Trainer",
+      "email": "trainer-1768000201474@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1650008",
+      "name": "Test Trainer",
+      "email": "trainer-1768175380914@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1770005",
+      "name": "Test Trainer",
+      "email": "trainer-1768433755748@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1830022",
+      "name": "Test Trainer",
+      "email": "trainer-1768522385393@test.com",
+      "role": "admin"
+    },
+    {
+      "id": "1830024",
+      "name": "Test Trainer",
+      "email": "trainer-1768522507641@test.com",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tAndy Knight\tandy@andyknight.asia\tadmin\n13\tluke\tluke@nuperformancecoaching.com\tadmin\n1530015\tTest Trainer\ttrainer-1767999855478@test.com\tadmin\n1530018\tTest Trainer\ttrainer-1767999909501@test.com\tadmin\n1530020\tTest Trainer\ttrainer-1768000060580@test.com\tadmin\n1530023\tTest Trainer\ttrainer-1768000201474@test.com\tadmin\n1650008\tTest Trainer\ttrainer-1768175380914@test.com\tadmin\n1770005\tTest Trainer\ttrainer-1768433755748@test.com\tadmin\n1830022\tTest Trainer\ttrainer-1768522385393@test.com\tadmin\n1830024\tTest Trainer\ttrainer-1768522507641@test.com\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 1548
+}
