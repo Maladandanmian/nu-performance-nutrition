@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { SessionEditModal } from "@/components/SessionEditModal";
+import { MobileCalendar } from "@/components/MobileCalendar";
 import { toast } from "sonner";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const locales = {
   "en-US": enUS,
@@ -45,6 +47,7 @@ interface TrainerCalendarProps {
 }
 
 export function TrainerCalendar({ trainerId }: TrainerCalendarProps) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [view, setView] = useState<View>("week");
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -170,6 +173,11 @@ export function TrainerCalendar({ trainerId }: TrainerCalendarProps) {
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setSelectedEvent(event);
   }, []);
+
+  // Show mobile calendar on small screens
+  if (isMobile) {
+    return <MobileCalendar trainerId={trainerId} />;
+  }
 
   return (
     <>

@@ -2524,3 +2524,14 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Create SQL cleanup query for removing test clients
 - [x] Implement automatic cleanup at end of each development task
 - [x] Verify protected client is preserved after cleanup
+
+
+## Mobile Calendar View
+- [x] Create MobileCalendar component with Today and Three Day views
+- [x] Implement horizontal scrolling for day navigation
+- [x] Add view toggle button (Today/Three Day)
+- [x] Implement session details modal for mobile
+- [x] Apply colour coding to mobile calendar sessions
+- [x] Update TrainerCalendar to show mobile view on small screens
+- [x] Test mobile calendar on various screen sizes
+- [x] Ensure touch-friendly interactions and spacing
