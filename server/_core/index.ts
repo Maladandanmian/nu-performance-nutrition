@@ -8,6 +8,8 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import cron from "node-cron";
+import { createAndEmailBackup } from "../backup";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -66,3 +68,24 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+
+// Schedule weekly database backup every Monday at 9:00 AM (HKT = UTC+8, so 01:00 UTC)
+cron.schedule('0 1 * * 1', async () => {
+  console.log('[Backup] Running scheduled weekly backup...');
+  try {
+    const result = await createAndEmailBackup('lukusdavey@gmail.com');
+    if (result.success) {
+      console.log('[Backup] Weekly backup completed successfully');
+    } else {
+      console.error('[Backup] Weekly backup failed:', result.message);
+      // Also notify Andy if backup fails
+      await createAndEmailBackup('andy@andyknight.asia').catch(() => {});
+    }
+  } catch (error) {
+    console.error('[Backup] Unexpected error in scheduled backup:', error);
+  }
+}, {
+  timezone: 'Asia/Hong_Kong'
+});
+
+console.log('[Backup] Weekly backup scheduled for every Monday at 9:00 AM HKT');

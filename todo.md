@@ -2535,3 +2535,12 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update TrainerCalendar to show mobile view on small screens
 - [x] Test mobile calendar on various screen sizes
 - [x] Ensure touch-friendly interactions and spacing
+
+## Backup System Update
+- [x] Restore session history for Luke's clients from March 4th backup
+- [x] Restore nutrition goals for Luke's clients from March 4th backup
+- [x] Restore session packages for Luke's clients from March 4th backup
+- [x] Backup uses mysqldump (full database) - all tables already included
+- [x] Wire backup cron job into server using node-cron (was previously disconnected)
+- [x] Schedule weekly backup every Monday at 9:00 AM HKT via node-cron
+- [x] Backup failure now logs to server console and notifies Andy
