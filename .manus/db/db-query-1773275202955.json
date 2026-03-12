@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, name, email FROM clients WHERE name LIKE 'Test Client%' OR email LIKE '%test%' OR email LIKE '%editdelete%' ORDER BY id DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email FROM clients WHERE name LIKE 'Test Client%' OR email LIKE '%test%' OR email LIKE '%editdelete%' ORDER BY id DESC LIMIT 20",
+  "rows": [
+    {
+      "id": "1590054",
+      "name": "Drink Edit Test Client",
+      "email": "drinkedit996949@test.com"
+    },
+    {
+      "id": "1590052",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274922970@test.com"
+    },
+    {
+      "id": "1590050",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274921179@test.com"
+    },
+    {
+      "id": "1590048",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274919612@test.com"
+    },
+    {
+      "id": "1590043",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274918270@test.com"
+    },
+    {
+      "id": "1590042",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274916929@test.com"
+    },
+    {
+      "id": "1590041",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773274915585@test.com"
+    },
+    {
+      "id": "1590024",
+      "name": "Test Client",
+      "email": "client-1773274893603@test.com"
+    },
+    {
+      "id": "1590022",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773273832318@test.com"
+    },
+    {
+      "id": "1590021",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773273830920@test.com"
+    },
+    {
+      "id": "1590020",
+      "name": "Test Client Schedule",
+      "email": "schedule1773273828854@test.com"
+    },
+    {
+      "id": "1590019",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1773273829509@test.com"
+    },
+    {
+      "id": "1590002",
+      "name": "Test Client",
+      "email": "client-1773273807910@test.com"
+    },
+    {
+      "id": "1320024",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575405244@test.com"
+    },
+    {
+      "id": "1320023",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575403462@test.com"
+    },
+    {
+      "id": "1320022",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575401918@test.com"
+    },
+    {
+      "id": "1320021",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575400596@test.com"
+    },
+    {
+      "id": "1320020",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575399275@test.com"
+    },
+    {
+      "id": "1320019",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575397949@test.com"
+    },
+    {
+      "id": "1320018",
+      "name": "Test Client for Edit",
+      "email": "client-edit-1771575376340@test.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1590054\tDrink Edit Test Client\tdrinkedit996949@test.com\n1590052\tTest Client for Edit\tclient-edit-1773274922970@test.com\n1590050\tTest Client for Edit\tclient-edit-1773274921179@test.com\n1590048\tTest Client for Edit\tclient-edit-1773274919612@test.com\n1590043\tTest Client for Edit\tclient-edit-1773274918270@test.com\n1590042\tTest Client for Edit\tclient-edit-1773274916929@test.com\n1590041\tTest Client for Edit\tclient-edit-1773274915585@test.com\n1590024\tTest Client\tclient-1773274893603@test.com\n1590022\tTest Client for Edit\tclient-edit-1773273832318@test.com\n1590021\tTest Client for Edit\tclient-edit-1773273830920@test.com\n1590020\tTest Client Schedule\tschedule1773273828854@test.com\n1590019\tTest Client for Edit\tclient-edit-1773273829509@test.com\n1590002\tTest Client\tclient-1773273807910@test.com\n1320024\tTest Client for Edit\tclient-edit-1771575405244@test.com\n1320023\tTest Client for Edit\tclient-edit-1771575403462@test.com\n1320022\tTest Client for Edit\tclient-edit-1771575401918@test.com\n1320021\tTest Client for Edit\tclient-edit-1771575400596@test.com\n1320020\tTest Client for Edit\tclient-edit-1771575399275@test.com\n1320019\tTest Client for Edit\tclient-edit-1771575397949@test.com\n1320018\tTest Client for Edit\tclient-edit-1771575376340@test.com\n",
+  "stderr": "",
+  "execution_time_ms": 1500
+}
