@@ -2544,3 +2544,6 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Wire backup cron job into server using node-cron (was previously disconnected)
 - [x] Schedule weekly backup every Monday at 9:00 AM HKT via node-cron
 - [x] Backup failure now logs to server console and notifies Andy
+
+## Backup Recipients Update
+- [x] Send weekly backup to both lukusdavey@gmail.com and andy@andyknight.asia
