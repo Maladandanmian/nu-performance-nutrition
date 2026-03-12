@@ -116,10 +116,24 @@ export function ClientCalendar({ clientId }: ClientCalendarProps) {
     return [...sessionEvents, ...groupClassEvents];
   }, [sessions, groupClasses]);
 
+  const SESSION_TYPE_COLORS: Record<string, { bg: string; border: string }> = {
+    "1on1_pt": { bg: "#3b82f6", border: "#2563eb" },
+    "2on1_pt": { bg: "#8b5cf6", border: "#7c3aed" },
+    "nutrition_initial": { bg: "#ec4899", border: "#db2777" },
+    "nutrition_coaching": { bg: "#f59e0b", border: "#d97706" },
+    "custom": { bg: "#06b6d4", border: "#0891b2" },
+  };
+
   const eventStyleGetter = useCallback((event: CalendarEvent) => {
-    const isSession = event.resource.type === "session";
-    const backgroundColor = isSession ? "#3b82f6" : "#10b981";
-    const borderColor = isSession ? "#2563eb" : "#059669";
+    let backgroundColor = "#10b981";
+    let borderColor = "#059669";
+
+    if (event.resource.type === "session") {
+      const sessionType = event.resource.sessionType || "1on1_pt";
+      const colors = SESSION_TYPE_COLORS[sessionType] || SESSION_TYPE_COLORS["1on1_pt"];
+      backgroundColor = colors.bg;
+      borderColor = colors.border;
+    }
 
     return {
       style: {

@@ -2508,3 +2508,11 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update SessionList to display custom session names with "Custom" badge
 - [x] Update ClientCalendar to display custom session names in calendar events
 - [x] Fix TypeScript type issues for custom session fields
+
+
+## Calendar Colour Coding by Session Type
+- [x] Define colour palette for each session type (1on1_pt, 2on1_pt, nutrition_initial, nutrition_coaching, custom)
+- [x] Update TrainerCalendar eventStyleGetter to apply session type colours
+- [x] Update ClientCalendar eventStyleGetter to apply session type colours
+- [x] Test colour coding in trainer calendar view
+- [x] Test colour coding in client calendar view
