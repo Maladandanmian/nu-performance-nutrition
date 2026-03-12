@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, email, trainer_id, created_at FROM clients WHERE trainer_id = 13 ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, trainer_id, created_at FROM clients WHERE trainer_id = 13 ORDER BY name;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'trainer_id' in 'where clause'"
+  ]
+}

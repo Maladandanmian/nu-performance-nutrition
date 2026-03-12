@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, name, email, trainerId, createdAt FROM clients WHERE trainerId = 13 ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, name, email, trainerId, createdAt FROM clients WHERE trainerId = 13 ORDER BY name;",
+  "rows": [
+    {
+      "id": "1080001",
+      "name": "Benjamin Lohr",
+      "email": "Benjamin.Lohr@gmail.com",
+      "trainerId": "13",
+      "createdAt": "2026-03-01 23:49:58"
+    },
+    {
+      "id": "1050001",
+      "name": "Daniel Zammit",
+      "email": "dbzammit@gmail.com",
+      "trainerId": "13",
+      "createdAt": "2026-02-28 04:46:31"
+    },
+    {
+      "id": "1110001",
+      "name": "Paul Haswell",
+      "email": "paulhaswell@mac.com",
+      "trainerId": "13",
+      "createdAt": "2026-03-03 03:05:07"
+    },
+    {
+      "id": "1020001",
+      "name": "Shirley Dirkin ",
+      "email": "shirleyd@me.com",
+      "trainerId": "13",
+      "createdAt": "2026-02-28 02:27:17"
+    },
+    {
+      "id": "1170001",
+      "name": "sofie Jacobs",
+      "email": "sofiejacobs77@icloud.com",
+      "trainerId": "13",
+      "createdAt": "2026-03-03 09:43:45"
+    },
+    {
+      "id": "1140001",
+      "name": "Thomas Poppe",
+      "email": "thomaspoppe@yahoo.com",
+      "trainerId": "13",
+      "createdAt": "2026-03-03 04:24:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\ttrainerId\tcreatedAt\n1080001\tBenjamin Lohr\tBenjamin.Lohr@gmail.com\t13\t2026-03-01 23:49:58\n1050001\tDaniel Zammit\tdbzammit@gmail.com\t13\t2026-02-28 04:46:31\n1110001\tPaul Haswell\tpaulhaswell@mac.com\t13\t2026-03-03 03:05:07\n1020001\tShirley Dirkin \tshirleyd@me.com\t13\t2026-02-28 02:27:17\n1170001\tsofie Jacobs\tsofiejacobs77@icloud.com\t13\t2026-03-03 09:43:45\n1140001\tThomas Poppe\tthomaspoppe@yahoo.com\t13\t2026-03-03 04:24:41\n",
+  "stderr": "",
+  "execution_time_ms": 1485
+}

@@ -58,11 +58,11 @@ export default function ClientDetail() {
   const [sendVerification, setSendVerification] = useState(false);
 
   const utils = trpc.useUtils();
-  const { data: client } = trpc.clients.get.useQuery(
+  const { data: client, isLoading: clientLoading } = trpc.clients.get.useQuery(
     { clientId: clientId! },
     { enabled: !!clientId }
   );
-  const { data: goals } = trpc.nutritionGoals.get.useQuery(
+  const { data: goals, isLoading: goalsLoading } = trpc.nutritionGoals.get.useQuery(
     { clientId: clientId! },
     { enabled: !!clientId }
   );
@@ -138,7 +138,7 @@ export default function ClientDetail() {
     return null;
   }
 
-  if (loading || !client || !goals) {
+  if (loading || clientLoading || goalsLoading || !client) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -150,13 +150,13 @@ export default function ClientDetail() {
   }
 
   const handleEditGoals = () => {
-    setCaloriesTarget(goals.caloriesTarget.toString());
-    setProteinTarget(goals.proteinTarget.toString());
-    setFatTarget(goals.fatTarget.toString());
-    setCarbsTarget(goals.carbsTarget.toString());
-    setFibreTarget(goals.fibreTarget.toString());
-    setHydrationTarget(goals.hydrationTarget.toString());
-    setWeightTarget(goals.weightTarget ? goals.weightTarget.toString() : "");
+    setCaloriesTarget((goals?.caloriesTarget ?? 2000).toString());
+    setProteinTarget((goals?.proteinTarget ?? 150).toString());
+    setFatTarget((goals?.fatTarget ?? 65).toString());
+    setCarbsTarget((goals?.carbsTarget ?? 250).toString());
+    setFibreTarget((goals?.fibreTarget ?? 25).toString());
+    setHydrationTarget((goals?.hydrationTarget ?? 2000).toString());
+    setWeightTarget(goals?.weightTarget ? goals.weightTarget.toString() : "");
     setIsEditGoalsOpen(true);
   };
 
@@ -387,27 +387,27 @@ export default function ClientDetail() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Calories</p>
-                  <p className="text-2xl font-bold">{goals.caloriesTarget}</p>
+                  <p className="text-2xl font-bold">{goals?.caloriesTarget ?? '—'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Protein</p>
-                  <p className="text-2xl font-bold">{goals.proteinTarget}g</p>
+                  <p className="text-2xl font-bold">{goals?.proteinTarget != null ? `${goals.proteinTarget}g` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Fat</p>
-                  <p className="text-2xl font-bold">{goals.fatTarget}g</p>
+                  <p className="text-2xl font-bold">{goals?.fatTarget != null ? `${goals.fatTarget}g` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Carbs</p>
-                  <p className="text-2xl font-bold">{goals.carbsTarget}g</p>
+                  <p className="text-2xl font-bold">{goals?.carbsTarget != null ? `${goals.carbsTarget}g` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Fibre</p>
-                  <p className="text-2xl font-bold">{goals.fibreTarget}g</p>
+                  <p className="text-2xl font-bold">{goals?.fibreTarget != null ? `${goals.fibreTarget}g` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Hydration</p>
-                  <p className="text-2xl font-bold">{goals.hydrationTarget}ml</p>
+                  <p className="text-2xl font-bold">{goals?.hydrationTarget != null ? `${goals.hydrationTarget}ml` : '—'}</p>
                 </div>
               </div>
             </CardContent>

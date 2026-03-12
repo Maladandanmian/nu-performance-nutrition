@@ -2547,3 +2547,12 @@ Next: Trainer management UI (session list view, package creation, group class sc
 
 ## Backup Recipients Update
 - [x] Send weekly backup to both lukusdavey@gmail.com and andy@andyknight.asia
+
+## Client Dashboard Loading Bug (Mar 2026)
+- [x] Investigate why some client dashboards spin and never load (e.g. Thomas Poppe)
+- [x] Compare working vs non-working clients to identify data differences
+- [x] Fix root cause: 4 clients missing nutrition_goals rows from backup; loading guard blocked on !goals
+- [x] Inserted default nutrition goals for Benjamin Lohr, Daniel Zammit, Sofie Jacobs, Thomas Poppe
+- [x] Fixed ClientDetail.tsx loading guard to use isLoading flags instead of data presence
+- [x] Fixed updateNutritionGoal in db.ts to upsert (create if missing) instead of plain UPDATE
+- [ ] Verify all 6 of Luke's clients load correctly (needs Luke to confirm)

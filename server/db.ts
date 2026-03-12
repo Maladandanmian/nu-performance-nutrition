@@ -203,7 +203,22 @@ export async function getNutritionGoalByClientId(clientId: number) {
 export async function updateNutritionGoal(clientId: number, data: Partial<InsertNutritionGoal>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return db.update(nutritionGoals).set(data).where(eq(nutritionGoals.clientId, clientId));
+  // Upsert: insert with defaults if no row exists, otherwise update
+  const existing = await db.select({ id: nutritionGoals.id }).from(nutritionGoals).where(eq(nutritionGoals.clientId, clientId)).limit(1);
+  if (existing.length === 0) {
+    await db.insert(nutritionGoals).values({
+      clientId,
+      caloriesTarget: 2000,
+      proteinTarget: 150,
+      fatTarget: 65,
+      carbsTarget: 250,
+      fibreTarget: 25,
+      hydrationTarget: 2000,
+      ...data,
+    });
+  } else {
+    await db.update(nutritionGoals).set(data).where(eq(nutritionGoals.clientId, clientId));
+  }
 }
 
 // Meal queries

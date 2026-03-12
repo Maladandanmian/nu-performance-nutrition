@@ -1,0 +1,40 @@
+{
+  "query": "\nSELECT c.id, c.name, ng.id as goals_id\nFROM clients c\nLEFT JOIN nutrition_goals ng ON ng.clientId = c.id\nWHERE c.trainerId = 13\nORDER BY c.name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT c.id, c.name, ng.id as goals_id\nFROM clients c\nLEFT JOIN nutrition_goals ng ON ng.clientId = c.id\nWHERE c.trainerId = 13\nORDER BY c.name;\n",
+  "rows": [
+    {
+      "id": "1080001",
+      "name": "Benjamin Lohr",
+      "goals_id": "NULL"
+    },
+    {
+      "id": "1050001",
+      "name": "Daniel Zammit",
+      "goals_id": "NULL"
+    },
+    {
+      "id": "1110001",
+      "name": "Paul Haswell",
+      "goals_id": "1020001"
+    },
+    {
+      "id": "1020001",
+      "name": "Shirley Dirkin ",
+      "goals_id": "960001"
+    },
+    {
+      "id": "1170001",
+      "name": "sofie Jacobs",
+      "goals_id": "NULL"
+    },
+    {
+      "id": "1140001",
+      "name": "Thomas Poppe",
+      "goals_id": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tgoals_id\n1080001\tBenjamin Lohr\tNULL\n1050001\tDaniel Zammit\tNULL\n1110001\tPaul Haswell\t1020001\n1020001\tShirley Dirkin \t960001\n1170001\tsofie Jacobs\tNULL\n1140001\tThomas Poppe\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1616
+}
