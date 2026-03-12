@@ -75,10 +75,10 @@ export async function createAndEmailBackup(recipientEmail: string) {
     const emailSent = await sendEmail({
       to: recipientEmail,
       subject: `Nu Performance Database Backup - ${timestamp}`,
-      text: `Weekly database backup for Nu Performance Nutrition.\n\nBackup Details:\n- Date: ${new Date().toLocaleDateString()}\n- Database: ${dbConfig.database}\n- File size: ${fileSizeKB} KB\n\nThe SQL backup file is attached to this email.`,
+      text: `Daily database backup for Nu Performance Nutrition.\n\nBackup Details:\n- Date: ${new Date().toLocaleDateString()}\n- Database: ${dbConfig.database}\n- File size: ${fileSizeKB} KB\n\nThe SQL backup file is attached to this email.`,
       html: `
-        <h2>Weekly Database Backup</h2>
-        <p>Your weekly database backup for Nu Performance Nutrition is ready.</p>
+        <h2>Daily Database Backup</h2>
+        <p>Your daily database backup for Nu Performance Nutrition is ready.</p>
         <h3>Backup Details:</h3>
         <ul>
           <li><strong>Date:</strong> ${new Date().toLocaleDateString()}</li>
@@ -86,7 +86,7 @@ export async function createAndEmailBackup(recipientEmail: string) {
           <li><strong>File size:</strong> ${fileSizeKB} KB</li>
         </ul>
         <p>The SQL backup file is attached to this email.</p>
-        <p><em>This is an automated backup email sent every Monday at 9:00 AM.</em></p>
+        <p><em>This is an automated backup email sent daily at 11:59 PM HKT.</em></p>
       `,
       attachments: [
         {
