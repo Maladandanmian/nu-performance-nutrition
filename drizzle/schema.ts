@@ -784,3 +784,22 @@ export const sessionPackages = mysqlTable("session_packages", {
 
 export type SessionPackage = typeof sessionPackages.$inferSelect;
 export type InsertSessionPackage = typeof sessionPackages.$inferInsert;
+
+
+/**
+ * Backup Logs - tracks all database backup attempts and their outcomes
+ * Used for monitoring backup health and debugging backup failures
+ */
+export const backupLogs = mysqlTable("backup_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  status: mysqlEnum("status", ["success", "failed"]).notNull(),
+  backupDate: date("backupDate").notNull(), // Date the backup was created
+  fileSizeKB: int("fileSizeKB"), // Size of backup file in KB (null if failed)
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  errorMessage: text("errorMessage"), // Error details if status is 'failed'
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type BackupLog = typeof backupLogs.$inferSelect;
+export type InsertBackupLog = typeof backupLogs.$inferInsert;
