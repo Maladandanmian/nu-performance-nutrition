@@ -17,7 +17,7 @@ import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
 import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
-import { hashPIN } from "./pinAuth";
+
 import { randomBytes } from "crypto";
 import { calculateGripStrengthScore } from "../shared/gripStrengthScoring";
 
@@ -101,71 +101,7 @@ export const appRouter = router({
       return { success: true };
     }),
     
-    loginWithPIN: publicProcedure
-      .input(z.object({
-        pin: z.string().length(6),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const { isValidPIN } = await import("./pinAuth");
-        const { checkRateLimit, recordLoginAttempt, getClientIP } = await import("./rateLimit");
-        
-        // Get client IP for rate limiting
-        const clientIP = getClientIP(ctx.req);
-        
-        // Check if IP is rate limited
-        const rateLimitStatus = await checkRateLimit(clientIP);
-        if (rateLimitStatus.isLocked) {
-          throw new TRPCError({
-            code: 'TOO_MANY_REQUESTS',
-            message: `Too many failed login attempts. Please try again in ${rateLimitStatus.remainingMinutes} minutes.`,
-          });
-        }
-        
-        if (!isValidPIN(input.pin)) {
-          await recordLoginAttempt(clientIP, false, input.pin);
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid PIN format' });
-        }
-        
-        const client = await db.getClientByPIN(input.pin);
-        if (!client) {
-          await recordLoginAttempt(clientIP, false, input.pin);
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid PIN' });
-        }
-        
-        // Record successful login
-        await recordLoginAttempt(clientIP, true, input.pin);
-        
-        // Create a session cookie for the client
-        // Store client ID in a simple session cookie
-        const sessionData = JSON.stringify({
-          clientId: client.id,
-          name: client.name,
-          type: 'client',
-          timestamp: Date.now(),
-        });
-        
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        const cookieValue = Buffer.from(sessionData).toString('base64');
-        console.log('[loginWithPIN] Setting cookie with options:', { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
-        console.log('[loginWithPIN] Cookie value:', cookieValue);
-        ctx.res.cookie('client_session', cookieValue, {
-          ...cookieOptions,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          httpOnly: true,
-          secure: cookieOptions.secure,
-          sameSite: cookieOptions.sameSite,
-        });
-        
-        return {
-          success: true,
-          client: {
-            id: client.id,
-            name: client.name,
-          },
-          // Return the session token so client can store it in localStorage as fallback
-          sessionToken: cookieValue,
-        };
-      }),
+
   }),
 
   // Client management (trainer only)
@@ -176,33 +112,21 @@ export const appRouter = router({
         email: z.string().email(), // Required for new clients
         phone: z.string().optional(),
         notes: z.string().optional(),
-        pin: z.string().length(6).regex(/^\d{6}$/, "PIN must be 6 digits").optional(), // Optional for backward compat
+
       }))
       .mutation(async ({ ctx, input }) => {
-        const { pin, ...clientData } = input;
+
         
         // Check if email already exists for this trainer
-        const existingClientByEmail = await db.getClientByEmail(clientData.email);
+        const existingClientByEmail = await db.getClientByEmail(input.email);
         if (existingClientByEmail) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'A client with this email already exists.' });
         }
         
-        // If PIN is provided, validate it
-        let hashedPin: string | undefined;
-        if (pin) {
-          // Check if PIN already exists
-          const existingClient = await db.getClientByPIN(pin);
-          if (existingClient) {
-            throw new TRPCError({ code: 'BAD_REQUEST', message: 'This PIN is already in use. Please choose a different PIN.' });
-          }
-          // Hash the PIN before storing
-          hashedPin = await hashPIN(pin);
-        }
-        
+
         const result = await db.createClient({
           trainerId: ctx.user.id,
-          pin: hashedPin,
-          ...clientData,
+          ...input,
         });
         
         // Create default nutrition goals for new client
@@ -224,19 +148,19 @@ export const appRouter = router({
         try {
           token = await db.generatePasswordSetupToken(clientId);
           emailSent = await sendPasswordSetupInvitation(
-            clientData.email,
-            clientData.name,
+            input.email,
+            input.name,
             token
           );
         } catch (emailError) {
-          console.error(`[ClientInvitation] Error sending email to ${clientData.email}:`, emailError);
+          console.error(`[ClientInvitation] Error sending email to ${input.email}:`, emailError);
         }
         
         if (!emailSent) {
-          console.warn(`[ClientInvitation] Failed to send email to ${clientData.email}. Token: ${token}`);
+          console.warn(`[ClientInvitation] Failed to send email to ${input.email}. Token: ${token}`);
         }
         
-        return { success: true, clientId, pin, invitationSent: emailSent };
+        return { success: true, clientId, invitationSent: emailSent };
       }),
 
     list: adminProcedure.query(async ({ ctx }) => {

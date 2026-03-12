@@ -37,12 +37,12 @@ export async function getTestClientId(): Promise<number> {
  * Use this in tests that need authentication
  */
 export async function createTestContext(): Promise<TrpcContext> {
-  const testClient = await db.getClientByPIN(TEST_ACCOUNT_PIN);
+  const testClient = await db.getClientById(TEST_CLIENT_ID);
   
   if (!testClient) {
     throw new Error(
-      `Test client with PIN ${TEST_ACCOUNT_PIN} not found. ` +
-      `Please create a test client with PIN ${TEST_ACCOUNT_PIN} in the UI before running tests.`
+      `Test client with ID ${TEST_CLIENT_ID} not found. ` +
+      `Please ensure the test client exists before running tests.`
     );
   }
 

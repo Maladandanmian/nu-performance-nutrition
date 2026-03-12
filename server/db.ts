@@ -163,31 +163,7 @@ export async function getClientById(clientId: number) {
  * Get client by PIN - supports both legacy plaintext and bcrypt hashed PINs
  * For bcrypt PINs, we need to fetch all clients and compare hashes
  */
-export async function getClientByPIN(pin: string) {
-  const { verifyPIN, isPINHashed } = await import('./pinAuth');
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  // First, try exact match for legacy plaintext PINs
-  const exactMatch = await db.select().from(clients).where(eq(clients.pin, pin)).limit(1);
-  if (exactMatch.length > 0) {
-    return exactMatch[0];
-  }
-  
-  // If no exact match, check hashed PINs
-  // Get all clients with hashed PINs (starts with $2)
-  const allClients = await db.select().from(clients);
-  for (const client of allClients) {
-    if (client.pin && isPINHashed(client.pin)) {
-      const matches = await verifyPIN(pin, client.pin);
-      if (matches) {
-        return client;
-      }
-    }
-  }
-  
-  return undefined;
-}
+
 
 /**
  * Get all clients (for PIN migration)

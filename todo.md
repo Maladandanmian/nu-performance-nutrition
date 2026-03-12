@@ -31,6 +31,13 @@
 - [x] Create authenticatedProcedure middleware for both auth types
 - [x] Update login page to show PIN entry option
 - [x] Create PIN login UI component with two-column layout
+- [x] Remove PIN authentication system (replaced with email/password)
+- [x] Remove pinAuth.ts file and all PIN-related imports
+- [x] Remove PIN field from clients.create schema
+- [x] Remove loginWithPIN and setupEmailAuth procedures
+- [x] Remove PIN-related test files (security.test.ts)
+- [x] Update test files to remove PIN references
+- [x] Clean up test-helpers.ts to use client ID instead of PIN
 
 ## Client Interface
 - [x] Create meal logging page with photo upload
@@ -59,12 +66,12 @@
 - [x] Add loading states for AI analysis
 - [x] Add error handling and user feedback
 - [x] Implement role-based navigation
-- [x] Make PIN login prominent on home page
+- [x] Remove PIN login from home page (replaced with email/password)
 - [x] Add confirmation dialog for trainer login
 
 ## Testing & Deployment
 - [x] Test meal photo upload and AI analysis
-- [x] Test PIN authentication flow
+- [x] Remove PIN authentication flow tests
 - [x] Test OAuth authentication for trainers
 - [x] Test data visualization charts
 - [x] Test role-based access control

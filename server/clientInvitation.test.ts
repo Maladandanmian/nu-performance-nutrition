@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as db from './db';
-import { hashPIN } from './pinAuth';
+
 import { hashPassword, verifyPassword } from './emailAuth';
 
 describe('Client Invitation and Password Setup', () => {
