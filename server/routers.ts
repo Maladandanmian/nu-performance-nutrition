@@ -2934,13 +2934,17 @@ Return as JSON.`
       .input(
         z.object({
           clientId: z.number(),
-          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]),
+          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching", "custom"]),
           sessionDate: z.string(), // YYYY-MM-DD format
           startTime: z.string(), // HH:MM format
           endTime: z.string(), // HH:MM format
           paymentStatus: z.enum(["paid", "unpaid", "from_package"]).default("unpaid"),
           packageId: z.number().optional(),
           notes: z.string().optional(),
+          // Custom session fields
+          customSessionName: z.string().optional(),
+          customDurationMinutes: z.number().optional(),
+          customPrice: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -2961,6 +2965,9 @@ Return as JSON.`
           recurringRuleId: null,
           cancelled: false,
           cancelledAt: null,
+          customSessionName: input.customSessionName || null,
+          customDurationMinutes: input.customDurationMinutes || null,
+          customPrice: input.customPrice || null,
         } as any);
 
         // Send booking confirmation email
@@ -2972,6 +2979,8 @@ Return as JSON.`
             clientName: client.name,
             clientEmail: client.email,
             sessionType: input.sessionType,
+            customSessionName: input.customSessionName,
+            customPrice: input.customPrice,
             sessionDate: input.sessionDate,
             startTime: input.startTime,
             endTime: input.endTime,
@@ -3096,7 +3105,7 @@ Return as JSON.`
       .input(
         z.object({
           clientId: z.number(),
-          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]),
+          sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching", "custom"]),
           startTime: z.string(), // HH:MM format
           endTime: z.string(), // HH:MM format
           paymentStatus: z.enum(["paid", "unpaid", "from_package"]).default("unpaid"),
@@ -3105,6 +3114,10 @@ Return as JSON.`
           startDate: z.string(), // YYYY-MM-DD format
           endDate: z.string(), // YYYY-MM-DD format
           daysOfWeek: z.array(z.number().min(0).max(6)), // 0 = Sunday, 6 = Saturday
+          // Custom session fields
+          customSessionName: z.string().optional(),
+          customDurationMinutes: z.number().optional(),
+          customPrice: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3122,6 +3135,9 @@ Return as JSON.`
           startDate: input.startDate,
           endDate: input.endDate,
           daysOfWeek: input.daysOfWeek,
+          customSessionName: input.customSessionName,
+          customDurationMinutes: input.customDurationMinutes,
+          customPrice: input.customPrice,
         });
 
         // Send booking confirmation emails for all sessions

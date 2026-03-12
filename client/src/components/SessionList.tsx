@@ -30,7 +30,16 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
   "2on1_pt": "2-on-1 PT",
   "nutrition_initial": "Nutrition Initial",
   "nutrition_coaching": "Nutrition Coaching",
+  "custom": "Custom",
 };
+
+// Helper function to get display label for a session
+function getSessionDisplayLabel(session: any): string {
+  if (session.sessionType === 'custom' && session.customSessionName) {
+    return session.customSessionName;
+  }
+  return SESSION_TYPE_LABELS[session.sessionType] || session.sessionType;
+}
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   paid: "bg-green-500/10 text-green-700 border-green-200",
@@ -168,8 +177,11 @@ export default function SessionList() {
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-3 flex-wrap">
                     <h4 className="font-semibold text-lg">
-                      {SESSION_TYPE_LABELS[session.sessionType] || session.sessionType}
+                      {getSessionDisplayLabel(session)}
                     </h4>
+                    {session.sessionType === 'custom' && (
+                      <Badge variant="secondary">Custom</Badge>
+                    )}
                     <Badge
                       variant="outline"
                       className={PAYMENT_STATUS_COLORS[session.paymentStatus]}

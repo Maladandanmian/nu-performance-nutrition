@@ -8,7 +8,7 @@ import * as db from './db';
 export async function generateRecurringSessions(params: {
   trainerId: number;
   clientId: number;
-  sessionType: '1on1_pt' | '2on1_pt' | 'nutrition_initial' | 'nutrition_coaching';
+  sessionType: '1on1_pt' | '2on1_pt' | 'nutrition_initial' | 'nutrition_coaching' | 'custom';
   startTime: string; // HH:MM format
   endTime: string; // HH:MM format
   paymentStatus: 'paid' | 'unpaid' | 'from_package';
@@ -18,6 +18,10 @@ export async function generateRecurringSessions(params: {
   startDate: string; // YYYY-MM-DD format
   endDate: string; // YYYY-MM-DD format
   daysOfWeek: number[]; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  // Custom session fields
+  customSessionName?: string;
+  customDurationMinutes?: number;
+  customPrice?: string;
 }): Promise<number[]> {
   const sessionIds: number[] = [];
   
@@ -58,6 +62,9 @@ export async function generateRecurringSessions(params: {
         recurringRuleId: null, // Will be updated after creating the rule
         cancelled: false,
         cancelledAt: null,
+        customSessionName: params.customSessionName || null,
+        customDurationMinutes: params.customDurationMinutes || null,
+        customPrice: params.customPrice || null,
       } as any);
       
       sessionIds.push(session.id);

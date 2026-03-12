@@ -28,6 +28,7 @@ interface CalendarEvent {
   resource: {
     type: "session" | "group_class";
     sessionType?: string;
+    customSessionName?: string;
     classType?: string;
     paymentStatus?: string;
     trainer?: string;
@@ -72,12 +73,13 @@ export function ClientCalendar({ clientId }: ClientCalendarProps) {
 
         return {
           id: session.id,
-          title: session.sessionType,
+          title: session.sessionType === 'custom' && session.customSessionName ? session.customSessionName : session.sessionType,
           start,
           end,
           resource: {
             type: "session" as const,
             sessionType: session.sessionType,
+            customSessionName: session.customSessionName || undefined,
             paymentStatus: session.paymentStatus,
             trainer: "Your Trainer", // TODO: Get trainer name from session
           },

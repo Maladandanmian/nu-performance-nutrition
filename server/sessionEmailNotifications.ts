@@ -15,6 +15,8 @@ interface SessionDetails {
   clientName: string;
   clientEmail: string;
   sessionType: string;
+  customSessionName?: string; // For custom sessions
+  customPrice?: string; // For custom sessions
   sessionDate: string; // YYYY-MM-DD format
   startTime: string; // HH:MM format
   endTime: string; // HH:MM format
@@ -116,8 +118,20 @@ export async function sendSessionBookingConfirmation(session: SessionDetails): P
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
                       </tr>
+                      ${session.sessionType === 'custom' && session.customSessionName ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Session:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.customSessionName}</td>
+                      </tr>
+                      ` : ''}
+                      ${session.customPrice !== undefined ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Price:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">£${parseFloat(session.customPrice || '0').toFixed(2)}</td>
+                      </tr>
+                      ` : ''}
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px;">Date & Time:</td>
                         <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${dateTime}</td>
@@ -242,8 +256,20 @@ export async function sendSessionCancellationNotification(session: SessionDetail
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
                       </tr>
+                      ${session.sessionType === 'custom' && session.customSessionName ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Session:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.customSessionName}</td>
+                      </tr>
+                      ` : ''}
+                      ${session.customPrice !== undefined ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Price:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">£${parseFloat(session.customPrice || '0').toFixed(2)}</td>
+                      </tr>
+                      ` : ''}
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px;">Date & Time:</td>
                         <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${dateTime}</td>
@@ -350,8 +376,20 @@ export async function sendSessionReminder(session: SessionDetails): Promise<bool
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
                       </tr>
+                      ${session.sessionType === 'custom' && session.customSessionName ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Session:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.customSessionName}</td>
+                      </tr>
+                      ` : ''}
+                      ${session.customPrice !== undefined ? `
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Price:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">£${parseFloat(session.customPrice || '0').toFixed(2)}</td>
+                      </tr>
+                      ` : ''}
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px;">Date & Time:</td>
                         <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${dateTime}</td>

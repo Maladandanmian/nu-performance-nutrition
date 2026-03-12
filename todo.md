@@ -2487,3 +2487,24 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Review hydration calculation logic
 - [x] Identify root cause: double-counting from meals + body_metrics
 - [x] Remove body_metrics entry creation when beverage is logged with meal
+
+
+## Custom Sessions Feature
+- [x] Update trainingSessions table schema to add customSessionName, customDurationMinutes, customPrice fields
+- [x] Update createTrainingSession function in server/db.ts to handle custom session fields
+- [x] Add "custom" to sessionType enum in trainingSessions.create input schema
+- [x] Update trainingSessions.create mutation to accept and pass custom session fields
+- [x] Update createRecurring input schema to support custom sessions
+- [x] Update generateRecurringSessions function to handle custom session fields
+- [x] Add custom session fields to SessionDetails interface in sessionEmailNotifications.ts
+- [x] Update email templates to display "Custom" for session type and custom session name
+- [x] Add custom session price display to email confirmations
+- [x] Add "Custom Session" option to SESSION_TYPES in TrainerSchedule.tsx
+- [x] Add custom session form fields (name, duration, price) to TrainerSchedule UI
+- [x] Add custom session field validation in handleCreateSession
+- [x] Update createSession and createRecurringSession mutations to pass custom session fields
+- [x] Update SESSION_TYPE_LABELS in SessionList.tsx to include "custom"
+- [x] Create getSessionDisplayLabel helper function to show custom session names
+- [x] Update SessionList to display custom session names with "Custom" badge
+- [x] Update ClientCalendar to display custom session names in calendar events
+- [x] Fix TypeScript type issues for custom session fields

@@ -34,6 +34,7 @@ const SESSION_TYPES = [
   { value: "2on1_pt", label: "2-on-1 Personal Training" },
   { value: "nutrition_initial", label: "Initial Nutrition Consultation" },
   { value: "nutrition_coaching", label: "Nutrition Coaching Session" },
+  { value: "custom", label: "Custom Session" },
 ];
 
 const CLASS_TYPES = [
@@ -68,6 +69,10 @@ export default function TrainerSchedule() {
     isRecurring: false,
     recurringDays: [] as number[],
     recurringEndDate: "",
+    // Custom session fields
+    customSessionName: "",
+    customDurationMinutes: "",
+    customPrice: "",
   });
 
   // Group class form state
@@ -97,6 +102,9 @@ export default function TrainerSchedule() {
         isRecurring: false,
         recurringDays: [],
         recurringEndDate: "",
+        customSessionName: "",
+        customDurationMinutes: "",
+        customPrice: "",
       });
     },
     onError: (error) => {
@@ -121,6 +129,9 @@ export default function TrainerSchedule() {
         isRecurring: false,
         recurringDays: [],
         recurringEndDate: "",
+        customSessionName: "",
+        customDurationMinutes: "",
+        customPrice: "",
       });
     },
     onError: (error) => {
@@ -159,6 +170,14 @@ export default function TrainerSchedule() {
       return;
     }
 
+    // Validate custom session fields if selected
+    if (sessionForm.sessionType === 'custom') {
+      if (!sessionForm.customSessionName || !sessionForm.customDurationMinutes || sessionForm.customPrice === '') {
+        toast.error("Please fill in all custom session fields (name, duration, and price).");
+        return;
+      }
+    }
+
     // Validate recurring fields if enabled
     if (sessionForm.isRecurring) {
       if (sessionForm.recurringDays.length === 0) {
@@ -181,6 +200,9 @@ export default function TrainerSchedule() {
         paymentStatus: sessionForm.paymentStatus,
         packageId: sessionForm.packageId,
         notes: sessionForm.notes || undefined,
+        customSessionName: sessionForm.customSessionName || undefined,
+        customDurationMinutes: sessionForm.customDurationMinutes ? parseInt(sessionForm.customDurationMinutes) : undefined,
+        customPrice: sessionForm.customPrice || undefined,
       });
     } else {
       createSession.mutate({
@@ -192,6 +214,9 @@ export default function TrainerSchedule() {
         paymentStatus: sessionForm.paymentStatus,
         packageId: sessionForm.packageId,
         notes: sessionForm.notes || undefined,
+        customSessionName: sessionForm.customSessionName || undefined,
+        customDurationMinutes: sessionForm.customDurationMinutes ? parseInt(sessionForm.customDurationMinutes) : undefined,
+        customPrice: sessionForm.customPrice || undefined,
       });
     }
   };
@@ -307,6 +332,59 @@ export default function TrainerSchedule() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Custom Session Fields (shown when custom is selected) */}
+              {sessionForm.sessionType === 'custom' && (
+                <div className="space-y-4 border-l-4 border-blue-500 pl-4 bg-blue-50 p-4 rounded">
+                  <div className="space-y-2">
+                    <Label htmlFor="customSessionName">Session Name *</Label>
+                    <Input
+                      id="customSessionName"
+                      placeholder="e.g., Meeting, Demo, Consultation"
+                      value={sessionForm.customSessionName}
+                      onChange={(e) =>
+                        setSessionForm({
+                          ...sessionForm,
+                          customSessionName: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="customDurationMinutes">Duration (minutes) *</Label>
+                      <Input
+                        id="customDurationMinutes"
+                        type="number"
+                        placeholder="e.g., 60"
+                        value={sessionForm.customDurationMinutes}
+                        onChange={(e) =>
+                          setSessionForm({
+                            ...sessionForm,
+                            customDurationMinutes: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="customPrice">Price (£) *</Label>
+                      <Input
+                        id="customPrice"
+                        type="number"
+                        step="0.01"
+                        placeholder="e.g., 0 for free"
+                        value={sessionForm.customPrice}
+                        onChange={(e) =>
+                          setSessionForm({
+                            ...sessionForm,
+                            customPrice: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Date and Time */}
               <div className="grid grid-cols-3 gap-4">

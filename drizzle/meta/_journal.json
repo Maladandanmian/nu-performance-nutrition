@@ -211,6 +211,13 @@
       "when": 1771546399688,
       "tag": "0029_stiff_snowbird",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1773277290129,
+      "tag": "0030_loose_titanium_man",
+      "breakpoints": true
     }
   ]
 }

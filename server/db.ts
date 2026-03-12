@@ -1971,7 +1971,7 @@ export async function createTrainingSession(session: InsertTrainingSession) {
   if (!db) throw new Error("Database not available");
   
   // Explicitly construct the insert object to avoid Drizzle type issues
-  const insertData = {
+  const insertData: any = {
     trainerId: session.trainerId,
     clientId: session.clientId,
     sessionType: session.sessionType,
@@ -1983,7 +1983,12 @@ export async function createTrainingSession(session: InsertTrainingSession) {
     notes: session.notes,
   };
   
-  const [result] = await db.insert(trainingSessions).values(insertData as any);
+  // Add custom session fields if present
+  if (session.customSessionName) insertData.customSessionName = session.customSessionName;
+  if (session.customDurationMinutes) insertData.customDurationMinutes = session.customDurationMinutes;
+  if (session.customPrice) insertData.customPrice = session.customPrice;
+  
+  const [result] = await db.insert(trainingSessions).values(insertData);
   return { id: Number(result.insertId), ...session };
 }
 

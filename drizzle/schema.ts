@@ -685,7 +685,11 @@ export const trainingSessions = mysqlTable("training_sessions", {
   id: int("id").autoincrement().primaryKey(),
   trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
-  sessionType: mysqlEnum("sessionType", ["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]).notNull(),
+  sessionType: mysqlEnum("sessionType", ["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching", "custom"]).notNull(),
+  // Custom session fields (only used when sessionType === 'custom')
+  customSessionName: varchar("customSessionName", { length: 255 }), // e.g., "Meeting", "Demo"
+  customDurationMinutes: int("customDurationMinutes"), // Duration in minutes
+  customPrice: varchar("customPrice", { length: 20 }), // Price as string to support decimals and free ("0")
   sessionDate: date("sessionDate").notNull(), // Date of the session
   startTime: varchar("startTime", { length: 5 }).notNull(), // HH:MM format (e.g., "09:00")
   endTime: varchar("endTime", { length: 5 }).notNull(), // HH:MM format (e.g., "10:00")
