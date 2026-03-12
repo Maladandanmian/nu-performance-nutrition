@@ -69,24 +69,21 @@ async function startServer() {
 
 startServer().catch(console.error);
 
-// Schedule weekly database backup every Monday at 9:00 AM HKT (UTC+8 = 01:00 UTC)
-const BACKUP_RECIPIENTS = ['lukusdavey@gmail.com', 'andy@andyknight.asia'];
-cron.schedule('0 1 * * 1', async () => {
-  console.log('[Backup] Running scheduled weekly backup...');
-  for (const recipient of BACKUP_RECIPIENTS) {
-    try {
-      const result = await createAndEmailBackup(recipient);
-      if (result.success) {
-        console.log(`[Backup] Weekly backup sent successfully to ${recipient}`);
-      } else {
-        console.error(`[Backup] Weekly backup failed for ${recipient}:`, result.message);
-      }
-    } catch (error) {
-      console.error(`[Backup] Unexpected error sending backup to ${recipient}:`, error);
+// Schedule daily database backup at 11:59 PM HKT (UTC+8 = 15:59 UTC)
+cron.schedule('0 59 23 * * *', async () => {
+  console.log('[Backup] Running scheduled daily backup...');
+  try {
+    const result = await createAndEmailBackup('lukusdavey@gmail.com');
+    if (result.success) {
+      console.log('[Backup] Daily backup sent successfully to lukusdavey@gmail.com');
+    } else {
+      console.error('[Backup] Daily backup failed:', result.message);
     }
+  } catch (error) {
+    console.error('[Backup] Unexpected error in scheduled backup:', error);
   }
 }, {
   timezone: 'Asia/Hong_Kong'
 });
 
-console.log('[Backup] Weekly backup scheduled for every Monday at 9:00 AM HKT');
+console.log('[Backup] Daily backup scheduled for 11:59 PM HKT');

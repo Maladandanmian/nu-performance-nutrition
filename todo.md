@@ -2556,3 +2556,7 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fixed ClientDetail.tsx loading guard to use isLoading flags instead of data presence
 - [x] Fixed updateNutritionGoal in db.ts to upsert (create if missing) instead of plain UPDATE
 - [ ] Verify all 6 of Luke's clients load correctly (needs Luke to confirm)
+
+## Backup Schedule Update (Mar 2026)
+- [x] Change backup from weekly Monday 9 AM to daily 11:59 PM HKT
+- [x] Send backup only to lukusdavey@gmail.com (remove andy@andyknight.asia)
