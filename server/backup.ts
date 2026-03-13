@@ -1,120 +1,191 @@
-import { exec } from "child_process";
-import { promisify } from "util";
-import { readFile, unlink } from "fs/promises";
 import { sendEmail } from "./emailService";
-import { ENV } from "./_core/env";
-import * as path from "path";
-
-const execAsync = promisify(exec);
+import { getDb } from "./db";
+import * as schema from "../drizzle/schema";
 
 /**
- * Parse MySQL connection string to extract connection parameters
+ * Queries every table via Drizzle and returns a JSON backup object.
+ * This avoids mysqldump entirely, which hangs on TiDB Cloud.
  */
-function parseMySQLUrl(url: string): {
-  host: string;
-  port: string;
-  user: string;
-  password: string;
-  database: string;
-} {
-  // Format: mysql://user:password@host:port/database?params
-  const match = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/([^?]+)/);
-  if (!match) {
-    throw new Error('Invalid MySQL connection string format');
-  }
-  
+async function dumpAllTables(): Promise<Record<string, unknown[]>> {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const [
+    users,
+    clients,
+    nutritionGoals,
+    dexaGoals,
+    meals,
+    drinks,
+    bodyMetrics,
+    dexaScans,
+    dexaBmdData,
+    dexaBodyComp,
+    dexaImages,
+    loginAttempts,
+    rateLimitLocks,
+    passwordResetTokens,
+    auditLogs,
+    emailVerificationTokens,
+    athleteMonitoring,
+    strengthTests,
+    nutritionReports,
+    vo2MaxTests,
+    vo2MaxAmbientData,
+    vo2MaxAnthropometric,
+    vo2MaxFitnessAssessment,
+    vo2MaxLactateProfile,
+    trainerNotifications,
+    notificationSettings,
+    supplementTemplates,
+    supplementLogs,
+    trainingSessions,
+    groupClasses,
+    groupClassAttendance,
+    recurringSessionRules,
+    sessionPackages,
+    backupLogs,
+  ] = await Promise.all([
+    db.select().from(schema.users),
+    db.select().from(schema.clients),
+    db.select().from(schema.nutritionGoals),
+    db.select().from(schema.dexaGoals),
+    db.select().from(schema.meals),
+    db.select().from(schema.drinks),
+    db.select().from(schema.bodyMetrics),
+    db.select().from(schema.dexaScans),
+    db.select().from(schema.dexaBmdData),
+    db.select().from(schema.dexaBodyComp),
+    db.select().from(schema.dexaImages),
+    db.select().from(schema.loginAttempts),
+    db.select().from(schema.rateLimitLocks),
+    db.select().from(schema.passwordResetTokens),
+    db.select().from(schema.auditLogs),
+    db.select().from(schema.emailVerificationTokens),
+    db.select().from(schema.athleteMonitoring),
+    db.select().from(schema.strengthTests),
+    db.select().from(schema.nutritionReports),
+    db.select().from(schema.vo2MaxTests),
+    db.select().from(schema.vo2MaxAmbientData),
+    db.select().from(schema.vo2MaxAnthropometric),
+    db.select().from(schema.vo2MaxFitnessAssessment),
+    db.select().from(schema.vo2MaxLactateProfile),
+    db.select().from(schema.trainerNotifications),
+    db.select().from(schema.notificationSettings),
+    db.select().from(schema.supplementTemplates),
+    db.select().from(schema.supplementLogs),
+    db.select().from(schema.trainingSessions),
+    db.select().from(schema.groupClasses),
+    db.select().from(schema.groupClassAttendance),
+    db.select().from(schema.recurringSessionRules),
+    db.select().from(schema.sessionPackages),
+    db.select().from(schema.backupLogs),
+  ]);
+
   return {
-    user: match[1],
-    password: match[2],
-    host: match[3],
-    port: match[4],
-    database: match[5],
+    users,
+    clients,
+    nutritionGoals,
+    dexaGoals,
+    meals,
+    drinks,
+    bodyMetrics,
+    dexaScans,
+    dexaBmdData,
+    dexaBodyComp,
+    dexaImages,
+    loginAttempts,
+    rateLimitLocks,
+    passwordResetTokens,
+    auditLogs,
+    emailVerificationTokens,
+    athleteMonitoring,
+    strengthTests,
+    nutritionReports,
+    vo2MaxTests,
+    vo2MaxAmbientData,
+    vo2MaxAnthropometric,
+    vo2MaxFitnessAssessment,
+    vo2MaxLactateProfile,
+    trainerNotifications,
+    notificationSettings,
+    supplementTemplates,
+    supplementLogs,
+    trainingSessions,
+    groupClasses,
+    groupClassAttendance,
+    recurringSessionRules,
+    sessionPackages,
+    backupLogs,
   };
 }
 
 /**
- * Creates a complete database backup and emails it to the specified recipient
+ * Creates a complete database backup and emails it to the specified recipient.
+ * Uses Drizzle queries instead of mysqldump to ensure compatibility with TiDB Cloud.
  */
 export async function createAndEmailBackup(recipientEmail: string) {
   const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const filename = `nu-performance-backup-${timestamp}.sql`;
-  const tempFilePath = path.join('/tmp', filename);
-  
+  const filename = `nu-performance-backup-${timestamp}.json`;
+
   try {
     console.log(`[Backup] Starting database backup at ${new Date().toISOString()}`);
-    
-    // Parse database connection string
-    const dbConfig = parseMySQLUrl(ENV.databaseUrl);
-    
-    // Create mysqldump command
-    // Note: --single-transaction is omitted as TiDB Cloud does not support SAVEPOINT
-    const dumpCommand = `mysqldump \\
-      --host=${dbConfig.host} \\
-      --port=${dbConfig.port} \\
-      --user=${dbConfig.user} \\
-      --password='${dbConfig.password}' \\
-      --routines \\
-      --triggers \\
-      --events \\
-      --add-drop-table \\
-      --result-file=${tempFilePath} \\
-      ${dbConfig.database}`;
-    
-    console.log(`[Backup] Executing mysqldump for database: ${dbConfig.database}`);
-    
-    // Execute mysqldump
-    await execAsync(dumpCommand);
-    
-    // Read the SQL file
-    const sqlDump = await readFile(tempFilePath);
-    const fileSizeKB = (sqlDump.length / 1024).toFixed(2);
-    
-    console.log(`[Backup] SQL dump created, size: ${fileSizeKB} KB`);
-    
-    // Send email with SQL file as attachment
+
+    const data = await dumpAllTables();
+
+    const backupPayload = {
+      exportedAt: new Date().toISOString(),
+      version: 1,
+      tables: data,
+    };
+
+    const jsonString = JSON.stringify(backupPayload, null, 2);
+    const fileBuffer = Buffer.from(jsonString, 'utf8');
+    const fileSizeKB = (fileBuffer.length / 1024).toFixed(2);
+
+    // Build a summary of row counts for the email body
+    const rowCounts = Object.entries(data)
+      .map(([table, rows]) => `<li><strong>${table}:</strong> ${(rows as unknown[]).length} rows</li>`)
+      .join('\n');
+
+    console.log(`[Backup] JSON dump created, size: ${fileSizeKB} KB`);
+
     const emailSent = await sendEmail({
       to: recipientEmail,
-      subject: `Nu Performance Database Backup - ${timestamp}`,
-      text: `Daily database backup for Nu Performance Nutrition.\n\nBackup Details:\n- Date: ${new Date().toLocaleDateString()}\n- Database: ${dbConfig.database}\n- File size: ${fileSizeKB} KB\n\nThe SQL backup file is attached to this email.`,
+      subject: `Nu Performance Daily Database Backup - ${timestamp}`,
+      text: `Daily database backup for Nu Performance Nutrition.\n\nBackup Details:\n- Date: ${timestamp}\n- File size: ${fileSizeKB} KB\n\nThe JSON backup file is attached to this email.`,
       html: `
         <h2>Daily Database Backup</h2>
-        <p>Your daily database backup for Nu Performance Nutrition is ready.</p>
+        <p>Your daily database backup for Nu Performance Nutrition is attached.</p>
         <h3>Backup Details:</h3>
         <ul>
-          <li><strong>Date:</strong> ${new Date().toLocaleDateString()}</li>
-          <li><strong>Database:</strong> ${dbConfig.database}</li>
+          <li><strong>Date:</strong> ${timestamp}</li>
           <li><strong>File size:</strong> ${fileSizeKB} KB</li>
         </ul>
-        <p>The SQL backup file is attached to this email.</p>
+        <h3>Row Counts:</h3>
+        <ul>
+          ${rowCounts}
+        </ul>
         <p><em>This is an automated backup email sent daily at 11:59 PM HKT.</em></p>
       `,
       attachments: [
         {
           filename,
-          content: sqlDump,
-        }
-      ]
+          content: fileBuffer,
+        },
+      ],
     });
-    
-    // Clean up temp file
-    await unlink(tempFilePath);
-    
+
     if (emailSent) {
       console.log(`[Backup] Email sent successfully to ${recipientEmail}`);
-      return { success: true, message: `Backup emailed to ${recipientEmail}` };
+      return { success: true, message: `Backup emailed to ${recipientEmail}`, fileSizeKB };
     } else {
       console.error(`[Backup] Failed to send email to ${recipientEmail}`);
       return { success: false, message: 'Failed to send backup email' };
     }
-    
+
   } catch (error) {
     console.error('[Backup] Error creating backup:', error);
-    
-    // Try to clean up temp file if it exists
-    try {
-      await unlink(tempFilePath);
-    } catch {}
-    
     return { success: false, message: `Backup failed: ${error}` };
   }
 }

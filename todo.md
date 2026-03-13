@@ -2560,3 +2560,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Backup Schedule Update (Mar 2026)
 - [x] Change backup from weekly Monday 9 AM to daily 11:59 PM HKT
 - [x] Send backup only to lukusdavey@gmail.com (remove andy@andyknight.asia)
+
+## Backup Rewrite (Mar 2026)
+- [x] Replace mysqldump with pure TypeScript/Drizzle backup (mysqldump hangs on TiDB Cloud)
+- [x] Export all tables as JSON, attach to email
+- [x] Test end-to-end and verify email sends to lukusdavey@gmail.com (159 KB, success)
