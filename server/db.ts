@@ -37,6 +37,8 @@ import {
   InsertSessionPackage,
   recurringSessionRules,
   InsertRecurringSessionRule,
+  backupLogs,
+  InsertBackupLog,
 } from "../drizzle/schema";
 import { ENV, isAdminEmail } from './_core/env';
 
@@ -2515,4 +2517,23 @@ export async function markGroupClassAttendance(attendanceId: number, attended: b
     .where(eq(groupClassAttendance.id, attendanceId));
   
   return { success: true };
+}
+
+// Backup log queries
+export async function getLastBackupLog(trainerId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select()
+    .from(backupLogs)
+    .where(eq(backupLogs.trainerId, trainerId))
+    .orderBy(desc(backupLogs.createdAt))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createBackupLog(log: InsertBackupLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(backupLogs).values(log);
 }

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Bell, Calendar, LogOut, Plus, Trash2, Users } from "lucide-react";
+import { Calendar, CheckCircle2, Database, LogOut, Plus, RefreshCw, Trash2, Users, XCircle } from "lucide-react";
 import { Link } from "wouter";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useState } from "react";
@@ -25,6 +25,16 @@ export default function TrainerDashboard() {
 
   const utils = trpc.useUtils();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
+  const { data: lastBackup, refetch: refetchBackup } = trpc.backup.getLastLog.useQuery();
+  const runBackupMutation = trpc.backup.sendBackup.useMutation({
+    onSuccess: () => {
+      toast.success("Backup sent to Luke's email");
+      refetchBackup();
+    },
+    onError: (error) => {
+      toast.error(`Backup failed: ${error.message}`);
+    },
+  });
   const createClientMutation = trpc.clients.create.useMutation({
     onSuccess: (data) => {
       const invitationStatus = data.invitationSent 
@@ -218,6 +228,43 @@ export default function TrainerDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
+          </div>
+
+          {/* Backup Status Row */}
+          <div className="mb-6 rounded-lg border bg-white px-5 py-4 flex items-center justify-between gap-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <Database className="h-5 w-5 text-gray-400 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">Database Backup</p>
+                {lastBackup ? (
+                  <p className="text-xs text-gray-500">
+                    {lastBackup.status === 'success' ? (
+                      <span className="inline-flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-green-500" />
+                        Last backup {new Date(lastBackup.createdAt).toLocaleString()} &mdash; {lastBackup.fileSizeKB ? `${lastBackup.fileSizeKB} KB` : ''}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <XCircle className="h-3 w-3 text-red-500" />
+                        Last attempt failed &mdash; {new Date(lastBackup.createdAt).toLocaleString()}
+                      </span>
+                    )}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400">No backup on record yet. Runs daily at 11:59 PM HKT.</p>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => runBackupMutation.mutate({ recipientEmail: 'lukusdavey@gmail.com' })}
+              disabled={runBackupMutation.isPending}
+              className="shrink-0 text-xs"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${runBackupMutation.isPending ? 'animate-spin' : ''}`} />
+              {runBackupMutation.isPending ? 'Running...' : 'Run Backup Now'}
+            </Button>
           </div>
 
           {/* Clients List */}

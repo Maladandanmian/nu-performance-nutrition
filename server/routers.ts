@@ -3435,19 +3435,34 @@ Return as JSON.`
 
   // Database Backup
   backup: router({
+    // Get the last backup log entry for this trainer
+    getLastLog: protectedProcedure.query(async ({ ctx }) => {
+      return db.getLastBackupLog(ctx.user.id);
+    }),
+
     // Manually trigger database backup email (admin only)
     sendBackup: adminProcedure
       .input(z.object({
         recipientEmail: z.string().email(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         const { createAndEmailBackup } = await import('./backup');
         const result = await createAndEmailBackup(input.recipientEmail);
-        
+
+        // Log the attempt regardless of outcome
+        await db.createBackupLog({
+          trainerId: ctx.user.id,
+          status: result.success ? 'success' : 'failed',
+          backupDate: new Date(),
+          fileSizeKB: result.success && 'fileSizeKB' in result ? Math.round(parseFloat(result.fileSizeKB as string)) : null,
+          recipientEmail: input.recipientEmail,
+          errorMessage: result.success ? null : result.message,
+        });
+
         if (!result.success) {
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: result.message });
         }
-        
+
         return result;
       }),
   }),

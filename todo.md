@@ -2565,3 +2565,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Replace mysqldump with pure TypeScript/Drizzle backup (mysqldump hangs on TiDB Cloud)
 - [x] Export all tables as JSON, attach to email
 - [x] Test end-to-end and verify email sends to lukusdavey@gmail.com (159 KB, success)
+
+## Backup Status Row (Mar 2026)
+- [x] Add tRPC procedure to fetch last backup log entry
+- [x] Add backup status row to trainer dashboard showing last backup date, file size, and status
+- [x] Add "Run Backup Now" button that triggers backup and refreshes status
