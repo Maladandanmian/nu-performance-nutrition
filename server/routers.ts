@@ -3447,17 +3447,8 @@ Return as JSON.`
       }))
       .mutation(async ({ ctx, input }) => {
         const { createAndEmailBackup } = await import('./backup');
-        const result = await createAndEmailBackup(input.recipientEmail);
-
-        // Log the attempt regardless of outcome
-        await db.createBackupLog({
-          trainerId: ctx.user.id,
-          status: result.success ? 'success' : 'failed',
-          backupDate: new Date(),
-          fileSizeKB: result.success && 'fileSizeKB' in result ? Math.round(parseFloat(result.fileSizeKB as string)) : null,
-          recipientEmail: input.recipientEmail,
-          errorMessage: result.success ? null : result.message,
-        });
+        // Pass trainerId so backup.ts writes to backup_logs (single source of truth)
+        const result = await createAndEmailBackup(input.recipientEmail, ctx.user.id);
 
         if (!result.success) {
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: result.message });

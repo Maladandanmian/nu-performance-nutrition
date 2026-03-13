@@ -1,5 +1,5 @@
 import { sendEmail } from "./emailService";
-import { getDb } from "./db";
+import { getDb, createBackupLog } from "./db";
 import * as schema from "../drizzle/schema";
 
 /**
@@ -123,8 +123,9 @@ async function dumpAllTables(): Promise<Record<string, unknown[]>> {
 /**
  * Creates a complete database backup and emails it to the specified recipient.
  * Uses Drizzle queries instead of mysqldump to ensure compatibility with TiDB Cloud.
+ * @param trainerId - If provided, the result is written to backup_logs for dashboard visibility.
  */
-export async function createAndEmailBackup(recipientEmail: string) {
+export async function createAndEmailBackup(recipientEmail: string, trainerId?: number) {
   const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const filename = `nu-performance-backup-${timestamp}.json`;
 
@@ -178,14 +179,44 @@ export async function createAndEmailBackup(recipientEmail: string) {
 
     if (emailSent) {
       console.log(`[Backup] Email sent successfully to ${recipientEmail}`);
+      if (trainerId) {
+        await createBackupLog({
+          trainerId,
+          status: 'success',
+          backupDate: new Date(),
+          fileSizeKB: Math.round(parseFloat(fileSizeKB)),
+          recipientEmail,
+          errorMessage: null,
+        }).catch(e => console.error('[Backup] Failed to write backup log:', e));
+      }
       return { success: true, message: `Backup emailed to ${recipientEmail}`, fileSizeKB };
     } else {
       console.error(`[Backup] Failed to send email to ${recipientEmail}`);
+      if (trainerId) {
+        await createBackupLog({
+          trainerId,
+          status: 'failed',
+          backupDate: new Date(),
+          fileSizeKB: null,
+          recipientEmail,
+          errorMessage: 'Failed to send backup email',
+        }).catch(e => console.error('[Backup] Failed to write backup log:', e));
+      }
       return { success: false, message: 'Failed to send backup email' };
     }
 
   } catch (error) {
     console.error('[Backup] Error creating backup:', error);
+    if (trainerId) {
+      await createBackupLog({
+        trainerId,
+        status: 'failed',
+        backupDate: new Date(),
+        fileSizeKB: null,
+        recipientEmail,
+        errorMessage: String(error),
+      }).catch(e => console.error('[Backup] Failed to write backup log:', e));
+    }
     return { success: false, message: `Backup failed: ${error}` };
   }
 }

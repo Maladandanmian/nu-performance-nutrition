@@ -10,6 +10,8 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import cron from "node-cron";
 import { createAndEmailBackup } from "../backup";
+import { getUserByOpenId } from "../db";
+import { ENV } from "./env";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -73,7 +75,10 @@ startServer().catch(console.error);
 cron.schedule('0 59 23 * * *', async () => {
   console.log('[Backup] Running scheduled daily backup...');
   try {
-    const result = await createAndEmailBackup('lukusdavey@gmail.com');
+    // Resolve the owner's trainer ID so the log appears on the dashboard
+    const owner = ENV.ownerOpenId ? await getUserByOpenId(ENV.ownerOpenId).catch(() => undefined) : undefined;
+    const trainerId = owner?.id;
+    const result = await createAndEmailBackup('lukusdavey@gmail.com', trainerId);
     if (result.success) {
       console.log('[Backup] Daily backup sent successfully to lukusdavey@gmail.com');
     } else {

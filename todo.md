@@ -2570,3 +2570,7 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add tRPC procedure to fetch last backup log entry
 - [x] Add backup status row to trainer dashboard showing last backup date, file size, and status
 - [x] Add "Run Backup Now" button that triggers backup and refreshes status
+
+## Backup Log Fix (Mar 2026)
+- [x] Move backup logging into createAndEmailBackup so cron and manual button both write to backup_logs
+- [x] Remove duplicate logging from the tRPC sendBackup mutation
