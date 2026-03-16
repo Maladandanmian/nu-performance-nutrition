@@ -2579,4 +2579,4 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add BACKUP_TRIGGER_TOKEN secret for securing the HTTP endpoint
 - [x] Add POST /api/trigger-backup HTTP endpoint protected by token
 - [x] Implement startup catch-up check: run backup on server start if last backup > 20 hours ago
-- [ ] Save checkpoint and publish
+- [x] Save checkpoint and publish
