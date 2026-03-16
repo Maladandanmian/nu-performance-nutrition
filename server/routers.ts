@@ -112,33 +112,39 @@ export const appRouter = router({
         email: z.string().email(), // Required for new clients
         phone: z.string().optional(),
         notes: z.string().optional(),
-
+        // Nutrition goals — required at creation, no server-side defaults
+        caloriesTarget: z.number().int().min(1, 'Calories target is required'),
+        proteinTarget: z.number().int().min(0, 'Protein target is required'),
+        fatTarget: z.number().int().min(0, 'Fat target is required'),
+        carbsTarget: z.number().int().min(0, 'Carbs target is required'),
+        fibreTarget: z.number().int().min(0, 'Fibre target is required'),
+        hydrationTarget: z.number().int().min(0, 'Hydration target is required'),
       }))
       .mutation(async ({ ctx, input }) => {
-
         
         // Check if email already exists for this trainer
         const existingClientByEmail = await db.getClientByEmail(input.email);
         if (existingClientByEmail) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'A client with this email already exists.' });
         }
-        
+
+        const { caloriesTarget, proteinTarget, fatTarget, carbsTarget, fibreTarget, hydrationTarget, ...clientData } = input;
 
         const result = await db.createClient({
           trainerId: ctx.user.id,
-          ...input,
+          ...clientData,
         });
         
-        // Create default nutrition goals for new client
+        // Create nutrition goals with trainer-specified values
         const clientId = result.id;
         await db.createNutritionGoal({
           clientId,
-          caloriesTarget: 2000,
-          proteinTarget: 150,
-          fatTarget: 65,
-          carbsTarget: 250,
-          fibreTarget: 25,
-          hydrationTarget: 2000,
+          caloriesTarget,
+          proteinTarget,
+          fatTarget,
+          carbsTarget,
+          fibreTarget,
+          hydrationTarget,
         });
         
         // Generate password setup token and send invitation email

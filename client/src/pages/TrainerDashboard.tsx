@@ -22,6 +22,13 @@ export default function TrainerDashboard() {
   const [newClientEmail, setNewClientEmail] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
   const [newClientNotes, setNewClientNotes] = useState("");
+  // Nutrition goals — required fields, no defaults pre-filled
+  const [newCalories, setNewCalories] = useState("");
+  const [newProtein, setNewProtein] = useState("");
+  const [newFat, setNewFat] = useState("");
+  const [newCarbs, setNewCarbs] = useState("");
+  const [newFibre, setNewFibre] = useState("");
+  const [newHydration, setNewHydration] = useState("");
 
   const utils = trpc.useUtils();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
@@ -48,6 +55,12 @@ export default function TrainerDashboard() {
       setNewClientEmail("");
       setNewClientPhone("");
       setNewClientNotes("");
+      setNewCalories("");
+      setNewProtein("");
+      setNewFat("");
+      setNewCarbs("");
+      setNewFibre("");
+      setNewHydration("");
       
       // Show success message
       alert(`Client created successfully!\n\n${invitationStatus}`);
@@ -101,17 +114,51 @@ export default function TrainerDashboard() {
       toast.error("Please enter a client name");
       return;
     }
-
     if (!newClientEmail.trim()) {
       toast.error("Please enter a client email");
       return;
     }
-
+    const calories = parseInt(newCalories);
+    const protein = parseInt(newProtein);
+    const fat = parseInt(newFat);
+    const carbs = parseInt(newCarbs);
+    const fibre = parseInt(newFibre);
+    const hydration = parseInt(newHydration);
+    if (!newCalories || isNaN(calories) || calories < 1) {
+      toast.error("Please enter a valid calories target");
+      return;
+    }
+    if (!newProtein || isNaN(protein) || protein < 0) {
+      toast.error("Please enter a valid protein target");
+      return;
+    }
+    if (!newFat || isNaN(fat) || fat < 0) {
+      toast.error("Please enter a valid fat target");
+      return;
+    }
+    if (!newCarbs || isNaN(carbs) || carbs < 0) {
+      toast.error("Please enter a valid carbs target");
+      return;
+    }
+    if (!newFibre || isNaN(fibre) || fibre < 0) {
+      toast.error("Please enter a valid fibre target");
+      return;
+    }
+    if (!newHydration || isNaN(hydration) || hydration < 0) {
+      toast.error("Please enter a valid hydration target");
+      return;
+    }
     createClientMutation.mutate({
       name: newClientName,
       email: newClientEmail,
       phone: newClientPhone || undefined,
       notes: newClientNotes || undefined,
+      caloriesTarget: calories,
+      proteinTarget: protein,
+      fatTarget: fat,
+      carbsTarget: carbs,
+      fibreTarget: fibre,
+      hydrationTarget: hydration,
     });
   };
 
@@ -175,10 +222,10 @@ export default function TrainerDashboard() {
                 <DialogHeader>
                   <DialogTitle>Add New Client</DialogTitle>
                   <DialogDescription>
-                    Create a new client profile with default nutrition goals
+                    All fields marked * are required. Nutrition goals must be set before the client can be created.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
                   <div>
                     <Label htmlFor="client-name">Name *</Label>
                     <Input
@@ -197,9 +244,8 @@ export default function TrainerDashboard() {
                       value={newClientEmail}
                       onChange={(e) => setNewClientEmail(e.target.value)}
                     />
-                    <p className="text-xs text-gray-500 mt-1">Client will receive invitation to set password</p>
+                    <p className="text-xs text-gray-500 mt-1">Client will receive an invitation to set their password</p>
                   </div>
-
                   <div>
                     <Label htmlFor="client-phone">Phone</Label>
                     <Input
@@ -218,6 +264,80 @@ export default function TrainerDashboard() {
                       onChange={(e) => setNewClientNotes(e.target.value)}
                     />
                   </div>
+
+                  {/* Nutrition Goals — required */}
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-semibold text-gray-800 mb-3">Nutrition Goals *</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="goal-calories">Calories (kcal) *</Label>
+                        <Input
+                          id="goal-calories"
+                          type="number"
+                          min="1"
+                          placeholder="e.g. 2200"
+                          value={newCalories}
+                          onChange={(e) => setNewCalories(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal-protein">Protein (g) *</Label>
+                        <Input
+                          id="goal-protein"
+                          type="number"
+                          min="0"
+                          placeholder="e.g. 160"
+                          value={newProtein}
+                          onChange={(e) => setNewProtein(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal-fat">Fat (g) *</Label>
+                        <Input
+                          id="goal-fat"
+                          type="number"
+                          min="0"
+                          placeholder="e.g. 70"
+                          value={newFat}
+                          onChange={(e) => setNewFat(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal-carbs">Carbs (g) *</Label>
+                        <Input
+                          id="goal-carbs"
+                          type="number"
+                          min="0"
+                          placeholder="e.g. 250"
+                          value={newCarbs}
+                          onChange={(e) => setNewCarbs(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal-fibre">Fibre (g) *</Label>
+                        <Input
+                          id="goal-fibre"
+                          type="number"
+                          min="0"
+                          placeholder="e.g. 30"
+                          value={newFibre}
+                          onChange={(e) => setNewFibre(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal-hydration">Hydration (ml) *</Label>
+                        <Input
+                          id="goal-hydration"
+                          type="number"
+                          min="0"
+                          placeholder="e.g. 2500"
+                          value={newHydration}
+                          onChange={(e) => setNewHydration(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <Button 
                     onClick={handleAddClient} 
                     className="w-full"

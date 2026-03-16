@@ -2580,3 +2580,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add POST /api/trigger-backup HTTP endpoint protected by token
 - [x] Implement startup catch-up check: run backup on server start if last backup > 20 hours ago
 - [x] Save checkpoint and publish
+
+## Mandatory Nutrition Goals on Client Creation (Mar 2026)
+- [x] Add nutrition goals fields to the Add Client form (required, cannot submit without them)
+- [x] Update createClient server procedure to atomically insert nutrition goals row
+- [x] Ensure no client can be created without a nutrition goals record
