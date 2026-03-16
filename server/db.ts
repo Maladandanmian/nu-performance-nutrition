@@ -2547,13 +2547,15 @@ export async function markGroupClassAttendance(attendanceId: number, attended: b
 }
 
 // Backup log queries
-export async function getLastBackupLog(trainerId: number) {
+// Returns the most recent backup log entry across all trainers.
+// The backup is a single shared system operation, so the status row
+// should show the same result to every trainer regardless of who triggered it.
+export async function getLastBackupLog(_trainerId?: number) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db
     .select()
     .from(backupLogs)
-    .where(eq(backupLogs.trainerId, trainerId))
     .orderBy(desc(backupLogs.createdAt))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;

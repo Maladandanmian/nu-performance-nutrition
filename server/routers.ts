@@ -3441,9 +3441,9 @@ Return as JSON.`
 
   // Database Backup
   backup: router({
-    // Get the last backup log entry for this trainer
-    getLastLog: protectedProcedure.query(async ({ ctx }) => {
-      return db.getLastBackupLog(ctx.user.id);
+    // Get the most recent backup log entry (global — same result for all trainers)
+    getLastLog: protectedProcedure.query(async ({ ctx: _ctx }) => {
+      return db.getLastBackupLog();
     }),
 
     // Manually trigger database backup email (admin only)

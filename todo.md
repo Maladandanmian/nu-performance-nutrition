@@ -2591,3 +2591,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Remove direct column write from checkoutSession (stop decrementing the column)
 - [x] Ensure all reads use dynamic calculation, not the column value
 - [x] Verify no unintended consequences (22 tests passing across 2 test files)
+
+## Backup Status Row Bug (Mar 2026)
+- [x] Fix backup log query to be global (not filtered by trainer ID) — Luke sees "No backup on record" because startup backup logged under Andy's trainer ID
+- [x] Fix getLastLog tRPC procedure to call getLastBackupLog() without trainer ID filter
+- [ ] Verify both Andy and Luke see the same last backup status (needs Luke to confirm after publish)
