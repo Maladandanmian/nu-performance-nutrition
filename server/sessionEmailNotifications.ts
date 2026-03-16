@@ -36,6 +36,21 @@ interface GroupClassDetails {
 }
 
 /**
+ * Human-readable labels for session types
+ */
+const SESSION_TYPE_LABELS: Record<string, string> = {
+  '1on1_pt': '1-on-1 Personal Training',
+  '2on1_pt': '2-on-1 Personal Training',
+  'nutrition_initial': 'Initial Nutrition Consultation',
+  'nutrition_coaching': 'Nutrition Coaching Session',
+  'custom': 'Custom Session',
+};
+
+function formatSessionType(sessionType: string): string {
+  return SESSION_TYPE_LABELS[sessionType] || sessionType;
+}
+
+/**
  * Format date and time for email display
  * The date and time are already in Hong Kong time from trainer input
  * We format them directly without timezone conversion to avoid double-conversion errors
@@ -118,7 +133,7 @@ export async function sendSessionBookingConfirmation(session: SessionDetails): P
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${formatSessionType(session.sessionType)}</td>
                       </tr>
                       ${session.sessionType === 'custom' && session.customSessionName ? `
                       <tr>
@@ -188,7 +203,7 @@ Hi ${session.clientName},
 
 Your training session has been booked:
 
-Session Type: ${session.sessionType}
+Session Type: ${formatSessionType(session.sessionType)}
 Date & Time: ${dateTime}
 Duration: ${session.startTime} - ${session.endTime}
 Trainer: ${session.trainerName}
@@ -256,7 +271,7 @@ export async function sendSessionCancellationNotification(session: SessionDetail
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${formatSessionType(session.sessionType)}</td>
                       </tr>
                       ${session.sessionType === 'custom' && session.customSessionName ? `
                       <tr>
@@ -312,7 +327,7 @@ Hi ${session.clientName},
 
 Your training session has been cancelled:
 
-Session Type: ${session.sessionType}
+Session Type: ${formatSessionType(session.sessionType)}
 Date & Time: ${dateTime}
 Trainer: ${session.trainerName}
 
@@ -376,7 +391,7 @@ export async function sendSessionReminder(session: SessionDetails): Promise<bool
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 120px;">Session Type:</td>
-                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.sessionType === 'custom' ? 'Custom' : session.sessionType}</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${formatSessionType(session.sessionType)}</td>
                       </tr>
                       ${session.sessionType === 'custom' && session.customSessionName ? `
                       <tr>
@@ -442,7 +457,7 @@ Hi ${session.clientName},
 
 This is a reminder that you have a training session coming up tomorrow:
 
-Session Type: ${session.sessionType}
+Session Type: ${formatSessionType(session.sessionType)}
 Date & Time: ${dateTime}
 Duration: ${session.startTime} - ${session.endTime}
 Trainer: ${session.trainerName}
@@ -819,7 +834,7 @@ Your training session has been updated. Here's what changed:
 ${changesList.replace(/<[^>]*>/g, '').replace(/&rarr;/g, '→')}
 
 Current Session Details:
-- Session Type: ${session.sessionType}
+- Session Type: ${formatSessionType(session.sessionType)}
 - Date & Time: ${dateTime}
 - Duration: ${session.startTime} - ${session.endTime}
 - Trainer: ${session.trainerName}

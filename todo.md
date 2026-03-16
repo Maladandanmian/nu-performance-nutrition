@@ -2596,3 +2596,12 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix backup log query to be global (not filtered by trainer ID) — Luke sees "No backup on record" because startup backup logged under Andy's trainer ID
 - [x] Fix getLastLog tRPC procedure to call getLastBackupLog() without trainer ID filter
 - [ ] Verify both Andy and Luke see the same last backup status (needs Luke to confirm after publish)
+
+## External Cron Trigger Failing (Mar 2026)
+- [x] Diagnose why cron-job.org test fails against POST /api/trigger-backup (was using GET method, not POST)
+- [x] Fix: change cron-job.org request method from GET to POST (no code change needed)
+- [x] Verified: test run returns 200 OK with {"ok":true,"message":"Backup triggered"}
+
+## Session Reminder Email Bugs (Mar 2026)
+- [x] Fix "Invalid Date" in Date & Time field of session reminder emails (Date.toString() has no T separator; changed to new Date().toISOString())
+- [x] Fix raw session type value (e.g. "1on1_pt") shown instead of human-readable label (added formatSessionType() helper)

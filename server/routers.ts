@@ -3159,7 +3159,7 @@ Return as JSON.`
               clientName: client.name,
               clientEmail: client.email,
               sessionType: input.sessionType,
-              sessionDate: firstSession.sessionDate.toString().split('T')[0],
+              sessionDate: new Date(firstSession.sessionDate).toISOString().split('T')[0],
               startTime: input.startTime,
               endTime: input.endTime,
               trainerName: ctx.user.name || 'Your Trainer',
