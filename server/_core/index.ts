@@ -10,7 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import cron from "node-cron";
 import { createAndEmailBackup } from "../backup";
-import { getUserByOpenId } from "../db";
+import { getUserByOpenId, getLastBackupLog } from "../db";
 import { ENV } from "./env";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -32,6 +32,35 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+/**
+ * Resolves the owner's trainer ID from the database.
+ * Used to attribute backup log entries to the correct trainer.
+ */
+async function getOwnerTrainerId(): Promise<number | undefined> {
+  if (!ENV.ownerOpenId) return undefined;
+  const owner = await getUserByOpenId(ENV.ownerOpenId).catch(() => undefined);
+  return owner?.id;
+}
+
+/**
+ * Runs a backup and logs the result.
+ * Safe to call from any context (cron, HTTP trigger, startup check).
+ */
+async function runBackup(source: string): Promise<void> {
+  console.log(`[Backup] Running backup (source: ${source})...`);
+  try {
+    const trainerId = await getOwnerTrainerId();
+    const result = await createAndEmailBackup('lukusdavey@gmail.com', trainerId);
+    if (result.success) {
+      console.log(`[Backup] Backup sent successfully (source: ${source})`);
+    } else {
+      console.error(`[Backup] Backup failed (source: ${source}):`, result.message);
+    }
+  } catch (error) {
+    console.error(`[Backup] Unexpected error (source: ${source}):`, error);
+  }
+}
+
 async function startServer() {
   const app = express();
   const server = createServer(app);
@@ -42,6 +71,24 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // ── Option 2: External HTTP trigger endpoint ──────────────────────────────
+  // Called by cron-job.org at 23:59 HKT daily via:
+  //   POST /api/trigger-backup
+  //   Header: x-backup-token: <BACKUP_TRIGGER_TOKEN>
+  app.post('/api/trigger-backup', async (req, res) => {
+    const token = req.headers['x-backup-token'];
+    if (!ENV.backupTriggerToken || token !== ENV.backupTriggerToken) {
+      console.warn('[Backup] Unauthorised trigger attempt from', req.ip);
+      res.status(401).json({ error: 'Unauthorised' });
+      return;
+    }
+    // Respond immediately so the external cron service doesn't time out
+    res.json({ ok: true, message: 'Backup triggered' });
+    // Run backup asynchronously after responding
+    runBackup('http-trigger');
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -67,28 +114,41 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
+
+  // ── Option 1: Startup catch-up check ─────────────────────────────────────
+  // If the server restarts and the last backup is more than 20 hours old,
+  // run a backup immediately rather than waiting for the next cron window.
+  // Runs 5 seconds after startup to avoid blocking the server boot.
+  setTimeout(async () => {
+    try {
+      const trainerId = await getOwnerTrainerId();
+      const lastLog = trainerId ? await getLastBackupLog(trainerId).catch(() => undefined) : undefined;
+      const twentyHoursMs = 20 * 60 * 60 * 1000;
+      const lastBackupTime = lastLog?.backupDate ? new Date(lastLog.backupDate).getTime() : 0;
+      const hoursSinceLast = Math.round((Date.now() - lastBackupTime) / 3600000);
+
+      if (Date.now() - lastBackupTime > twentyHoursMs) {
+        console.log(`[Backup] Startup check: last backup was ${hoursSinceLast}h ago — running catch-up backup`);
+        runBackup('startup-catchup');
+      } else {
+        console.log(`[Backup] Startup check: last backup was ${hoursSinceLast}h ago — no catch-up needed`);
+      }
+    } catch (error) {
+      console.error('[Backup] Startup check error:', error);
+    }
+  }, 5000);
 }
 
 startServer().catch(console.error);
 
-// Schedule daily database backup at 11:59 PM HKT (UTC+8 = 15:59 UTC)
-cron.schedule('0 59 23 * * *', async () => {
-  console.log('[Backup] Running scheduled daily backup...');
-  try {
-    // Resolve the owner's trainer ID so the log appears on the dashboard
-    const owner = ENV.ownerOpenId ? await getUserByOpenId(ENV.ownerOpenId).catch(() => undefined) : undefined;
-    const trainerId = owner?.id;
-    const result = await createAndEmailBackup('lukusdavey@gmail.com', trainerId);
-    if (result.success) {
-      console.log('[Backup] Daily backup sent successfully to lukusdavey@gmail.com');
-    } else {
-      console.error('[Backup] Daily backup failed:', result.message);
-    }
-  } catch (error) {
-    console.error('[Backup] Unexpected error in scheduled backup:', error);
-  }
+// ── Fallback in-process cron ──────────────────────────────────────────────
+// This fires at 23:59 HKT if the process is alive at that time.
+// The external HTTP trigger from cron-job.org is the primary mechanism;
+// this is a secondary fallback in case the external trigger fails.
+cron.schedule('0 59 23 * * *', () => {
+  runBackup('cron');
 }, {
   timezone: 'Asia/Hong_Kong'
 });
 
-console.log('[Backup] Daily backup scheduled for 11:59 PM HKT');
+console.log('[Backup] Daily backup scheduled for 11:59 PM HKT (cron + HTTP trigger + startup catch-up)');

@@ -2574,3 +2574,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Backup Log Fix (Mar 2026)
 - [x] Move backup logging into createAndEmailBackup so cron and manual button both write to backup_logs
 - [x] Remove duplicate logging from the tRPC sendBackup mutation
+
+## Backup Reliability Fix (Mar 2026)
+- [x] Add BACKUP_TRIGGER_TOKEN secret for securing the HTTP endpoint
+- [x] Add POST /api/trigger-backup HTTP endpoint protected by token
+- [x] Implement startup catch-up check: run backup on server start if last backup > 20 hours ago
+- [ ] Save checkpoint and publish
