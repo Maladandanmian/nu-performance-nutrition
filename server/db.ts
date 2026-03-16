@@ -2254,36 +2254,63 @@ export async function getSessionPackagesByTrainer(trainerId: number) {
 export async function getSessionPackageById(packageId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   const [pkg] = await db
     .select()
     .from(sessionPackages)
     .where(eq(sessionPackages.id, packageId))
     .limit(1);
-  
-  return pkg;
+
+  if (!pkg) return undefined;
+
+  // Override the stale column with a dynamic count of non-cancelled sessions
+  const [row] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(trainingSessions)
+    .where(
+      and(
+        eq(trainingSessions.packageId, packageId),
+        sql`${trainingSessions.cancelledAt} IS NULL`
+      )
+    );
+
+  const sessionsUsed = Number(row?.count || 0);
+  return {
+    ...pkg,
+    sessionsRemaining: pkg.sessionsTotal - sessionsUsed,
+  };
 }
 
 /**
- * Checkout a session from a package (decrement sessionsRemaining)
+ * Checkout a session from a package.
+ * Uses a dynamic count of non-cancelled sessions to guard against overbooking.
+ * Does NOT write to the sessionsRemaining column — that column is deprecated.
  */
 export async function checkoutSessionFromPackage(packageId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   const pkg = await getSessionPackageById(packageId);
   if (!pkg) throw new Error("Package not found");
-  if (pkg.sessionsRemaining <= 0) throw new Error("No sessions remaining in package");
-  
-  await db
-    .update(sessionPackages)
-    .set({ 
-      sessionsRemaining: pkg.sessionsRemaining - 1,
-      updatedAt: new Date()
-    })
-    .where(eq(sessionPackages.id, packageId));
-  
-  return { success: true, sessionsRemaining: pkg.sessionsRemaining - 1 };
+
+  // Count all non-cancelled sessions linked to this package (past and future)
+  const [row] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(trainingSessions)
+    .where(
+      and(
+        eq(trainingSessions.packageId, packageId),
+        sql`${trainingSessions.cancelledAt} IS NULL`
+      )
+    );
+
+  const sessionsUsed = Number(row?.count || 0);
+  const sessionsRemaining = pkg.sessionsTotal - sessionsUsed;
+
+  if (sessionsRemaining <= 0) throw new Error("No sessions remaining in package");
+
+  // No column write — balance is always derived dynamically
+  return { success: true, sessionsRemaining: sessionsRemaining - 1 };
 }
 
 /**

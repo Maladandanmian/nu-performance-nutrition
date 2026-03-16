@@ -115,7 +115,7 @@ describe("Session Packages", () => {
       clientId: testClientId,
       packageType: "10 Session Package",
       sessionsTotal: 10,
-      sessionsRemaining: 10,
+      sessionsRemaining: 10, // initial value only; balance is derived dynamically
       purchaseDate: "2026-02-19",
       expiryDate: "2026-08-19",
       notes: "Test package",
@@ -125,7 +125,9 @@ describe("Session Packages", () => {
     expect(pkg.id).toBeDefined();
     expect(pkg.packageType).toBe("10 Session Package");
     expect(pkg.sessionsTotal).toBe(10);
-    expect(pkg.sessionsRemaining).toBe(10);
+    // Dynamic balance: no sessions yet, so full balance
+    const retrieved = await db.getSessionPackageById(pkg.id);
+    expect(retrieved?.sessionsRemaining).toBe(10);
     testPackageId = pkg.id;
   });
 
@@ -143,37 +145,80 @@ describe("Session Packages", () => {
     expect(pkg!.packageType).toBe("10 Session Package");
   });
 
-  it("should checkout a session from package", async () => {
+  it("should checkout a session from package (validates balance, does not write column)", async () => {
+    // checkoutSessionFromPackage validates balance using dynamic count
+    // It does not write to the sessionsRemaining column
     const result = await db.checkoutSessionFromPackage(testPackageId);
     expect(result.success).toBe(true);
+    // result.sessionsRemaining reflects what the balance will be after the session is inserted
     expect(result.sessionsRemaining).toBe(9);
-
+    // The column is NOT updated, so getSessionPackageById still shows 10 (no sessions inserted yet)
     const pkg = await db.getSessionPackageById(testPackageId);
-    expect(pkg!.sessionsRemaining).toBe(9);
+    expect(pkg!.sessionsRemaining).toBe(10); // dynamic count: still 0 sessions linked
   });
 
   it("should update a session package", async () => {
     const result = await db.updateSessionPackage(testPackageId, {
       notes: "Updated test package",
-      sessionsRemaining: 8,
+      // sessionsRemaining is no longer accepted in updates — balance is dynamic
     } as any);
     expect(result.success).toBe(true);
 
     const updated = await db.getSessionPackageById(testPackageId);
     expect(updated!.notes).toBe("Updated test package");
-    expect(updated!.sessionsRemaining).toBe(8);
+    // Balance is still 10 — no sessions linked
+    expect(updated!.sessionsRemaining).toBe(10);
   });
 
-  it("should prevent checkout when no sessions remaining", async () => {
-    // Set sessions remaining to 0
-    await db.updateSessionPackage(testPackageId, {
-      sessionsRemaining: 0,
+  it("should prevent checkout when no sessions remaining (dynamic guard)", async () => {
+    // To exhaust a 10-session package, we need to insert 10 non-cancelled sessions
+    // This test verifies the dynamic guard works correctly
+    // We use a 1-session package for simplicity
+    const smallPkg = await db.createSessionPackage({
+      trainerId: testTrainerId,
+      clientId: testClientId,
+      packageType: "1 Session Package",
+      sessionsTotal: 1,
+      sessionsRemaining: 1,
+      purchaseDate: "2026-02-19",
+      expiryDate: null,
+      notes: null,
+    } as any);
+
+    // Insert one non-cancelled session to exhaust the balance
+    const dbInstance = await db.getDb();
+    if (!dbInstance) throw new Error("DB not available");
+    const { trainingSessions } = await import("../drizzle/schema");
+    await dbInstance.insert(trainingSessions).values({
+      clientId: testClientId,
+      trainerId: testTrainerId,
+      packageId: smallPkg.id,
+      sessionDate: new Date(),
+      startTime: "09:00",
+      endTime: "10:00",
+      durationMinutes: 60,
+      sessionType: "1on1_pt",
+      paymentStatus: "from_package",
+      price: 0,
+      notes: null,
+      cancelled: false,
+      cancelledAt: null,
+      recurringRuleId: null,
+      customSessionName: null,
+      customDurationMinutes: null,
+      customPrice: null,
     } as any);
 
     // Attempt checkout should throw error
     await expect(
-      db.checkoutSessionFromPackage(testPackageId)
+      db.checkoutSessionFromPackage(smallPkg.id)
     ).rejects.toThrow("No sessions remaining in package");
+
+    // Clean up
+    const { sessionPackages } = await import("../drizzle/schema");
+    const { eq } = await import("drizzle-orm");
+    await dbInstance.delete(trainingSessions).where(eq(trainingSessions.packageId, smallPkg.id));
+    await dbInstance.delete(sessionPackages).where(eq(sessionPackages.id, smallPkg.id));
   });
 
   // Cleanup: Delete test package after all tests

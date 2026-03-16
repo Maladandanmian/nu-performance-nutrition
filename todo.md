@@ -2585,3 +2585,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add nutrition goals fields to the Add Client form (required, cannot submit without them)
 - [x] Update createClient server procedure to atomically insert nutrition goals row
 - [x] Ensure no client can be created without a nutrition goals record
+
+## sessionsRemaining Column Fix (Mar 2026)
+- [x] Audit all references to sessionsRemaining across codebase
+- [x] Remove direct column write from checkoutSession (stop decrementing the column)
+- [x] Ensure all reads use dynamic calculation, not the column value
+- [x] Verify no unintended consequences (22 tests passing across 2 test files)

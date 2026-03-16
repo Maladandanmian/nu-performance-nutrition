@@ -1,15 +1,43 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as db from "./db";
-import { sessionPackages } from "../drizzle/schema";
+import { sessionPackages, trainingSessions } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+
+// Helper to insert a test training session linked to a package
+async function insertTestSession(
+  dbInstance: Awaited<ReturnType<typeof db.getDb>>,
+  opts: { clientId: number; trainerId: number; packageId: number; cancelled?: boolean }
+) {
+  if (!dbInstance) throw new Error("DB not available");
+  const [result] = await dbInstance.insert(trainingSessions).values({
+    clientId: opts.clientId,
+    trainerId: opts.trainerId,
+    packageId: opts.packageId,
+    sessionDate: new Date(),
+    startTime: "09:00",
+    endTime: "10:00",
+    durationMinutes: 60,
+    sessionType: "1on1_pt",
+    paymentStatus: "from_package",
+    price: 0,
+    notes: null,
+    cancelled: opts.cancelled ?? false,
+    cancelledAt: opts.cancelled ? new Date() : null,
+    recurringRuleId: null,
+    customSessionName: null,
+    customDurationMinutes: null,
+    customPrice: null,
+  } as any);
+  return Number((result as any).insertId);
+}
 
 describe("Package Management", () => {
   let testClientId: number;
   let testTrainerId: number;
   let packageIds: number[] = [];
+  let sessionIds: number[] = [];
 
   beforeEach(async () => {
-    // Create test trainer
     const openId = `test-trainer-${Date.now()}`;
     await db.upsertUser({
       openId,
@@ -22,7 +50,6 @@ describe("Package Management", () => {
     if (!trainer) throw new Error("Failed to create test trainer");
     testTrainerId = trainer.id;
 
-    // Create test client
     const client = await db.createClient({
       trainerId: testTrainerId,
       name: "TEST CLIENT PACKAGE",
@@ -40,48 +67,54 @@ describe("Package Management", () => {
   });
 
   afterEach(async () => {
-    // Clean up packages
-    for (const packageId of packageIds) {
-      try {
-        const dbInstance = await db.getDb();
-        if (dbInstance) {
-          await dbInstance.delete(sessionPackages).where(eq(sessionPackages.id, packageId));
+    const dbInstance = await db.getDb();
+    if (dbInstance) {
+      for (const sessionId of sessionIds) {
+        try {
+          await dbInstance.delete(trainingSessions).where(eq(trainingSessions.id, sessionId));
+        } catch (error) {
+          console.error(`Failed to delete session ${sessionId}:`, error);
         }
-      } catch (error) {
-        console.error(`Failed to delete package ${packageId}:`, error);
+      }
+      for (const packageId of packageIds) {
+        try {
+          await dbInstance.delete(sessionPackages).where(eq(sessionPackages.id, packageId));
+        } catch (error) {
+          console.error(`Failed to delete package ${packageId}:`, error);
+        }
       }
     }
     packageIds = [];
+    sessionIds = [];
 
-    // Clean up client
     if (testClientId) {
       await db.deleteClient(testClientId);
     }
-    // Note: Users are not deleted in tests to avoid breaking OAuth state
   });
 
-  it("should create a session package", async () => {
+  it("should create a session package with full dynamic balance", async () => {
     const pkg = await db.createSessionPackage({
       clientId: testClientId,
       trainerId: testTrainerId,
       packageType: "10 Session Package - $1000",
       sessionsTotal: 10,
-      sessionsRemaining: 10,
+      sessionsRemaining: 10, // initial value only; not maintained
       purchaseDate: new Date().toISOString().split("T")[0],
       expiryDate: null,
       notes: "Test package",
     });
-
     packageIds.push(pkg.id);
 
     expect(pkg.id).toBeDefined();
     expect(pkg.sessionsTotal).toBe(10);
-    expect(pkg.sessionsRemaining).toBe(10);
     expect(pkg.packageType).toBe("10 Session Package - $1000");
+
+    // Dynamic balance: no sessions yet, so full balance
+    const retrieved = await db.getSessionPackageById(pkg.id);
+    expect(retrieved?.sessionsRemaining).toBe(10);
   });
 
   it("should retrieve packages for a client", async () => {
-    // Create two packages
     const pkg1 = await db.createSessionPackage({
       clientId: testClientId,
       trainerId: testTrainerId,
@@ -107,14 +140,13 @@ describe("Package Management", () => {
     packageIds.push(pkg2.id);
 
     const packages = await db.getSessionPackagesByClient(testClientId);
-
     expect(packages.length).toBeGreaterThanOrEqual(2);
-    const packageIds_retrieved = packages.map((p: any) => p.id);
-    expect(packageIds_retrieved).toContain(pkg1.id);
-    expect(packageIds_retrieved).toContain(pkg2.id);
+    const retrievedIds = packages.map((p: any) => p.id);
+    expect(retrievedIds).toContain(pkg1.id);
+    expect(retrievedIds).toContain(pkg2.id);
   });
 
-  it("should checkout a session from a package", async () => {
+  it("should reflect reduced balance after a session is linked to the package", async () => {
     const pkg = await db.createSessionPackage({
       clientId: testClientId,
       trainerId: testTrainerId,
@@ -127,18 +159,67 @@ describe("Package Management", () => {
     });
     packageIds.push(pkg.id);
 
-    // Checkout one session
-    const result = await db.checkoutSessionFromPackage(pkg.id);
+    // Full balance before any sessions
+    const before = await db.getSessionPackageById(pkg.id);
+    expect(before?.sessionsRemaining).toBe(5);
 
+    // checkoutSessionFromPackage validates balance but does not write the column
+    const result = await db.checkoutSessionFromPackage(pkg.id);
     expect(result.success).toBe(true);
     expect(result.sessionsRemaining).toBe(4);
 
-    // Verify the package was updated
-    const updatedPkg = await db.getSessionPackageById(pkg.id);
-    expect(updatedPkg?.sessionsRemaining).toBe(4);
+    // Insert a non-cancelled session to simulate the booking
+    const dbInstance = await db.getDb();
+    const sessionId = await insertTestSession(dbInstance, {
+      clientId: testClientId,
+      trainerId: testTrainerId,
+      packageId: pkg.id,
+    });
+    sessionIds.push(sessionId);
+
+    // Dynamic balance should now reflect 1 session used
+    const after = await db.getSessionPackageById(pkg.id);
+    expect(after?.sessionsRemaining).toBe(4);
   });
 
-  it("should prevent checkout when package has zero balance", async () => {
+  it("should restore balance when a session is cancelled", async () => {
+    const pkg = await db.createSessionPackage({
+      clientId: testClientId,
+      trainerId: testTrainerId,
+      packageType: "5 Session Package",
+      sessionsTotal: 5,
+      sessionsRemaining: 5,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      expiryDate: null,
+      notes: null,
+    });
+    packageIds.push(pkg.id);
+
+    const dbInstance = await db.getDb();
+    const sessionId = await insertTestSession(dbInstance, {
+      clientId: testClientId,
+      trainerId: testTrainerId,
+      packageId: pkg.id,
+    });
+    sessionIds.push(sessionId);
+
+    // Balance should be 4 (1 session used)
+    const before = await db.getSessionPackageById(pkg.id);
+    expect(before?.sessionsRemaining).toBe(4);
+
+    // Cancel the session
+    if (!dbInstance) throw new Error("DB not available");
+    await dbInstance
+      .update(trainingSessions)
+      .set({ cancelledAt: new Date(), cancelled: true })
+      .where(eq(trainingSessions.id, sessionId));
+
+    // Balance should be restored to 5
+    const after = await db.getSessionPackageById(pkg.id);
+    expect(after?.sessionsRemaining).toBe(5);
+  });
+
+  it("should prevent checkout when package has zero balance (dynamic guard)", async () => {
     const pkg = await db.createSessionPackage({
       clientId: testClientId,
       trainerId: testTrainerId,
@@ -151,16 +232,22 @@ describe("Package Management", () => {
     });
     packageIds.push(pkg.id);
 
-    // Checkout the only session
-    await db.checkoutSessionFromPackage(pkg.id);
+    // Insert one non-cancelled session to exhaust the balance
+    const dbInstance = await db.getDb();
+    const sessionId = await insertTestSession(dbInstance, {
+      clientId: testClientId,
+      trainerId: testTrainerId,
+      packageId: pkg.id,
+    });
+    sessionIds.push(sessionId);
 
-    // Try to checkout again (should fail)
+    // Attempt checkout should throw error
     await expect(db.checkoutSessionFromPackage(pkg.id)).rejects.toThrow(
       "No sessions remaining in package"
     );
   });
 
-  it("should track multiple checkouts correctly", async () => {
+  it("should track multiple sessions correctly via dynamic count", async () => {
     const pkg = await db.createSessionPackage({
       clientId: testClientId,
       trainerId: testTrainerId,
@@ -173,12 +260,17 @@ describe("Package Management", () => {
     });
     packageIds.push(pkg.id);
 
-    // Checkout 3 sessions
-    await db.checkoutSessionFromPackage(pkg.id);
-    await db.checkoutSessionFromPackage(pkg.id);
-    await db.checkoutSessionFromPackage(pkg.id);
+    // Insert 3 non-cancelled sessions
+    const dbInstance = await db.getDb();
+    for (let i = 0; i < 3; i++) {
+      const sessionId = await insertTestSession(dbInstance, {
+        clientId: testClientId,
+        trainerId: testTrainerId,
+        packageId: pkg.id,
+      });
+      sessionIds.push(sessionId);
+    }
 
-    // Verify balance
     const updatedPkg = await db.getSessionPackageById(pkg.id);
     expect(updatedPkg?.sessionsRemaining).toBe(7);
     expect(updatedPkg?.sessionsTotal).toBe(10);
@@ -197,22 +289,17 @@ describe("Package Management", () => {
     });
     packageIds.push(pkg.id);
 
-    // Update package
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 90);
     const expiryDate = futureDate.toISOString().split("T")[0];
 
-    await db.updateSessionPackage(pkg.id, {
-      expiryDate,
-      notes: "Updated notes",
-    });
+    await db.updateSessionPackage(pkg.id, { expiryDate, notes: "Updated notes" });
 
-    // Verify updates
     const updatedPkg = await db.getSessionPackageById(pkg.id);
-    // Database returns Date object, convert to ISO date string
-    const retrievedDate = updatedPkg?.expiryDate instanceof Date 
-      ? updatedPkg.expiryDate.toISOString().split('T')[0]
-      : updatedPkg?.expiryDate;
+    const retrievedDate =
+      updatedPkg?.expiryDate instanceof Date
+        ? updatedPkg.expiryDate.toISOString().split("T")[0]
+        : updatedPkg?.expiryDate;
     expect(retrievedDate).toBe(expiryDate);
     expect(updatedPkg?.notes).toBe("Updated notes");
   });
@@ -234,17 +321,17 @@ describe("Package Management", () => {
     });
     packageIds.push(pkg.id);
 
-    // Database returns Date object, convert to ISO date string
-    const pkgDate = pkg.expiryDate instanceof Date 
-      ? pkg.expiryDate.toISOString().split('T')[0]
-      : pkg.expiryDate;
+    const pkgDate =
+      pkg.expiryDate instanceof Date
+        ? pkg.expiryDate.toISOString().split("T")[0]
+        : pkg.expiryDate;
     expect(pkgDate).toBe(expiryDate);
 
-    // Verify retrieval
     const retrievedPkg = await db.getSessionPackageById(pkg.id);
-    const retrievedDate = retrievedPkg?.expiryDate instanceof Date 
-      ? retrievedPkg.expiryDate.toISOString().split('T')[0]
-      : retrievedPkg?.expiryDate;
+    const retrievedDate =
+      retrievedPkg?.expiryDate instanceof Date
+        ? retrievedPkg.expiryDate.toISOString().split("T")[0]
+        : retrievedPkg?.expiryDate;
     expect(retrievedDate).toBe(expiryDate);
   });
 });

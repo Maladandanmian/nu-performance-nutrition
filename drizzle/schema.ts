@@ -774,7 +774,7 @@ export const sessionPackages = mysqlTable("session_packages", {
   trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   packageType: varchar("packageType", { length: 100 }).notNull(), // e.g., "10 Session Package", "Monthly Unlimited"
   sessionsTotal: int("sessionsTotal").notNull(), // Total sessions in package
-  sessionsRemaining: int("sessionsRemaining").notNull(), // Sessions left
+  sessionsRemaining: int("sessionsRemaining").notNull(), // DEPRECATED: no longer written to after creation. Balance is always derived dynamically from trainingSessions records.
   purchaseDate: date("purchaseDate").notNull(),
   expiryDate: date("expiryDate"), // Optional expiry date
   notes: text("notes"),

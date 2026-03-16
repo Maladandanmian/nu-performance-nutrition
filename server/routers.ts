@@ -3193,7 +3193,7 @@ Return as JSON.`
           clientId: input.clientId,
           packageType: input.packageType,
           sessionsTotal: input.sessionsTotal,
-          sessionsRemaining: input.sessionsTotal, // Start with full balance
+          sessionsRemaining: input.sessionsTotal, // Initialised once at creation; not maintained thereafter — balance is derived dynamically
           purchaseDate: input.purchaseDate,
           expiryDate: input.expiryDate || null,
           notes: input.notes || null,
@@ -3226,7 +3226,7 @@ Return as JSON.`
       .input(
         z.object({
           packageId: z.number(),
-          sessionsRemaining: z.number().optional(),
+          // sessionsRemaining intentionally excluded — balance is derived dynamically from session records
           expiryDate: z.string().optional(), // YYYY-MM-DD format
           notes: z.string().optional(),
         })
