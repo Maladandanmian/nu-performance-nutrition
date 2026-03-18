@@ -26,7 +26,7 @@ import SessionList from "@/components/SessionList";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PackageCreationForm } from "@/components/PackageCreationForm";
-import { PackageList } from "@/components/PackageList";
+import { PackageManagement } from "@/components/PackageManagement";
 import { PackageSelector } from "@/components/PackageSelector";
 import { TrainerCalendar } from "@/components/TrainerCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -709,7 +709,7 @@ export default function TrainerSchedule() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PackageCreationForm />
-          <PackageList trainerId={currentUser?.id || 0} />
+          <PackageManagement trainerId={currentUser?.id || 0} />
         </div>
       </div>
 

@@ -2605,3 +2605,12 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Session Reminder Email Bugs (Mar 2026)
 - [x] Fix "Invalid Date" in Date & Time field of session reminder emails (Date.toString() has no T separator; changed to new Date().toISOString())
 - [x] Fix raw session type value (e.g. "1on1_pt") shown instead of human-readable label (added formatSessionType() helper)
+
+## Package Management – Delete, Edit, Deduct Session (Mar 2026)
+- [x] Server: deletePackage procedure (trainer-scoped, zero-usage only)
+- [x] Server: updatePackage procedure (edit packageType, purchaseDate, expiryDate, notes)
+- [x] Server: deductSession procedure (subtract N sessions from sessionsTotal baseline with optional note)
+- [x] UI: Delete button on package card with confirmation dialog (disabled if sessions exist)
+- [x] UI: Edit form on package card (packageType, purchaseDate, expiryDate, notes)
+- [x] UI: Deduct Session button with quantity input (default 1) and optional note field
+- [x] Tests: 9 tests passing in packageEditDelete.test.ts

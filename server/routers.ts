@@ -3249,15 +3249,42 @@ Return as JSON.`
       .input(
         z.object({
           packageId: z.number(),
-          // sessionsRemaining intentionally excluded — balance is derived dynamically from session records
-          expiryDate: z.string().optional(), // YYYY-MM-DD format
-          notes: z.string().optional(),
+          packageType: z.string().optional(),
+          sessionsTotal: z.number().optional(),
+          purchaseDate: z.string().optional(), // YYYY-MM-DD format
+          expiryDate: z.string().optional().nullable(), // YYYY-MM-DD format
+          notes: z.string().optional().nullable(),
         })
       )
       .mutation(async ({ input }) => {
         const { packageId, ...updates } = input;
         // Cast to any to avoid type issues with date strings
         return db.updateSessionPackage(packageId, updates as any);
+      }),
+
+    // Delete a package (trainer-scoped, zero-usage only)
+    delete: adminProcedure
+      .input(z.object({ packageId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteSessionPackage(input.packageId, ctx.user.id);
+      }),
+
+    // Deduct N sessions from a package baseline (for trial sessions etc.)
+    deductSessions: adminProcedure
+      .input(
+        z.object({
+          packageId: z.number(),
+          count: z.number().min(1),
+          note: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.deductSessionsFromPackage(
+          input.packageId,
+          ctx.user.id,
+          input.count,
+          input.note
+        );
       }),
   }),
 

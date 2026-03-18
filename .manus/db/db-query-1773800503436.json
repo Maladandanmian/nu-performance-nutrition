@@ -1,0 +1,15 @@
+{
+  "query": "\nSELECT u.id as trainer_id, u.name as trainer_name, u.email as trainer_email\nFROM users u\nWHERE u.name LIKE '%luke%' OR u.email LIKE '%luke%'\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT u.id as trainer_id, u.name as trainer_name, u.email as trainer_email\nFROM users u\nWHERE u.name LIKE '%luke%' OR u.email LIKE '%luke%'\nLIMIT 5;\n",
+  "rows": [
+    {
+      "trainer_id": "13",
+      "trainer_name": "luke",
+      "trainer_email": "luke@nuperformancecoaching.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "trainer_id\ttrainer_name\ttrainer_email\n13\tluke\tluke@nuperformancecoaching.com\n",
+  "stderr": "",
+  "execution_time_ms": 1548
+}

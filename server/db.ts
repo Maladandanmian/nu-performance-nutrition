@@ -2328,6 +2328,84 @@ export async function updateSessionPackage(packageId: number, updates: Partial<I
   return { success: true };
 }
 
+/**
+ * Delete a session package.
+ * Only allowed if zero non-cancelled sessions are linked to the package.
+ * Throws if sessions exist to prevent accidental data loss.
+ */
+export async function deleteSessionPackage(packageId: number, trainerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Ownership check
+  const [pkg] = await db
+    .select({ id: sessionPackages.id, trainerId: sessionPackages.trainerId })
+    .from(sessionPackages)
+    .where(eq(sessionPackages.id, packageId))
+    .limit(1);
+
+  if (!pkg) throw new Error("Package not found");
+  if (pkg.trainerId !== trainerId) throw new Error("Not authorised to delete this package");
+
+  // Guard: refuse if any non-cancelled sessions are linked
+  const [row] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(trainingSessions)
+    .where(
+      and(
+        eq(trainingSessions.packageId, packageId),
+        sql`${trainingSessions.cancelledAt} IS NULL`
+      )
+    );
+
+  const sessionsUsed = Number(row?.count || 0);
+  if (sessionsUsed > 0) {
+    throw new Error(
+      `Cannot delete: ${sessionsUsed} session${sessionsUsed !== 1 ? 's are' : ' is'} linked to this package`
+    );
+  }
+
+  await db.delete(sessionPackages).where(eq(sessionPackages.id, packageId));
+  return { success: true };
+}
+
+/**
+ * Deduct N sessions from a package's sessionsTotal baseline.
+ * Used for trial sessions that were attended before the package was created.
+ * Stores an optional note in the package notes field (appended).
+ */
+export async function deductSessionsFromPackage(
+  packageId: number,
+  trainerId: number,
+  count: number,
+  note?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const pkg = await getSessionPackageById(packageId);
+  if (!pkg) throw new Error("Package not found");
+  if (pkg.trainerId !== trainerId) throw new Error("Not authorised to modify this package");
+
+  const newTotal = pkg.sessionsTotal - count;
+  if (newTotal < 0) throw new Error("Cannot deduct more sessions than the package total");
+
+  const existingNotes = pkg.notes || "";
+  const deductionNote = note
+    ? `[Deducted ${count} session${count !== 1 ? 's' : ''}: ${note}]`
+    : `[Deducted ${count} session${count !== 1 ? 's' : ''} on ${new Date().toISOString().split('T')[0]}]`;
+  const updatedNotes = existingNotes
+    ? `${existingNotes}\n${deductionNote}`
+    : deductionNote;
+
+  await db
+    .update(sessionPackages)
+    .set({ sessionsTotal: newTotal, notes: updatedNotes, updatedAt: new Date() })
+    .where(eq(sessionPackages.id, packageId));
+
+  return { success: true, newTotal, sessionsRemaining: newTotal - (pkg.sessionsTotal - pkg.sessionsRemaining) };
+}
+
 
 // ============================================================================
 // Group Classes
