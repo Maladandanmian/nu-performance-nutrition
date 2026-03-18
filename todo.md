@@ -2614,3 +2614,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] UI: Edit form on package card (packageType, purchaseDate, expiryDate, notes)
 - [x] UI: Deduct Session button with quantity input (default 1) and optional note field
 - [x] Tests: 9 tests passing in packageEditDelete.test.ts
+
+## Backup Logging Bug (Mar 2026)
+- [x] Backup runs nightly at 23:59 HKT and sends email, but backup_logs table is not updated
+- [x] Root cause: getOwnerTrainerId() returns undefined, so logging code was skipped (if trainerId check)
+- [x] Fix: use fallback trainer ID (1 for primary admin) so logging always happens

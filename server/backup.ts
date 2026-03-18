@@ -177,46 +177,43 @@ export async function createAndEmailBackup(recipientEmail: string, trainerId?: n
       ],
     });
 
+    const logTrainerId = trainerId || 1; // Fallback to primary admin if owner lookup fails
+
     if (emailSent) {
       console.log(`[Backup] Email sent successfully to ${recipientEmail}`);
-      if (trainerId) {
-        await createBackupLog({
-          trainerId,
-          status: 'success',
-          backupDate: new Date(),
-          fileSizeKB: Math.round(parseFloat(fileSizeKB)),
-          recipientEmail,
-          errorMessage: null,
-        }).catch(e => console.error('[Backup] Failed to write backup log:', e));
-      }
+      await createBackupLog({
+        trainerId: logTrainerId,
+        status: 'success',
+        backupDate: new Date(),
+        fileSizeKB: Math.round(parseFloat(fileSizeKB)),
+        recipientEmail,
+        errorMessage: null,
+      }).catch(e => console.error('[Backup] Failed to write backup log:', e));
       return { success: true, message: `Backup emailed to ${recipientEmail}`, fileSizeKB };
     } else {
       console.error(`[Backup] Failed to send email to ${recipientEmail}`);
-      if (trainerId) {
-        await createBackupLog({
-          trainerId,
-          status: 'failed',
-          backupDate: new Date(),
-          fileSizeKB: null,
-          recipientEmail,
-          errorMessage: 'Failed to send backup email',
-        }).catch(e => console.error('[Backup] Failed to write backup log:', e));
-      }
+      await createBackupLog({
+        trainerId: logTrainerId,
+        status: 'failed',
+        backupDate: new Date(),
+        fileSizeKB: null,
+        recipientEmail,
+        errorMessage: 'Failed to send backup email',
+      }).catch(e => console.error('[Backup] Failed to write backup log:', e));
       return { success: false, message: 'Failed to send backup email' };
     }
 
   } catch (error) {
     console.error('[Backup] Error creating backup:', error);
-    if (trainerId) {
-      await createBackupLog({
-        trainerId,
-        status: 'failed',
-        backupDate: new Date(),
-        fileSizeKB: null,
-        recipientEmail,
-        errorMessage: String(error),
-      }).catch(e => console.error('[Backup] Failed to write backup log:', e));
-    }
-    return { success: false, message: `Backup failed: ${error}` };
+    const logTrainerId = trainerId || 1; // Fallback to primary admin if owner lookup fails
+    await createBackupLog({
+      trainerId: logTrainerId,
+      status: 'failed',
+      backupDate: new Date(),
+      fileSizeKB: null,
+      recipientEmail,
+      errorMessage: error instanceof Error ? error.message : String(error),
+    }).catch(e => console.error('[Backup] Failed to write backup log:', e));
+    return { success: false, message: `Backup failed: ${error instanceof Error ? error.message : String(error)}` };
   }
 }

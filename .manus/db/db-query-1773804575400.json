@@ -1,0 +1,145 @@
+{
+  "query": "SELECT id, trainerId, status, backupDate, fileSizeKB, recipientEmail, createdAt FROM backup_logs ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, trainerId, status, backupDate, fileSizeKB, recipientEmail, createdAt FROM backup_logs ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "150002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "310",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 03:18:05"
+    },
+    {
+      "id": "150001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "309",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 03:17:48"
+    },
+    {
+      "id": "120002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "320",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 02:13:05"
+    },
+    {
+      "id": "120001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "319",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 02:11:45"
+    },
+    {
+      "id": "90002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "254",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 01:52:37"
+    },
+    {
+      "id": "90001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "fileSizeKB": "254",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-18 01:39:15"
+    },
+    {
+      "id": "60001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-16",
+      "fileSizeKB": "233",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 04:23:44"
+    },
+    {
+      "id": "30007",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "204",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 03:25:34"
+    },
+    {
+      "id": "30006",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "204",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 03:25:01"
+    },
+    {
+      "id": "30005",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "203",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 03:24:25"
+    },
+    {
+      "id": "30004",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "203",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 03:24:09"
+    },
+    {
+      "id": "30003",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "203",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 02:41:58"
+    },
+    {
+      "id": "30002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "203",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 02:31:44"
+    },
+    {
+      "id": "30001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-15",
+      "fileSizeKB": "201",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-16 02:07:49"
+    },
+    {
+      "id": "1",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-13",
+      "fileSizeKB": "159",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "createdAt": "2026-03-13 05:16:57"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tstatus\tbackupDate\tfileSizeKB\trecipientEmail\tcreatedAt\n150002\t1\tsuccess\t2026-03-17\t310\tlukusdavey@gmail.com\t2026-03-18 03:18:05\n150001\t1\tsuccess\t2026-03-17\t309\tlukusdavey@gmail.com\t2026-03-18 03:17:48\n120002\t1\tsuccess\t2026-03-17\t320\tlukusdavey@gmail.com\t2026-03-18 02:13:05\n120001\t1\tsuccess\t2026-03-17\t319\tlukusdavey@gmail.com\t2026-03-18 02:11:45\n90002\t1\tsuccess\t2026-03-17\t254\tlukusdavey@gmail.com\t2026-03-18 01:52:37\n90001\t1\tsuccess\t2026-03-17\t254\tlukusdavey@gmail.com\t2026-03-18 01:39:15\n60001\t1\tsuccess\t2026-03-16\t233\tlukusdavey@gmail.com\t2026-03-16 04:23:44\n30007\t1\tsuccess\t2026-03-15\t204\tlukusdavey@gmail.com\t2026-03-16 03:25:34\n30006\t1\tsuccess\t2026-03-15\t204\tlukusdavey@gmail.com\t2026-03-16 03:25:01\n30005\t1\tsuccess\t2026-03-15\t203\tlukusdavey@gmail.com\t2026-03-16 03:24:25\n30004\t1\tsuccess\t2026-03-15\t203\tlukusdavey@gmail.com\t2026-03-16 03:24:09\n30003\t1\tsuccess\t2026-03-15\t203\tlukusdavey@gmail.com\t2026-03-16 02:41:58\n30002\t1\tsuccess\t2026-03-15\t203\tlukusdavey@gmail.com\t2026-03-16 02:31:44\n30001\t1\tsuccess\t2026-03-15\t201\tlukusdavey@gmail.com\t2026-03-16 02:07:49\n1\t1\tsuccess\t2026-03-13\t159\tlukusdavey@gmail.com\t2026-03-13 05:16:57\n",
+  "stderr": "",
+  "execution_time_ms": 1517
+}
