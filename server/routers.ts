@@ -2978,8 +2978,9 @@ Return as JSON.`
 
         // Send booking confirmation email
         const client = await db.getClientById(input.clientId);
+        let isLastSession = false;
         if (client && client.email) {
-          const { sendSessionBookingConfirmation } = await import('./sessionEmailNotifications');
+          const { sendSessionBookingConfirmation, sendLastSessionAlert } = await import('./sessionEmailNotifications');
           await sendSessionBookingConfirmation({
             id: session.id,
             clientName: client.name,
@@ -2993,9 +2994,31 @@ Return as JSON.`
             trainerName: ctx.user.name || 'Your Trainer',
             notes: input.notes,
           });
+
+          // Last-session alert: check if this booking used the final session in the package
+          if (input.paymentStatus === 'from_package' && input.packageId) {
+            const pkg = await db.getSessionPackageById(input.packageId);
+            if (pkg && pkg.sessionsRemaining <= 0) {
+              isLastSession = true;
+              sendLastSessionAlert({
+                id: session.id,
+                clientName: client.name,
+                clientEmail: client.email,
+                sessionType: input.sessionType,
+                sessionDate: input.sessionDate,
+                startTime: input.startTime,
+                endTime: input.endTime,
+                trainerName: ctx.user.name || 'Your Trainer',
+                packageType: pkg.packageType,
+                sessionsTotal: pkg.sessionsTotal,
+              }).catch((err: Error) => {
+                console.error('[LastSessionAlert] Failed to send last-session email:', err);
+              });
+            }
+          }
         }
 
-        return session;
+        return { ...session, isLastSession };
       }),
 
     // Get sessions for a client

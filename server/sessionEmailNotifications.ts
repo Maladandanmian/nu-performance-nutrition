@@ -853,3 +853,119 @@ See you at your session!
     text,
   });
 }
+
+/**
+ * Send a "last session" alert email to a client when their final package session is booked.
+ */
+export async function sendLastSessionAlert(session: SessionDetails & { packageType: string; sessionsTotal: number }): Promise<boolean> {
+  const subject = 'Your Final Session is Booked – Nu Performance Nutrition';
+  const dateTime = formatDateTime(session.sessionDate, session.startTime);
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #E8A838; padding: 30px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Nu Performance Nutrition</h1>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 16px 0; color: #333333; font-size: 20px;">&#127937; Your Final Session is Booked</h2>
+
+              <p style="margin: 0 0 16px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                Hi ${session.clientName},
+              </p>
+
+              <p style="margin: 0 0 24px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                This session is the <strong>last session in your current package</strong>. We hope you've made great progress — your trainer will be in touch to discuss your next steps and how to keep the momentum going.
+              </p>
+
+              <!-- Session Details Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef9ec; border-left: 4px solid #E8A838; border-radius: 4px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px; width: 140px;">Session Type:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${formatSessionType(session.sessionType)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Date &amp; Time:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${dateTime}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Duration:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.startTime} – ${session.endTime}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Trainer:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${session.trainerName}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; color: #999999; font-size: 14px;">Package:</td>
+                        <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold;">${formatSessionType(session.packageType)} (${session.sessionsTotal} sessions)</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 16px 0; color: #666666; font-size: 15px; line-height: 1.6;">
+                If you'd like to continue training, speak to ${session.trainerName} at your session or reply to this email.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f5f5f5; padding: 20px 40px; text-align: center;">
+              <p style="margin: 0; color: #999999; font-size: 13px;">© ${new Date().getFullYear()} Nu Performance Nutrition. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  const text = `
+Your Final Session is Booked
+
+Hi ${session.clientName},
+
+This session is the last session in your current package. Your trainer will be in touch to discuss next steps.
+
+Session Type: ${formatSessionType(session.sessionType)}
+Date & Time: ${dateTime}
+Duration: ${session.startTime} – ${session.endTime}
+Trainer: ${session.trainerName}
+Package: ${formatSessionType(session.packageType)} (${session.sessionsTotal} sessions)
+
+Speak to ${session.trainerName} at your session or reply to this email to continue training.
+
+© ${new Date().getFullYear()} Nu Performance Nutrition
+  `.trim();
+
+  return sendEmail({
+    to: session.clientEmail,
+    subject,
+    html,
+    text,
+  });
+}

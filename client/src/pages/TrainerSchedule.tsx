@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -48,6 +50,8 @@ const CLASS_TYPES = [
 export default function TrainerSchedule() {
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [classDialogOpen, setClassDialogOpen] = useState(false);
+  const [lastSessionAlertOpen, setLastSessionAlertOpen] = useState(false);
+  const [lastSessionClientName, setLastSessionClientName] = useState("");
   const [activeTab, setActiveTab] = useState("list");
 
   // Get current user (trainer)
@@ -114,9 +118,10 @@ export default function TrainerSchedule() {
 
   // Create session mutation
   const createSession = trpc.trainingSessions.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Training session has been scheduled successfully.");
       setSessionDialogOpen(false);
+      const formClientId = sessionForm.clientId;
       setSessionForm({
         clientId: "",
         sessionType: "",
@@ -133,6 +138,12 @@ export default function TrainerSchedule() {
         customDurationMinutes: "",
         customPrice: "",
       });
+      // Show last-session alert if this was the final session in the package
+      if (data?.isLastSession) {
+        const clientName = clients?.find((c: any) => c.id === parseInt(formClientId))?.name || "this client";
+        setLastSessionClientName(clientName);
+        setLastSessionAlertOpen(true);
+      }
     },
     onError: (error) => {
       toast.error(error.message);
@@ -701,6 +712,34 @@ export default function TrainerSchedule() {
           <PackageList trainerId={currentUser?.id || 0} />
         </div>
       </div>
+
+      {/* Last Session Alert Modal */}
+      <Dialog open={lastSessionAlertOpen} onOpenChange={setLastSessionAlertOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <span className="text-2xl">&#127937;</span>
+              Last Session Alert
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              This is the final session in the client's package.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <p className="text-base font-medium">
+              This is the <span className="text-amber-600 font-semibold">last session</span> in {lastSessionClientName}'s current package.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Use this session to discuss next steps and renewal options with your client. A notification email has been sent to them automatically.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setLastSessionAlertOpen(false)} className="w-full">
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Schedule View Tabs */}
       <div>
