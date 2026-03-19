@@ -2619,3 +2619,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Backup runs nightly at 23:59 HKT and sends email, but backup_logs table is not updated
 - [x] Root cause: getOwnerTrainerId() returns undefined, so logging code was skipped (if trainerId check)
 - [x] Fix: use fallback trainer ID (1 for primary admin) so logging always happens
+
+## In-Process Cron Backup Bug (Mar 2026)
+- [x] Found: node-cron was firing multiple times per hour due to timezone handling issues
+- [x] Disabled in-process cron (commented out import and cron.schedule call)
+- [x] Now relies on external cron-job.org trigger (primary) + startup catch-up (fallback)

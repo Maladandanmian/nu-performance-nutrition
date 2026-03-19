@@ -8,7 +8,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import cron from "node-cron";
+// import cron from "node-cron"; // Disabled: causing duplicate backups due to timezone issues
 import { createAndEmailBackup } from "../backup";
 import { getUserByOpenId, getLastBackupLog } from "../db";
 import { ENV } from "./env";
@@ -141,14 +141,12 @@ async function startServer() {
 
 startServer().catch(console.error);
 
-// ── Fallback in-process cron ──────────────────────────────────────────────
-// This fires at 23:59 HKT if the process is alive at that time.
-// The external HTTP trigger from cron-job.org is the primary mechanism;
-// this is a secondary fallback in case the external trigger fails.
-cron.schedule('0 59 23 * * *', () => {
-  runBackup('cron');
-}, {
-  timezone: 'Asia/Hong_Kong'
-});
+// ── Backup trigger mechanisms ──────────────────────────────────────────────
+// PRIMARY: External HTTP trigger from cron-job.org at 23:59 HKT daily (POST /api/trigger-backup)
+// FALLBACK: Startup catch-up check (if last backup > 20 hours old)
+//
+// NOTE: In-process cron.schedule() was disabled due to timezone handling issues
+// causing duplicate backups. node-cron was not respecting the Asia/Hong_Kong timezone
+// and was firing multiple times per hour. Rely on external trigger instead.
 
-console.log('[Backup] Daily backup scheduled for 11:59 PM HKT (cron + HTTP trigger + startup catch-up)');
+console.log('[Backup] Backup triggers: HTTP trigger (primary) + startup catch-up (fallback)');

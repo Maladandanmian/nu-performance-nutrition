@@ -1,0 +1,84 @@
+{
+  "query": "SELECT id, trainerId, status, backupDate, createdAt, fileSizeKB, errorMessage FROM backup_logs WHERE DATE(createdAt) = '2026-03-18' ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT id, trainerId, status, backupDate, createdAt, fileSizeKB, errorMessage FROM backup_logs WHERE DATE(createdAt) = '2026-03-18' ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "150004",
+      "trainerId": "1",
+      "status": "failed",
+      "backupDate": "2026-03-18",
+      "createdAt": "2026-03-18 03:38:35",
+      "fileSizeKB": "NULL",
+      "errorMessage": "Failed query: select `id`, `openId`, `name`, `email`, `loginMethod`, `role`, `createdAt`, `updatedAt`, `lastSignedIn` from `users`"
+    },
+    {
+      "id": "150003",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 03:34:45",
+      "fileSizeKB": "310",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "150002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 03:18:05",
+      "fileSizeKB": "310",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "150001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 03:17:48",
+      "fileSizeKB": "309",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "120002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 02:13:05",
+      "fileSizeKB": "320",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "120001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 02:11:45",
+      "fileSizeKB": "319",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "90002",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 01:52:37",
+      "fileSizeKB": "254",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "90001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-17",
+      "createdAt": "2026-03-18 01:39:15",
+      "fileSizeKB": "254",
+      "errorMessage": "NULL"
+    }
+  ],
+  "messages": [
+    "params: "
+  ],
+  "stdout": "id\ttrainerId\tstatus\tbackupDate\tcreatedAt\tfileSizeKB\terrorMessage\n150004\t1\tfailed\t2026-03-18\t2026-03-18 03:38:35\tNULL\tFailed query: select `id`, `openId`, `name`, `email`, `loginMethod`, `role`, `createdAt`, `updatedAt`, `lastSignedIn` from `users`\nparams: \n150003\t1\tsuccess\t2026-03-17\t2026-03-18 03:34:45\t310\tNULL\n150002\t1\tsuccess\t2026-03-17\t2026-03-18 03:18:05\t310\tNULL\n150001\t1\tsuccess\t2026-03-17\t2026-03-18 03:17:48\t309\tNULL\n120002\t1\tsuccess\t2026-03-17\t2026-03-18 02:13:05\t320\tNULL\n120001\t1\tsuccess\t2026-03-17\t2026-03-18 02:11:45\t319\tNULL\n90002\t1\tsuccess\t2026-03-17\t2026-03-18 01:52:37\t254\tNULL\n90001\t1\tsuccess\t2026-03-17\t2026-03-18 01:39:15\t254\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1682
+}
