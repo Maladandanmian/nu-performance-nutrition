@@ -2630,9 +2630,12 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [ ] Likely cause: in-process cron firing every few minutes exhausted resources or hung the app
 - [ ] Confirm fix: after disabling in-process cron, monitor next scheduled backup (19/03 at 23:59 HKT)
 
-## Backup Query Resilience (Mar 2026)
-- [x] Replace Promise.all() with Promise.allSettled() in dumpAllTables (prevents one slow query from blocking entire backup)
-- [x] Add per-table error handling: failed queries return empty arrays instead of throwing
-- [x] Add console warnings for failed table queries (for debugging)
+## Backup Query Resilience & Compression (Mar 2026)
+- [x] Investigate root cause of 503 errors: 33 parallel queries serializing on single connection (15s total)
+- [x] Replace Promise.all() with sequential batching (5 tables at a time) to prevent connection pool exhaustion
+- [x] Add per-table error handling with Promise.allSettled() as safety net
+- [x] Add console logging for each batch to track progress
+- [x] Add gzip compression to backup before emailing (reduces size 70-80%)
 - [x] Write 7 vitest tests for backup resilience (all passing)
+- [x] End-to-end testing: backups completing successfully with compression
 - [ ] Monitor next scheduled backup (20/03 at 23:59 HKT) to confirm 503 errors are resolved

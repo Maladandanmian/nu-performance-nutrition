@@ -1,10 +1,14 @@
 import { getDb, createBackupLog } from "./db";
 import * as schema from "../drizzle/schema";
+import { gzip } from "zlib";
+import { promisify } from "util";
+
+const gzipAsync = promisify(gzip);
 
 /**
  * Queries every table via Drizzle and returns a JSON backup object.
+ * Uses sequential batching (5 tables at a time) to avoid overwhelming the connection pool.
  * This avoids mysqldump entirely, which hangs on TiDB Cloud.
- * Uses allSettled to prevent one slow query from blocking the entire backup.
  */
 async function dumpAllTables(): Promise<Record<string, unknown[]>> {
   const db = await getDb();
@@ -47,18 +51,27 @@ async function dumpAllTables(): Promise<Record<string, unknown[]>> {
     { name: 'backupLogs', query: () => db.select().from(schema.backupLogs) },
   ];
 
-  const results = await Promise.allSettled(queries.map(q => q.query()));
-  
   const data: Record<string, unknown[]> = {};
-  results.forEach((result, index) => {
-    const tableName = queries[index].name;
-    if (result.status === 'fulfilled') {
-      data[tableName] = result.value;
-    } else {
-      console.warn(`[Backup] Warning: failed to query ${tableName}: ${result.reason}`);
-      data[tableName] = []; // Use empty array as fallback
-    }
-  });
+  const batchSize = 5; // Query 5 tables at a time to avoid overwhelming the connection
+
+  console.log(`[Backup] Starting sequential batch queries (batch size: ${batchSize})`);
+
+  for (let i = 0; i < queries.length; i += batchSize) {
+    const batch = queries.slice(i, i + batchSize);
+    console.log(`[Backup] Querying batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(queries.length / batchSize)}: ${batch.map(q => q.name).join(', ')}`);
+
+    const results = await Promise.allSettled(batch.map(q => q.query()));
+
+    results.forEach((result, index) => {
+      const tableName = batch[index].name;
+      if (result.status === 'fulfilled') {
+        data[tableName] = result.value;
+      } else {
+        console.warn(`[Backup] Warning: failed to query ${tableName}: ${result.reason}`);
+        data[tableName] = []; // Use empty array as fallback
+      }
+    });
+  }
 
   return data;
 }
@@ -66,11 +79,12 @@ async function dumpAllTables(): Promise<Record<string, unknown[]>> {
 /**
  * Creates a complete database backup and emails it to the specified recipient.
  * Uses Drizzle queries instead of mysqldump to ensure compatibility with TiDB Cloud.
+ * Compresses the backup with gzip before emailing.
  * @param trainerId - If provided, the result is written to backup_logs for dashboard visibility.
  */
 export async function createAndEmailBackup(recipientEmail: string, trainerId?: number) {
   const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const filename = `nu-performance-backup-${timestamp}.json`;
+  const filename = `nu-performance-backup-${timestamp}.json.gz`;
 
   try {
     console.log(`[Backup] Starting database backup at ${new Date().toISOString()}`);
@@ -84,13 +98,17 @@ export async function createAndEmailBackup(recipientEmail: string, trainerId?: n
     };
 
     const jsonString = JSON.stringify(backupPayload, null, 2);
-    const buffer = Buffer.from(jsonString, 'utf-8');
-    const fileSizeKB = Math.ceil(buffer.length / 1024);
+    const jsonBuffer = Buffer.from(jsonString, 'utf-8');
+    
+    // Compress the JSON before emailing
+    console.log(`[Backup] Compressing backup (uncompressed: ${Math.ceil(jsonBuffer.length / 1024)} KB)`);
+    const compressedBuffer = await gzipAsync(jsonBuffer);
+    const compressedSizeKB = Math.ceil(compressedBuffer.length / 1024);
+    
+    console.log(`[Backup] Backup compressed: ${compressedSizeKB} KB (compression ratio: ${(100 - Math.round(compressedSizeKB * 1024 / jsonBuffer.length * 100)).toFixed(1)}%)`);
 
-    console.log(`[Backup] Backup created: ${fileSizeKB} KB`);
-
-    // Send email with backup attachment
-    const emailResult = await sendBackupEmail(recipientEmail, filename, buffer);
+    // Send email with compressed backup attachment
+    const emailResult = await sendBackupEmail(recipientEmail, filename, compressedBuffer);
 
     if (emailResult.success) {
       console.log(`[Backup] Email sent successfully to ${recipientEmail}`);
@@ -99,7 +117,7 @@ export async function createAndEmailBackup(recipientEmail: string, trainerId?: n
         trainerId: logTrainerId,
         status: 'success',
         backupDate: new Date(),
-        fileSizeKB,
+        fileSizeKB: compressedSizeKB,
         recipientEmail,
       }).catch(e => console.error('[Backup] Failed to write backup log:', e));
       return { success: true, message: `Backup completed and emailed to ${recipientEmail}` };
@@ -110,7 +128,7 @@ export async function createAndEmailBackup(recipientEmail: string, trainerId?: n
         trainerId: logTrainerId,
         status: 'failed',
         backupDate: new Date(),
-        fileSizeKB,
+        fileSizeKB: compressedSizeKB,
         recipientEmail,
         errorMessage: emailResult.error || 'Failed to send email',
       }).catch(e => console.error('[Backup] Failed to write backup log:', e));
@@ -157,13 +175,13 @@ async function sendBackupEmail(
       from: process.env.EMAIL_FROM,
       to: recipientEmail,
       subject: `Nu Performance Nutrition - Database Backup (${new Date().toISOString().split('T')[0]})`,
-      text: 'Please find the attached database backup file.',
-      html: '<p>Please find the attached database backup file.</p>',
+      text: 'Please find the attached compressed database backup file (.json.gz). Extract with: gunzip backup.json.gz',
+      html: '<p>Please find the attached compressed database backup file (.json.gz).</p><p>Extract with: <code>gunzip backup.json.gz</code></p>',
       attachments: [
         {
           filename,
           content: buffer,
-          contentType: 'application/json',
+          contentType: 'application/gzip',
         },
       ],
     });
