@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 // import cron from "node-cron"; // Disabled: causing duplicate backups due to timezone issues
 import { createAndEmailBackup } from "../backup";
+import { sendSessionReminders } from "../sessionReminderService";
 import { getUserByOpenId, getLastBackupLog } from "../db";
 import { ENV } from "./env";
 
@@ -87,6 +88,29 @@ async function startServer() {
     res.json({ ok: true, message: 'Backup triggered' });
     // Run backup asynchronously after responding
     runBackup('http-trigger');
+  });
+
+  // Session Reminder Trigger
+  // Called by cron-job.org daily to send 24-hour reminder emails
+  app.post('/api/trigger-reminders', async (req, res) => {
+    const token = req.headers['x-reminder-token'];
+    if (!ENV.reminderTriggerToken || token !== ENV.reminderTriggerToken) {
+      console.warn('[SessionReminders] Unauthorised trigger attempt from', req.ip);
+      res.status(401).json({ error: 'Unauthorised' });
+      return;
+    }
+    // Respond immediately so the external cron service doesn't time out
+    res.json({ ok: true, message: 'Session reminders triggered' });
+    // Run reminders asynchronously after responding
+    try {
+      const result = await sendSessionReminders();
+      console.log(`[SessionReminders] Triggered: ${result.sessionRemindersSent} session reminders, ${result.groupClassRemindersSent} group class reminders sent`);
+      if (result.errors.length > 0) {
+        console.error('[SessionReminders] Errors during reminder dispatch:', result.errors);
+      }
+    } catch (error) {
+      console.error('[SessionReminders] Unexpected error during trigger:', error);
+    }
   });
 
   // tRPC API

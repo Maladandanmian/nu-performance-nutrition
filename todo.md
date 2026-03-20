@@ -2639,3 +2639,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Write 7 vitest tests for backup resilience (all passing)
 - [x] End-to-end testing: backups completing successfully with compression
 - [ ] Monitor next scheduled backup (20/03 at 23:59 HKT) to confirm 503 errors are resolved
+
+## Session Reminder Email Scheduling (Mar 2026)
+- [x] Create HTTP endpoint POST /api/trigger-reminders for external cron trigger
+- [x] Add REMINDER_TRIGGER_TOKEN secret for endpoint authentication
+- [x] Wire up sendSessionReminders() service to the HTTP endpoint
+- [x] Write 4 vitest tests for reminder trigger endpoint (all passing)
+- [x] Write 5 unit tests for reminder service logic with mocked database (all passing)
+- [x] End-to-end test: reminder endpoint responding correctly with valid token
+- [ ] Set up cron-job.org trigger to call /api/trigger-reminders daily at 09:00 HKT
+- [ ] Verify reminders are being sent consistently (monitor for 1 week)

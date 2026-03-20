@@ -16,6 +16,7 @@ export const ENV = {
   emailFrom: process.env.EMAIL_FROM ?? "",
   appUrl: process.env.VITE_APP_URL ?? "",
   backupTriggerToken: process.env.BACKUP_TRIGGER_TOKEN ?? "",
+  reminderTriggerToken: process.env.REMINDER_TRIGGER_TOKEN ?? "",
 };
 
 // Parse comma-separated admin emails into an array
