@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM backup_logs WHERE backupDate = '2026-03-19' ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM backup_logs WHERE backupDate = '2026-03-19' ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "180001",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-19",
+      "fileSizeKB": "325",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "errorMessage": "NULL",
+      "createdAt": "2026-03-19 06:39:01"
+    }
+  ],
+  "messages": [
+    "180002\t1\tfailed\t2026-03-19\tNULL\tlukusdavey@gmail.com\tFailed query: select `id`, `openId`, `name`, `email`, `loginMethod`, `role`, `createdAt`, `updatedAt`, `lastSignedIn` from `users`",
+    "params: \t2026-03-19 06:43:59"
+  ],
+  "stdout": "id\ttrainerId\tstatus\tbackupDate\tfileSizeKB\trecipientEmail\terrorMessage\tcreatedAt\n180002\t1\tfailed\t2026-03-19\tNULL\tlukusdavey@gmail.com\tFailed query: select `id`, `openId`, `name`, `email`, `loginMethod`, `role`, `createdAt`, `updatedAt`, `lastSignedIn` from `users`\nparams: \t2026-03-19 06:43:59\n180001\t1\tsuccess\t2026-03-19\t325\tlukusdavey@gmail.com\tNULL\t2026-03-19 06:39:01\n",
+  "stderr": "",
+  "execution_time_ms": 1553
+}

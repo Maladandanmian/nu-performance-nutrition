@@ -2624,3 +2624,15 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Found: node-cron was firing multiple times per hour due to timezone handling issues
 - [x] Disabled in-process cron (commented out import and cron.schedule call)
 - [x] Now relies on external cron-job.org trigger (primary) + startup catch-up (fallback)
+
+## Cron-Job.org 503 Error (Mar 2026)
+- [ ] Investigate why server returned 503 at 15:59 UTC (23:59 HKT) on 18/03
+- [ ] Likely cause: in-process cron firing every few minutes exhausted resources or hung the app
+- [ ] Confirm fix: after disabling in-process cron, monitor next scheduled backup (19/03 at 23:59 HKT)
+
+## Backup Query Resilience (Mar 2026)
+- [x] Replace Promise.all() with Promise.allSettled() in dumpAllTables (prevents one slow query from blocking entire backup)
+- [x] Add per-table error handling: failed queries return empty arrays instead of throwing
+- [x] Add console warnings for failed table queries (for debugging)
+- [x] Write 7 vitest tests for backup resilience (all passing)
+- [ ] Monitor next scheduled backup (20/03 at 23:59 HKT) to confirm 503 errors are resolved
