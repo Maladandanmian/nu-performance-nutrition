@@ -47,7 +47,7 @@ export function MobileCalendar({ trainerId }: MobileCalendarProps) {
   // Get the date range to display
   const dateRange = useMemo(() => {
     const start = startOfDay(currentDate);
-    const end = viewMode === "today" ? start : addDays(start, 2);
+    const end = viewMode === "today" ? addDays(start, 1) : addDays(start, 3);
     return { start, end };
   }, [currentDate, viewMode]);
 
@@ -57,8 +57,8 @@ export function MobileCalendar({ trainerId }: MobileCalendarProps) {
     
     return sessions
       .filter((session: any) => {
-        const sessionDate = new Date(session.sessionDate);
-        return sessionDate >= dateRange.start && sessionDate <= dateRange.end;
+        const sessionDate = startOfDay(new Date(session.sessionDate));
+        return sessionDate >= dateRange.start && sessionDate < dateRange.end;
       })
       .sort((a: any, b: any) => {
         const dateCompare = new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime();
