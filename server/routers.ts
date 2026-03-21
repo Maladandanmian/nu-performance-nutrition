@@ -3502,6 +3502,21 @@ Return as JSON.`
         recipientEmail: z.string().email(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Rate limit: prevent multiple backups within the same hour
+        const lastLog = await db.getLastBackupLog();
+        if (lastLog) {
+          const lastBackupTime = new Date(lastLog.createdAt).getTime();
+          const oneHourAgo = Date.now() - 60 * 60 * 1000;
+          if (lastBackupTime > oneHourAgo) {
+            const nextAvailable = new Date(lastBackupTime + 60 * 60 * 1000);
+            const minutesLeft = Math.ceil((nextAvailable.getTime() - Date.now()) / 60000);
+            throw new TRPCError({
+              code: 'TOO_MANY_REQUESTS',
+              message: `A backup was run recently. Next backup available in ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}.`,
+            });
+          }
+        }
+
         const { createAndEmailBackup } = await import('./backup');
         // Pass trainerId so backup.ts writes to backup_logs (single source of truth)
         const result = await createAndEmailBackup(input.recipientEmail, ctx.user.id);

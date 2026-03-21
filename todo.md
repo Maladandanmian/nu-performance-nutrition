@@ -2649,3 +2649,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] End-to-end test: reminder endpoint responding correctly with valid token
 - [ ] Set up cron-job.org trigger to call /api/trigger-reminders daily at 09:00 HKT
 - [ ] Verify reminders are being sent consistently (monitor for 1 week)
+
+## Backup Rate Limiting (Mar 2026)
+- [x] Add 1-hour cooldown check to sendBackup tRPC procedure (returns TOO_MANY_REQUESTS with minutes remaining)
+- [x] Disable "Run Backup Now" button when backup ran within last hour, show "Available in Xm" countdown
+- [x] Error message now shows cooldown info instead of generic error

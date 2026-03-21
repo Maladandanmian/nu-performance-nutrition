@@ -10,7 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { Calendar, CheckCircle2, Database, LogOut, Plus, RefreshCw, Trash2, Users, XCircle } from "lucide-react";
 import { Link } from "wouter";
 import { NotificationBell } from "@/components/NotificationBell";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -39,9 +39,21 @@ export default function TrainerDashboard() {
       refetchBackup();
     },
     onError: (error) => {
-      toast.error(`Backup failed: ${error.message}`);
+      toast.error(error.message);
     },
   });
+
+  // Compute cooldown state: disable button if last backup was within the past hour
+  const backupCooldownMinutesLeft = useMemo(() => {
+    if (!lastBackup) return 0;
+    const lastBackupTime = new Date(lastBackup.createdAt).getTime();
+    const oneHourMs = 60 * 60 * 1000;
+    const elapsed = Date.now() - lastBackupTime;
+    if (elapsed < oneHourMs) {
+      return Math.ceil((oneHourMs - elapsed) / 60000);
+    }
+    return 0;
+  }, [lastBackup]);
   const createClientMutation = trpc.clients.create.useMutation({
     onSuccess: (data) => {
       const invitationStatus = data.invitationSent 
@@ -379,11 +391,12 @@ export default function TrainerDashboard() {
               variant="outline"
               size="sm"
               onClick={() => runBackupMutation.mutate({ recipientEmail: 'lukusdavey@gmail.com' })}
-              disabled={runBackupMutation.isPending}
+              disabled={runBackupMutation.isPending || backupCooldownMinutesLeft > 0}
               className="shrink-0 text-xs"
+              title={backupCooldownMinutesLeft > 0 ? `Next backup available in ${backupCooldownMinutesLeft} minute${backupCooldownMinutesLeft !== 1 ? 's' : ''}` : undefined}
             >
               <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${runBackupMutation.isPending ? 'animate-spin' : ''}`} />
-              {runBackupMutation.isPending ? 'Running...' : 'Run Backup Now'}
+              {runBackupMutation.isPending ? 'Running...' : backupCooldownMinutesLeft > 0 ? `Available in ${backupCooldownMinutesLeft}m` : 'Run Backup Now'}
             </Button>
           </div>
 
