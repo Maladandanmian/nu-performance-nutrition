@@ -1,0 +1,110 @@
+{
+  "query": "SELECT createdAt, fileSizeKB FROM backup_logs WHERE DATE(createdAt) = '2026-03-20' ORDER BY createdAt ASC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT createdAt, fileSizeKB FROM backup_logs WHERE DATE(createdAt) = '2026-03-20' ORDER BY createdAt ASC",
+  "rows": [
+    {
+      "createdAt": "2026-03-20 04:46:04",
+      "fileSizeKB": "336"
+    },
+    {
+      "createdAt": "2026-03-20 04:58:07",
+      "fileSizeKB": "391"
+    },
+    {
+      "createdAt": "2026-03-20 04:58:11",
+      "fileSizeKB": "106"
+    },
+    {
+      "createdAt": "2026-03-20 05:00:18",
+      "fileSizeKB": "33"
+    },
+    {
+      "createdAt": "2026-03-20 05:05:19",
+      "fileSizeKB": "22"
+    },
+    {
+      "createdAt": "2026-03-20 06:07:54",
+      "fileSizeKB": "33"
+    },
+    {
+      "createdAt": "2026-03-20 06:44:44",
+      "fileSizeKB": "33"
+    },
+    {
+      "createdAt": "2026-03-20 06:44:55",
+      "fileSizeKB": "33"
+    },
+    {
+      "createdAt": "2026-03-20 06:45:47",
+      "fileSizeKB": "33"
+    },
+    {
+      "createdAt": "2026-03-20 07:11:27",
+      "fileSizeKB": "35"
+    },
+    {
+      "createdAt": "2026-03-20 07:13:00",
+      "fileSizeKB": "27"
+    },
+    {
+      "createdAt": "2026-03-20 07:20:29",
+      "fileSizeKB": "20"
+    },
+    {
+      "createdAt": "2026-03-20 08:31:39",
+      "fileSizeKB": "34"
+    },
+    {
+      "createdAt": "2026-03-20 10:02:31",
+      "fileSizeKB": "29"
+    },
+    {
+      "createdAt": "2026-03-20 11:13:31",
+      "fileSizeKB": "34"
+    },
+    {
+      "createdAt": "2026-03-20 11:51:45",
+      "fileSizeKB": "35"
+    },
+    {
+      "createdAt": "2026-03-20 12:25:00",
+      "fileSizeKB": "27"
+    },
+    {
+      "createdAt": "2026-03-20 13:17:50",
+      "fileSizeKB": "35"
+    },
+    {
+      "createdAt": "2026-03-20 13:49:27",
+      "fileSizeKB": "24"
+    },
+    {
+      "createdAt": "2026-03-20 15:57:43",
+      "fileSizeKB": "35"
+    },
+    {
+      "createdAt": "2026-03-20 15:59:12",
+      "fileSizeKB": "35"
+    },
+    {
+      "createdAt": "2026-03-20 16:42:06",
+      "fileSizeKB": "32"
+    },
+    {
+      "createdAt": "2026-03-20 17:53:54",
+      "fileSizeKB": "31"
+    },
+    {
+      "createdAt": "2026-03-20 18:11:11",
+      "fileSizeKB": "28"
+    },
+    {
+      "createdAt": "2026-03-20 23:30:01",
+      "fileSizeKB": "32"
+    }
+  ],
+  "messages": [],
+  "stdout": "createdAt\tfileSizeKB\n2026-03-20 04:46:04\t336\n2026-03-20 04:58:07\t391\n2026-03-20 04:58:11\t106\n2026-03-20 05:00:18\t33\n2026-03-20 05:05:19\t22\n2026-03-20 06:07:54\t33\n2026-03-20 06:44:44\t33\n2026-03-20 06:44:55\t33\n2026-03-20 06:45:47\t33\n2026-03-20 07:11:27\t35\n2026-03-20 07:13:00\t27\n2026-03-20 07:20:29\t20\n2026-03-20 08:31:39\t34\n2026-03-20 10:02:31\t29\n2026-03-20 11:13:31\t34\n2026-03-20 11:51:45\t35\n2026-03-20 12:25:00\t27\n2026-03-20 13:17:50\t35\n2026-03-20 13:49:27\t24\n2026-03-20 15:57:43\t35\n2026-03-20 15:59:12\t35\n2026-03-20 16:42:06\t32\n2026-03-20 17:53:54\t31\n2026-03-20 18:11:11\t28\n2026-03-20 23:30:01\t32\n",
+  "stderr": "",
+  "execution_time_ms": 1589
+}

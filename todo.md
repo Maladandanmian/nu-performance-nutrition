@@ -2660,3 +2660,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Root cause: Manus performs frequent maintenance restarts overnight (midnight-7am)
 - [x] Disabled: Commented out the startup catch-up logic in server/_core/index.ts
 - [x] Rationale: External cron-job.org trigger at 11:59 PM is reliable; manual "Run Backup Now" button (with 1-hour cooldown) handles emergencies
+
+## 24-Hour Backup Cooldown (Mar 2026)
+- [x] Update sendBackup procedure: Check if backup ran in last 24 hours (manual or cron)
+- [x] Return error if cooldown active, show "Next backup available in Xh Xm"
+- [x] Update UI: Show countdown timer for when next backup is available
+- [ ] Test: Verify cron-job backup blocks manual trigger for 24 hours
+- [ ] Test: Verify manual backup blocks cron-job trigger for 24 hours

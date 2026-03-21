@@ -1,0 +1,62 @@
+{
+  "query": "SELECT createdAt, fileSizeKB FROM backup_logs WHERE DATE(createdAt) = '2026-03-21' ORDER BY createdAt ASC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT createdAt, fileSizeKB FROM backup_logs WHERE DATE(createdAt) = '2026-03-21' ORDER BY createdAt ASC",
+  "rows": [
+    {
+      "createdAt": "2026-03-21 00:02:51",
+      "fileSizeKB": "28"
+    },
+    {
+      "createdAt": "2026-03-21 00:46:24",
+      "fileSizeKB": "36"
+    },
+    {
+      "createdAt": "2026-03-21 01:03:28",
+      "fileSizeKB": "22"
+    },
+    {
+      "createdAt": "2026-03-21 03:04:25",
+      "fileSizeKB": "36"
+    },
+    {
+      "createdAt": "2026-03-21 03:04:52",
+      "fileSizeKB": "15"
+    },
+    {
+      "createdAt": "2026-03-21 04:17:21",
+      "fileSizeKB": "24"
+    },
+    {
+      "createdAt": "2026-03-21 05:32:39",
+      "fileSizeKB": "25"
+    },
+    {
+      "createdAt": "2026-03-21 07:41:47",
+      "fileSizeKB": "25"
+    },
+    {
+      "createdAt": "2026-03-21 12:43:36",
+      "fileSizeKB": "25"
+    },
+    {
+      "createdAt": "2026-03-21 13:18:37",
+      "fileSizeKB": "36"
+    },
+    {
+      "createdAt": "2026-03-21 13:19:53",
+      "fileSizeKB": "36"
+    },
+    {
+      "createdAt": "2026-03-21 13:20:22",
+      "fileSizeKB": "28"
+    },
+    {
+      "createdAt": "2026-03-21 16:00:09",
+      "fileSizeKB": "36"
+    }
+  ],
+  "messages": [],
+  "stdout": "createdAt\tfileSizeKB\n2026-03-21 00:02:51\t28\n2026-03-21 00:46:24\t36\n2026-03-21 01:03:28\t22\n2026-03-21 03:04:25\t36\n2026-03-21 03:04:52\t15\n2026-03-21 04:17:21\t24\n2026-03-21 05:32:39\t25\n2026-03-21 07:41:47\t25\n2026-03-21 12:43:36\t25\n2026-03-21 13:18:37\t36\n2026-03-21 13:19:53\t36\n2026-03-21 13:20:22\t28\n2026-03-21 16:00:09\t36\n",
+  "stderr": "",
+  "execution_time_ms": 1680
+}

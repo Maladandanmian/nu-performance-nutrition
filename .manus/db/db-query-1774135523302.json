@@ -1,0 +1,20 @@
+{
+  "query": "SELECT * FROM backup_logs LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT * FROM backup_logs LIMIT 1",
+  "rows": [
+    {
+      "id": "1",
+      "trainerId": "1",
+      "status": "success",
+      "backupDate": "2026-03-13",
+      "fileSizeKB": "159",
+      "recipientEmail": "lukusdavey@gmail.com",
+      "errorMessage": "NULL",
+      "createdAt": "2026-03-13 05:16:57"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tstatus\tbackupDate\tfileSizeKB\trecipientEmail\terrorMessage\tcreatedAt\n1\t1\tsuccess\t2026-03-13\t159\tlukusdavey@gmail.com\tNULL\t2026-03-13 05:16:57\n",
+  "stderr": "",
+  "execution_time_ms": 1640
+}

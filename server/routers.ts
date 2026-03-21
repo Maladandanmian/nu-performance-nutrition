@@ -3502,17 +3502,19 @@ Return as JSON.`
         recipientEmail: z.string().email(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Rate limit: prevent multiple backups within the same hour
+        // Rate limit: prevent multiple backups within the same 24 hours
         const lastLog = await db.getLastBackupLog();
         if (lastLog) {
           const lastBackupTime = new Date(lastLog.createdAt).getTime();
-          const oneHourAgo = Date.now() - 60 * 60 * 1000;
-          if (lastBackupTime > oneHourAgo) {
-            const nextAvailable = new Date(lastBackupTime + 60 * 60 * 1000);
-            const minutesLeft = Math.ceil((nextAvailable.getTime() - Date.now()) / 60000);
+          const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+          if (lastBackupTime > oneDayAgo) {
+            const nextAvailable = new Date(lastBackupTime + 24 * 60 * 60 * 1000);
+            const hoursLeft = Math.ceil((nextAvailable.getTime() - Date.now()) / (60 * 60 * 1000));
+            const minutesLeft = Math.ceil(((nextAvailable.getTime() - Date.now()) % (60 * 60 * 1000)) / 60000);
+            const timeStr = hoursLeft > 0 ? `${hoursLeft}h ${minutesLeft}m` : `${minutesLeft}m`;
             throw new TRPCError({
               code: 'TOO_MANY_REQUESTS',
-              message: `A backup was run recently. Next backup available in ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}.`,
+              message: `A backup was run recently. Next backup available in ${timeStr}.`,
             });
           }
         }
