@@ -1,0 +1,106 @@
+{
+  "query": "SELECT \n  createdAt,\n  status,\n  fileSizeKB,\n  recipientEmail\nFROM backup_logs \nWHERE createdAt >= CONVERT_TZ(CONCAT(CURDATE(), ' 00:01:00'), '+08:00', '+00:00')\nORDER BY createdAt ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute SELECT \n  createdAt,\n  status,\n  fileSizeKB,\n  recipientEmail\nFROM backup_logs \nWHERE createdAt >= CONVERT_TZ(CONCAT(CURDATE(), ' 00:01:00'), '+08:00', '+00:00')\nORDER BY createdAt ASC;",
+  "rows": [
+    {
+      "createdAt": "2026-03-20 16:42:06",
+      "status": "success",
+      "fileSizeKB": "32",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-20 17:53:54",
+      "status": "success",
+      "fileSizeKB": "31",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-20 18:11:11",
+      "status": "success",
+      "fileSizeKB": "28",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-20 23:30:01",
+      "status": "success",
+      "fileSizeKB": "32",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 00:02:51",
+      "status": "success",
+      "fileSizeKB": "28",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 00:46:24",
+      "status": "success",
+      "fileSizeKB": "36",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 01:03:28",
+      "status": "success",
+      "fileSizeKB": "22",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 03:04:25",
+      "status": "success",
+      "fileSizeKB": "36",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 03:04:52",
+      "status": "success",
+      "fileSizeKB": "15",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 04:17:21",
+      "status": "success",
+      "fileSizeKB": "24",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 05:32:39",
+      "status": "success",
+      "fileSizeKB": "25",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 07:41:47",
+      "status": "success",
+      "fileSizeKB": "25",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 12:43:36",
+      "status": "success",
+      "fileSizeKB": "25",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 13:18:37",
+      "status": "success",
+      "fileSizeKB": "36",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 13:19:53",
+      "status": "success",
+      "fileSizeKB": "36",
+      "recipientEmail": "lukusdavey@gmail.com"
+    },
+    {
+      "createdAt": "2026-03-21 13:20:22",
+      "status": "success",
+      "fileSizeKB": "28",
+      "recipientEmail": "lukusdavey@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "createdAt\tstatus\tfileSizeKB\trecipientEmail\n2026-03-20 16:42:06\tsuccess\t32\tlukusdavey@gmail.com\n2026-03-20 17:53:54\tsuccess\t31\tlukusdavey@gmail.com\n2026-03-20 18:11:11\tsuccess\t28\tlukusdavey@gmail.com\n2026-03-20 23:30:01\tsuccess\t32\tlukusdavey@gmail.com\n2026-03-21 00:02:51\tsuccess\t28\tlukusdavey@gmail.com\n2026-03-21 00:46:24\tsuccess\t36\tlukusdavey@gmail.com\n2026-03-21 01:03:28\tsuccess\t22\tlukusdavey@gmail.com\n2026-03-21 03:04:25\tsuccess\t36\tlukusdavey@gmail.com\n2026-03-21 03:04:52\tsuccess\t15\tlukusdavey@gmail.com\n2026-03-21 04:17:21\tsuccess\t24\tlukusdavey@gmail.com\n2026-03-21 05:32:39\tsuccess\t25\tlukusdavey@gmail.com\n2026-03-21 07:41:47\tsuccess\t25\tlukusdavey@gmail.com\n2026-03-21 12:43:36\tsuccess\t25\tlukusdavey@gmail.com\n2026-03-21 13:18:37\tsuccess\t36\tlukusdavey@gmail.com\n2026-03-21 13:19:53\tsuccess\t36\tlukusdavey@gmail.com\n2026-03-21 13:20:22\tsuccess\t28\tlukusdavey@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 1761
+}

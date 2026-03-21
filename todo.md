@@ -2654,3 +2654,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add 1-hour cooldown check to sendBackup tRPC procedure (returns TOO_MANY_REQUESTS with minutes remaining)
 - [x] Disable "Run Backup Now" button when backup ran within last hour, show "Available in Xm" countdown
 - [x] Error message now shows cooldown info instead of generic error
+
+## Startup Backup Check Disabled (Mar 2026)
+- [x] Identified: Startup catch-up check was triggering backups on every server restart
+- [x] Root cause: Manus performs frequent maintenance restarts overnight (midnight-7am)
+- [x] Disabled: Commented out the startup catch-up logic in server/_core/index.ts
+- [x] Rationale: External cron-job.org trigger at 11:59 PM is reliable; manual "Run Backup Now" button (with 1-hour cooldown) handles emergencies

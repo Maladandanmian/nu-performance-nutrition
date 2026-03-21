@@ -140,27 +140,14 @@ async function startServer() {
   });
 
   // ── Option 1: Startup catch-up check ─────────────────────────────────────
-  // If the server restarts and the last backup is more than 20 hours old,
-  // run a backup immediately rather than waiting for the next cron window.
-  // Runs 5 seconds after startup to avoid blocking the server boot.
-  setTimeout(async () => {
-    try {
-      const trainerId = await getOwnerTrainerId();
-      const lastLog = trainerId ? await getLastBackupLog(trainerId).catch(() => undefined) : undefined;
-      const twentyHoursMs = 20 * 60 * 60 * 1000;
-      const lastBackupTime = lastLog?.backupDate ? new Date(lastLog.backupDate).getTime() : 0;
-      const hoursSinceLast = Math.round((Date.now() - lastBackupTime) / 3600000);
-
-      if (Date.now() - lastBackupTime > twentyHoursMs) {
-        console.log(`[Backup] Startup check: last backup was ${hoursSinceLast}h ago — running catch-up backup`);
-        runBackup('startup-catchup');
-      } else {
-        console.log(`[Backup] Startup check: last backup was ${hoursSinceLast}h ago — no catch-up needed`);
-      }
-    } catch (error) {
-      console.error('[Backup] Startup check error:', error);
-    }
-  }, 5000);
+  // DISABLED: Was triggering unwanted backups on every server restart due to Manus
+  // performing frequent maintenance restarts overnight. The external cron-job.org trigger
+  // at 11:59 PM is reliable and sufficient. If backups are missed, they can be triggered
+  // manually via the "Run Backup Now" button (with 1-hour cooldown).
+  // 
+  // if (process.env.ENABLE_STARTUP_BACKUP_CHECK === 'true') {
+  //   setTimeout(async () => { ... }, 5000);
+  // }
 }
 
 startServer().catch(console.error);
