@@ -2667,3 +2667,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update UI: Show countdown timer for when next backup is available
 - [ ] Test: Verify cron-job backup blocks manual trigger for 24 hours
 - [ ] Test: Verify manual backup blocks cron-job trigger for 24 hours
+
+## Backup Failure Alert System (Mar 2026)
+- [x] Detect when last backup is failed status AND older than 24 hours
+- [x] Turn backup button red when backup is overdue (failed cron + 24h passed)
+- [x] Show warning tooltip explaining the situation
+- [x] Test: Verify button turns red when cron job fails and 24 hours pass (7 vitest tests all passing)
+- [ ] Test: Verify button returns to normal after successful manual backup

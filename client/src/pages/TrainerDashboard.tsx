@@ -59,6 +59,30 @@ export default function TrainerDashboard() {
     return { isOnCooldown: false, timeStr: '' };
   }, [lastBackup]);
   const backupCooldownMinutesLeft = backupCooldownState.isOnCooldown ? 1 : 0; // For compatibility with existing code
+
+  // Compute backup alert state: red button if last backup failed AND is older than 24 hours
+  const backupAlertState = useMemo(() => {
+    if (!lastBackup) return { isAlert: false, reason: '' };
+    
+    // Check if last backup failed
+    if (lastBackup.status !== 'failed') return { isAlert: false, reason: '' };
+    
+    // Check if it's been more than 24 hours since the failed backup
+    const lastBackupTime = new Date(lastBackup.createdAt).getTime();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const elapsed = Date.now() - lastBackupTime;
+    
+    if (elapsed > oneDayMs) {
+      const hoursSince = Math.floor(elapsed / (60 * 60 * 1000));
+      return { 
+        isAlert: true, 
+        reason: `Backup failed ${hoursSince}h ago. Manual backup needed.` 
+      };
+    }
+    
+    return { isAlert: false, reason: '' };
+  }, [lastBackup]);
+
   const createClientMutation = trpc.clients.create.useMutation({
     onSuccess: (data) => {
       const invitationStatus = data.invitationSent 
@@ -397,11 +421,15 @@ export default function TrainerDashboard() {
               size="sm"
               onClick={() => runBackupMutation.mutate({ recipientEmail: 'lukusdavey@gmail.com' })}
               disabled={runBackupMutation.isPending || backupCooldownState.isOnCooldown}
-              className="shrink-0 text-xs"
-              title={backupCooldownState.isOnCooldown ? `Next backup available in ${backupCooldownState.timeStr}` : undefined}
+              className={`shrink-0 text-xs ${
+                backupAlertState.isAlert 
+                  ? 'border-red-500 text-white bg-red-600 hover:bg-red-700' 
+                  : ''
+              }`}
+              title={backupAlertState.isAlert ? backupAlertState.reason : backupCooldownState.isOnCooldown ? `Next backup available in ${backupCooldownState.timeStr}` : undefined}
             >
               <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${runBackupMutation.isPending ? 'animate-spin' : ''}`} />
-              {runBackupMutation.isPending ? 'Running...' : backupCooldownState.isOnCooldown ? `Available in ${backupCooldownState.timeStr}` : 'Run Backup Now'}
+              {runBackupMutation.isPending ? 'Running...' : backupAlertState.isAlert ? '⚠️ Backup Overdue' : backupCooldownState.isOnCooldown ? `Available in ${backupCooldownState.timeStr}` : 'Run Backup Now'}
             </Button>
           </div>
 
