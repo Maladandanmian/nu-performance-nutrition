@@ -2674,3 +2674,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Show warning tooltip explaining the situation
 - [x] Test: Verify button turns red when cron job fails and 24 hours pass (7 vitest tests all passing)
 - [ ] Test: Verify button returns to normal after successful manual backup
+
+## Duplicate Session Reminder Emails (Mar 2026)
+- [x] Investigate root cause of duplicate reminders (similar to backup issue?)
+- [x] Check if multiple cron-job triggers or server restarts causing repeats
+- [x] Implement 24-hour cooldown for session reminders per client
+- [x] Add lastReminderSentAt timestamp to track reminder frequency
+- [x] Test: Verify only one reminder per client per 24 hours (8 vitest tests all passing)

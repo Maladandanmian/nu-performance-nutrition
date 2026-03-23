@@ -2644,3 +2644,23 @@ export async function createBackupLog(log: InsertBackupLog) {
   if (!db) throw new Error("Database not available");
   return db.insert(backupLogs).values(log);
 }
+
+
+export async function updateSessionReminderTimestamp(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .update(trainingSessions)
+    .set({ lastReminderSentAt: new Date() })
+    .where(eq(trainingSessions.id, sessionId));
+}
+
+
+export async function updateGroupClassReminderTimestamp(groupClassId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .update(groupClasses)
+    .set({ lastReminderSentAt: new Date() })
+    .where(eq(groupClasses.id, groupClassId));
+}

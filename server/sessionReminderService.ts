@@ -49,6 +49,16 @@ export async function sendSessionReminders(): Promise<{
               continue;
             }
 
+            // Check if reminder was already sent within the last 24 hours
+            const lastReminderTime = session.lastReminderSentAt ? new Date(session.lastReminderSentAt).getTime() : 0;
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            const timeSinceLastReminder = Date.now() - lastReminderTime;
+
+            if (timeSinceLastReminder < oneDayMs) {
+              console.log(`[SessionReminders] Skipping session ${session.id} - reminder already sent ${Math.floor(timeSinceLastReminder / 60000)} minutes ago`);
+              continue;
+            }
+
             // Send reminder email
             await sendSessionReminder({
               id: session.id,
@@ -61,6 +71,9 @@ export async function sendSessionReminders(): Promise<{
               trainerName: trainer.name || 'Your Trainer',
               notes: session.notes || undefined,
             });
+
+            // Update lastReminderSentAt timestamp
+            await db.updateSessionReminderTimestamp(session.id);
 
             sessionRemindersSent++;
             console.log(`[SessionReminders] Sent reminder for session ${session.id} to ${client.email}`);
@@ -86,10 +99,21 @@ export async function sendSessionReminders(): Promise<{
               continue;
             }
 
+            // Check if reminder was already sent within the last 24 hours
+            const lastReminderTime = groupClass.lastReminderSentAt ? new Date(groupClass.lastReminderSentAt).getTime() : 0;
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            const timeSinceLastReminder = Date.now() - lastReminderTime;
+
+            if (timeSinceLastReminder < oneDayMs) {
+              console.log(`[SessionReminders] Skipping group class ${groupClass.id} - reminder already sent ${Math.floor(timeSinceLastReminder / 60000)} minutes ago`);
+              continue;
+            }
+
             // Get attendees
             const attendees = await db.getGroupClassAttendees(groupClass.id);
 
-            // Send reminder to each attendee
+            // Send reminders for each group class (only once per 24 hours)
+            let reminderSentToAnyAttendee = false;
             for (const attendee of attendees) {
               try {
                 const client = await db.getClientById(attendee.clientId);
@@ -110,6 +134,7 @@ export async function sendSessionReminders(): Promise<{
                   trainerName: trainer.name || 'Your Trainer',
                 });
 
+                reminderSentToAnyAttendee = true;
                 groupClassRemindersSent++;
                 console.log(`[SessionReminders] Sent reminder for group class ${groupClass.id} to ${client.email}`);
               } catch (error) {
@@ -117,6 +142,11 @@ export async function sendSessionReminders(): Promise<{
                 console.error(`[SessionReminders] ${errorMsg}`);
                 errors.push(errorMsg);
               }
+            }
+
+            // Update lastReminderSentAt timestamp if any reminder was sent
+            if (reminderSentToAnyAttendee) {
+              await db.updateGroupClassReminderTimestamp(groupClass.id);
             }
           } catch (error) {
             const errorMsg = `Failed to process group class ${groupClass.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;

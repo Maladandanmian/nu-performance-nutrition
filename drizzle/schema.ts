@@ -699,6 +699,7 @@ export const trainingSessions = mysqlTable("training_sessions", {
   notes: text("notes"),
   cancelled: boolean("cancelled").default(false).notNull(),
   cancelledAt: timestamp("cancelledAt"),
+  lastReminderSentAt: timestamp("lastReminderSentAt"), // Track when reminder was last sent (24-hour cooldown)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -722,6 +723,7 @@ export const groupClasses = mysqlTable("group_classes", {
   notes: text("notes"),
   cancelled: boolean("cancelled").default(false).notNull(),
   cancelledAt: timestamp("cancelledAt"),
+  lastReminderSentAt: timestamp("lastReminderSentAt"), // Track when reminder was last sent (24-hour cooldown)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

@@ -1,0 +1,1 @@
+ALTER TABLE `group_classes` ADD `lastReminderSentAt` timestamp;
