@@ -1,0 +1,26 @@
+{
+  "query": "\nSELECT \n  id,\n  status,\n  createdAt,\n  DATE(createdAt) as backup_date,\n  TIME(createdAt) as backup_time,\n  errorMessage\nFROM backup_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY createdAt DESC\nLIMIT 50;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  status,\n  createdAt,\n  DATE(createdAt) as backup_date,\n  TIME(createdAt) as backup_time,\n  errorMessage\nFROM backup_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY createdAt DESC\nLIMIT 50;\n",
+  "rows": [
+    {
+      "id": "1020001",
+      "status": "success",
+      "createdAt": "2026-03-24 15:59:55",
+      "backup_date": "2026-03-24",
+      "backup_time": "15:59:55",
+      "errorMessage": "NULL"
+    },
+    {
+      "id": "990001",
+      "status": "success",
+      "createdAt": "2026-03-23 16:00:30",
+      "backup_date": "2026-03-23",
+      "backup_time": "16:00:30",
+      "errorMessage": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tcreatedAt\tbackup_date\tbackup_time\terrorMessage\n1020001\tsuccess\t2026-03-24 15:59:55\t2026-03-24\t15:59:55\tNULL\n990001\tsuccess\t2026-03-23 16:00:30\t2026-03-23\t16:00:30\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1563
+}

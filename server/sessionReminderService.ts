@@ -60,7 +60,7 @@ export async function sendSessionReminders(): Promise<{
             }
 
             // Send reminder email
-            await sendSessionReminder({
+            const emailSent = await sendSessionReminder({
               id: session.id,
               clientName: client.name,
               clientEmail: client.email,
@@ -72,11 +72,16 @@ export async function sendSessionReminders(): Promise<{
               notes: session.notes || undefined,
             });
 
-            // Update lastReminderSentAt timestamp
-            await db.updateSessionReminderTimestamp(session.id);
-
-            sessionRemindersSent++;
-            console.log(`[SessionReminders] Sent reminder for session ${session.id} to ${client.email}`);
+            // Only update timestamp if email was actually sent
+            if (emailSent) {
+              await db.updateSessionReminderTimestamp(session.id);
+              sessionRemindersSent++;
+              console.log(`[SessionReminders] Sent reminder for session ${session.id} to ${client.email}`);
+            } else {
+              const errorMsg = `Failed to send reminder email for session ${session.id} to ${client.email}`;
+              console.error(`[SessionReminders] ${errorMsg}`);
+              errors.push(errorMsg);
+            }
           } catch (error) {
             const errorMsg = `Failed to send reminder for session ${session.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
             console.error(`[SessionReminders] ${errorMsg}`);
@@ -123,7 +128,7 @@ export async function sendSessionReminders(): Promise<{
                 }
 
                 // Send reminder email
-                await sendGroupClassReminder({
+                const emailSent = await sendGroupClassReminder({
                   id: groupClass.id,
                   clientName: client.name,
                   clientEmail: client.email,
@@ -134,9 +139,15 @@ export async function sendSessionReminders(): Promise<{
                   trainerName: trainer.name || 'Your Trainer',
                 });
 
-                reminderSentToAnyAttendee = true;
-                groupClassRemindersSent++;
-                console.log(`[SessionReminders] Sent reminder for group class ${groupClass.id} to ${client.email}`);
+                if (emailSent) {
+                  reminderSentToAnyAttendee = true;
+                  groupClassRemindersSent++;
+                  console.log(`[SessionReminders] Sent reminder for group class ${groupClass.id} to ${client.email}`);
+                } else {
+                  const errorMsg = `Failed to send reminder email for group class ${groupClass.id} to ${client.email}`;
+                  console.error(`[SessionReminders] ${errorMsg}`);
+                  errors.push(errorMsg);
+                }
               } catch (error) {
                 const errorMsg = `Failed to send reminder for group class ${groupClass.id} to client ${attendee.clientId}: ${error instanceof Error ? error.message : 'Unknown error'}`;
                 console.error(`[SessionReminders] ${errorMsg}`);

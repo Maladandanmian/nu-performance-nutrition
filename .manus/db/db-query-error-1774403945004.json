@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  id,\n  status,\n  createdAt,\n  DATE(createdAt) as backup_date,\n  TIME(createdAt) as backup_time,\n  fileSize,\n  errorMessage\nFROM backup_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY createdAt DESC\nLIMIT 50;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  status,\n  createdAt,\n  DATE(createdAt) as backup_date,\n  TIME(createdAt) as backup_time,\n  fileSize,\n  errorMessage\nFROM backup_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY createdAt DESC\nLIMIT 50;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'filesize' in 'field list'"
+  ]
+}

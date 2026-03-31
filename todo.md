@@ -2681,3 +2681,15 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Implement 24-hour cooldown for session reminders per client
 - [x] Add lastReminderSentAt timestamp to track reminder frequency
 - [x] Test: Verify only one reminder per client per 24 hours (8 vitest tests all passing)
+
+
+## CRITICAL BUG: Session Reminders Not Being Delivered (Mar 2026)
+- [x] Investigate: Reminders marked as sent in DB but not reaching clients
+- [x] Check email sending function in sessionEmailNotifications.ts
+- [x] Verify email service credentials and configuration
+- [x] Fix email delivery issue: Changed emailService.ts from SendGrid API to Nodemailer SMTP
+- [x] Fixed sessionReminderService.ts to only update timestamp if email actually sent
+- [x] Fixed groupClassReminderService.ts to only update timestamp if email actually sent
+- [x] All 8 email service tests passing
+- [ ] Test with andy@andyknight.asia (test client) to confirm delivery
+- [ ] Verify Thomas Lee and other clients now receive reminders

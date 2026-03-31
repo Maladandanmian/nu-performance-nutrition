@@ -1,0 +1,25 @@
+{
+  "query": "\nSELECT \n  id,\n  trainerId,\n  clientId,\n  sessionType,\n  sessionDate,\n  startTime,\n  endTime,\n  cancelled,\n  cancelledAt,\n  lastReminderSentAt,\n  notes,\n  createdAt,\n  updatedAt\nFROM training_sessions\nWHERE id = 600035;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  trainerId,\n  clientId,\n  sessionType,\n  sessionDate,\n  startTime,\n  endTime,\n  cancelled,\n  cancelledAt,\n  lastReminderSentAt,\n  notes,\n  createdAt,\n  updatedAt\nFROM training_sessions\nWHERE id = 600035;\n",
+  "rows": [
+    {
+      "id": "600035",
+      "trainerId": "1",
+      "clientId": "990036",
+      "sessionType": "nutrition_initial",
+      "sessionDate": "2026-03-31",
+      "startTime": "11:00",
+      "endTime": "12:00",
+      "cancelled": "0",
+      "cancelledAt": "NULL",
+      "lastReminderSentAt": "2026-03-30 01:00:37",
+      "notes": "NULL",
+      "createdAt": "2026-03-12 00:52:08",
+      "updatedAt": "2026-03-30 01:00:37"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tclientId\tsessionType\tsessionDate\tstartTime\tendTime\tcancelled\tcancelledAt\tlastReminderSentAt\tnotes\tcreatedAt\tupdatedAt\n600035\t1\t990036\tnutrition_initial\t2026-03-31\t11:00\t12:00\t0\tNULL\t2026-03-30 01:00:37\tNULL\t2026-03-12 00:52:08\t2026-03-30 01:00:37\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}

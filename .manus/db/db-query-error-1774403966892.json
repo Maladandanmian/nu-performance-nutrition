@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  id,\n  action,\n  userId,\n  clientId,\n  createdAt,\n  DATE(createdAt) as log_date,\n  TIME(createdAt) as log_time,\n  details\nFROM audit_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\n  AND (action LIKE '%email%' OR action LIKE '%reminder%' OR action LIKE '%notification%')\nORDER BY createdAt DESC\nLIMIT 100;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  action,\n  userId,\n  clientId,\n  createdAt,\n  DATE(createdAt) as log_date,\n  TIME(createdAt) as log_time,\n  details\nFROM audit_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\n  AND (action LIKE '%email%' OR action LIKE '%reminder%' OR action LIKE '%notification%')\nORDER BY createdAt DESC\nLIMIT 100;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'userid' in 'field list'"
+  ]
+}

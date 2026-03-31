@@ -1,0 +1,76 @@
+{
+  "query": "\nSELECT \n  id,\n  clientId,\n  sessionDate,\n  startTime,\n  lastReminderSentAt,\n  DATE(lastReminderSentAt) as reminder_date,\n  TIME(lastReminderSentAt) as reminder_time,\n  TIMESTAMPDIFF(HOUR, lastReminderSentAt, NOW()) as hours_since_reminder,\n  TIMESTAMPDIFF(MINUTE, lastReminderSentAt, NOW()) as minutes_since_reminder\nFROM training_sessions\nWHERE lastReminderSentAt IS NOT NULL\n  AND lastReminderSentAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY lastReminderSentAt DESC\nLIMIT 50;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  clientId,\n  sessionDate,\n  startTime,\n  lastReminderSentAt,\n  DATE(lastReminderSentAt) as reminder_date,\n  TIME(lastReminderSentAt) as reminder_time,\n  TIMESTAMPDIFF(HOUR, lastReminderSentAt, NOW()) as hours_since_reminder,\n  TIMESTAMPDIFF(MINUTE, lastReminderSentAt, NOW()) as minutes_since_reminder\nFROM training_sessions\nWHERE lastReminderSentAt IS NOT NULL\n  AND lastReminderSentAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nORDER BY lastReminderSentAt DESC\nLIMIT 50;\n",
+  "rows": [
+    {
+      "id": "1170001",
+      "clientId": "2070001",
+      "sessionDate": "2026-03-26",
+      "startTime": "16:00",
+      "lastReminderSentAt": "2026-03-25 01:00:48",
+      "reminder_date": "2026-03-25",
+      "reminder_time": "01:00:48",
+      "hours_since_reminder": "0",
+      "minutes_since_reminder": "59"
+    },
+    {
+      "id": "900004",
+      "clientId": "1170001",
+      "sessionDate": "2026-03-26",
+      "startTime": "15:00",
+      "lastReminderSentAt": "2026-03-25 01:00:45",
+      "reminder_date": "2026-03-25",
+      "reminder_time": "01:00:45",
+      "hours_since_reminder": "0",
+      "minutes_since_reminder": "59"
+    },
+    {
+      "id": "900002",
+      "clientId": "1650001",
+      "sessionDate": "2026-03-26",
+      "startTime": "10:00",
+      "lastReminderSentAt": "2026-03-25 01:00:41",
+      "reminder_date": "2026-03-25",
+      "reminder_time": "01:00:41",
+      "hours_since_reminder": "0",
+      "minutes_since_reminder": "59"
+    },
+    {
+      "id": "1170002",
+      "clientId": "1920001",
+      "sessionDate": "2026-03-26",
+      "startTime": "06:30",
+      "lastReminderSentAt": "2026-03-25 01:00:38",
+      "reminder_date": "2026-03-25",
+      "reminder_time": "01:00:38",
+      "hours_since_reminder": "0",
+      "minutes_since_reminder": "59"
+    },
+    {
+      "id": "1050001",
+      "clientId": "1110001",
+      "sessionDate": "2026-03-25",
+      "startTime": "13:00",
+      "lastReminderSentAt": "2026-03-24 01:00:43",
+      "reminder_date": "2026-03-24",
+      "reminder_time": "01:00:43",
+      "hours_since_reminder": "24",
+      "minutes_since_reminder": "1499"
+    },
+    {
+      "id": "1200001",
+      "clientId": "1980001",
+      "sessionDate": "2026-03-25",
+      "startTime": "12:00",
+      "lastReminderSentAt": "2026-03-24 01:00:41",
+      "reminder_date": "2026-03-24",
+      "reminder_time": "01:00:41",
+      "hours_since_reminder": "24",
+      "minutes_since_reminder": "1499"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tclientId\tsessionDate\tstartTime\tlastReminderSentAt\treminder_date\treminder_time\thours_since_reminder\tminutes_since_reminder\n1170001\t2070001\t2026-03-26\t16:00\t2026-03-25 01:00:48\t2026-03-25\t01:00:48\t0\t59\n900004\t1170001\t2026-03-26\t15:00\t2026-03-25 01:00:45\t2026-03-25\t01:00:45\t0\t59\n900002\t1650001\t2026-03-26\t10:00\t2026-03-25 01:00:41\t2026-03-25\t01:00:41\t0\t59\n1170002\t1920001\t2026-03-26\t06:30\t2026-03-25 01:00:38\t2026-03-25\t01:00:38\t0\t59\n1050001\t1110001\t2026-03-25\t13:00\t2026-03-24 01:00:43\t2026-03-24\t01:00:43\t24\t1499\n1200001\t1980001\t2026-03-25\t12:00\t2026-03-24 01:00:41\t2026-03-24\t01:00:41\t24\t1499\n",
+  "stderr": "",
+  "execution_time_ms": 1642
+}

@@ -2,12 +2,14 @@
  * Email Service
  * 
  * Handles sending emails for password setup invitations and other notifications.
- * Uses SendGrid Web API for reliable email delivery.
+ * Uses Nodemailer with SMTP for reliable email delivery (same as backup system).
  * 
  * Configuration:
- * - Requires EMAIL_PASSWORD env var (SendGrid API key)
- * - Requires EMAIL_FROM env var for sender address
- * - Falls back to console.log if email is not configured
+ * - Requires EMAIL_HOST env var (SMTP server hostname)
+ * - Requires EMAIL_PORT env var (SMTP port, typically 587 or 465)
+ * - Requires EMAIL_USER env var (SMTP username)
+ * - Requires EMAIL_PASSWORD env var (SMTP password)
+ * - Requires EMAIL_FROM env var (sender email address)
  */
 
 import { ENV } from './_core/env';
@@ -24,19 +26,22 @@ interface EmailOptions {
 }
 
 /**
- * Send an email using SendGrid Web API
+ * Send an email using Nodemailer with SMTP
  * Returns true if email was sent successfully, false otherwise
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  // Check if email is configured - use EMAIL_PASSWORD (SendGrid API key)
-  const apiKey = ENV.emailPassword;
+  // Check if email is configured
+  const emailHost = ENV.emailHost;
+  const emailPort = ENV.emailPort;
+  const emailUser = ENV.emailUser;
+  const emailPassword = ENV.emailPassword;
   const emailFrom = ENV.emailFrom || 'Nu Performance Nutrition <noreply@nunutrition.com>';
   
   // Debug logging
-  console.log(`[EmailService] Checking config - apiKey exists: ${!!apiKey}, emailFrom: ${emailFrom}`);
+  console.log(`[EmailService] Checking config - host: ${emailHost}, port: ${emailPort}, user: ${emailUser}, from: ${emailFrom}`);
 
   // If email is not configured, log to console and return false
-  if (!apiKey) {
+  if (!emailHost || !emailPort || !emailUser || !emailPassword) {
     console.log('[EmailService] Email not configured. Would have sent:');
     console.log(`[EmailService] To: ${options.to}`);
     console.log(`[EmailService] Subject: ${options.subject}`);
@@ -45,74 +50,63 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   }
 
   try {
-    // Use SendGrid Web API v3
-    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+    // Import nodemailer dynamically
+    const nodemailer = await import('nodemailer');
+    
+    // Create SMTP transporter
+    const transporter = nodemailer.default.createTransport({
+      host: emailHost,
+      port: parseInt(emailPort),
+      secure: emailPort === '465', // Use TLS for port 465, STARTTLS for others
+      auth: {
+        user: emailUser,
+        pass: emailPassword,
       },
-      body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: options.to }],
-          },
-        ],
-        from: parseEmailAddress(emailFrom),
-        subject: options.subject,
-        content: [
-          ...(options.text ? [{ type: 'text/plain', value: options.text }] : []),
-          { type: 'text/html', value: options.html },
-        ],
-        ...(options.attachments && options.attachments.length > 0 ? {
-          attachments: options.attachments.map(att => ({
-            filename: att.filename,
-            content: att.content.toString('base64'),
-            type: 'application/octet-stream',
-            disposition: 'attachment',
-          })),
-        } : {}),
-      }),
     });
 
-    if (response.ok || response.status === 202) {
-      console.log(`[EmailService] Email sent successfully to ${options.to}`);
-      return true;
-    } else {
-      const errorText = await response.text();
-      console.error(`[EmailService] SendGrid API error: ${response.status} - ${errorText}`);
-      return false;
-    }
+    // Send email
+    const info = await transporter.sendMail({
+      from: emailFrom,
+      to: options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+      ...(options.attachments && options.attachments.length > 0 ? {
+        attachments: options.attachments.map(att => ({
+          filename: att.filename,
+          content: att.content,
+          contentType: 'application/octet-stream',
+        })),
+      } : {}),
+    });
+
+    console.log(`[EmailService] Email sent successfully to ${options.to} (Message ID: ${info.messageId})`);
+    return true;
   } catch (error) {
-    console.error('[EmailService] Failed to send email:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(`[EmailService] Failed to send email to ${options.to}: ${errorMsg}`);
     return false;
   }
 }
 
 /**
- * Parse email address string into SendGrid format
+ * Parse email address string into Nodemailer format
  * Handles both "Name <email@example.com>" and "email@example.com" formats
  */
-function parseEmailAddress(emailString: string): { email: string; name?: string } {
-  const match = emailString.match(/^(.+?)\s*<(.+?)>$/);
-  if (match) {
-    return { name: match[1].trim(), email: match[2].trim() };
-  }
-  return { email: emailString.trim() };
+function parseEmailAddress(emailString: string): string {
+  return emailString;
 }
 
 /**
- * Send password setup invitation email to a client
+ * Send password setup invitation email
  */
 export async function sendPasswordSetupInvitation(
   clientEmail: string,
   clientName: string,
-  token: string
+  setupLink: string
 ): Promise<boolean> {
-  const setupUrl = `${ENV.appUrl || 'https://nuperformnut-cvoywtwv.manus.space'}/set-password?token=${token}`;
-
   const subject = 'Welcome to Nu Performance Nutrition - Set Your Password';
-
+  
   const html = `
 <!DOCTYPE html>
 <html>
@@ -128,7 +122,7 @@ export async function sendPasswordSetupInvitation(
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background-color: #578DB3; padding: 30px 40px; text-align: center;">
+            <td style="background-color: #F59E0B; padding: 30px 40px; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Nu Performance Nutrition</h1>
             </td>
           </tr>
@@ -138,33 +132,29 @@ export async function sendPasswordSetupInvitation(
             <td style="padding: 40px;">
               <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 20px;">Welcome, ${clientName}!</h2>
               
-              <p style="margin: 0 0 15px 0; color: #666666; font-size: 16px; line-height: 1.5;">
-                Your trainer has created an account for you on Nu Performance Nutrition. To get started, you need to set your password.
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Your account has been created. Please click the button below to set your password and activate your account.
               </p>
               
-              <p style="margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.5;">
-                Click the button below to set your password and access your nutrition dashboard:
-              </p>
-              
-              <!-- Button -->
-              <table width="100%" cellpadding="0" cellspacing="0">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                 <tr>
                   <td align="center">
-                    <a href="${setupUrl}" style="display: inline-block; background-color: #578DB3; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 4px; font-size: 16px; font-weight: bold;">Set Your Password</a>
+                    <a href="${setupLink}" style="display: inline-block; background-color: #F59E0B; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                      Set Your Password
+                    </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 30px 0 15px 0; color: #666666; font-size: 14px; line-height: 1.5;">
-                Or copy and paste this link into your browser:
+              <p style="margin: 0 0 15px 0; color: #666666; font-size: 14px; line-height: 1.5;">
+                Or copy and paste this link in your browser:
+              </p>
+              <p style="margin: 0 0 30px 0; color: #0066cc; font-size: 12px; word-break: break-all;">
+                ${setupLink}
               </p>
               
-              <p style="margin: 0 0 30px 0; color: #578DB3; font-size: 14px; word-break: break-all;">
-                ${setupUrl}
-              </p>
-              
-              <p style="margin: 0; color: #999999; font-size: 13px; line-height: 1.5;">
-                <strong>Note:</strong> This link will expire in 24 hours. If you didn't request this account, please contact your trainer.
+              <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.5;">
+                This link will expire in 24 hours for security reasons.
               </p>
             </td>
           </tr>
@@ -186,16 +176,13 @@ export async function sendPasswordSetupInvitation(
   `.trim();
 
   const text = `
-Welcome to Nu Performance Nutrition, ${clientName}!
+Welcome to Nu Performance Nutrition!
 
-Your trainer has created an account for you. To get started, you need to set your password.
+Your account has been created. Please click the link below to set your password and activate your account:
 
-Click the link below to set your password:
-${setupUrl}
+${setupLink}
 
-This link will expire in 24 hours.
-
-If you didn't request this account, please contact your trainer.
+This link will expire in 24 hours for security reasons.
 
 © ${new Date().getFullYear()} Nu Performance Nutrition
   `.trim();
@@ -209,17 +196,15 @@ If you didn't request this account, please contact your trainer.
 }
 
 /**
- * Send email verification email to a client
+ * Send email verification link
  */
 export async function sendEmailVerification(
   clientEmail: string,
   clientName: string,
-  token: string
+  verificationLink: string
 ): Promise<boolean> {
-  const verifyUrl = `${ENV.appUrl || 'https://gymtrackapp-pxnerpfk.manus.space'}/verify-email?token=${token}`;
-
   const subject = 'Verify Your Email - Nu Performance Nutrition';
-
+  
   const html = `
 <!DOCTYPE html>
 <html>
@@ -235,7 +220,7 @@ export async function sendEmailVerification(
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background-color: #578DB3; padding: 30px 40px; text-align: center;">
+            <td style="background-color: #F59E0B; padding: 30px 40px; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Nu Performance Nutrition</h1>
             </td>
           </tr>
@@ -243,39 +228,28 @@ export async function sendEmailVerification(
           <!-- Body -->
           <tr>
             <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 20px;">Verify Your Email, ${clientName}</h2>
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 20px;">Verify Your Email</h2>
               
-              <p style="margin: 0 0 15px 0; color: #666666; font-size: 16px; line-height: 1.5;">
-                Your trainer has updated your email address. Please verify your new email to continue accessing your nutrition dashboard.
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Hi ${clientName},
               </p>
               
-              <p style="margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.5;">
-                Click the button below to verify your email:
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.5;">
+                Please verify your email address by clicking the button below.
               </p>
               
-              <!-- Button -->
-              <table width="100%" cellpadding="0" cellspacing="0">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                 <tr>
                   <td align="center">
-                    <a href="${verifyUrl}" style="display: inline-block; background-color: #578DB3; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 4px; font-size: 16px; font-weight: bold;">Verify Email</a>
+                    <a href="${verificationLink}" style="display: inline-block; background-color: #F59E0B; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                      Verify Email
+                    </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 30px 0 15px 0; color: #666666; font-size: 14px; line-height: 1.5;">
-                Or copy and paste this link into your browser:
-              </p>
-              
-              <p style="margin: 0 0 30px 0; color: #578DB3; font-size: 14px; word-break: break-all;">
-                ${verifyUrl}
-              </p>
-              
-              <p style="margin: 0 0 15px 0; color: #999999; font-size: 14px; line-height: 1.5;">
-                This link will expire in 24 hours for security reasons.
-              </p>
-              
-              <p style="margin: 0; color: #999999; font-size: 14px; line-height: 1.5;">
-                If you didn't request this email change, please contact your trainer immediately.
+              <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.5;">
+                This link will expire in 24 hours.
               </p>
             </td>
           </tr>
@@ -284,7 +258,7 @@ export async function sendEmailVerification(
           <tr>
             <td style="background-color: #f9f9f9; padding: 20px 40px; text-align: center; border-top: 1px solid #eeeeee;">
               <p style="margin: 0; color: #999999; font-size: 12px;">
-                © 2026 Nu Performance Nutrition. All rights reserved.
+                © ${new Date().getFullYear()} Nu Performance Nutrition. All rights reserved.
               </p>
             </td>
           </tr>
@@ -294,24 +268,21 @@ export async function sendEmailVerification(
   </table>
 </body>
 </html>
-  `;
+  `.trim();
 
   const text = `
 Verify Your Email
 
 Hi ${clientName},
 
-Your trainer has updated your email address. Please verify your new email to continue accessing your nutrition dashboard.
+Please verify your email address by clicking the link below:
 
-Verify your email by visiting this link:
-${verifyUrl}
+${verificationLink}
 
-This link will expire in 24 hours for security reasons.
+This link will expire in 24 hours.
 
-If you didn't request this email change, please contact your trainer immediately.
-
-© 2026 Nu Performance Nutrition. All rights reserved.
-  `;
+© ${new Date().getFullYear()} Nu Performance Nutrition
+  `.trim();
 
   return sendEmail({
     to: clientEmail,

@@ -1,0 +1,9 @@
+{
+  "query": "\nSELECT \n  action,\n  COUNT(*) as count,\n  MIN(createdAt) as first_occurrence,\n  MAX(createdAt) as last_occurrence\nFROM audit_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nGROUP BY action\nORDER BY count DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  action,\n  COUNT(*) as count,\n  MIN(createdAt) as first_occurrence,\n  MAX(createdAt) as last_occurrence\nFROM audit_logs\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 2 DAY)\nGROUP BY action\nORDER BY count DESC\nLIMIT 20;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1673
+}

@@ -1,0 +1,100 @@
+{
+  "query": "\nSELECT \n  id,\n  trainerId,\n  sessionType,\n  sessionDate,\n  startTime,\n  cancelled,\n  lastReminderSentAt,\n  createdAt\nFROM training_sessions\nWHERE clientId = 990036\nORDER BY sessionDate DESC, startTime DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Acm1QzHQhQUgLe.35139a5d2a11 --database CVoYWTwV8QMMBSnZsHHM3q --execute \nSELECT \n  id,\n  trainerId,\n  sessionType,\n  sessionDate,\n  startTime,\n  cancelled,\n  lastReminderSentAt,\n  createdAt\nFROM training_sessions\nWHERE clientId = 990036\nORDER BY sessionDate DESC, startTime DESC\nLIMIT 20;\n",
+  "rows": [
+    {
+      "id": "990018",
+      "trainerId": "1",
+      "sessionType": "nutrition_coaching",
+      "sessionDate": "2026-05-19",
+      "startTime": "14:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-20 06:55:18"
+    },
+    {
+      "id": "990017",
+      "trainerId": "1",
+      "sessionType": "1on1_pt",
+      "sessionDate": "2026-05-19",
+      "startTime": "10:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-20 06:55:18"
+    },
+    {
+      "id": "600034",
+      "trainerId": "1",
+      "sessionType": "nutrition_coaching",
+      "sessionDate": "2026-05-10",
+      "startTime": "14:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-12 00:52:06"
+    },
+    {
+      "id": "600033",
+      "trainerId": "1",
+      "sessionType": "1on1_pt",
+      "sessionDate": "2026-05-10",
+      "startTime": "10:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-12 00:52:06"
+    },
+    {
+      "id": "990021",
+      "trainerId": "1",
+      "sessionType": "1on1_pt",
+      "sessionDate": "2026-04-29",
+      "startTime": "10:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-20 06:55:23"
+    },
+    {
+      "id": "600036",
+      "trainerId": "1",
+      "sessionType": "1on1_pt",
+      "sessionDate": "2026-04-10",
+      "startTime": "15:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-12 00:52:09"
+    },
+    {
+      "id": "990019",
+      "trainerId": "1",
+      "sessionType": "nutrition_initial",
+      "sessionDate": "2026-04-09",
+      "startTime": "11:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-03-20 06:55:20"
+    },
+    {
+      "id": "600035",
+      "trainerId": "1",
+      "sessionType": "nutrition_initial",
+      "sessionDate": "2026-03-31",
+      "startTime": "11:00",
+      "cancelled": "0",
+      "lastReminderSentAt": "2026-03-30 01:00:37",
+      "createdAt": "2026-03-12 00:52:08"
+    },
+    {
+      "id": "90027",
+      "trainerId": "1",
+      "sessionType": "2on1_pt",
+      "sessionDate": "2026-02-21",
+      "startTime": "08:30",
+      "cancelled": "0",
+      "lastReminderSentAt": "NULL",
+      "createdAt": "2026-02-20 09:27:15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttrainerId\tsessionType\tsessionDate\tstartTime\tcancelled\tlastReminderSentAt\tcreatedAt\n990018\t1\tnutrition_coaching\t2026-05-19\t14:00\t0\tNULL\t2026-03-20 06:55:18\n990017\t1\t1on1_pt\t2026-05-19\t10:00\t0\tNULL\t2026-03-20 06:55:18\n600034\t1\tnutrition_coaching\t2026-05-10\t14:00\t0\tNULL\t2026-03-12 00:52:06\n600033\t1\t1on1_pt\t2026-05-10\t10:00\t0\tNULL\t2026-03-12 00:52:06\n990021\t1\t1on1_pt\t2026-04-29\t10:00\t0\tNULL\t2026-03-20 06:55:23\n600036\t1\t1on1_pt\t2026-04-10\t15:00\t0\tNULL\t2026-03-12 00:52:09\n990019\t1\tnutrition_initial\t2026-04-09\t11:00\t0\tNULL\t2026-03-20 06:55:20\n600035\t1\tnutrition_initial\t2026-03-31\t11:00\t0\t2026-03-30 01:00:37\t2026-03-12 00:52:08\n90027\t1\t2on1_pt\t2026-02-21\t08:30\t0\tNULL\t2026-02-20 09:27:15\n",
+  "stderr": "",
+  "execution_time_ms": 1574
+}
