@@ -2693,3 +2693,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] All 8 email service tests passing
 - [ ] Test with andy@andyknight.asia (test client) to confirm delivery
 - [ ] Verify Thomas Lee and other clients now receive reminders
+
+
+## CRITICAL: Backup System Complete Failure (Apr 2026)
+- [x] Investigate: Automated backups stopped, manual backups not working
+- [x] Check backup logs for error messages (root cause: SendGrid credits exceeded)
+- [x] Fix backup email sending: Configured Gmail SMTP (lukusdavey@gmail.com)
+- [x] Fix backup database operations
+- [x] Test manual backup trigger: Success — 48 KB backup sent to lukusdavey@gmail.com
+- [x] Verify automated backup still scheduled correctly: 24-hour cooldown working
+- [x] Fix client reminder emails: Configured Gmail SMTP, reminders now sending successfully
