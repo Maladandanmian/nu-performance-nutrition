@@ -30,6 +30,14 @@ interface EmailOptions {
  * Returns true if email was sent successfully, false otherwise
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
+  // Check if email whitelist is enabled (development/testing mode)
+  let recipientEmail = options.to;
+  if (ENV.emailWhitelistEnabled) {
+    const originalTo = options.to;
+    recipientEmail = ENV.emailWhitelist[0]; // Send to first whitelisted email
+    console.log(`[EmailService] WHITELIST MODE: Redirecting email from ${originalTo} to ${recipientEmail}`);
+  }
+
   // Check if email is configured
   const emailHost = ENV.emailHost;
   const emailPort = ENV.emailPort;
@@ -67,7 +75,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     // Send email
     const info = await transporter.sendMail({
       from: emailFrom,
-      to: options.to,
+      to: recipientEmail,
       subject: options.subject,
       text: options.text,
       html: options.html,
@@ -80,11 +88,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       } : {}),
     });
 
-    console.log(`[EmailService] Email sent successfully to ${options.to} (Message ID: ${info.messageId})`);
+    console.log(`[EmailService] Email sent successfully to ${recipientEmail} (Message ID: ${info.messageId})`);
     return true;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error(`[EmailService] Failed to send email to ${options.to}: ${errorMsg}`);
+    console.error(`[EmailService] Failed to send email to ${recipientEmail}: ${errorMsg}`);
     return false;
   }
 }

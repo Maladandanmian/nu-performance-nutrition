@@ -17,6 +17,12 @@ export const ENV = {
   appUrl: process.env.VITE_APP_URL ?? "",
   backupTriggerToken: process.env.BACKUP_TRIGGER_TOKEN ?? "",
   reminderTriggerToken: process.env.REMINDER_TRIGGER_TOKEN ?? "",
+  // Email whitelist for development/testing
+  emailWhitelistEnabled: process.env.EMAIL_WHITELIST_ENABLED === "true",
+  emailWhitelist: (process.env.EMAIL_WHITELIST ?? "andy@andyknight.asia,lukusdavey@gmail.com")
+    .split(",")
+    .map(e => e.trim().toLowerCase())
+    .filter(e => e.length > 0),
 };
 
 // Parse comma-separated admin emails into an array

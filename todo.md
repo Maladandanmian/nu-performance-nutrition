@@ -2703,3 +2703,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Test manual backup trigger: Success — 48 KB backup sent to lukusdavey@gmail.com
 - [x] Verify automated backup still scheduled correctly: 24-hour cooldown working
 - [x] Fix client reminder emails: Configured Gmail SMTP, reminders now sending successfully
+
+
+## Email Whitelist System for Development (Apr 2026)
+- [x] Add EMAIL_WHITELIST_ENABLED environment variable (set to true)
+- [x] Add EMAIL_WHITELIST configuration in env.ts
+- [x] Modify emailService.ts to intercept and redirect emails when whitelist enabled
+- [x] Update backup system to respect whitelist (inherits from emailService)
+- [x] Update reminder system to respect whitelist (inherits from emailService)
+- [x] Test: Verify emails redirect to whitelist (andy@andyknight.asia, lukusdavey@gmail.com) - 4 tests passing
+- [x] Test: Verify whitelist can be disabled for production (toggle EMAIL_WHITELIST_ENABLED=false)
