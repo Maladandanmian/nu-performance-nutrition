@@ -17,8 +17,10 @@ export const ENV = {
   appUrl: process.env.VITE_APP_URL ?? "",
   backupTriggerToken: process.env.BACKUP_TRIGGER_TOKEN ?? "",
   reminderTriggerToken: process.env.REMINDER_TRIGGER_TOKEN ?? "",
-  // Email whitelist for development/testing
-  emailWhitelistEnabled: process.env.EMAIL_WHITELIST_ENABLED === "true",
+  // Email whitelist: automatically enabled in development, disabled in production
+  // In production (NODE_ENV=production), all emails go to actual recipients
+  // In development, all emails redirect to the whitelist to prevent accidental client emails
+  emailWhitelistEnabled: process.env.NODE_ENV !== "production",
   emailWhitelist: (process.env.EMAIL_WHITELIST ?? "andy@andyknight.asia,lukusdavey@gmail.com")
     .split(",")
     .map(e => e.trim().toLowerCase())

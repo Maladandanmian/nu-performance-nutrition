@@ -2713,3 +2713,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update reminder system to respect whitelist (inherits from emailService)
 - [x] Test: Verify emails redirect to whitelist (andy@andyknight.asia, lukusdavey@gmail.com) - 4 tests passing
 - [x] Test: Verify whitelist can be disabled for production (toggle EMAIL_WHITELIST_ENABLED=false)
+
+## Fix Email Whitelist Auto-Detection (Apr 2026)
+- [x] Remove hardcoded EMAIL_WHITELIST_ENABLED=true env variable
+- [x] Tie whitelist to NODE_ENV: auto-enable in development, auto-disable in production
+- [x] Test: Verify whitelist is ON in dev, OFF in production (4 tests passing)
