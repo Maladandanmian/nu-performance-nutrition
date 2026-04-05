@@ -2718,3 +2718,14 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Remove hardcoded EMAIL_WHITELIST_ENABLED=true env variable
 - [x] Tie whitelist to NODE_ENV: auto-enable in development, auto-disable in production
 - [x] Test: Verify whitelist is ON in dev, OFF in production (4 tests passing)
+
+## Resend Whitelist-Blocked Booking Confirmations (Apr 2026)
+- [x] Find sessions booked for Ben/Emma Davey, Oliver Stern, Judith Dirkin, Shirley Dirkin, Sofie Jacobs, Alex Howarth, Benjamin Lohr
+- [x] Identify the booking confirmation email template and content
+- [x] Resend confirmations to correct client email addresses (9/9 sent successfully)
+- [x] Verify delivery: all 9 emails delivered with message IDs confirmed
+
+## Backup Failure Investigation (Apr 6 2026)
+- [x] Investigate why Apr 6 backup failed at 00:00:24 (Google SMTP transient error: 454 temporary system problem)
+- [x] Fix 24-hour cooldown to allow manual backup after a FAILED automated backup (both server and frontend)
+- [x] Test manual backup is available immediately after a failed automated backup (7 vitest tests passing)

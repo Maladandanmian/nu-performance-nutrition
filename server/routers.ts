@@ -3502,9 +3502,11 @@ Return as JSON.`
         recipientEmail: z.string().email(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Rate limit: prevent multiple backups within the same 24 hours
+        // Rate limit: only block if the last SUCCESSFUL backup was within 24 hours.
+        // A failed backup never counts as a cooldown — manual backup must always be
+        // available after a failure so the trainer can recover immediately.
         const lastLog = await db.getLastBackupLog();
-        if (lastLog) {
+        if (lastLog && lastLog.status === 'success') {
           const lastBackupTime = new Date(lastLog.createdAt).getTime();
           const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
           if (lastBackupTime > oneDayAgo) {

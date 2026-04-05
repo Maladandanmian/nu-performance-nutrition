@@ -45,7 +45,9 @@ export default function TrainerDashboard() {
 
   // Compute cooldown state: disable button if last backup was within the past 24 hours
   const backupCooldownState = useMemo(() => {
-    if (!lastBackup) return { isOnCooldown: false, timeStr: '' };
+    // Only apply cooldown if the last backup SUCCEEDED.
+    // A failed backup must never block the manual button.
+    if (!lastBackup || lastBackup.status !== 'success') return { isOnCooldown: false, timeStr: '' };
     const lastBackupTime = new Date(lastBackup.createdAt).getTime();
     const oneDayMs = 24 * 60 * 60 * 1000;
     const elapsed = Date.now() - lastBackupTime;
