@@ -10,7 +10,8 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 // import cron from "node-cron"; // Disabled: causing duplicate backups due to timezone issues
 import { createAndEmailBackup } from "../backup";
-import { sendSessionReminders } from "../sessionReminderService";
+import { sendSessionReminders } from '../sessionReminderService';
+import { sendDailySummary } from '../dailySummaryService';
 import { getUserByOpenId, getLastBackupLog } from "../db";
 import { ENV } from "./env";
 
@@ -136,6 +137,29 @@ async function startServer() {
       }
     } catch (error) {
       console.error('[SessionReminders] Unexpected error during trigger:', error);
+    }
+  });
+
+  // ── Daily Summary Trigger ────────────────────────────────────────────────────
+  // Called by cron-job.org at 09:30 HKT daily via:
+  //   POST /api/trigger-daily-summary
+  //   Header: x-backup-token: <BACKUP_TRIGGER_TOKEN>
+  // Sends a morning summary to the trainer: backup status + reminders sent/missed.
+  app.post('/api/trigger-daily-summary', async (req, res) => {
+    const token = req.headers['x-backup-token'];
+    if (!ENV.backupTriggerToken || token !== ENV.backupTriggerToken) {
+      console.warn('[DailySummary] Unauthorised trigger attempt from', req.ip);
+      res.status(401).json({ error: 'Unauthorised' });
+      return;
+    }
+    // Respond immediately so the external cron service does not time out
+    res.json({ ok: true, message: 'Daily summary triggered' });
+    // Run asynchronously after responding
+    try {
+      const result = await sendDailySummary();
+      console.log(`[DailySummary] Completed: backup=${result.backupSucceeded}, sent=${result.remindersSent.length}, missed=${result.remindersMissed.length}, emailSent=${result.emailSent}`);
+    } catch (error) {
+      console.error('[DailySummary] Unexpected error during trigger:', error);
     }
   });
 

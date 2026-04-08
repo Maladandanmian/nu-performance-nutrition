@@ -2734,3 +2734,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add 12:30 AM retry endpoint (/api/trigger-backup-retry) that only fires if the 11:59 PM backup failed
 - [x] Retry skips silently if last backup succeeded within the last 2 hours
 - [x] Test retry logic with vitest (8 tests passing)
+
+## Daily Operations Summary Email (Apr 2026)
+- [x] Build dailySummaryService.ts: query last night's backup status and today's reminder delivery
+- [x] Identify clients with sessions in next 24h who did NOT receive a reminder
+- [x] Build HTML email template: backup status + reminder delivery table
+- [x] Add /api/trigger-daily-summary endpoint (POST, same token pattern as backup)
+- [ ] Add manual resend reminder button to trainer dashboard for missed reminders
+- [ ] Add tRPC procedure: resendReminder(sessionId) for manual resend
+- [x] Write vitest tests for summary logic (20 tests passing)
+- [ ] Provide cron-job.org setup instructions for 09:30 HKT daily trigger
