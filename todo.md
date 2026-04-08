@@ -2729,3 +2729,8 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Investigate why Apr 6 backup failed at 00:00:24 (Google SMTP transient error: 454 temporary system problem)
 - [x] Fix 24-hour cooldown to allow manual backup after a FAILED automated backup (both server and frontend)
 - [x] Test manual backup is available immediately after a failed automated backup (7 vitest tests passing)
+
+## Backup Retry Mechanism (Apr 2026)
+- [x] Add 12:30 AM retry endpoint (/api/trigger-backup-retry) that only fires if the 11:59 PM backup failed
+- [x] Retry skips silently if last backup succeeded within the last 2 hours
+- [x] Test retry logic with vitest (8 tests passing)

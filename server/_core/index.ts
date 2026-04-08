@@ -90,6 +90,32 @@ async function startServer() {
     runBackup('http-trigger');
   });
 
+  // ── Backup retry endpoint ──────────────────────────────────────────────────
+  // Called by cron-job.org at 00:30 HKT daily via:
+  //   POST /api/trigger-backup-retry
+  //   Header: x-backup-token: <BACKUP_TRIGGER_TOKEN>
+  // Only runs if the 23:59 HKT primary backup failed or did not run tonight.
+  app.post('/api/trigger-backup-retry', async (req, res) => {
+    const token = req.headers['x-backup-token'];
+    if (!ENV.backupTriggerToken || token !== ENV.backupTriggerToken) {
+      console.warn('[Backup] Unauthorised retry trigger attempt from', req.ip);
+      res.status(401).json({ error: 'Unauthorised' });
+      return;
+    }
+    // Check if a successful backup already ran tonight (within the last 2 hours)
+    const lastLog = await getLastBackupLog().catch(() => null);
+    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+    if (lastLog && lastLog.status === 'success' && lastLog.createdAt.getTime() > twoHoursAgo) {
+      console.log('[Backup] Retry skipped — successful backup already ran tonight.');
+      res.json({ ok: true, message: 'Skipped — backup already succeeded tonight' });
+      return;
+    }
+    // Primary backup failed or didn't run — fire the retry
+    console.log('[Backup] Retry firing — primary backup failed or missing.');
+    res.json({ ok: true, message: 'Retry backup triggered' });
+    runBackup('http-retry');
+  });
+
   // Session Reminder Trigger
   // Called by cron-job.org daily to send 24-hour reminder emails
   app.post('/api/trigger-reminders', async (req, res) => {
