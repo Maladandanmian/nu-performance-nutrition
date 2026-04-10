@@ -144,8 +144,7 @@ export async function getUserById(id: number) {
 export async function createClient(client: InsertClient) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(clients).values(client);
-  return { id: Number(result.insertId), ...client };
+  return db.insert(clients).values(client);
 }
 
 export async function getClientsByTrainerId(trainerId: number) {

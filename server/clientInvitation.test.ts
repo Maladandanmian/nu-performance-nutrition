@@ -17,7 +17,7 @@ describe('Client Invitation and Password Setup', () => {
   let testTrainerId: number;
   let testClientId: number;
   let passwordSetupToken: string;
-  const testClientEmail = 'test-client-invitation@example.com';
+  const testClientEmail = `test-client-invitation-${Date.now()}@example.com`;
   const testClientName = 'Test Client Invitation';
   const testPassword = 'SecurePassword123!';
 
@@ -36,9 +36,13 @@ describe('Client Invitation and Password Setup', () => {
   });
 
   afterAll(async () => {
-    // Cleanup: delete test client and trainer
+    // Cleanup: delete test client
     if (testClientId) {
-      await db.deleteClientAndData(testClientId);
+      try {
+        await db.deleteClientAndData(testClientId);
+      } catch (e) {
+        // Ignore cleanup errors
+      }
     }
   });
 

@@ -137,7 +137,7 @@ export const appRouter = router({
         });
         
         // Create nutrition goals with trainer-specified values
-        const clientId = result.id;
+        const clientId = Number(result[0].insertId);
         await db.createNutritionGoal({
           clientId,
           caloriesTarget,

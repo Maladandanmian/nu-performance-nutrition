@@ -2751,3 +2751,11 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Updated routers.ts to construct full URL: `${ENV.appUrl}/set-password?token=${encodeURIComponent(token)}`
 - [x] Added ENV import to routers.ts
 - [x] Write 11 vitest tests for URL construction and encoding (all passing)
+
+
+## Database Test Failures Fixed (Apr 2026)
+- [x] Fix createClient result structure: changed to return raw Drizzle result array instead of custom object
+- [x] Fix routers.ts to extract insertId from result[0].insertId instead of result.id
+- [x] Fix getClientByEmail returning null: issue was duplicate test data from previous runs
+- [x] Use unique test email addresses (with timestamp) to avoid database conflicts
+- [x] All 16 clientInvitation tests now passing (4 integration tests + 12 URL construction tests)
