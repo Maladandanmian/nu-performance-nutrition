@@ -17,6 +17,7 @@ import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
 import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
+import { ENV } from "./_core/env";
 
 import { randomBytes } from "crypto";
 import { calculateGripStrengthScore } from "../shared/gripStrengthScoring";
@@ -153,10 +154,12 @@ export const appRouter = router({
         let token = '';
         try {
           token = await db.generatePasswordSetupToken(clientId);
+          // Construct the full setup URL with token as query parameter
+          const setupUrl = `${ENV.appUrl}/set-password?token=${encodeURIComponent(token)}`;
           emailSent = await sendPasswordSetupInvitation(
             input.email,
             input.name,
-            token
+            setupUrl
           );
         } catch (emailError) {
           console.error(`[ClientInvitation] Error sending email to ${input.email}:`, emailError);

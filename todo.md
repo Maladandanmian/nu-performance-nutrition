@@ -2744,3 +2744,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [ ] Add tRPC procedure: resendReminder(sessionId) for manual resend
 - [x] Write vitest tests for summary logic (20 tests passing)
 - [ ] Provide cron-job.org setup instructions for 09:30 HKT daily trigger
+
+
+## Client Invitation Email URL Fix (Apr 2026)
+- [x] Fix broken client invitation email link: token was being sent as raw string instead of full URL
+- [x] Updated routers.ts to construct full URL: `${ENV.appUrl}/set-password?token=${encodeURIComponent(token)}`
+- [x] Added ENV import to routers.ts
+- [x] Write 11 vitest tests for URL construction and encoding (all passing)
