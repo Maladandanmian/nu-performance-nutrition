@@ -239,6 +239,13 @@
       "when": 1774250638187,
       "tag": "0033_stale_apocalypse",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1776037584351,
+      "tag": "0034_strong_stature",
+      "breakpoints": true
     }
   ]
 }

@@ -805,3 +805,38 @@ export const backupLogs = mysqlTable("backup_logs", {
 
 export type BackupLog = typeof backupLogs.$inferSelect;
 export type InsertBackupLog = typeof backupLogs.$inferInsert;
+
+/**
+ * Invoices - generated from session packages and sent to clients
+ * Allows trainers to create, edit, and send invoices for packages
+ * Sent invoices are stored here for monitoring and record-keeping
+ */
+export const invoices = mysqlTable("invoices", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  clientId: int("clientId").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  packageId: int("packageId").references(() => sessionPackages.id, { onDelete: "set null" }),
+  invoiceNumber: varchar("invoiceNumber", { length: 50 }).notNull().unique(), // e.g. INV-2026-0001
+  lineItems: json("lineItems").notNull(), // Array of { description, quantity, unitPrice, total }
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxRate: decimal("taxRate", { precision: 5, scale: 2 }).default("0.00").notNull(), // Percentage e.g. 8.00 for 8%
+  taxAmount: decimal("taxAmount", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("HKD").notNull(),
+  status: mysqlEnum("status", ["draft", "sent", "paid", "cancelled"]).default("draft").notNull(),
+  notes: text("notes"), // Optional notes/payment instructions on invoice
+  dueDate: date("dueDate"), // Optional payment due date
+  sentAt: timestamp("sentAt"), // When the invoice was emailed to the client
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+
+export type InvoiceLineItem = {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+};

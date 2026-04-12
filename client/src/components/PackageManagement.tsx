@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Package, Pencil, Trash2, MinusCircle } from "lucide-react";
+import { Calendar, Package, Pencil, Trash2, MinusCircle, FileText } from "lucide-react";
+import { InvoiceModal } from "./InvoiceModal";
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
   "1on1_pt": "1-on-1 Personal Training",
@@ -83,6 +84,9 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
 
   // ── Delete state ─────────────────────────────────────────────────────────────
   const [deletingPkg, setDeletingPkg] = useState<Package | null>(null);
+
+  // ── Invoice state ─────────────────────────────────────────────────────────────
+  const [invoicingPkg, setInvoicingPkg] = useState<Package | null>(null);
 
   // ── Deduct state ─────────────────────────────────────────────────────────────
   const [deductingPkg, setDeductingPkg] = useState<Package | null>(null);
@@ -250,6 +254,16 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
           <Button
             size="sm"
             variant="outline"
+            className="gap-1.5 text-xs"
+            onClick={() => setInvoicingPkg(pkg)}
+          >
+            <FileText className="h-3 w-3" />
+            Invoice
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
             className={`gap-1.5 text-xs border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${
               hasUsedSessions ? "opacity-40 cursor-not-allowed" : ""
             }`}
@@ -307,9 +321,12 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
                       </div>
                       <Badge variant="outline" className="text-xs">0 / {pkg.sessionsTotal} left</Badge>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => openEdit(pkg as Package)}>
                         <Pencil className="h-3 w-3" />Edit
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => setInvoicingPkg(pkg as Package)}>
+                        <FileText className="h-3 w-3" />Invoice
                       </Button>
                       <Button
                         size="sm"
@@ -402,6 +419,19 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* ── Invoice Modal ─────────────────────────────────────────────────── */}
+      {invoicingPkg && (
+        <InvoiceModal
+          open={!!invoicingPkg}
+          onOpenChange={(o) => !o && setInvoicingPkg(null)}
+          clientId={invoicingPkg.clientId}
+          clientName={invoicingPkg.clientName || "Client"}
+          packageId={invoicingPkg.id}
+          packageType={formatPackageType(invoicingPkg.packageType)}
+          sessionsTotal={invoicingPkg.sessionsTotal}
+        />
+      )}
 
       {/* ── Deduct Sessions Dialog ───────────────────────────────────────────── */}
       <Dialog open={!!deductingPkg} onOpenChange={(o) => !o && setDeductingPkg(null)}>

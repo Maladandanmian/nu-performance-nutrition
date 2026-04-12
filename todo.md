@@ -2770,3 +2770,17 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Write 9 vitest tests for token expiry validation logic (all passing)
 - [x] Fix emailAuthProcedures.ts session handling with HTTP-only cookies
 - [x] Remove sessionToken references from Home.tsx (now handled via cookies)
+
+## Invoice System (Apr 2026) — COMPLETE
+- [x] Add invoices table to drizzle/schema.ts (id, trainerId, clientId, packageId, invoiceNumber, lineItems JSON, subtotal, taxRate, taxAmount, total, currency, status, notes, dueDate, sentAt, createdAt)
+- [x] Push schema migration (direct SQL applied)
+- [x] Add invoiceDb.ts helpers: createInvoice, getInvoiceById, getInvoicesByClient, getInvoicesByTrainer, getInvoicesByPackage, updateInvoice, markInvoiceSent, deleteInvoice, calculateInvoiceTotals, generateInvoiceNumber
+- [x] Add invoiceEmailService.ts: HTML invoice email with line items table
+- [x] Add invoiceRouter.ts with procedures: generate, update, send, listByTrainer, listByClient, listByPackage, getById, delete
+- [x] Wire invoiceRouter into appRouter in routers.ts
+- [x] Add Invoice button to active and exhausted package cards in PackageManagement.tsx
+- [x] Build InvoiceModal.tsx: editable line items table, tax rate, currency, due date, notes, totals, Save Draft + Send to Client buttons
+- [x] Build Invoices.tsx monitoring page: stats cards, search, invoice history table with status badges
+- [x] Add /trainer/invoices route in App.tsx
+- [x] Add Invoices nav link in TrainerDashboard header
+- [x] Write 17 vitest tests for invoice logic (all passing)

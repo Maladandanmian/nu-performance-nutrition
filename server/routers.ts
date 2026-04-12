@@ -15,6 +15,7 @@ import { estimateFoodNutrition } from "./foodQuantityEstimation";
 import { identifyMealItems } from "./mealItemIdentification";
 import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
+import { invoiceRouter } from "./invoiceRouter";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
 import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
 import { ENV } from "./_core/env";
@@ -33,6 +34,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const appRouter = router({
   system: systemRouter,
   emailAuth: emailAuthRouter,
+  invoices: invoiceRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     

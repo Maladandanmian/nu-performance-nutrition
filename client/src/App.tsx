@@ -11,6 +11,7 @@ import ClientDetail from "./pages/ClientDetail";
 import SetPassword from "./pages/SetPassword";
 import TrainerNotifications from "./pages/TrainerNotifications";
 import TrainerSchedule from "./pages/TrainerSchedule";
+import Invoices from "./pages/Invoices";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/trainer"} component={TrainerDashboard} />      <Route path={"/trainer/notifications"} component={TrainerNotifications} />
       <Route path={"/trainer/schedule"} component={TrainerSchedule} />
       <Route path={"/trainer/client/:id"} component={ClientDetail} />
+      <Route path={"/trainer/invoices"} component={Invoices} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
