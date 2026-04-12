@@ -2759,3 +2759,14 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix getClientByEmail returning null: issue was duplicate test data from previous runs
 - [x] Use unique test email addresses (with timestamp) to avoid database conflicts
 - [x] All 16 clientInvitation tests now passing (4 integration tests + 12 URL construction tests)
+
+
+## Token Expiry Validation Implementation (Apr 2026)
+- [x] Add checkPasswordSetupTokenStatus function to db.ts: returns { valid, expired, client }
+- [x] Update checkPasswordSetupToken procedure to distinguish between expired and invalid tokens
+- [x] Update SetPassword UI to show distinct error messages for expired vs invalid links
+- [x] Add Clock icon for expired tokens, AlertCircle for invalid tokens
+- [x] Add recovery messaging: "contact your trainer for a new invitation"
+- [x] Write 9 vitest tests for token expiry validation logic (all passing)
+- [x] Fix emailAuthProcedures.ts session handling with HTTP-only cookies
+- [x] Remove sessionToken references from Home.tsx (now handled via cookies)

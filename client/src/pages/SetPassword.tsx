@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 
 export default function SetPassword() {
   const [, setLocation] = useLocation();
@@ -74,17 +74,51 @@ export default function SetPassword() {
     );
   }
 
-  if (!tokenStatus?.valid) {
+  // Token expired
+  if (!tokenStatus?.valid && tokenStatus?.expired) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <Card className="w-full max-w-md border-orange-200 bg-orange-50">
           <CardHeader>
-            <CardTitle className="text-red-600">Invalid Link</CardTitle>
-            <CardDescription>
-              This password setup link is invalid or has expired. Please contact your trainer for a new invitation.
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-6 w-6 text-orange-600" />
+              <CardTitle className="text-orange-600">Link Expired</CardTitle>
+            </div>
+            <CardDescription className="text-orange-700">
+              Your password setup link expired after 24 hours. This is for security reasons.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-700">
+              To set up your account, please contact your trainer to request a new invitation email.
+            </p>
+            <Button onClick={() => setLocation("/")} className="w-full">
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Token invalid
+  if (!tokenStatus?.valid) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <Card className="w-full max-w-md border-red-200 bg-red-50">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+              <CardTitle className="text-red-600">Invalid Link</CardTitle>
+            </div>
+            <CardDescription className="text-red-700">
+              This password setup link is invalid or has already been used.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-700">
+              If you need to set up your account, please contact your trainer for a new invitation.
+            </p>
             <Button onClick={() => setLocation("/")} className="w-full">
               Go to Login
             </Button>
@@ -121,7 +155,7 @@ export default function SetPassword() {
           </div>
           <CardTitle>Set Your Password</CardTitle>
           <CardDescription>
-            Welcome, {tokenStatus.clientName}! Create a password to access your nutrition dashboard.
+            Welcome, {tokenStatus?.clientName}! Create a password to access your nutrition dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,7 +165,7 @@ export default function SetPassword() {
               <Input
                 id="email"
                 type="email"
-                value={tokenStatus.clientEmail || ""}
+                value={tokenStatus?.clientEmail || ""}
                 disabled
                 className="bg-gray-100"
               />

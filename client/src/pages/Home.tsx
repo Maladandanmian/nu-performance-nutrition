@@ -21,9 +21,7 @@ export default function Home() {
 
   const loginWithEmailMutation = trpc.emailAuth.loginWithEmail.useMutation({
     onSuccess: async (data) => {
-      if (data.sessionToken) {
-        setClientSessionInStorage(data.sessionToken);
-      }
+      // Session is now handled via HTTP-only cookie set by server
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {
         window.location.href = '/client';

@@ -918,6 +918,39 @@ export async function generatePasswordSetupToken(clientId: number): Promise<stri
 }
 
 /**
+ * Check password setup token validity with expiry status
+ * Returns: { valid: true, expired: false, client } or { valid: false, expired: true/false }
+ */
+export async function checkPasswordSetupTokenStatus(token: string): Promise<{
+  valid: boolean;
+  expired: boolean;
+  client?: typeof clients.$inferSelect;
+}> {
+  const db = await getDb();
+  if (!db) return { valid: false, expired: false };
+  
+  // Find client with this token (regardless of expiry)
+  const result = await db.select().from(clients)
+    .where(eq(clients.passwordSetupToken, token))
+    .limit(1);
+  
+  if (result.length === 0) {
+    // Token doesn't exist
+    return { valid: false, expired: false };
+  }
+  
+  const client = result[0];
+  
+  // Check if token has expired
+  if (client.passwordSetupTokenExpires && new Date(client.passwordSetupTokenExpires) < new Date()) {
+    return { valid: false, expired: true };
+  }
+  
+  // Token is valid and not expired
+  return { valid: true, expired: false, client };
+}
+
+/**
  * Verify and consume a password setup token
  * Returns the client if token is valid, undefined otherwise
  */
