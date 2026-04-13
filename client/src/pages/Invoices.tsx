@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceModal } from "@/components/InvoiceModal";
-import { ArrowLeft, FileText, Search, Send, Eye } from "lucide-react";
+import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 
 const STATUS_COLOURS: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
@@ -26,8 +26,14 @@ export default function Invoices() {
   const [search, setSearch] = useState("");
   const [viewingInvoiceId, setViewingInvoiceId] = useState<number | null>(null);
 
+  const utils = trpc.useUtils();
+
   const { data: invoices = [], isLoading } = trpc.invoices.listByTrainer.useQuery(undefined, {
     enabled: !!user,
+  });
+
+  const markPaidMutation = trpc.invoices.markPaid.useMutation({
+    onSuccess: () => utils.invoices.listByTrainer.invalidate(),
   });
 
   const filtered = invoices.filter((inv) => {
@@ -158,18 +164,32 @@ export default function Invoices() {
                           : "—"}
                       </td>
                       <td className="py-3 px-3 text-right">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 gap-1.5 text-xs"
-                          onClick={() => setViewingInvoiceId(inv.id)}
-                        >
-                          {inv.status === "draft" ? (
-                            <><Send className="h-3 w-3" />Edit / Send</>
-                          ) : (
-                            <><Eye className="h-3 w-3" />View</>
+                        <div className="flex items-center justify-end gap-1">
+                          {inv.status === "sent" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 gap-1.5 text-xs text-green-700 border-green-300 hover:bg-green-50"
+                              onClick={() => markPaidMutation.mutate({ invoiceId: inv.id })}
+                              disabled={markPaidMutation.isPending}
+                            >
+                              <CheckCircle className="h-3 w-3" />
+                              Mark Paid
+                            </Button>
                           )}
-                        </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 gap-1.5 text-xs"
+                            onClick={() => setViewingInvoiceId(inv.id)}
+                          >
+                            {inv.status === "draft" ? (
+                              <><Send className="h-3 w-3" />Edit / Send</>
+                            ) : (
+                              <><Eye className="h-3 w-3" />View</>
+                            )}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

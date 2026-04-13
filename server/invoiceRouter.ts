@@ -200,6 +200,26 @@ export const invoiceRouter = router({
     }),
 
   /**
+   * Mark a sent invoice as paid
+   */
+  markPaid: adminProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .mutation(async ({ input }) => {
+      const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
+      if (!invoice) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invoice not found" });
+      }
+      if (invoice.status !== "sent") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Only sent invoices can be marked as paid",
+        });
+      }
+      await invoiceDb.markInvoicePaid(input.invoiceId);
+      return { success: true };
+    }),
+
+  /**
    * Delete a draft invoice
    */
   delete: adminProcedure

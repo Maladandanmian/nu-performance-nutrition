@@ -113,6 +113,16 @@ export async function markInvoiceSent(id: number) {
     .where(eq(invoices.id, id));
 }
 
+export async function markInvoicePaid(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  await db
+    .update(invoices)
+    .set({ status: "paid" })
+    .where(eq(invoices.id, id));
+}
+
 export async function deleteInvoice(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");

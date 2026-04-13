@@ -2801,3 +2801,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Default due date to 14 days from invoice creation date (editable)
 - [x] taxRate passed as 0 to update procedure for schema compatibility
 - [x] Due date label updated to remove "(optional)" since it now defaults
+
+## Mark Invoice as Paid (Apr 2026)
+- [x] Add markPaid db helper in invoiceDb.ts
+- [x] Add invoices.markPaid tRPC procedure in invoiceRouter.ts
+- [x] Add Mark Paid button to Invoices.tsx (visible on sent invoices only, green outline style)
+- [x] Status badge already handles Paid state (secondary variant)
