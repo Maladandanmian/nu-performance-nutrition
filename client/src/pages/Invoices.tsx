@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceModal } from "@/components/InvoiceModal";
-import { FileText, Search, Send, Eye } from "lucide-react";
+import { ArrowLeft, FileText, Search, Send, Eye } from "lucide-react";
+import { Link } from "wouter";
 
 const STATUS_COLOURS: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
   draft: "outline",
@@ -47,6 +48,14 @@ export default function Invoices() {
 
   return (
     <div className="container py-6 space-y-6 max-w-5xl mx-auto">
+      <div className="flex items-center gap-4">
+        <Link href="/trainer">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Invoices</h1>
