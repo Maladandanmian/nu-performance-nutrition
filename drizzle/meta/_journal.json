@@ -246,6 +246,13 @@
       "when": 1776037584351,
       "tag": "0034_strong_stature",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1776062335228,
+      "tag": "0035_complete_boomerang",
+      "breakpoints": true
     }
   ]
 }

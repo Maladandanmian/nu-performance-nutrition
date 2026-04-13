@@ -34,6 +34,7 @@ export const invoiceRouter = router({
         packageId: z.number().optional(),
         packageType: z.string().optional(),
         sessionsTotal: z.number().optional(),
+        pricePerSession: z.number().optional(), // Pre-populate unit price from package
         currency: z.string().default("HKD"),
         notes: z.string().optional(),
         dueDate: z.string().optional(), // YYYY-MM-DD
@@ -45,11 +46,12 @@ export const invoiceRouter = router({
       // Build default line item from package
       const lineItems: InvoiceLineItem[] = [];
       if (input.packageType && input.sessionsTotal) {
+        const unitPrice = input.pricePerSession ?? 0;
         lineItems.push({
           description: input.packageType,
           quantity: input.sessionsTotal,
-          unitPrice: 0,
-          total: 0,
+          unitPrice,
+          total: Math.round(input.sessionsTotal * unitPrice * 100) / 100,
         });
       }
 

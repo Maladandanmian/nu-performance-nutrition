@@ -777,6 +777,7 @@ export const sessionPackages = mysqlTable("session_packages", {
   packageType: varchar("packageType", { length: 100 }).notNull(), // e.g., "10 Session Package", "Monthly Unlimited"
   sessionsTotal: int("sessionsTotal").notNull(), // Total sessions in package
   sessionsRemaining: int("sessionsRemaining").notNull(), // DEPRECATED: no longer written to after creation. Balance is always derived dynamically from trainingSessions records.
+  pricePerSession: decimal("pricePerSession", { precision: 10, scale: 2 }), // Optional per-session rate for invoice pre-population
   purchaseDate: date("purchaseDate").notNull(),
   expiryDate: date("expiryDate"), // Optional expiry date
   notes: text("notes"),

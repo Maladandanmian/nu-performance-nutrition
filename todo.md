@@ -2784,3 +2784,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add /trainer/invoices route in App.tsx
 - [x] Add Invoices nav link in TrainerDashboard header
 - [x] Write 17 vitest tests for invoice logic (all passing)
+
+## Invoice Price Pre-population Fix (Apr 2026)
+- [x] Add pricePerSession column to session_packages table (DECIMAL 10,2)
+- [x] Apply column via direct SQL (migration runner blocked by pre-existing duplicate column)
+- [x] Add pricePerSession to sessionPackages.create and sessionPackages.update tRPC procedures
+- [x] Add pricePerSession field to PackageCreationForm.tsx (replaces unused totalPrice field)
+- [x] Add pricePerSession field to Edit Package dialog in PackageManagement.tsx
+- [x] Update invoiceRouter.ts generate procedure to accept pricePerSession and calculate line item total
+- [x] Update InvoiceModal.tsx props, destructuring, initial state, and generate call to pass pricePerSession
+- [x] Update Package interface in PackageManagement.tsx to include pricePerSession field

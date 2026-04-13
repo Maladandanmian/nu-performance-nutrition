@@ -57,6 +57,7 @@ interface Package {
   packageType: string;
   sessionsTotal: number;
   sessionsRemaining: number;
+  pricePerSession?: string | number | null;
   purchaseDate: Date | string | null;
   expiryDate: Date | string | null;
   notes: string | null;
@@ -79,6 +80,7 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
   // ── Edit state ──────────────────────────────────────────────────────────────
   const [editingPkg, setEditingPkg] = useState<Package | null>(null);
   const [editPackageType, setEditPackageType] = useState("");
+  const [editPricePerSession, setEditPricePerSession] = useState("");
   const [editExpiryDate, setEditExpiryDate] = useState("");
   const [editNotes, setEditNotes] = useState("");
 
@@ -130,6 +132,7 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
   function openEdit(pkg: Package) {
     setEditingPkg(pkg);
     setEditPackageType(pkg.packageType);
+    setEditPricePerSession(pkg.pricePerSession != null ? String(pkg.pricePerSession) : "");
     setEditExpiryDate(
       pkg.expiryDate ? new Date(pkg.expiryDate).toISOString().split("T")[0] : ""
     );
@@ -138,9 +141,11 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
 
   function submitEdit() {
     if (!editingPkg) return;
+    const price = editPricePerSession ? parseFloat(editPricePerSession) : null;
     updateMutation.mutate({
       packageId: editingPkg.id,
       packageType: editPackageType || undefined,
+      pricePerSession: price,
       expiryDate: editExpiryDate || null,
       notes: editNotes || null,
     });
@@ -370,6 +375,17 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
               </Select>
             </div>
             <div className="space-y-2">
+              <Label>Price per Session (optional)</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="e.g., 800"
+                value={editPricePerSession}
+                onChange={(e) => setEditPricePerSession(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Expiry Date (optional)</Label>
               <Input
                 type="date"
@@ -430,6 +446,7 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
           packageId={invoicingPkg.id}
           packageType={formatPackageType(invoicingPkg.packageType)}
           sessionsTotal={invoicingPkg.sessionsTotal}
+          pricePerSession={invoicingPkg.pricePerSession != null ? parseFloat(String(invoicingPkg.pricePerSession)) : undefined}
         />
       )}
 

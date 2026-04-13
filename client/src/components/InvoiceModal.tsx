@@ -37,6 +37,7 @@ interface InvoiceModalProps {
   packageId?: number;
   packageType?: string;
   sessionsTotal?: number;
+  pricePerSession?: number; // Pre-populate unit price from package
   /** If provided, opens an existing invoice for editing/sending */
   existingInvoiceId?: number;
 }
@@ -51,6 +52,7 @@ export function InvoiceModal({
   packageId,
   packageType,
   sessionsTotal,
+  pricePerSession,
   existingInvoiceId,
 }: InvoiceModalProps) {
   const utils = trpc.useUtils();
@@ -97,7 +99,12 @@ export function InvoiceModal({
       setInvoiceNumber("");
       setLineItems(
         packageType && sessionsTotal
-          ? [{ description: packageType, quantity: sessionsTotal, unitPrice: 0, total: 0 }]
+          ? [{
+              description: packageType,
+              quantity: sessionsTotal,
+              unitPrice: pricePerSession ?? 0,
+              total: Math.round(sessionsTotal * (pricePerSession ?? 0) * 100) / 100,
+            }]
           : [{ description: "", quantity: 1, unitPrice: 0, total: 0 }]
       );
       setTaxRate(0);
@@ -167,6 +174,7 @@ export function InvoiceModal({
         packageId,
         packageType,
         sessionsTotal,
+        pricePerSession,
         currency,
         notes: notes || undefined,
         dueDate: dueDate || undefined,

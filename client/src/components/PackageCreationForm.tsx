@@ -18,7 +18,7 @@ export function PackageCreationForm() {
   const [clientId, setClientId] = useState<string>("");
   const [packageType, setPackageType] = useState<string>("");
   const [sessionsTotal, setSessionsTotal] = useState<string>("");
-  const [totalPrice, setTotalPrice] = useState<string>("");
+  const [pricePerSession, setPricePerSession] = useState<string>("");
   const [expiryDate, setExpiryDate] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
@@ -32,7 +32,7 @@ export function PackageCreationForm() {
       setClientId("");
       setPackageType("");
       setSessionsTotal("");
-      setTotalPrice("");
+      setPricePerSession("");
       setExpiryDate("");
       setNotes("");
       // Invalidate packages query to refresh the list
@@ -57,10 +57,17 @@ export function PackageCreationForm() {
       return;
     }
 
+    const price = pricePerSession ? parseFloat(pricePerSession) : undefined;
+    if (price !== undefined && (isNaN(price) || price < 0)) {
+      toast.error("Price per session must be a positive number");
+      return;
+    }
+
     createPackageMutation.mutate({
       clientId: parseInt(clientId),
       packageType: packageType,
       sessionsTotal: sessions,
+      pricePerSession: price,
       purchaseDate: new Date().toISOString().split("T")[0], // Today's date
       expiryDate: expiryDate || undefined,
       notes: notes || undefined,
@@ -122,15 +129,15 @@ export function PackageCreationForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="totalPrice">Total Price (Optional)</Label>
+              <Label htmlFor="pricePerSession">Price per Session (Optional)</Label>
               <Input
-                id="totalPrice"
+                id="pricePerSession"
                 type="number"
                 min="0"
                 step="0.01"
-                placeholder="e.g., 1000"
-                value={totalPrice}
-                onChange={(e) => setTotalPrice(e.target.value)}
+                placeholder="e.g., 800"
+                value={pricePerSession}
+                onChange={(e) => setPricePerSession(e.target.value)}
               />
             </div>
           </div>

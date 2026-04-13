@@ -3209,6 +3209,7 @@ Return as JSON.`
           clientId: z.number(),
           packageType: z.string(),
           sessionsTotal: z.number(),
+          pricePerSession: z.number().optional(), // Per-session rate for invoice pre-population
           purchaseDate: z.string(), // YYYY-MM-DD format
           expiryDate: z.string().optional(),
           notes: z.string().optional(),
@@ -3222,6 +3223,7 @@ Return as JSON.`
           packageType: input.packageType,
           sessionsTotal: input.sessionsTotal,
           sessionsRemaining: input.sessionsTotal, // Initialised once at creation; not maintained thereafter — balance is derived dynamically
+          pricePerSession: input.pricePerSession != null ? String(input.pricePerSession) : null,
           purchaseDate: input.purchaseDate,
           expiryDate: input.expiryDate || null,
           notes: input.notes || null,
@@ -3256,15 +3258,19 @@ Return as JSON.`
           packageId: z.number(),
           packageType: z.string().optional(),
           sessionsTotal: z.number().optional(),
+          pricePerSession: z.number().optional().nullable(), // Per-session rate
           purchaseDate: z.string().optional(), // YYYY-MM-DD format
           expiryDate: z.string().optional().nullable(), // YYYY-MM-DD format
           notes: z.string().optional().nullable(),
         })
       )
       .mutation(async ({ input }) => {
-        const { packageId, ...updates } = input;
-        // Cast to any to avoid type issues with date strings
-        return db.updateSessionPackage(packageId, updates as any);
+        const { packageId, pricePerSession, ...updates } = input;
+        const payload: any = { ...updates };
+        if (pricePerSession !== undefined) {
+          payload.pricePerSession = pricePerSession != null ? String(pricePerSession) : null;
+        }
+        return db.updateSessionPackage(packageId, payload as any);
       }),
 
     // Delete a package (trainer-scoped, zero-usage only)

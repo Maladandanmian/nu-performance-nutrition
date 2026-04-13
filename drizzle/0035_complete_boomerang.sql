@@ -1,0 +1,1 @@
+ALTER TABLE `session_packages` ADD `pricePerSession` decimal(10,2);
