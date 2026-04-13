@@ -113,7 +113,7 @@ export function InvoiceModal({
       setDueDate("");
       setStatus("draft");
     }
-  }, [open, existingInvoiceId, packageType, sessionsTotal]);
+  }, [open, existingInvoiceId, packageType, sessionsTotal, pricePerSession]);
 
   const generateMutation = trpc.invoices.generate.useMutation({
     onSuccess: (data) => {

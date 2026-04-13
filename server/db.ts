@@ -2240,6 +2240,7 @@ export async function getSessionPackagesByTrainer(trainerId: number) {
       trainerId: sessionPackages.trainerId,
       packageType: sessionPackages.packageType,
       sessionsTotal: sessionPackages.sessionsTotal,
+      pricePerSession: sessionPackages.pricePerSession,
       purchaseDate: sessionPackages.purchaseDate,
       expiryDate: sessionPackages.expiryDate,
       notes: sessionPackages.notes,
