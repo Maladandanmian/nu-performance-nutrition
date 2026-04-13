@@ -2794,3 +2794,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update invoiceRouter.ts generate procedure to accept pricePerSession and calculate line item total
 - [x] Update InvoiceModal.tsx props, destructuring, initial state, and generate call to pass pricePerSession
 - [x] Update Package interface in PackageManagement.tsx to include pricePerSession field
+
+## Invoice UX Changes (Apr 2026)
+- [x] Remove tax rate field from InvoiceModal UI
+- [x] Remove taxRate/taxAmount from totals calculation (total = subtotal only)
+- [x] Default due date to 14 days from invoice creation date (editable)
+- [x] taxRate passed as 0 to update procedure for schema compatibility
+- [x] Due date label updated to remove "(optional)" since it now defaults

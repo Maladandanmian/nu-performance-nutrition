@@ -44,6 +44,13 @@ interface InvoiceModalProps {
 
 const CURRENCIES = ["HKD", "USD", "GBP", "EUR", "AUD", "SGD"];
 
+/** Returns a date string YYYY-MM-DD for today + n days */
+function dateInDays(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().split("T")[0];
+}
+
 export function InvoiceModal({
   open,
   onOpenChange,
@@ -61,7 +68,6 @@ export function InvoiceModal({
   const [invoiceId, setInvoiceId] = useState<number | null>(existingInvoiceId ?? null);
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
-  const [taxRate, setTaxRate] = useState<number>(0);
   const [currency, setCurrency] = useState<string>("HKD");
   const [notes, setNotes] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
@@ -80,13 +86,12 @@ export function InvoiceModal({
       setInvoiceId(existingInvoice.id);
       setInvoiceNumber(existingInvoice.invoiceNumber);
       setLineItems((existingInvoice.lineItems as LineItem[]) || []);
-      setTaxRate(parseFloat(String(existingInvoice.taxRate || "0")));
       setCurrency(existingInvoice.currency || "HKD");
       setNotes(existingInvoice.notes || "");
       setDueDate(
         existingInvoice.dueDate
           ? new Date(existingInvoice.dueDate).toISOString().split("T")[0]
-          : ""
+          : dateInDays(14)
       );
       setStatus(existingInvoice.status || "draft");
     }
@@ -107,10 +112,9 @@ export function InvoiceModal({
             }]
           : [{ description: "", quantity: 1, unitPrice: 0, total: 0 }]
       );
-      setTaxRate(0);
       setCurrency("HKD");
       setNotes("");
-      setDueDate("");
+      setDueDate(dateInDays(14)); // Default: 14 days from today (invoice creation date)
       setStatus("draft");
     }
   }, [open, existingInvoiceId, packageType, sessionsTotal, pricePerSession]);
@@ -156,9 +160,7 @@ export function InvoiceModal({
     );
   }
 
-  const subtotal = lineItems.reduce((s, i) => s + i.total, 0);
-  const taxAmount = Math.round(subtotal * (taxRate / 100) * 100) / 100;
-  const total = Math.round((subtotal + taxAmount) * 100) / 100;
+  const total = Math.round(lineItems.reduce((s, i) => s + i.total, 0) * 100) / 100;
 
   function fmt(n: number) {
     return `${currency} ${n.toFixed(2)}`;
@@ -189,7 +191,7 @@ export function InvoiceModal({
     await updateMutation.mutateAsync({
       invoiceId,
       lineItems,
-      taxRate,
+      taxRate: 0,
       notes: notes || null,
       dueDate: dueDate || null,
       currency,
@@ -205,7 +207,7 @@ export function InvoiceModal({
     await updateMutation.mutateAsync({
       invoiceId,
       lineItems,
-      taxRate,
+      taxRate: 0,
       notes: notes || null,
       dueDate: dueDate || null,
       currency,
@@ -289,7 +291,7 @@ export function InvoiceModal({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Due Date (optional)</Label>
+              <Label>Due Date</Label>
               <Input
                 type="date"
                 value={dueDate}
@@ -380,37 +382,12 @@ export function InvoiceModal({
             )}
           </div>
 
-          {/* Totals */}
-          <div className="space-y-2 border-t pt-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Label className="text-sm">Tax Rate (%)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  step="0.5"
-                  value={taxRate}
-                  onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                  className="h-8 w-20"
-                  disabled={isSent}
-                />
-              </div>
-              <div className="text-right space-y-1">
-                <div className="flex justify-between gap-8 text-sm text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>{fmt(subtotal)}</span>
-                </div>
-                {taxRate > 0 && (
-                  <div className="flex justify-between gap-8 text-sm text-muted-foreground">
-                    <span>Tax ({taxRate}%)</span>
-                    <span>{fmt(taxAmount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between gap-8 text-base font-semibold">
-                  <span>Total</span>
-                  <span className="text-primary">{fmt(total)}</span>
-                </div>
+          {/* Total */}
+          <div className="border-t pt-3 flex justify-end">
+            <div className="text-right">
+              <div className="flex justify-between gap-12 text-base font-semibold">
+                <span>Total</span>
+                <span className="text-primary">{fmt(total)}</span>
               </div>
             </div>
           </div>
