@@ -188,7 +188,7 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
     const isExpiringSoon =
       pkg.expiryDate &&
       new Date(pkg.expiryDate).getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000;
-    const hasUsedSessions = usedSessions > 0;
+
 
     return (
       <div key={pkg.id} className="rounded-lg border bg-card p-4 space-y-3">
@@ -269,12 +269,9 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
           <Button
             size="sm"
             variant="outline"
-            className={`gap-1.5 text-xs border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${
-              hasUsedSessions ? "opacity-40 cursor-not-allowed" : ""
-            }`}
-            disabled={hasUsedSessions}
-            title={hasUsedSessions ? `Cannot delete: ${usedSessions} session${usedSessions !== 1 ? "s are" : " is"} linked to this package` : "Delete package"}
-            onClick={() => !hasUsedSessions && setDeletingPkg(pkg)}
+            className="gap-1.5 text-xs text-destructive border-destructive hover:bg-destructive/10"
+            title="Delete package"
+            onClick={() => setDeletingPkg(pkg)}
           >
             <Trash2 className="h-3 w-3" />
             Delete
