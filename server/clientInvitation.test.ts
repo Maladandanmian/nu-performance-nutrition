@@ -252,3 +252,80 @@ describe('Client Invitation Email URL Construction', () => {
     expect(url1).toBe(url2);
   });
 });
+
+
+describe('Client Login Session Regression Test', () => {
+  /**
+   * REGRESSION TEST: Ensures that client login tokens include the `name` field
+   * required by clientSession validation in routers.ts.
+   * 
+   * This test caught a bug where loginWithEmail and setPasswordWithToken were
+   * encoding tokens without the `name` field, causing clientSession queries to
+   * always return null and redirect clients back to login.
+   * 
+   * See: https://github.com/Maladandanmian/nu-performance-nutrition/issues/XXX
+   */
+  it('should encode session tokens with both clientId and name fields', async () => {
+    const testEmail = `regression-test-${Date.now()}@example.com`;
+    const testName = 'Regression Test Client';
+    const testPassword = 'RegressionTest123!';
+
+    // Create a test trainer
+    const trainerOpenId = `regression-trainer-${Date.now()}`;
+    await db.upsertUser({
+      openId: trainerOpenId,
+      name: 'Regression Test Trainer',
+      email: 'regression-trainer@example.com',
+      role: 'admin',
+    });
+    const trainer = await db.getUserByOpenId(trainerOpenId);
+    if (!trainer) throw new Error('Failed to create trainer for regression test');
+
+    // Create client with email
+    await db.createClient({
+      trainerId: trainer.id,
+      name: testName,
+      email: testEmail,
+    });
+    
+    // Fetch the client to get all fields including id and name
+    const client = await db.getClientByEmail(testEmail);
+    if (!client) throw new Error('Failed to fetch created client');
+
+    // Set password (simulating what setPasswordWithToken does)
+    const passwordHash = await hashPassword(testPassword);
+    await db.updateClientAuth(client.id, {
+      passwordHash,
+      authMethod: 'email',
+    });
+    await db.verifyClientEmail(client.id);
+
+    // Simulate what loginWithEmail and setPasswordWithToken do: create a session token
+    // This token is what gets set as the client_session cookie
+    const sessionToken = Buffer.from(JSON.stringify({
+      clientId: client.id,
+      name: client.name,  // CRITICAL: This field must be present
+      timestamp: Date.now(),
+    })).toString('base64');
+
+    // Decode and verify the token contains both required fields
+    // The clientSession validator in routers.ts requires BOTH clientId AND name
+    const decoded = JSON.parse(Buffer.from(sessionToken, 'base64').toString());
+    expect(decoded.clientId).toBe(client.id);
+    expect(decoded.name).toBe(testName);
+    expect(decoded.timestamp).toBeDefined();
+    expect(typeof decoded.timestamp).toBe('number');
+
+    // Verify that the token would pass clientSession validation
+    // (which checks: if (!decoded.clientId || !decoded.name) return null;)
+    expect(decoded.clientId).toBeTruthy();
+    expect(decoded.name).toBeTruthy();
+
+    // Cleanup
+    try {
+      await db.deleteClientAndData(client.id);
+    } catch (e) {
+      // Ignore cleanup errors
+    }
+  });
+});

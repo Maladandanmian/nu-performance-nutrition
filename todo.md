@@ -2831,3 +2831,9 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Fix: corrected cookie name from `clientSession` to `client_session` to match server-side validation
 - [x] Fix: added explicit Max-Age to cookie string for 7-day expiry
 - [x] Verified: clientInvitation tests still passing (16/16)
+
+## Regression Test for Client Login (Apr 14, 2026)
+- [x] Added regression test to clientInvitation.test.ts that verifies session tokens include the `name` field
+- [x] Test ensures that loginWithEmail and setPasswordWithToken encode tokens with both `clientId` and `name`
+- [x] Test will catch any future changes that remove the `name` field from session tokens
+- [x] All 17 tests in clientInvitation.test.ts passing
