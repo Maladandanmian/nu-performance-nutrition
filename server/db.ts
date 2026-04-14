@@ -2380,21 +2380,23 @@ export async function deleteSessionPackage(packageId: number, trainerId: number)
   if (!pkg) throw new Error("Package not found");
   if (pkg.trainerId !== trainerId) throw new Error("Not authorised to delete this package");
 
-  // Guard: refuse if any non-cancelled sessions are linked
+  // Guard: refuse only if there are future non-cancelled sessions linked to this package.
+  // Past sessions are historical records and should not block deletion.
   const [row] = await db
     .select({ count: sql<number>`count(*)` })
     .from(trainingSessions)
     .where(
       and(
         eq(trainingSessions.packageId, packageId),
-        sql`${trainingSessions.cancelledAt} IS NULL`
+        sql`${trainingSessions.cancelledAt} IS NULL`,
+        sql`${trainingSessions.sessionDate} >= CURDATE()`
       )
     );
 
-  const sessionsUsed = Number(row?.count || 0);
-  if (sessionsUsed > 0) {
+  const futureSessions = Number(row?.count || 0);
+  if (futureSessions > 0) {
     throw new Error(
-      `Cannot delete: ${sessionsUsed} session${sessionsUsed !== 1 ? 's are' : ' is'} linked to this package`
+      `Cannot delete: ${futureSessions} upcoming session${futureSessions !== 1 ? 's are' : ' is'} linked to this package. Cancel them first.`
     );
   }
 
