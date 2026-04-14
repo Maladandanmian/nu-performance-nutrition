@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceModal } from "@/components/InvoiceModal";
-import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle } from "lucide-react";
+import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 const STATUS_COLOURS: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
   draft: "outline",
@@ -19,6 +20,11 @@ const STATUS_COLOURS: Record<string, "default" | "secondary" | "outline" | "dest
 function formatCurrency(amount: number | string, currency: string) {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   return `${currency} ${num.toFixed(2)}`;
+}
+
+function formatDate(d: Date | string | null | undefined, opts?: Intl.DateTimeFormatOptions) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-GB", opts ?? { day: "numeric", month: "short" });
 }
 
 export default function Invoices() {
@@ -33,7 +39,19 @@ export default function Invoices() {
   });
 
   const markPaidMutation = trpc.invoices.markPaid.useMutation({
-    onSuccess: () => utils.invoices.listByTrainer.invalidate(),
+    onSuccess: () => {
+      toast.success("Invoice marked as paid");
+      utils.invoices.listByTrainer.invalidate();
+    },
+    onError: (e) => toast.error(`Failed: ${e.message}`),
+  });
+
+  const resendMutation = trpc.invoices.resend.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Invoice resent to ${data.sentTo}`);
+      utils.invoices.listByTrainer.invalidate();
+    },
+    onError: (e) => toast.error(`Resend failed: ${e.message}`),
   });
 
   const filtered = invoices.filter((inv) => {
@@ -120,12 +138,13 @@ export default function Invoices() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2 px-3 font-medium text-muted-foreground">Invoice #</th>
-                    <th className="text-left py-2 px-3 font-medium text-muted-foreground">Date</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground">Created</th>
                     <th className="text-left py-2 px-3 font-medium text-muted-foreground">Due</th>
                     <th className="text-right py-2 px-3 font-medium text-muted-foreground">Total</th>
                     <th className="text-center py-2 px-3 font-medium text-muted-foreground">Status</th>
                     <th className="text-right py-2 px-3 font-medium text-muted-foreground">Sent</th>
-                    <th className="w-20" />
+                    <th className="text-right py-2 px-3 font-medium text-muted-foreground">Paid On</th>
+                    <th className="w-28" />
                   </tr>
                 </thead>
                 <tbody>
@@ -133,19 +152,10 @@ export default function Invoices() {
                     <tr key={inv.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                       <td className="py-3 px-3 font-medium">{inv.invoiceNumber}</td>
                       <td className="py-3 px-3 text-muted-foreground">
-                        {new Date(inv.createdAt).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {formatDate(inv.createdAt, { day: "numeric", month: "short", year: "numeric" })}
                       </td>
                       <td className="py-3 px-3 text-muted-foreground">
-                        {inv.dueDate
-                          ? new Date(inv.dueDate).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                            })
-                          : "—"}
+                        {formatDate(inv.dueDate)}
                       </td>
                       <td className="py-3 px-3 text-right font-medium">
                         {formatCurrency(inv.total, inv.currency || "HKD")}
@@ -156,15 +166,13 @@ export default function Invoices() {
                         </Badge>
                       </td>
                       <td className="py-3 px-3 text-right text-muted-foreground text-xs">
-                        {inv.sentAt
-                          ? new Date(inv.sentAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                            })
-                          : "—"}
+                        {formatDate(inv.sentAt)}
+                      </td>
+                      <td className="py-3 px-3 text-right text-muted-foreground text-xs">
+                        {(inv as any).paidAt ? formatDate((inv as any).paidAt) : "—"}
                       </td>
                       <td className="py-3 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1 flex-wrap">
                           {inv.status === "sent" && (
                             <Button
                               size="sm"
@@ -175,6 +183,19 @@ export default function Invoices() {
                             >
                               <CheckCircle className="h-3 w-3" />
                               Mark Paid
+                            </Button>
+                          )}
+                          {(inv.status === "sent" || inv.status === "paid") && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 gap-1.5 text-xs"
+                              onClick={() => resendMutation.mutate({ invoiceId: inv.id })}
+                              disabled={resendMutation.isPending}
+                              title="Resend this invoice to the client"
+                            >
+                              <RefreshCw className="h-3 w-3" />
+                              Resend
                             </Button>
                           )}
                           <Button
@@ -205,7 +226,7 @@ export default function Invoices() {
         <InvoiceModal
           open={!!viewingInvoiceId}
           onOpenChange={(o) => !o && setViewingInvoiceId(null)}
-          clientId={0} // Not needed when editing existing invoice
+          clientId={0}
           clientName=""
           existingInvoiceId={viewingInvoiceId}
         />

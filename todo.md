@@ -2807,3 +2807,13 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add invoices.markPaid tRPC procedure in invoiceRouter.ts
 - [x] Add Mark Paid button to Invoices.tsx (visible on sent invoices only, green outline style)
 - [x] Status badge already handles Paid state (secondary variant)
+
+## Three Feature Additions (Apr 2026)
+- [x] Display pricePerSession on package card (e.g. "HKD 800 / session")
+- [x] Add paidAt column to invoices table in schema
+- [x] Apply paidAt migration via direct SQL
+- [x] Update markInvoicePaid db helper to record paidAt timestamp
+- [x] Update invoices.markPaid tRPC procedure to persist paidAt
+- [x] Add invoices.resend tRPC procedure (re-sends email, updates sentAt)
+- [x] Add Resend button to Invoices.tsx (visible on sent/paid invoices)
+- [x] Add "Paid On" column to Invoices table in Invoices.tsx

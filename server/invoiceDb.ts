@@ -119,7 +119,7 @@ export async function markInvoicePaid(id: number) {
 
   await db
     .update(invoices)
-    .set({ status: "paid" })
+    .set({ status: "paid", paidAt: new Date() })
     .where(eq(invoices.id, id));
 }
 

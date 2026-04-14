@@ -162,6 +162,58 @@ export const invoiceRouter = router({
     }),
 
   /**
+   * Resend an existing invoice to the client (reuses the same invoice number)
+   */
+  resend: adminProcedure
+    .input(z.object({ invoiceId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
+      if (!invoice) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invoice not found" });
+      }
+      if (invoice.status === "draft" || invoice.status === "cancelled") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Only sent or paid invoices can be resent",
+        });
+      }
+
+      const client = await db.getClientById(invoice.clientId);
+      if (!client || !client.email) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Client does not have an email address on file",
+        });
+      }
+
+      let packageType: string | undefined;
+      if (invoice.packageId) {
+        const pkg = await db.getSessionPackageById(invoice.packageId);
+        packageType = pkg?.packageType;
+      }
+
+      const result = await sendInvoiceEmail({
+        invoice,
+        clientName: client.name,
+        clientEmail: client.email,
+        trainerName: ctx.user.name || "Your Trainer",
+        packageType,
+      });
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to resend invoice: ${result.error}`,
+        });
+      }
+
+      // Update sentAt to the current time so the audit trail reflects the resend
+      await invoiceDb.markInvoiceSent(invoice.id);
+
+      return { success: true, sentTo: client.email };
+    }),
+
+  /**
    * Get all invoices for the trainer (for the invoices monitoring page)
    */
   listByTrainer: adminProcedure.query(async ({ ctx }) => {

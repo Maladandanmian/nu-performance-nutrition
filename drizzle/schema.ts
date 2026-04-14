@@ -828,6 +828,7 @@ export const invoices = mysqlTable("invoices", {
   notes: text("notes"), // Optional notes/payment instructions on invoice
   dueDate: date("dueDate"), // Optional payment due date
   sentAt: timestamp("sentAt"), // When the invoice was emailed to the client
+  paidAt: timestamp("paidAt"), // When the invoice was marked as paid
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

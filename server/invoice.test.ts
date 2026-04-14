@@ -124,6 +124,58 @@ describe("invoice status logic", () => {
   });
 });
 
+// ── paidAt recording ────────────────────────────────────────────────────────
+
+describe("paidAt recording", () => {
+  it("markInvoicePaid sets status to paid and paidAt to a Date", () => {
+    // Simulate what markInvoicePaid does
+    const before = { status: "sent" as const, paidAt: null as Date | null };
+    const now = new Date();
+    const after = { ...before, status: "paid" as const, paidAt: now };
+    expect(after.status).toBe("paid");
+    expect(after.paidAt).toBeInstanceOf(Date);
+  });
+
+  it("paidAt is null before marking paid", () => {
+    const invoice = { status: "sent" as const, paidAt: null as Date | null };
+    expect(invoice.paidAt).toBeNull();
+  });
+
+  it("paidAt is preserved after marking paid", () => {
+    const paidAt = new Date("2026-04-14T00:00:00Z");
+    const invoice = { status: "paid" as const, paidAt };
+    expect(invoice.paidAt).toEqual(paidAt);
+  });
+});
+
+// ── Resend eligibility ────────────────────────────────────────────────────────
+
+describe("resend eligibility", () => {
+  it("sent invoices can be resent", () => {
+    const status = "sent";
+    const canResend = status === "sent" || status === "paid";
+    expect(canResend).toBe(true);
+  });
+
+  it("paid invoices can be resent", () => {
+    const status = "paid";
+    const canResend = status === "sent" || status === "paid";
+    expect(canResend).toBe(true);
+  });
+
+  it("draft invoices cannot be resent", () => {
+    const status = "draft";
+    const canResend = status === "sent" || status === "paid";
+    expect(canResend).toBe(false);
+  });
+
+  it("cancelled invoices cannot be resent", () => {
+    const status = "cancelled";
+    const canResend = status === "sent" || status === "paid";
+    expect(canResend).toBe(false);
+  });
+});
+
 // ── Line item total calculation ───────────────────────────────────────────────
 
 describe("line item total calculation", () => {

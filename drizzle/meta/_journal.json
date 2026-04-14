@@ -253,6 +253,13 @@
       "when": 1776062335228,
       "tag": "0035_complete_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1776129877637,
+      "tag": "0036_careful_pyro",
+      "breakpoints": true
     }
   ]
 }

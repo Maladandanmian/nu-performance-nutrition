@@ -225,6 +225,13 @@ export function PackageManagement({ trainerId }: PackageManagementProps) {
           <Progress value={progressPercent} className="h-2" />
         </div>
 
+        {/* Price per session */}
+        {pkg.pricePerSession != null && parseFloat(String(pkg.pricePerSession)) > 0 && (
+          <p className="text-xs text-muted-foreground">
+            HKD {parseFloat(String(pkg.pricePerSession)).toLocaleString("en-HK", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} / session
+          </p>
+        )}
+
         {/* Notes */}
         {pkg.notes && (
           <p className="text-xs text-muted-foreground whitespace-pre-line">{pkg.notes}</p>
