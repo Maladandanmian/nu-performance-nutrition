@@ -2817,3 +2817,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Add invoices.resend tRPC procedure (re-sends email, updates sentAt)
 - [x] Add Resend button to Invoices.tsx (visible on sent/paid invoices)
 - [x] Add "Paid On" column to Invoices table in Invoices.tsx
+
+## Test Email Spam Fix (Apr 14, 2026)
+- [x] Identify root cause: test files creating clients via tRPC without mocking email service
+- [x] Create global vitest setup file to mock emailService for all tests
+- [x] Update vitest.config.ts to use setupFiles configuration
+- [x] Remove individual email mocks from clientInvitation.test.ts and vo2-max.test.ts
+- [x] Verify all tests pass with global mock in place
