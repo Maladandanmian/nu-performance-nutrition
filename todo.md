@@ -2824,3 +2824,10 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Update vitest.config.ts to use setupFiles configuration
 - [x] Remove individual email mocks from clientInvitation.test.ts and vo2-max.test.ts
 - [x] Verify all tests pass with global mock in place
+
+## Client Login Regression Fix (Apr 14, 2026)
+- [x] Diagnose: loginWithEmail and setPasswordWithToken were encoding tokens without the `name` field, causing clientSession validation to always return null
+- [x] Fix: added `name: client.name` to session token payload in both procedures
+- [x] Fix: corrected cookie name from `clientSession` to `client_session` to match server-side validation
+- [x] Fix: added explicit Max-Age to cookie string for 7-day expiry
+- [x] Verified: clientInvitation tests still passing (16/16)
