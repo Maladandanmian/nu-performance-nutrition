@@ -31,16 +31,15 @@ export const emailAuthRouter = router({
         });
       }
 
-      // Create session token — must include name for clientSession validation
+      // Create session token
       const sessionToken = Buffer.from(JSON.stringify({
         clientId: client.id,
-        name: client.name,
         timestamp: Date.now(),
       })).toString('base64');
 
-      // Set session cookie using the correct cookie name (client_session)
+      // Set session cookie
       const cookieOpts = getSessionCookieOptions(ctx.req);
-      const cookieStr = `client_session=${sessionToken}; Path=${cookieOpts.path}; SameSite=${cookieOpts.sameSite}; ${cookieOpts.secure ? 'Secure' : ''}; HttpOnly; Max-Age=${7 * 24 * 60 * 60}`;
+      const cookieStr = `clientSession=${sessionToken}; Path=${cookieOpts.path}; SameSite=${cookieOpts.sameSite}; ${cookieOpts.secure ? 'Secure' : ''}; HttpOnly`;
       ctx.res.setHeader('Set-Cookie', cookieStr);
 
       return {
@@ -82,16 +81,15 @@ export const emailAuthRouter = router({
       // Clear the token
       await db.clearPasswordSetupToken(client.id);
 
-      // Create session token — must include name for clientSession validation
+      // Create session token
       const sessionToken = Buffer.from(JSON.stringify({
         clientId: client.id,
-        name: client.name,
         timestamp: Date.now(),
       })).toString('base64');
 
-      // Set session cookie using the correct cookie name (client_session)
+      // Set session cookie
       const cookieOpts = getSessionCookieOptions(ctx.req);
-      const cookieStr = `client_session=${sessionToken}; Path=${cookieOpts.path}; SameSite=${cookieOpts.sameSite}; ${cookieOpts.secure ? 'Secure' : ''}; HttpOnly; Max-Age=${7 * 24 * 60 * 60}`;
+      const cookieStr = `clientSession=${sessionToken}; Path=${cookieOpts.path}; SameSite=${cookieOpts.sameSite}; ${cookieOpts.secure ? 'Secure' : ''}; HttpOnly`;
       ctx.res.setHeader('Set-Cookie', cookieStr);
 
       return {

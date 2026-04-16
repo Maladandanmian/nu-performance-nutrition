@@ -700,6 +700,10 @@ export const trainingSessions = mysqlTable("training_sessions", {
   cancelled: boolean("cancelled").default(false).notNull(),
   cancelledAt: timestamp("cancelledAt"),
   lastReminderSentAt: timestamp("lastReminderSentAt"), // Track when reminder was last sent (24-hour cooldown)
+  // PAYG payment fields — only populated for non-package sessions
+  sessionFee: decimal("sessionFee", { precision: 10, scale: 2 }), // Agreed price at booking
+  amountPaid: decimal("amountPaid", { precision: 10, scale: 2 }), // Amount actually received
+  paidAt: timestamp("paidAt"), // When payment was received
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -829,6 +833,10 @@ export const invoices = mysqlTable("invoices", {
   dueDate: date("dueDate"), // Optional payment due date
   sentAt: timestamp("sentAt"), // When the invoice was emailed to the client
   paidAt: timestamp("paidAt"), // When the invoice was marked as paid
+  // Accounting fields
+  serviceType: varchar("serviceType", { length: 100 }), // References serviceTypes.name — stored as string so historical records are unaffected by future renames
+  discountAmount: decimal("discountAmount", { precision: 10, scale: 2 }).default("0.00"), // Discount applied before net total
+  discountDescription: varchar("discountDescription", { length: 255 }), // e.g. "Promotional discount"
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -842,3 +850,37 @@ export type InvoiceLineItem = {
   unitPrice: number;
   total: number;
 };
+
+/**
+ * Service Types — trainer-managed lookup table for invoice service type options
+ * Names are immutable once created (no edit, only add/delete if unused)
+ */
+export const serviceTypes = mysqlTable("service_types", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(), // e.g. "PT Package"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ServiceType = typeof serviceTypes.$inferSelect;
+export type InsertServiceType = typeof serviceTypes.$inferInsert;
+
+/**
+ * Business Costs — monthly cost tracking for the accounting module
+ * Recurring entries serve as a monthly template Luke confirms and adjusts
+ */
+export const businessCosts = mysqlTable("business_costs", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  category: mysqlEnum("category", ["Rent", "Software Subscriptions", "Insurance", "Equipment", "Marketing", "Other"]).notNull(),
+  description: varchar("description", { length: 255 }).notNull(), // e.g. "Gym rent — Sai Ying Pun"
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  isRecurring: boolean("isRecurring").default(false).notNull(), // Whether this entry is a recurring template
+  month: varchar("month", { length: 7 }).notNull(), // YYYY-MM format
+  confirmedAt: timestamp("confirmedAt"), // When Luke confirmed this month's costs
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BusinessCost = typeof businessCosts.$inferSelect;
+export type InsertBusinessCost = typeof businessCosts.$inferInsert;

@@ -260,6 +260,13 @@
       "when": 1776129877637,
       "tag": "0036_careful_pyro",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1776320287700,
+      "tag": "0037_clammy_prowler",
+      "breakpoints": true
     }
   ]
 }

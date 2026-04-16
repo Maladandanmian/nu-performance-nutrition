@@ -7,7 +7,11 @@ import type { InvoiceLineItem } from "../drizzle/schema";
 describe("calculateInvoiceTotals", () => {
   it("returns zeros for an empty line items array", () => {
     const result = calculateInvoiceTotals([], 0);
-    expect(result).toEqual({ subtotal: 0, taxAmount: 0, total: 0 });
+    expect(result.subtotal).toBe(0);
+    expect(result.taxAmount).toBe(0);
+    expect(result.total).toBe(0);
+    expect(result.discountAmount).toBe(0);
+    expect(result.netAfterDiscount).toBe(0);
   });
 
   it("sums line item totals correctly with no tax", () => {

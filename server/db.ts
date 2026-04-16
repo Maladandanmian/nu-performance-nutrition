@@ -2036,6 +2036,10 @@ export async function createTrainingSession(session: InsertTrainingSession) {
   if (session.customSessionName) insertData.customSessionName = session.customSessionName;
   if (session.customDurationMinutes) insertData.customDurationMinutes = session.customDurationMinutes;
   if (session.customPrice) insertData.customPrice = session.customPrice;
+  // Add PAYG payment fields if present
+  if (session.sessionFee != null) insertData.sessionFee = session.sessionFee;
+  if (session.amountPaid != null) insertData.amountPaid = session.amountPaid;
+  if (session.paidAt != null) insertData.paidAt = session.paidAt;
   
   const [result] = await db.insert(trainingSessions).values(insertData);
   return { id: Number(result.insertId), ...session };

@@ -41,6 +41,9 @@ interface SessionEditModalProps {
     sessionType: string;
     paymentStatus: string;
     packageId?: number | null;
+    sessionFee?: string | number | null;
+    amountPaid?: string | number | null;
+    paidAt?: string | Date | null;
   } | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -60,6 +63,9 @@ export function SessionEditModal({
     sessionType: "",
     paymentStatus: "",
     packageId: null as number | null,
+    sessionFee: "",
+    amountPaid: "",
+    paidAt: "",
   });
 
   const utils = trpc.useUtils();
@@ -67,10 +73,14 @@ export function SessionEditModal({
   // Populate form when session changes
   useEffect(() => {
     if (session) {
-      const dateObj = typeof session.sessionDate === "string" 
-        ? new Date(session.sessionDate) 
+      const dateObj = typeof session.sessionDate === "string"
+        ? new Date(session.sessionDate)
         : session.sessionDate;
-      
+
+      const paidAtDate = session.paidAt
+        ? (typeof session.paidAt === "string" ? new Date(session.paidAt) : session.paidAt)
+        : null;
+
       setFormData({
         sessionDate: dateObj.toISOString().split("T")[0],
         startTime: session.startTime,
@@ -78,6 +88,9 @@ export function SessionEditModal({
         sessionType: session.sessionType,
         paymentStatus: session.paymentStatus,
         packageId: session.packageId || null,
+        sessionFee: session.sessionFee != null ? String(session.sessionFee) : "",
+        amountPaid: session.amountPaid != null ? String(session.amountPaid) : "",
+        paidAt: paidAtDate ? paidAtDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
       });
     }
   }, [session]);
@@ -105,6 +118,12 @@ export function SessionEditModal({
       return;
     }
 
+    // When marking as paid, amountPaid is required
+    if (formData.paymentStatus === "paid" && !formData.amountPaid) {
+      toast.error("Please enter the amount received");
+      return;
+    }
+
     updateSession.mutate({
       id: session.id,
       sessionDate: formData.sessionDate,
@@ -113,12 +132,19 @@ export function SessionEditModal({
       sessionType: formData.sessionType as "1on1_pt" | "2on1_pt" | "nutrition_initial" | "nutrition_coaching",
       paymentStatus: formData.paymentStatus as "paid" | "unpaid" | "from_package",
       packageId: formData.packageId ?? undefined,
+      // PAYG payment fields — only sent when not from_package
+      ...(formData.paymentStatus !== "from_package" && {
+        sessionFee: formData.sessionFee ? parseFloat(formData.sessionFee) : null,
+        amountPaid: formData.paymentStatus === "paid" && formData.amountPaid ? parseFloat(formData.amountPaid) : null,
+        paidAt: formData.paymentStatus === "paid" && formData.paidAt ? formData.paidAt : null,
+      }),
     });
   };
 
   if (!session) return null;
 
   const isPastSession = new Date(session.sessionDate) < new Date();
+  const isPayg = formData.paymentStatus !== "from_package";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,9 +165,7 @@ export function SessionEditModal({
               id="sessionDate"
               type="date"
               value={formData.sessionDate}
-              onChange={(e) =>
-                setFormData({ ...formData, sessionDate: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, sessionDate: e.target.value })}
             />
           </div>
 
@@ -152,9 +176,7 @@ export function SessionEditModal({
                 id="startTime"
                 type="time"
                 value={formData.startTime}
-                onChange={(e) =>
-                  setFormData({ ...formData, startTime: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -163,9 +185,7 @@ export function SessionEditModal({
                 id="endTime"
                 type="time"
                 value={formData.endTime}
-                onChange={(e) =>
-                  setFormData({ ...formData, endTime: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
               />
             </div>
           </div>
@@ -174,9 +194,7 @@ export function SessionEditModal({
             <Label htmlFor="sessionType">Session Type *</Label>
             <Select
               value={formData.sessionType}
-              onValueChange={(value) =>
-                setFormData({ ...formData, sessionType: value })
-              }
+              onValueChange={(value) => setFormData({ ...formData, sessionType: value })}
             >
               <SelectTrigger id="sessionType">
                 <SelectValue placeholder="Select session type" />
@@ -196,7 +214,12 @@ export function SessionEditModal({
             <Select
               value={formData.paymentStatus}
               onValueChange={(value) =>
-                setFormData({ ...formData, paymentStatus: value })
+                setFormData({
+                  ...formData,
+                  paymentStatus: value,
+                  // Clear payment fields when switching to from_package
+                  ...(value === "from_package" && { sessionFee: "", amountPaid: "", paidAt: "" }),
+                })
               }
             >
               <SelectTrigger id="paymentStatus">
@@ -211,6 +234,51 @@ export function SessionEditModal({
               </SelectContent>
             </Select>
           </div>
+
+          {/* PAYG payment fields — shown when not from_package */}
+          {isPayg && (
+            <div className="space-y-3 border rounded-lg p-3 bg-muted/30">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Payment Details</p>
+              <div className="space-y-2">
+                <Label htmlFor="sessionFee">Agreed Fee (HKD)</Label>
+                <Input
+                  id="sessionFee"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="e.g. 800"
+                  value={formData.sessionFee}
+                  onChange={(e) => setFormData({ ...formData, sessionFee: e.target.value })}
+                />
+              </div>
+
+              {formData.paymentStatus === "paid" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="amountPaid">Amount Received (HKD) *</Label>
+                    <Input
+                      id="amountPaid"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 800"
+                      value={formData.amountPaid}
+                      onChange={(e) => setFormData({ ...formData, amountPaid: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="paidAt">Date Received *</Label>
+                    <Input
+                      id="paidAt"
+                      type="date"
+                      value={formData.paidAt}
+                      onChange={(e) => setFormData({ ...formData, paidAt: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           <div className="flex gap-2 pt-4">
             <Button

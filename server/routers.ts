@@ -16,6 +16,7 @@ import { identifyMealItems } from "./mealItemIdentification";
 import { analyzeMealNutrition } from "./mealNutritionAnalysis";
 import { emailAuthRouter } from "./emailAuthProcedures";
 import { invoiceRouter } from "./invoiceRouter";
+import { accountingRouter } from "./accountingRouter";
 import { logLogin, logFailedLogin, getIPFromRequest, getUserAgentFromRequest } from "./auditLog";
 import { sendPasswordSetupInvitation, sendEmailVerification as sendVerificationEmail } from "./emailService";
 import { ENV } from "./_core/env";
@@ -35,6 +36,7 @@ export const appRouter = router({
   system: systemRouter,
   emailAuth: emailAuthRouter,
   invoices: invoiceRouter,
+  accounting: accountingRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     
@@ -2921,6 +2923,10 @@ Return as JSON.`
           sessionType: z.enum(["1on1_pt", "2on1_pt", "nutrition_initial", "nutrition_coaching"]).optional(),
           paymentStatus: z.enum(["paid", "unpaid", "from_package"]).optional(),
           packageId: z.number().optional().nullable(),
+          // PAYG payment fields
+          sessionFee: z.number().optional().nullable(),
+          amountPaid: z.number().optional().nullable(),
+          paidAt: z.string().optional().nullable(), // ISO date string
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -2931,6 +2937,10 @@ Return as JSON.`
         if (input.sessionType) updates.sessionType = input.sessionType;
         if (input.paymentStatus) updates.paymentStatus = input.paymentStatus;
         if (input.packageId !== undefined) updates.packageId = input.packageId;
+        // PAYG payment fields
+        if (input.sessionFee !== undefined) updates.sessionFee = input.sessionFee;
+        if (input.amountPaid !== undefined) updates.amountPaid = input.amountPaid;
+        if (input.paidAt !== undefined) updates.paidAt = input.paidAt ? new Date(input.paidAt) : null;
 
         const session = await db.updateTrainingSession(input.id, updates);
 
@@ -2956,6 +2966,10 @@ Return as JSON.`
           customSessionName: z.string().optional(),
           customDurationMinutes: z.number().optional(),
           customPrice: z.string().optional(),
+          // PAYG payment fields
+          sessionFee: z.number().optional(),
+          amountPaid: z.number().optional(),
+          paidAt: z.string().optional(), // ISO date string
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -2979,6 +2993,9 @@ Return as JSON.`
           customSessionName: input.customSessionName || null,
           customDurationMinutes: input.customDurationMinutes || null,
           customPrice: input.customPrice || null,
+          sessionFee: input.sessionFee ?? null,
+          amountPaid: input.amountPaid ?? null,
+          paidAt: input.paidAt ? new Date(input.paidAt) : null,
         } as any);
 
         // Send booking confirmation email

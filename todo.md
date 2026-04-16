@@ -2825,15 +2825,47 @@ Next: Trainer management UI (session list view, package creation, group class sc
 - [x] Remove individual email mocks from clientInvitation.test.ts and vo2-max.test.ts
 - [x] Verify all tests pass with global mock in place
 
-## Client Login Regression Fix (Apr 14, 2026)
-- [x] Diagnose: loginWithEmail and setPasswordWithToken were encoding tokens without the `name` field, causing clientSession validation to always return null
-- [x] Fix: added `name: client.name` to session token payload in both procedures
-- [x] Fix: corrected cookie name from `clientSession` to `client_session` to match server-side validation
-- [x] Fix: added explicit Max-Age to cookie string for 7-day expiry
-- [x] Verified: clientInvitation tests still passing (16/16)
+## Accounting Module (feature/accounting-development branch)
 
-## Regression Test for Client Login (Apr 14, 2026)
-- [x] Added regression test to clientInvitation.test.ts that verifies session tokens include the `name` field
-- [x] Test ensures that loginWithEmail and setPasswordWithToken encode tokens with both `clientId` and `name`
-- [x] Test will catch any future changes that remove the `name` field from session tokens
-- [x] All 17 tests in clientInvitation.test.ts passing
+### Phase 1 — Schema Migrations
+- [ ] Add sessionFee, amountPaid, paidAt columns to trainingSessions table
+- [ ] Add serviceType (varchar), discountAmount, discountDescription columns to invoices table
+- [ ] Create serviceTypes lookup table (id, trainerId, name, createdAt)
+- [ ] Create businessCosts table (id, trainerId, category, description, amount, isRecurring, month, confirmedAt, createdAt)
+- [ ] Run pnpm db:push and verify all migrations applied cleanly
+
+### Phase 2 — PAYG Session Flow
+- [ ] Update trainingSessions.create router procedure to accept sessionFee, amountPaid, paidAt
+- [ ] Update trainingSessions.update router procedure to accept sessionFee, amountPaid, paidAt
+- [ ] Update db.createTrainingSession and db.updateTrainingSession helpers
+- [ ] Add sessionFee field to TrainerSchedule.tsx session creation form (shown when not from_package)
+- [ ] Add amountPaid + paidAt fields to SessionEditModal.tsx (shown when marking as paid)
+
+### Phase 3 — Invoice Enhancements
+- [ ] Add serviceTypes router (list, create, delete) gated to Luke only
+- [ ] Seed 6 default service types on first run
+- [ ] Update invoiceRouter.generate and invoiceRouter.update to accept serviceType, discountAmount, discountDescription
+- [ ] Update invoiceDb.calculateInvoiceTotals to apply discount
+- [ ] Update InvoiceModal.tsx with serviceType dropdown and discount fields
+- [ ] Update invoice total calculation in UI
+
+### Phase 4 — Business Costs
+- [ ] Add accounting.costs router procedures (getByMonth, confirmMonth, upsertCost, deleteCost)
+- [ ] All procedures gated to lukusdavey@gmail.com
+- [ ] Monthly template copy logic (copy previous month recurring entries)
+
+### Phase 5 — Accounting Pages
+- [ ] Add /trainer/accounting route to App.tsx (Luke-only guard on frontend)
+- [ ] Add Accounting nav link to TrainerDashboard.tsx header (Luke-only)
+- [ ] Build Accounting.tsx page with three tabs: Taxman Report, Monthly Overview, Remaining Packages
+- [ ] Taxman Report: date range filter, service type filter, unified revenue table (invoices + PAYG sessions)
+- [ ] Monthly Overview: revenue vs costs by month, cost template management UI
+- [ ] Remaining Packages: sessions used/remaining, value of remaining sessions, expiry date
+
+### Phase 6 — Tests & Verification
+- [ ] Vitest tests for PAYG session fee flow
+- [ ] Vitest tests for Taxman Report query logic
+- [ ] Vitest tests for Luke-only access guard
+- [ ] Vitest tests for cost template copy logic
+- [ ] Confirm all existing tests still pass
+- [ ] Save checkpoint on accounting branch

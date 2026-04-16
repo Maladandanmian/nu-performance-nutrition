@@ -34,10 +34,13 @@ export const invoiceRouter = router({
         packageId: z.number().optional(),
         packageType: z.string().optional(),
         sessionsTotal: z.number().optional(),
-        pricePerSession: z.number().optional(), // Pre-populate unit price from package
+        pricePerSession: z.number().optional(),
         currency: z.string().default("HKD"),
         notes: z.string().optional(),
         dueDate: z.string().optional(), // YYYY-MM-DD
+        serviceType: z.string().optional(),
+        discountAmount: z.number().min(0).optional(),
+        discountDescription: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -55,7 +58,9 @@ export const invoiceRouter = router({
         });
       }
 
-      const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(lineItems, 0);
+      const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(
+        lineItems, 0, input.discountAmount
+      );
 
       const invoiceId = await invoiceDb.createInvoice({
         trainerId: ctx.user.id,
@@ -71,6 +76,9 @@ export const invoiceRouter = router({
         status: "draft",
         notes: input.notes ?? null,
         dueDate: input.dueDate ? new Date(input.dueDate) : null,
+        serviceType: input.serviceType ?? null,
+        discountAmount: input.discountAmount != null ? String(input.discountAmount) as any : null,
+        discountDescription: input.discountDescription ?? null,
       });
 
       return { invoiceId, invoiceNumber };
@@ -88,6 +96,9 @@ export const invoiceRouter = router({
         notes: z.string().optional().nullable(),
         dueDate: z.string().optional().nullable(),
         currency: z.string().optional(),
+        serviceType: z.string().optional().nullable(),
+        discountAmount: z.number().min(0).optional().nullable(),
+        discountDescription: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ input }) => {
@@ -98,7 +109,10 @@ export const invoiceRouter = router({
 
       const lineItems = (input.lineItems ?? (existing.lineItems as InvoiceLineItem[]));
       const taxRate = input.taxRate ?? parseFloat(String(existing.taxRate || "0"));
-      const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(lineItems, taxRate);
+      const discountAmount = input.discountAmount !== undefined
+        ? (input.discountAmount ?? 0)
+        : parseFloat(String(existing.discountAmount || "0"));
+      const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(lineItems, taxRate, discountAmount);
 
       await invoiceDb.updateInvoice(input.invoiceId, {
         lineItems,
@@ -109,6 +123,9 @@ export const invoiceRouter = router({
         notes: input.notes !== undefined ? input.notes : existing.notes,
         dueDate: input.dueDate !== undefined ? (input.dueDate ? new Date(input.dueDate) : null) : existing.dueDate,
         currency: input.currency ?? existing.currency,
+        serviceType: input.serviceType !== undefined ? input.serviceType : existing.serviceType,
+        discountAmount: input.discountAmount !== undefined ? (input.discountAmount != null ? String(input.discountAmount) as any : null) : existing.discountAmount,
+        discountDescription: input.discountDescription !== undefined ? input.discountDescription : existing.discountDescription,
       });
 
       return { success: true };
@@ -288,6 +305,35 @@ export const invoiceRouter = router({
         });
       }
       await invoiceDb.deleteInvoice(input.invoiceId);
+      return { success: true };
+    }),
+
+  // ── Service Types ─────────────────────────────────────────────────────────────
+
+  /**
+   * List all service types for the trainer
+   */
+  listServiceTypes: adminProcedure.query(async ({ ctx }) => {
+    return invoiceDb.getServiceTypes(ctx.user.id);
+  }),
+
+  /**
+   * Create a new service type (name is immutable once created)
+   */
+  createServiceType: adminProcedure
+    .input(z.object({ name: z.string().min(1).max(100) }))
+    .mutation(async ({ ctx, input }) => {
+      const id = await invoiceDb.createServiceType(ctx.user.id, input.name.trim());
+      return { id };
+    }),
+
+  /**
+   * Delete a service type (only if unused on invoices)
+   */
+  deleteServiceType: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await invoiceDb.deleteServiceType(input.id, ctx.user.id);
       return { success: true };
     }),
 });

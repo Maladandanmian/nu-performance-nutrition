@@ -77,6 +77,8 @@ export default function TrainerSchedule() {
     customSessionName: "",
     customDurationMinutes: "",
     customPrice: "",
+    // PAYG payment fields
+    sessionFee: "",
   });
 
   // Group class form state
@@ -109,6 +111,7 @@ export default function TrainerSchedule() {
         customSessionName: "",
         customDurationMinutes: "",
         customPrice: "",
+        sessionFee: "",
       });
     },
     onError: (error) => {
@@ -137,6 +140,7 @@ export default function TrainerSchedule() {
         customSessionName: "",
         customDurationMinutes: "",
         customPrice: "",
+        sessionFee: "",
       });
       // Show last-session alert if this was the final session in the package
       if (data?.isLastSession) {
@@ -228,6 +232,10 @@ export default function TrainerSchedule() {
         customSessionName: sessionForm.customSessionName || undefined,
         customDurationMinutes: sessionForm.customDurationMinutes ? parseInt(sessionForm.customDurationMinutes) : undefined,
         customPrice: sessionForm.customPrice || undefined,
+        sessionFee: sessionForm.sessionFee ? parseFloat(sessionForm.sessionFee) : undefined,
+        // If booking as paid, record paidAt as today
+        paidAt: sessionForm.paymentStatus === 'paid' ? new Date().toISOString() : undefined,
+        amountPaid: sessionForm.paymentStatus === 'paid' && sessionForm.sessionFee ? parseFloat(sessionForm.sessionFee) : undefined,
       });
     }
   };
@@ -462,6 +470,27 @@ export default function TrainerSchedule() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Session Fee (shown when not from_package) */}
+              {sessionForm.paymentStatus !== "from_package" && (
+                <div className="space-y-2">
+                  <Label htmlFor="sessionFee">
+                    Session Fee (HKD){sessionForm.paymentStatus === "paid" ? " *" : " (Optional)"}
+                  </Label>
+                  <Input
+                    id="sessionFee"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 800"
+                    value={sessionForm.sessionFee}
+                    onChange={(e) => setSessionForm({ ...sessionForm, sessionFee: e.target.value })}
+                  />
+                  {sessionForm.paymentStatus === "paid" && (
+                    <p className="text-xs text-muted-foreground">This amount will be recorded as received today.</p>
+                  )}
+                </div>
+              )}
 
               {/* Package Selector (shown when payment is from_package) */}
               {sessionForm.paymentStatus === "from_package" && sessionForm.clientId && sessionForm.sessionType && (

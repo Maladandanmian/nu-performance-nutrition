@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Calendar, CheckCircle2, Database, FileText, LogOut, Plus, RefreshCw, Trash2, Users, XCircle } from "lucide-react";
+import { BarChart3, Calendar, CheckCircle2, Database, FileText, LogOut, Plus, RefreshCw, Trash2, Users, XCircle } from "lucide-react";
 import { Link } from "wouter";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useState, useMemo } from "react";
@@ -239,6 +239,18 @@ export default function TrainerDashboard() {
                 Invoices
               </Button>
             </Link>
+            {user?.email === "lukusdavey@gmail.com" && (
+              <Link href="/trainer/accounting">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm font-medium"
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Accounting
+                </Button>
+              </Link>
+            )}
             <NotificationBell />
             <span className="text-sm" style={{color: '#6F6E70'}}>{user?.name}</span>
             <Button 
