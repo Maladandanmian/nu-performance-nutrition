@@ -2828,44 +2828,44 @@ Next: Trainer management UI (session list view, package creation, group class sc
 ## Accounting Module (feature/accounting-development branch)
 
 ### Phase 1 — Schema Migrations
-- [ ] Add sessionFee, amountPaid, paidAt columns to trainingSessions table
-- [ ] Add serviceType (varchar), discountAmount, discountDescription columns to invoices table
-- [ ] Create serviceTypes lookup table (id, trainerId, name, createdAt)
-- [ ] Create businessCosts table (id, trainerId, category, description, amount, isRecurring, month, confirmedAt, createdAt)
-- [ ] Run pnpm db:push and verify all migrations applied cleanly
+- [x] Add sessionFee, amountPaid, paidAt columns to trainingSessions table
+- [x] Add serviceType (varchar), discountAmount, discountDescription columns to invoices table
+- [x] Create serviceTypes lookup table (id, trainerId, name, createdAt)
+- [x] Create businessCosts table (id, trainerId, category, description, amount, isRecurring, month, confirmedAt, createdAt)
+- [x] Run pnpm db:push and verify all migrations applied cleanly
 
 ### Phase 2 — PAYG Session Flow
-- [ ] Update trainingSessions.create router procedure to accept sessionFee, amountPaid, paidAt
-- [ ] Update trainingSessions.update router procedure to accept sessionFee, amountPaid, paidAt
-- [ ] Update db.createTrainingSession and db.updateTrainingSession helpers
-- [ ] Add sessionFee field to TrainerSchedule.tsx session creation form (shown when not from_package)
-- [ ] Add amountPaid + paidAt fields to SessionEditModal.tsx (shown when marking as paid)
+- [x] Update trainingSessions.create router procedure to accept sessionFee, amountPaid, paidAt
+- [x] Update trainingSessions.update router procedure to accept sessionFee, amountPaid, paidAt
+- [x] Update db.createTrainingSession and db.updateTrainingSession helpers
+- [x] Add sessionFee field to TrainerSchedule.tsx session creation form (shown when not from_package)
+- [x] Add amountPaid + paidAt fields to SessionEditModal.tsx (shown when marking as paid)
 
 ### Phase 3 — Invoice Enhancements
-- [ ] Add serviceTypes router (list, create, delete) gated to Luke only
-- [ ] Seed 6 default service types on first run
-- [ ] Update invoiceRouter.generate and invoiceRouter.update to accept serviceType, discountAmount, discountDescription
-- [ ] Update invoiceDb.calculateInvoiceTotals to apply discount
-- [ ] Update InvoiceModal.tsx with serviceType dropdown and discount fields
-- [ ] Update invoice total calculation in UI
+- [x] Add serviceTypes router (list, create, delete) gated to Luke only
+- [x] Seed 6 default service types on first run
+- [x] Update invoiceRouter.generate and invoiceRouter.update to accept serviceType, discountAmount, discountDescription
+- [x] Update invoiceDb.calculateInvoiceTotals to apply discount
+- [x] Update InvoiceModal.tsx with serviceType dropdown and discount fields
+- [x] Update invoice total calculation in UI
 
 ### Phase 4 — Business Costs
-- [ ] Add accounting.costs router procedures (getByMonth, confirmMonth, upsertCost, deleteCost)
-- [ ] All procedures gated to lukusdavey@gmail.com
-- [ ] Monthly template copy logic (copy previous month recurring entries)
+- [x] Add accounting.costs router procedures (getByMonth, confirmMonth, upsertCost, deleteCost)
+- [x] All procedures gated to lukusdavey@gmail.com
+- [x] Monthly template copy logic (copy previous month recurring entries)
 
 ### Phase 5 — Accounting Pages
-- [ ] Add /trainer/accounting route to App.tsx (Luke-only guard on frontend)
-- [ ] Add Accounting nav link to TrainerDashboard.tsx header (Luke-only)
-- [ ] Build Accounting.tsx page with three tabs: Taxman Report, Monthly Overview, Remaining Packages
-- [ ] Taxman Report: date range filter, service type filter, unified revenue table (invoices + PAYG sessions)
-- [ ] Monthly Overview: revenue vs costs by month, cost template management UI
-- [ ] Remaining Packages: sessions used/remaining, value of remaining sessions, expiry date
+- [x] Add /trainer/accounting route to App.tsx (Luke-only guard on frontend)
+- [x] Add Accounting nav link to TrainerDashboard.tsx header (Luke-only)
+- [x] Build Accounting.tsx page with three tabs: Taxman Report, Monthly Overview, Remaining Packages
+- [x] Taxman Report: date range filter, service type filter, unified revenue table (invoices + PAYG sessions)
+- [x] Monthly Overview: revenue vs costs by month, cost template management UI
+- [x] Remaining Packages: sessions used/remaining, value of remaining sessions, expiry date
 
 ### Phase 6 — Tests & Verification
-- [ ] Vitest tests for PAYG session fee flow
-- [ ] Vitest tests for Taxman Report query logic
-- [ ] Vitest tests for Luke-only access guard
-- [ ] Vitest tests for cost template copy logic
-- [ ] Confirm all existing tests still pass
-- [ ] Save checkpoint on accounting branch
+- [x] Vitest tests for PAYG session fee flow
+- [x] Vitest tests for Taxman Report query logic
+- [x] Vitest tests for Luke-only access guard
+- [x] Vitest tests for cost template copy logic
+- [x] Confirm all existing tests still pass
+- [x] Save checkpoint on accounting branch
