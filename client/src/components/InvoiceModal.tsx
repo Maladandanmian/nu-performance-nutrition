@@ -37,7 +37,7 @@ interface InvoiceModalProps {
   packageId?: number;
   packageType?: string;
   sessionsTotal?: number;
-  pricePerSession?: number; // Pre-populate unit price from package
+  pricePerSession?: number;
   /** If provided, opens an existing invoice for editing/sending */
   existingInvoiceId?: number;
 }
@@ -49,6 +49,14 @@ function dateInDays(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() + n);
   return d.toISOString().split("T")[0];
+}
+
+function recalcItem(items: LineItem[], index: number): LineItem[] {
+  return items.map((item, i) =>
+    i === index
+      ? { ...item, total: Math.round(item.quantity * item.unitPrice * 100) / 100 }
+      : item
+  );
 }
 
 export function InvoiceModal({
@@ -75,6 +83,24 @@ export function InvoiceModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
+  // New fields
+  const [serviceType, setServiceType] = useState<string>("");
+  const [discountAmount, setDiscountAmount] = useState<string>("");
+  const [discountDescription, setDiscountDescription] = useState<string>("");
+
+  // PAYG mode: when no clientId is provided, allow selecting a client
+  const isPAYG = !packageId && clientId === 0;
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+
+  const { data: clients = [] } = trpc.clients.list.useQuery(undefined, {
+    enabled: isPAYG && open,
+  });
+
+  const { data: serviceTypes = [] } = trpc.invoices.listServiceTypes.useQuery(undefined, {
+    enabled: open,
+  });
+
   // Load existing invoice
   const { data: existingInvoice } = trpc.invoices.getById.useQuery(
     { invoiceId: existingInvoiceId! },
@@ -94,6 +120,13 @@ export function InvoiceModal({
           : dateInDays(14)
       );
       setStatus(existingInvoice.status || "draft");
+      setServiceType((existingInvoice as any).serviceType || "");
+      setDiscountAmount(
+        (existingInvoice as any).discountAmount
+          ? String(parseFloat((existingInvoice as any).discountAmount))
+          : ""
+      );
+      setDiscountDescription((existingInvoice as any).discountDescription || "");
     }
   }, [existingInvoice]);
 
@@ -102,22 +135,18 @@ export function InvoiceModal({
     if (open && !existingInvoiceId) {
       setInvoiceId(null);
       setInvoiceNumber("");
-      setLineItems(
-        packageType && sessionsTotal
-          ? [{
-              description: packageType,
-              quantity: sessionsTotal,
-              unitPrice: pricePerSession ?? 0,
-              total: Math.round(sessionsTotal * (pricePerSession ?? 0) * 100) / 100,
-            }]
-          : [{ description: "", quantity: 1, unitPrice: 0, total: 0 }]
-      );
+      setLineItems([]);
       setCurrency("HKD");
       setNotes("");
-      setDueDate(dateInDays(14)); // Default: 14 days from today (invoice creation date)
+      setDueDate(dateInDays(14));
       setStatus("draft");
+      setServiceType("");
+      setDiscountAmount("");
+      setDiscountDescription("");
+      setSelectedClientId("");
+      setSelectedClientName("");
     }
-  }, [open, existingInvoiceId, packageType, sessionsTotal, pricePerSession]);
+  }, [open, existingInvoiceId]);
 
   const generateMutation = trpc.invoices.generate.useMutation({
     onSuccess: (data) => {
@@ -136,7 +165,7 @@ export function InvoiceModal({
       utils.invoices.listByTrainer.invalidate();
       if (packageId) utils.invoices.listByPackage.invalidate({ packageId });
     },
-    onError: (e) => toast.error(`Failed to save invoice: ${e.message}`),
+    onError: (e) => toast.error(`Save failed: ${e.message}`),
   });
 
   const sendMutation = trpc.invoices.send.useMutation({
@@ -145,22 +174,13 @@ export function InvoiceModal({
       setStatus("sent");
       utils.invoices.listByTrainer.invalidate();
       if (packageId) utils.invoices.listByPackage.invalidate({ packageId });
-      onOpenChange(false);
     },
-    onError: (e) => toast.error(`Failed to send invoice: ${e.message}`),
+    onError: (e) => toast.error(`Send failed: ${e.message}`),
   });
 
-  // ── Calculations ─────────────────────────────────────────────────────────────
-
-  function recalcItem(items: LineItem[], index: number): LineItem[] {
-    return items.map((item, i) =>
-      i === index
-        ? { ...item, total: Math.round(item.quantity * item.unitPrice * 100) / 100 }
-        : item
-    );
-  }
-
-  const total = Math.round(lineItems.reduce((s, i) => s + i.total, 0) * 100) / 100;
+  const subtotal = Math.round(lineItems.reduce((s, i) => s + i.total, 0) * 100) / 100;
+  const discountNum = parseFloat(discountAmount) || 0;
+  const total = Math.max(0, Math.round((subtotal - discountNum) * 100) / 100);
 
   function fmt(n: number) {
     return `${currency} ${n.toFixed(2)}`;
@@ -169,10 +189,15 @@ export function InvoiceModal({
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
   async function handleGenerate() {
+    const resolvedClientId = isPAYG ? parseInt(selectedClientId) : clientId;
+    if (!resolvedClientId) {
+      toast.error("Please select a client");
+      return;
+    }
     setIsGenerating(true);
     try {
       await generateMutation.mutateAsync({
-        clientId,
+        clientId: resolvedClientId,
         packageId,
         packageType,
         sessionsTotal,
@@ -180,6 +205,9 @@ export function InvoiceModal({
         currency,
         notes: notes || undefined,
         dueDate: dueDate || undefined,
+        serviceType: serviceType && serviceType !== "_none" ? serviceType : undefined,
+        discountAmount: discountNum > 0 ? discountNum : undefined,
+        discountDescription: discountDescription || undefined,
       });
     } finally {
       setIsGenerating(false);
@@ -195,6 +223,9 @@ export function InvoiceModal({
       notes: notes || null,
       dueDate: dueDate || null,
       currency,
+      serviceType: serviceType && serviceType !== "_none" ? serviceType : null,
+      discountAmount: discountNum > 0 ? discountNum : null,
+      discountDescription: discountDescription || null,
     });
   }
 
@@ -203,7 +234,6 @@ export function InvoiceModal({
       toast.error("Save the invoice first before sending");
       return;
     }
-    // Save latest edits first
     await updateMutation.mutateAsync({
       invoiceId,
       lineItems,
@@ -211,6 +241,9 @@ export function InvoiceModal({
       notes: notes || null,
       dueDate: dueDate || null,
       currency,
+      serviceType: serviceType && serviceType !== "_none" ? serviceType : null,
+      discountAmount: discountNum > 0 ? discountNum : null,
+      discountDescription: discountDescription || null,
     });
     setIsSending(true);
     try {
@@ -236,6 +269,7 @@ export function InvoiceModal({
   }
 
   const isSent = status === "sent";
+  const resolvedClientName = isPAYG ? selectedClientName : clientName;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -249,8 +283,8 @@ export function InvoiceModal({
             {isSent
               ? "This invoice has been sent."
               : invoiceId
-              ? `Draft invoice for ${clientName}. Edit details then send.`
-              : `Create an invoice for ${clientName}.`}
+              ? `Draft invoice for ${resolvedClientName}. Edit details then send.`
+              : `Create an invoice${resolvedClientName ? ` for ${resolvedClientName}` : ""}.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -274,6 +308,50 @@ export function InvoiceModal({
               )}
             </div>
           )}
+
+          {/* PAYG: client selector */}
+          {isPAYG && !invoiceId && (
+            <div className="space-y-1.5">
+              <Label>Client</Label>
+              <Select
+                value={selectedClientId}
+                onValueChange={(val) => {
+                  setSelectedClientId(val);
+                  const c = clients.find((cl: any) => String(cl.id) === val);
+                  setSelectedClientName(c ? c.name : "");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a client…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((c: any) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Service Type */}
+          <div className="space-y-1.5">
+            <Label>Service Type <span className="text-muted-foreground font-normal">(optional)</span></Label>
+            <Select value={serviceType || "_none"} onValueChange={(v) => setServiceType(v === "_none" ? "" : v)} disabled={isSent}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select service type…" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">— None —</SelectItem>
+                {serviceTypes.map((st: any) => (
+                  <SelectItem key={st.id} value={st.name}>
+                    {st.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Currency + Due Date */}
           <div className="grid grid-cols-2 gap-4">
@@ -382,10 +460,50 @@ export function InvoiceModal({
             )}
           </div>
 
-          {/* Total */}
+          {/* Discount */}
+          {!isSent && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Discount Amount <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="0.00"
+                  value={discountAmount}
+                  onChange={(e) => setDiscountAmount(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Discount Description <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Input
+                  placeholder="e.g. Loyalty discount"
+                  value={discountDescription}
+                  onChange={(e) => setDiscountDescription(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          {isSent && discountNum > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Discount applied: {fmt(discountNum)}{discountDescription ? ` — ${discountDescription}` : ""}
+            </div>
+          )}
+
+          {/* Totals */}
           <div className="border-t pt-3 flex justify-end">
-            <div className="text-right">
-              <div className="flex justify-between gap-12 text-base font-semibold">
+            <div className="text-right space-y-1 min-w-[200px]">
+              <div className="flex justify-between gap-12 text-sm text-muted-foreground">
+                <span>Subtotal</span>
+                <span>{fmt(subtotal)}</span>
+              </div>
+              {discountNum > 0 && (
+                <div className="flex justify-between gap-12 text-sm text-green-700">
+                  <span>Discount{discountDescription ? ` (${discountDescription})` : ""}</span>
+                  <span>− {fmt(discountNum)}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-12 text-base font-semibold border-t pt-1">
                 <span>Total</span>
                 <span className="text-primary">{fmt(total)}</span>
               </div>

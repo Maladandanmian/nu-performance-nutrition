@@ -7,12 +7,12 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { drizzle } from "drizzle-orm/mysql2";
-import { eq, and, gte, lte, ne, isNotNull, asc } from "drizzle-orm";
-import { invoices, trainingSessions, clients, sessionPackages, serviceTypes } from "../drizzle/schema";
+import { eq, and, gte, lte, ne, isNotNull } from "drizzle-orm";
+import { invoices, trainingSessions, clients, sessionPackages } from "../drizzle/schema";
 import * as businessCostsDb from "./businessCostsDb";
 import * as invoiceDb from "./invoiceDb";
 
-const LUKE_EMAIL = "luke@nuperformancecoaching.com";
+const LUKE_EMAIL = "lukusdavey@gmail.com";
 
 // Luke-only procedure
 const lukeProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -368,17 +368,4 @@ export const accountingRouter = router({
       await businessCostsDb.confirmMonth(ctx.user.id, input.month);
       return { success: true };
     }),
-
-  listServiceTypes: lukeProcedure.query(async ({ ctx }) => {
-    const db = await getDb();
-    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-
-    const types = await db
-      .select()
-      .from(serviceTypes)
-      .where(eq(serviceTypes.trainerId, ctx.user.id))
-      .orderBy(asc(serviceTypes.createdAt));
-
-    return types;
-  }),
 });

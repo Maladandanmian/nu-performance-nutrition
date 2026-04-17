@@ -14,7 +14,7 @@ import { ArrowLeft, BarChart3, CheckCircle, ChevronLeft, ChevronRight, Download,
 import { Link } from "wouter";
 import { toast } from "sonner";
 
-const LUKE_EMAIL = "luke@nuperformancecoaching.com";
+const LUKE_EMAIL = "lukusdavey@gmail.com";
 
 function formatHKD(amount: number) {
   return `HKD ${amount.toLocaleString("en-HK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -56,7 +56,7 @@ function TaxmanReport() {
 
   const [startDate, setStartDate] = useState(firstOfYear);
   const [endDate, setEndDate] = useState(today);
-  const [serviceFilter, setServiceFilter] = useState("__all__");
+  const [serviceFilter, setServiceFilter] = useState("");
   const [queryParams, setQueryParams] = useState({ startDate: firstOfYear, endDate: today, serviceType: "" });
 
   const { data, isLoading, error } = trpc.accounting.taxmanReport.useQuery({
@@ -65,10 +65,10 @@ function TaxmanReport() {
     serviceType: queryParams.serviceType || undefined,
   });
 
-  const { data: serviceTypes, isLoading: isLoadingServiceTypes } = trpc.accounting.listServiceTypes.useQuery();
+  const { data: serviceTypes } = trpc.invoices.listServiceTypes.useQuery();
 
   const handleRun = () => {
-    setQueryParams({ startDate, endDate, serviceType: serviceFilter === "__all__" ? "" : serviceFilter });
+    setQueryParams({ startDate, endDate, serviceType: serviceFilter });
   };
 
   const handleExportCSV = () => {
@@ -114,17 +114,15 @@ function TaxmanReport() {
             </div>
             <div>
               <Label>Service Type (optional)</Label>
-              <Select value={serviceFilter} onValueChange={setServiceFilter} disabled={isLoadingServiceTypes}>
+              <Select value={serviceFilter} onValueChange={setServiceFilter}>
                 <SelectTrigger>
-                  <SelectValue placeholder={isLoadingServiceTypes ? "Loading..." : "All services"} />
+                  <SelectValue placeholder="All services" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">All services</SelectItem>
-                  {serviceTypes && serviceTypes.length > 0 && (
-                    serviceTypes.map((st) => (
-                      <SelectItem key={st.id} value={st.name}>{st.name}</SelectItem>
-                    ))
-                  )}
+                  <SelectItem value="">All services</SelectItem>
+                  {serviceTypes?.map((st) => (
+                    <SelectItem key={st.id} value={st.name}>{st.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceModal } from "@/components/InvoiceModal";
-import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle, RefreshCw, Plus } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -31,6 +31,7 @@ export default function Invoices() {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [viewingInvoiceId, setViewingInvoiceId] = useState<number | null>(null);
+  const [showPAYGModal, setShowPAYGModal] = useState(false);
 
   const utils = trpc.useUtils();
 
@@ -84,9 +85,13 @@ export default function Invoices() {
         <div>
           <h1 className="text-2xl font-bold">Invoices</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            All invoices generated from client packages
+            All invoices — package-based and PAYG services
           </p>
         </div>
+        <Button onClick={() => setShowPAYGModal(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
+          New Invoice
+        </Button>
       </div>
 
       {/* Stats */}
@@ -130,7 +135,7 @@ export default function Invoices() {
             <p className="text-sm text-muted-foreground py-4">Loading invoices…</p>
           ) : filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4">
-              {search ? "No invoices match your search." : "No invoices yet. Generate one from a client package."}
+              {search ? "No invoices match your search." : "No invoices yet. Use 'New Invoice' to create one, or generate from a client package."}
             </p>
           ) : (
             <div className="overflow-x-auto">
@@ -231,6 +236,14 @@ export default function Invoices() {
           existingInvoiceId={viewingInvoiceId}
         />
       )}
+
+      {/* Create new PAYG invoice */}
+      <InvoiceModal
+        open={showPAYGModal}
+        onOpenChange={setShowPAYGModal}
+        clientId={0}
+        clientName=""
+      />
     </div>
   );
 }
