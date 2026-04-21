@@ -56,6 +56,11 @@ export default function ClientDetail() {
   const [clientHeight, setClientHeight] = useState("");
   const [clientGender, setClientGender] = useState<"male" | "female" | "other" | "">("");
   const [sendVerification, setSendVerification] = useState(false);
+  
+  // Body metrics entry state
+  const [isAddBodyMetricOpen, setIsAddBodyMetricOpen] = useState(false);
+  const [bodyWeight, setBodyWeight] = useState("");
+  const [bodyMetricNotes, setBodyMetricNotes] = useState("");
 
   const utils = trpc.useUtils();
   const { data: client, isLoading: clientLoading } = trpc.clients.get.useQuery(
@@ -97,6 +102,19 @@ export default function ClientDetail() {
     },
     onError: (error) => {
       toast.error(`Failed to delete meal: ${error.message}`);
+    },
+  });
+
+  const addBodyMetricMutation = trpc.bodyMetrics.create.useMutation({
+    onSuccess: () => {
+      toast.success("Bodyweight recorded successfully!");
+      utils.bodyMetrics.list.invalidate({ clientId: clientId! });
+      setIsAddBodyMetricOpen(false);
+      setBodyWeight("");
+      setBodyMetricNotes("");
+    },
+    onError: (error) => {
+      toast.error(`Failed to record bodyweight: ${error.message}`);
     },
   });
 
@@ -204,7 +222,7 @@ export default function ClientDetail() {
 
   // Prepare chart data for nutrition trends
   const nutritionChartData = meals?.slice(-7).map((meal) => ({
-    date: new Date(meal.loggedAt).toLocaleDateString(),
+    date: new Date(meal.loggedAt).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong" }),
     calories: meal.calories || 0,
     protein: meal.protein || 0,
     fat: meal.fat || 0,
@@ -215,7 +233,7 @@ export default function ClientDetail() {
 
   // Prepare chart data for body metrics
   const bodyMetricsChartData = bodyMetrics?.slice(-7).map((metric) => ({
-    date: new Date(metric.recordedAt).toLocaleDateString(),
+    date: new Date(metric.recordedAt).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong" }),
     weight: metric.weight ? metric.weight / 10 : 0, // Convert back from integer storage
     hydration: metric.hydration || 0,
   })) || [];
@@ -561,8 +579,75 @@ export default function ClientDetail() {
             <TabsContent value="body" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Weight Trend</CardTitle>
-                  <CardDescription>Last 7 recordings</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Weight Trend</CardTitle>
+                      <CardDescription>Last 7 recordings</CardDescription>
+                    </div>
+                    <Dialog open={isAddBodyMetricOpen} onOpenChange={setIsAddBodyMetricOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          size="sm" 
+                          style={{backgroundColor: '#578DB3'}}
+                          className="hover:opacity-90"
+                        >
+                          <TrendingUp className="h-4 w-4 mr-2" />
+                          Add Bodyweight
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Record Bodyweight</DialogTitle>
+                        <DialogDescription>
+                            Enter {client?.name}'s current bodyweight
+                        </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="bodyWeight">Weight (kg)</Label>
+                            <Input
+                              id="bodyWeight"
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g., 75.5"
+                              value={bodyWeight}
+                              onChange={(e) => setBodyWeight(e.target.value)}
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="bodyMetricNotes">Notes (optional)</Label>
+                            <Input
+                              id="bodyMetricNotes"
+                              type="text"
+                              placeholder="e.g., Morning measurement"
+                              value={bodyMetricNotes}
+                              onChange={(e) => setBodyMetricNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            onClick={() => {
+                              const weight = bodyWeight ? parseFloat(bodyWeight) : undefined;
+                              if (!weight) {
+                                toast.error("Please enter a weight");
+                                return;
+                              }
+                              addBodyMetricMutation.mutate({
+                                clientId: clientId!,
+                                weight,
+                                notes: bodyMetricNotes || undefined,
+                              });
+                            }}
+                            disabled={addBodyMetricMutation.isPending}
+                            style={{backgroundColor: '#578DB3'}}
+                            className="w-full hover:opacity-90"
+                          >
+                            {addBodyMetricMutation.isPending ? "Recording..." : "Record Bodyweight"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {bodyMetricsChartData.length > 0 ? (

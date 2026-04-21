@@ -44,6 +44,16 @@ interface InvoiceModalProps {
 
 const CURRENCIES = ["HKD", "USD", "GBP", "EUR", "AUD", "SGD"];
 
+/** Temporary standard pricing for service types (HKD) — Luke can edit these per invoice */
+const SERVICE_TYPE_PRICING: Record<string, { unitPrice: number; quantity?: number }> = {
+  "PT Package": { unitPrice: 950, quantity: 10 }, // 10 sessions × HKD 950
+  "PT PAYG": { unitPrice: 950 }, // Single session
+  "Nutrition Consult": { unitPrice: 500 },
+  "Monthly Online Gym Program": { unitPrice: 300 },
+  "One Month Nutrition Coaching": { unitPrice: 800 },
+  "Three Month Nutrition Coaching": { unitPrice: 2000 },
+};
+
 /** Returns a date string YYYY-MM-DD for today + n days */
 function dateInDays(n: number): string {
   const d = new Date();
@@ -130,12 +140,23 @@ export function InvoiceModal({
     }
   }, [existingInvoice]);
 
-  // Reset when opening for a new invoice
+  // Reset when opening for a new invoice, pre-populate line items from package
   useEffect(() => {
     if (open && !existingInvoiceId) {
       setInvoiceId(null);
       setInvoiceNumber("");
-      setLineItems([]);
+      // Pre-populate line items from package props if available
+      if (packageType && sessionsTotal) {
+        const unitPrice = pricePerSession ?? 0;
+        setLineItems([{
+          description: packageType,
+          quantity: sessionsTotal,
+          unitPrice,
+          total: Math.round(sessionsTotal * unitPrice * 100) / 100,
+        }]);
+      } else {
+        setLineItems([]);
+      }
       setCurrency("HKD");
       setNotes("");
       setDueDate(dateInDays(14));
@@ -146,7 +167,7 @@ export function InvoiceModal({
       setSelectedClientId("");
       setSelectedClientName("");
     }
-  }, [open, existingInvoiceId]);
+  }, [open, existingInvoiceId, packageType, sessionsTotal, pricePerSession]);
 
   const generateMutation = trpc.invoices.generate.useMutation({
     onSuccess: (data) => {
@@ -186,6 +207,26 @@ export function InvoiceModal({
     return `${currency} ${n.toFixed(2)}`;
   }
 
+  // Auto-populate line item when service type is selected
+  useEffect(() => {
+    if (serviceType && serviceType !== "_none" && !existingInvoiceId) {
+      const pricing = SERVICE_TYPE_PRICING[serviceType];
+      if (pricing) {
+        const qty = pricing.quantity ?? 1;
+        const total = Math.round(qty * pricing.unitPrice * 100) / 100;
+        const description = pricing.quantity
+          ? `${serviceType} - ${pricing.quantity} sessions`
+          : serviceType;
+        setLineItems([{
+          description,
+          quantity: qty,
+          unitPrice: pricing.unitPrice,
+          total,
+        }]);
+      }
+    }
+  }, [serviceType, existingInvoiceId]);
+
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
   async function handleGenerate() {
@@ -194,14 +235,18 @@ export function InvoiceModal({
       toast.error("Please select a client");
       return;
     }
+    if (lineItems.length === 0) {
+      toast.error("Add at least one line item before creating the invoice");
+      return;
+    }
     setIsGenerating(true);
     try {
-      await generateMutation.mutateAsync({
+      // Create invoice with the line items already built in the modal
+      const invoiceData = await generateMutation.mutateAsync({
         clientId: resolvedClientId,
         packageId,
-        packageType,
-        sessionsTotal,
-        pricePerSession,
+        lineItems: lineItems.length > 0 ? lineItems : undefined,
+        // Don't pass packageType/sessionsTotal/pricePerSession — line items are already set
         currency,
         notes: notes || undefined,
         dueDate: dueDate || undefined,
@@ -209,6 +254,20 @@ export function InvoiceModal({
         discountAmount: discountNum > 0 ? discountNum : undefined,
         discountDescription: discountDescription || undefined,
       });
+      // After creation, update the invoice with the pre-built line items
+      if (invoiceData?.invoiceId && lineItems.length > 0) {
+        await updateMutation.mutateAsync({
+          invoiceId: invoiceData.invoiceId,
+          lineItems,
+          taxRate: 0,
+          notes: notes || null,
+          dueDate: dueDate || null,
+          currency,
+          serviceType: serviceType && serviceType !== "_none" ? serviceType : null,
+          discountAmount: discountNum > 0 ? discountNum : null,
+          discountDescription: discountDescription || null,
+        });
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -344,11 +403,16 @@ export function InvoiceModal({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_none">— None —</SelectItem>
-                {serviceTypes.map((st: any) => (
-                  <SelectItem key={st.id} value={st.name}>
-                    {st.name}
-                  </SelectItem>
-                ))}
+                {serviceTypes.map((st: any) => {
+                  const pricing = SERVICE_TYPE_PRICING[st.name];
+                  const displayPrice = pricing ? `${currency} ${pricing.unitPrice.toFixed(2)}` : "";
+                  const displayQty = pricing?.quantity ? ` × ${pricing.quantity}` : "";
+                  return (
+                    <SelectItem key={st.id} value={st.name}>
+                      {st.name} {displayPrice && `(${displayPrice}${displayQty})`}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -379,7 +443,7 @@ export function InvoiceModal({
             </div>
           </div>
 
-          {/* Line Items */}
+          {/* Line Items — visible before and after creation */}
           <div className="space-y-2">
             <Label>Line Items</Label>
             <div className="rounded-md border overflow-hidden">
@@ -394,6 +458,13 @@ export function InvoiceModal({
                   </tr>
                 </thead>
                 <tbody>
+                  {lineItems.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-4 text-center text-sm text-muted-foreground">
+                        No line items yet — add one below.
+                      </td>
+                    </tr>
+                  )}
                   {lineItems.map((item, index) => (
                     <tr key={index} className="border-t">
                       <td className="px-2 py-1.5">
@@ -457,6 +528,11 @@ export function InvoiceModal({
                 <Plus className="h-3.5 w-3.5" />
                 Add Line Item
               </Button>
+            )}
+            {!invoiceId && lineItems.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                Add at least one line item before creating the invoice.
+              </p>
             )}
           </div>
 

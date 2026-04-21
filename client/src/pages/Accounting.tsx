@@ -14,7 +14,7 @@ import { ArrowLeft, BarChart3, CheckCircle, ChevronLeft, ChevronRight, Download,
 import { Link } from "wouter";
 import { toast } from "sonner";
 
-const LUKE_EMAIL = "lukusdavey@gmail.com";
+const LUKE_EMAIL = "luke@nuperformancecoaching.com";
 
 function formatHKD(amount: number) {
   return `HKD ${amount.toLocaleString("en-HK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -22,7 +22,7 @@ function formatHKD(amount: number) {
 
 function formatDate(d: Date | string | null | undefined) {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(d).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", day: "numeric", month: "short", year: "numeric" });
 }
 
 function currentMonthStr() {
@@ -32,7 +32,7 @@ function currentMonthStr() {
 
 function monthLabel(ym: string) {
   const [y, m] = ym.split("-").map(Number);
-  return new Date(y, m - 1, 1).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  return new Date(y, m - 1, 1).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", month: "long", year: "numeric" });
 }
 
 function prevMonth(ym: string) {
@@ -56,16 +56,16 @@ function TaxmanReport() {
 
   const [startDate, setStartDate] = useState(firstOfYear);
   const [endDate, setEndDate] = useState(today);
-  const [serviceFilter, setServiceFilter] = useState("");
-  const [queryParams, setQueryParams] = useState({ startDate: firstOfYear, endDate: today, serviceType: "" });
+  const [serviceFilter, setServiceFilter] = useState("_all");
+  const [queryParams, setQueryParams] = useState({ startDate: firstOfYear, endDate: today, serviceType: "_all" });
 
   const { data, isLoading, error } = trpc.accounting.taxmanReport.useQuery({
     startDate: queryParams.startDate,
     endDate: queryParams.endDate,
-    serviceType: queryParams.serviceType || undefined,
+    serviceType: queryParams.serviceType === "_all" ? undefined : queryParams.serviceType,
   });
 
-  const { data: serviceTypes } = trpc.invoices.listServiceTypes.useQuery();
+  const { data: serviceTypes, isLoading: serviceTypesLoading, error: serviceTypesError } = trpc.invoices.listServiceTypes.useQuery();
 
   const handleRun = () => {
     setQueryParams({ startDate, endDate, serviceType: serviceFilter });
@@ -114,17 +114,25 @@ function TaxmanReport() {
             </div>
             <div>
               <Label>Service Type (optional)</Label>
-              <Select value={serviceFilter} onValueChange={setServiceFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All services" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All services</SelectItem>
-                  {serviceTypes?.map((st) => (
-                    <SelectItem key={st.id} value={st.name}>{st.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {serviceTypesError ? (
+                <p className="text-red-500 text-sm">Error loading service types</p>
+              ) : (
+                <Select value={serviceFilter} onValueChange={setServiceFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All services" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_all">All services</SelectItem>
+                    {serviceTypes && serviceTypes.length > 0 ? (
+                      serviceTypes.map((st) => (
+                        <SelectItem key={st.id} value={st.name}>{st.name}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="_none" disabled>No service types available</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <Button onClick={handleRun} style={{ backgroundColor: "#578DB3" }} className="hover:opacity-90">
               Run Report

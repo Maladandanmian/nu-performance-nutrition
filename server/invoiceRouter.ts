@@ -7,14 +7,6 @@ import * as db from "./db";
 import { sendInvoiceEmail } from "./invoiceEmailService";
 import { InvoiceLineItem } from "../drizzle/schema";
 
-// Admin-only procedure for trainers
-const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Only trainers can access this resource" });
-  }
-  return next({ ctx });
-});
-
 const lineItemSchema = z.object({
   description: z.string().min(1),
   quantity: z.number().min(0),
@@ -27,7 +19,7 @@ export const invoiceRouter = router({
    * Generate a draft invoice pre-populated from a package
    * Returns the new invoice ID
    */
-  generate: adminProcedure
+  generate: protectedProcedure
     .input(
       z.object({
         clientId: z.number(),
@@ -35,6 +27,12 @@ export const invoiceRouter = router({
         packageType: z.string().optional(),
         sessionsTotal: z.number().optional(),
         pricePerSession: z.number().optional(),
+        lineItems: z.array(z.object({
+          description: z.string(),
+          quantity: z.number(),
+          unitPrice: z.number(),
+          total: z.number(),
+        })).optional(),
         currency: z.string().default("HKD"),
         notes: z.string().optional(),
         dueDate: z.string().optional(), // YYYY-MM-DD
@@ -46,9 +44,9 @@ export const invoiceRouter = router({
     .mutation(async ({ ctx, input }) => {
       const invoiceNumber = await invoiceDb.generateInvoiceNumber();
 
-      // Build default line item from package
-      const lineItems: InvoiceLineItem[] = [];
-      if (input.packageType && input.sessionsTotal) {
+      // Use provided line items, or build from package data
+      let lineItems: InvoiceLineItem[] = input.lineItems ?? [];
+      if (lineItems.length === 0 && input.packageType && input.sessionsTotal) {
         const unitPrice = input.pricePerSession ?? 0;
         lineItems.push({
           description: input.packageType,
@@ -67,7 +65,7 @@ export const invoiceRouter = router({
         clientId: input.clientId,
         packageId: input.packageId ?? null,
         invoiceNumber,
-        lineItems,
+        lineItems: JSON.stringify(lineItems) as any,
         subtotal: String(subtotal) as any,
         taxRate: "0.00" as any,
         taxAmount: String(taxAmount) as any,
@@ -75,7 +73,7 @@ export const invoiceRouter = router({
         currency: input.currency,
         status: "draft",
         notes: input.notes ?? null,
-        dueDate: input.dueDate ? new Date(input.dueDate) : null,
+        dueDate: input.dueDate ?? null,
         serviceType: input.serviceType ?? null,
         discountAmount: input.discountAmount != null ? String(input.discountAmount) as any : null,
         discountDescription: input.discountDescription ?? null,
@@ -87,7 +85,7 @@ export const invoiceRouter = router({
   /**
    * Update invoice line items and recalculate totals
    */
-  update: adminProcedure
+  update: protectedProcedure
     .input(
       z.object({
         invoiceId: z.number(),
@@ -115,13 +113,13 @@ export const invoiceRouter = router({
       const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(lineItems, taxRate, discountAmount);
 
       await invoiceDb.updateInvoice(input.invoiceId, {
-        lineItems,
+        lineItems: JSON.stringify(lineItems) as any,
         subtotal: String(subtotal) as any,
         taxRate: String(taxRate) as any,
         taxAmount: String(taxAmount) as any,
         total: String(total) as any,
         notes: input.notes !== undefined ? input.notes : existing.notes,
-        dueDate: input.dueDate !== undefined ? (input.dueDate ? new Date(input.dueDate) : null) : existing.dueDate,
+        dueDate: input.dueDate !== undefined ? (input.dueDate ?? null) : (existing.dueDate ?? null),
         currency: input.currency ?? existing.currency,
         serviceType: input.serviceType !== undefined ? input.serviceType : existing.serviceType,
         discountAmount: input.discountAmount !== undefined ? (input.discountAmount != null ? String(input.discountAmount) as any : null) : existing.discountAmount,
@@ -134,7 +132,7 @@ export const invoiceRouter = router({
   /**
    * Send invoice to client via email and mark as sent
    */
-  send: adminProcedure
+  send: protectedProcedure
     .input(z.object({ invoiceId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
@@ -181,7 +179,7 @@ export const invoiceRouter = router({
   /**
    * Resend an existing invoice to the client (reuses the same invoice number)
    */
-  resend: adminProcedure
+  resend: protectedProcedure
     .input(z.object({ invoiceId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
@@ -233,14 +231,14 @@ export const invoiceRouter = router({
   /**
    * Get all invoices for the trainer (for the invoices monitoring page)
    */
-  listByTrainer: adminProcedure.query(async ({ ctx }) => {
+  listByTrainer: protectedProcedure.query(async ({ ctx }) => {
     return invoiceDb.getInvoicesByTrainer(ctx.user.id);
   }),
 
   /**
    * Get invoices for a specific client
    */
-  listByClient: adminProcedure
+  listByClient: protectedProcedure
     .input(z.object({ clientId: z.number() }))
     .query(async ({ input }) => {
       return invoiceDb.getInvoicesByClient(input.clientId);
@@ -249,7 +247,7 @@ export const invoiceRouter = router({
   /**
    * Get invoices for a specific package
    */
-  listByPackage: adminProcedure
+  listByPackage: protectedProcedure
     .input(z.object({ packageId: z.number() }))
     .query(async ({ input }) => {
       return invoiceDb.getInvoicesByPackage(input.packageId);
@@ -258,7 +256,7 @@ export const invoiceRouter = router({
   /**
    * Get a single invoice by ID
    */
-  getById: adminProcedure
+  getById: protectedProcedure
     .input(z.object({ invoiceId: z.number() }))
     .query(async ({ input }) => {
       const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
@@ -271,7 +269,7 @@ export const invoiceRouter = router({
   /**
    * Mark a sent invoice as paid
    */
-  markPaid: adminProcedure
+  markPaid: protectedProcedure
     .input(z.object({ invoiceId: z.number() }))
     .mutation(async ({ input }) => {
       const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
@@ -291,7 +289,7 @@ export const invoiceRouter = router({
   /**
    * Delete a draft invoice
    */
-  delete: adminProcedure
+  delete: protectedProcedure
     .input(z.object({ invoiceId: z.number() }))
     .mutation(async ({ input }) => {
       const invoice = await invoiceDb.getInvoiceById(input.invoiceId);
@@ -313,14 +311,14 @@ export const invoiceRouter = router({
   /**
    * List all service types for the trainer
    */
-  listServiceTypes: adminProcedure.query(async ({ ctx }) => {
+  listServiceTypes: protectedProcedure.query(async ({ ctx }) => {
     return invoiceDb.getServiceTypes(ctx.user.id);
   }),
 
   /**
    * Create a new service type (name is immutable once created)
    */
-  createServiceType: adminProcedure
+  createServiceType: protectedProcedure
     .input(z.object({ name: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
       const id = await invoiceDb.createServiceType(ctx.user.id, input.name.trim());
@@ -330,7 +328,7 @@ export const invoiceRouter = router({
   /**
    * Delete a service type (only if unused on invoices)
    */
-  deleteServiceType: adminProcedure
+  deleteServiceType: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       await invoiceDb.deleteServiceType(input.id, ctx.user.id);

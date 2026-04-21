@@ -175,7 +175,7 @@ export default function TrainerNotifications() {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
-    return new Date(date).toLocaleDateString();
+    return new Date(date).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong" });
   };
 
   // Redirect non-authenticated users

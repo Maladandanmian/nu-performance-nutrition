@@ -830,7 +830,7 @@ export const invoices = mysqlTable("invoices", {
   currency: varchar("currency", { length: 3 }).default("HKD").notNull(),
   status: mysqlEnum("status", ["draft", "sent", "paid", "cancelled"]).default("draft").notNull(),
   notes: text("notes"), // Optional notes/payment instructions on invoice
-  dueDate: date("dueDate"), // Optional payment due date
+  dueDate: varchar("dueDate", { length: 10 }), // YYYY-MM-DD string — avoids MySQL date serialisation issues with Drizzle
   sentAt: timestamp("sentAt"), // When the invoice was emailed to the client
   paidAt: timestamp("paidAt"), // When the invoice was marked as paid
   // Accounting fields
@@ -859,6 +859,7 @@ export const serviceTypes = mysqlTable("service_types", {
   id: int("id").autoincrement().primaryKey(),
   trainerId: int("trainerId").notNull().references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 100 }).notNull(), // e.g. "PT Package"
+  standardPrice: decimal("standardPrice", { precision: 10, scale: 2 }).default("0"), // Standard price for this service type
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

@@ -239,7 +239,7 @@ export default function TrainerDashboard() {
                 Invoices
               </Button>
             </Link>
-            {user?.email === "lukusdavey@gmail.com" && (
+            {user?.email === "luke@nuperformancecoaching.com" && (
               <Link href="/trainer/accounting">
                 <Button
                   variant="ghost"

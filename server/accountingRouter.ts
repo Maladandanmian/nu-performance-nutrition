@@ -1,6 +1,6 @@
 /**
  * Accounting Router
- * All procedures are restricted to Luke's email address (lukusdavey@gmail.com).
+ * All procedures are restricted to Luke's email address (luke@nuperformancecoaching.com).
  * This router handles: Taxman Report, Monthly Overview (costs), Remaining Packages report.
  */
 import { router, protectedProcedure } from "./_core/trpc";
@@ -12,7 +12,7 @@ import { invoices, trainingSessions, clients, sessionPackages } from "../drizzle
 import * as businessCostsDb from "./businessCostsDb";
 import * as invoiceDb from "./invoiceDb";
 
-const LUKE_EMAIL = "lukusdavey@gmail.com";
+const LUKE_EMAIL = "luke@nuperformancecoaching.com";
 
 // Luke-only procedure
 const lukeProcedure = protectedProcedure.use(({ ctx, next }) => {

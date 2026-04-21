@@ -24,7 +24,7 @@ function formatCurrency(amount: number | string, currency: string) {
 
 function formatDate(d: Date | string | null | undefined, opts?: Intl.DateTimeFormatOptions) {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-GB", opts ?? { day: "numeric", month: "short" });
+  return new Date(d).toLocaleDateString("en-GB", { timeZone: "Asia/Hong_Kong", ...(opts ?? { day: "numeric", month: "short" }) });
 }
 
 export default function Invoices() {
