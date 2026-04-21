@@ -33,15 +33,7 @@ export async function generateInvoiceNumber(): Promise<string> {
     r.invoiceNumber.startsWith(prefix)
   );
 
-  // Extract the max sequence number from existing invoices, not the count
-  let maxSeq = 0;
-  for (const inv of thisYearInvoices) {
-    const seqStr = inv.invoiceNumber.replace(prefix, "");
-    const seq = parseInt(seqStr, 10);
-    if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
-  }
-
-  const nextSeq = maxSeq + 1;
+  const nextSeq = thisYearInvoices.length + 1;
   return `${prefix}${String(nextSeq).padStart(4, "0")}`;
 }
 

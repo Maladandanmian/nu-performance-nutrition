@@ -65,7 +65,7 @@ export const invoiceRouter = router({
         clientId: input.clientId,
         packageId: input.packageId ?? null,
         invoiceNumber,
-        lineItems: lineItems as any,
+        lineItems: JSON.stringify(lineItems) as any,
         subtotal: String(subtotal) as any,
         taxRate: "0.00" as any,
         taxAmount: String(taxAmount) as any,
@@ -113,7 +113,7 @@ export const invoiceRouter = router({
       const { subtotal, taxAmount, total } = invoiceDb.calculateInvoiceTotals(lineItems, taxRate, discountAmount);
 
       await invoiceDb.updateInvoice(input.invoiceId, {
-        lineItems: lineItems as any,
+        lineItems: JSON.stringify(lineItems) as any,
         subtotal: String(subtotal) as any,
         taxRate: String(taxRate) as any,
         taxAmount: String(taxAmount) as any,
