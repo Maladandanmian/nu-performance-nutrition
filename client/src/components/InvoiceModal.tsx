@@ -107,9 +107,10 @@ export function InvoiceModal({
     enabled: isPAYG && open,
   });
 
-  const { data: serviceTypes = [] } = trpc.invoices.listServiceTypes.useQuery(undefined, {
+  const { data: serviceTypes = [], error: serviceTypesError } = trpc.invoices.listServiceTypes.useQuery(undefined, {
     enabled: open,
   });
+  if (serviceTypesError) console.error('[InvoiceModal] listServiceTypes error:', serviceTypesError.message, serviceTypesError.data?.code);
 
   // Load existing invoice
   const { data: existingInvoice } = trpc.invoices.getById.useQuery(
