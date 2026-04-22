@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceModal } from "@/components/InvoiceModal";
-import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle, RefreshCw, Plus } from "lucide-react";
+import { ArrowLeft, FileText, Search, Send, Eye, CheckCircle, RefreshCw, Plus, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -53,6 +53,14 @@ export default function Invoices() {
       utils.invoices.listByTrainer.invalidate();
     },
     onError: (e) => toast.error(`Resend failed: ${e.message}`),
+  });
+
+  const deleteMutation = trpc.invoices.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Invoice deleted");
+      utils.invoices.listByTrainer.invalidate();
+    },
+    onError: (e) => toast.error(`Delete failed: ${e.message}`),
   });
 
   const filtered = invoices.filter((inv) => {
@@ -215,6 +223,23 @@ export default function Invoices() {
                               <><Eye className="h-3 w-3" />View</>
                             )}
                           </Button>
+                          {inv.status === "draft" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 gap-1.5 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => {
+                                if (confirm(`Delete ${inv.invoiceNumber}? This cannot be undone.`)) {
+                                  deleteMutation.mutate({ invoiceId: inv.id });
+                                }
+                              }}
+                              disabled={deleteMutation.isPending}
+                              title="Delete this draft invoice"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Delete
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
