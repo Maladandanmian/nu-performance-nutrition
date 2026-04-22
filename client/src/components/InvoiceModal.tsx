@@ -102,15 +102,15 @@ export function InvoiceModal({
   const isPAYG = !packageId && clientId === 0;
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [selectedClientName, setSelectedClientName] = useState<string>("");
+  const [confirmedClientName, setConfirmedClientName] = useState<string>("");
 
   const { data: clients = [] } = trpc.clients.list.useQuery(undefined, {
     enabled: isPAYG && open,
   });
 
-  const { data: serviceTypes = [], error: serviceTypesError } = trpc.invoices.listServiceTypes.useQuery(undefined, {
+  const { data: serviceTypes = [] } = trpc.invoices.listServiceTypes.useQuery(undefined, {
     enabled: open,
   });
-  if (serviceTypesError) console.error('[InvoiceModal] listServiceTypes error:', serviceTypesError.message, serviceTypesError.data?.code);
 
   // Load existing invoice
   const { data: existingInvoice } = trpc.invoices.getById.useQuery(
@@ -167,6 +167,7 @@ export function InvoiceModal({
       setDiscountDescription("");
       setSelectedClientId("");
       setSelectedClientName("");
+      setConfirmedClientName("");
     }
   }, [open, existingInvoiceId, packageType, sessionsTotal, pricePerSession]);
 
@@ -236,6 +237,8 @@ export function InvoiceModal({
       toast.error("Please select a client");
       return;
     }
+    // Lock in the client name before mutation so it persists in the post-creation header
+    if (isPAYG && selectedClientName) setConfirmedClientName(selectedClientName);
     if (lineItems.length === 0) {
       toast.error("Add at least one line item before creating the invoice");
       return;
@@ -329,7 +332,7 @@ export function InvoiceModal({
   }
 
   const isSent = status === "sent";
-  const resolvedClientName = isPAYG ? selectedClientName : clientName;
+  const resolvedClientName = isPAYG ? (confirmedClientName || selectedClientName) : clientName;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
