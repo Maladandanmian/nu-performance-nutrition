@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
+import { runBackup } from "../backupService";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -12,6 +13,17 @@ export const systemRouter = router({
     .query(() => ({
       ok: true,
     })),
+
+  triggerBackup: adminProcedure
+    .mutation(async () => {
+      try {
+        await runBackup();
+        return { success: true, message: 'Backup completed and emailed successfully.' };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, message };
+      }
+    }),
 
   notifyOwner: adminProcedure
     .input(

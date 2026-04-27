@@ -42,7 +42,7 @@ function parseDbUrl(url: string) {
 /**
  * Perform the database dump and email it to the recipient.
  */
-async function runBackup(): Promise<void> {
+export async function runBackup(): Promise<void> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupFile = path.join(BACKUP_DIR, `backup-${timestamp}.sql`);
 
